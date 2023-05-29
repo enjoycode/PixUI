@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Platforms>AnyCPU;ARM64</Platforms>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\PixUI.Demo\PixUI.Demo.csproj" />
+		<ProjectReference Include="..\PixUI.Platform.Win\PixUI.Platform.Win.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="MaterialIconsOutlined.otf">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="MaterialIcons.ttf">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<Choose>
+		<When Condition=" '$(Platform)'=='ARM64' ">
+			<ItemGroup>
+				<Content Include="..\PixUI.Platform.Win\libs\arm64\skia.dll">
+					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+				</Content>
+				<Content Include="..\PixUI.Platform.Win\libs\arm64\icudtl.dat">
+					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+				</Content>
+				<Content Include="..\PixUI.CodeEditor\libs\win-arm64\tree-sitter.dll">
+					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+				</Content>
+				<Content Include="..\PixUI.CodeEditor\libs\win-arm64\tree-sitter-csharp.dll">
+					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+				</Content>
+			</ItemGroup>
+		</When>
+		<Otherwise>
+			<ItemGroup>
+				<Content Include="..\PixUI.Platform.Win\libs\x64\skia.dll">
+					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+				</Content>
+				<Content Include="..\PixUI.Platform.Win\libs\x64\icudtl.dat">
+					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+				</Content>
+				<Content Include="..\PixUI.CodeEditor\libs\win-x64\tree-sitter.dll">
+					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+				</Content>
+				<Content Include="..\PixUI.CodeEditor\libs\win-x64\tree-sitter-csharp.dll">
+					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+				</Content>
+			</ItemGroup>
+		</Otherwise>
+	</Choose>
+
+</Project>

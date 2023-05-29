@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>10</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="Icons\MaterialIcons-Regular.codepoints" />
+      <EmbeddedResource Include="MaterialIcons\MaterialIcons-Regular.codepoints" />
+      <None Remove="Icons\MaterialIconsOutlined-Regular.codepoints" />
+      <EmbeddedResource Include="MaterialIcons\MaterialIconsOutlined-Regular.codepoints" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <Nullable>enable</Nullable>
+        <LangVersion>10</LangVersion>
+        <Configurations>Debug;Release;DebugWeb</Configurations>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'DebugWeb' ">
+        <DefineConstants>TRACE;__WEB__</DefineConstants>
+        <DocumentationFile />
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\ext\LiveCharts2\src\LiveChartsCore\LiveChartsCore.csproj" />
+      <ProjectReference Include="..\PixUI.TSAttributes\PixUI.TSAttributes.csproj" />
+      <ProjectReference Include="..\PixUI\PixUI.csproj" />
+    </ItemGroup>
+
+</Project>

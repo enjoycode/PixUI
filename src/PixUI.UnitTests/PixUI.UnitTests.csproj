@@ -1,0 +1,120 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <LangVersion>10</LangVersion>
+        <Nullable>enable</Nullable>
+        <Configurations>Debug;Release;DebugWeb</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <OutputType>Library</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
+        <PackageReference Include="NUnit" Version="3.13.2" />
+        <PackageReference Include="NUnit3TestAdapter" Version="4.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\PixUI.CodeEditor\PixUI.CodeEditor.csproj" />
+      <ProjectReference Include="..\PixUI.CS2TS\PixUI.CS2TS.csproj" />
+      <ProjectReference Include="..\PixUI\PixUI.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Resources\TestCode\TestClass.cs" />
+      <None Include="Resources\TestCode\TestClass.cs" />
+      <Compile Remove="Resources\TestCode\TestInherits.cs" />
+      <None Include="Resources\TestCode\TestInherits.cs" />
+      <Compile Remove="Resources\TestCode\TestGeneric.cs" />
+      <None Include="Resources\TestCode\TestGeneric.cs" />
+      <Compile Remove="Resources\TestCode\TestForStatement.cs" />
+      <None Include="Resources\TestCode\TestForStatement.cs" />
+      <Compile Remove="Resources\TestCode\TestWhileStatement.cs" />
+      <None Include="Resources\TestCode\TestWhileStatement.cs" />
+      <Compile Remove="Resources\TestCode\TestStatic.cs" />
+      <None Include="Resources\TestCode\TestStatic.cs" />
+      <Compile Remove="Resources\TestCode\TestIfStatement.cs" />
+      <None Include="Resources\TestCode\TestIfStatement.cs" />
+      <Compile Remove="Resources\TestCode\TestLambda.cs" />
+      <None Include="Resources\TestCode\TestLambda.cs" />
+      <Compile Remove="Resources\TestCode\TestProperty.cs" />
+      <None Include="Resources\TestCode\TestProperty.cs" />
+      <Compile Remove="Resources\TestCode\TestNullable.cs" />
+      <None Include="Resources\TestCode\TestNullable.cs" />
+      <Compile Remove="Resources\TestCode\TestConstructor.cs" />
+      <None Include="Resources\TestCode\TestConstructor.cs" />
+      <Compile Remove="Resources\TestCode\TestStruct.cs" />
+      <None Include="Resources\TestCode\TestStruct.cs" />
+      <Compile Remove="Resources\TestCode\TestBug.cs" />
+      <None Include="Resources\TestCode\TestBug.cs" />
+      <Compile Remove="Resources\TestCode\TestInitializer.cs" />
+      <None Include="Resources\TestCode\TestInitializer.cs" />
+      <Compile Remove="Resources\TestCode\TestGenericTypeOverloads.cs" />
+      <Compile Remove="Resources\TestCode\TestInterceptor.cs" />
+      <None Include="Resources\TestCode\TestInterceptor.cs" />
+      <Compile Remove="Resources\TestCode\TestMemberAccess.cs" />
+      <None Include="Resources\TestCode\TestMemberAccess.cs" />
+      <Compile Remove="Resources\TestCode\TestSystem.cs" />
+      <None Include="Resources\TestCode\TestSystem.cs" />
+      <Compile Remove="Resources\TestCode\TestPattern.cs" />
+      <None Include="Resources\TestCode\TestPattern.cs" />
+      <Compile Remove="Resources\TestCode\TestSwitchExpression.cs" />
+      <None Include="Resources\TestCode\TestSwitchExpression.cs" />
+      <Compile Remove="Resources\TestCode\TestConversionOperator.cs" />
+      <None Include="Resources\TestCode\TestConversionOperator.cs" />
+      <Compile Remove="Resources\TestCode\TestInterfaceOf.cs" />
+      <None Include="Resources\TestCode\TestInterfaceOf.cs" />
+      <Compile Remove="Resources\TestCode\TestDispose.cs" />
+      <None Include="Resources\TestCode\TestDispose.cs" />
+      <Compile Remove="Resources\TestCode\TestMethodArgs.cs" />
+      <None Include="Resources\TestCode\TestMethodArgs.cs" />
+      <Compile Remove="Resources\TestCode\TestEvent.cs" />
+      <None Include="Resources\TestCode\TestEvent.cs" />
+      <Compile Remove="Resources\TestCode\TestDelegate.cs" />
+      <None Include="Resources\TestCode\TestDelegate.cs" />
+      <Compile Remove="Resources\TestCode\TestEnumType.cs" />
+      <None Include="Resources\TestCode\TestEnumType.cs" />
+      <Compile Remove="Resources\TestCode\TestOverrideOperator.cs" />
+      <None Include="Resources\TestCode\TestOverrideOperator.cs" />
+      <Compile Remove="Resources\TestCode\TestIngnoreInterceptor.cs" />
+      <Compile Remove="Resources\TestCode\TestCollection.cs" />
+      <None Include="Resources\TestCode\TestCollection.cs" />
+      <Compile Remove="Resources\TestCode\State.cs" />
+      <Compile Remove="Resources\TestCode\Common.cs" />
+      <None Include="Resources\TestCode\Common.cs" />
+      <Compile Remove="Resources\TestCode\TestLiteral.cs" />
+      <None Include="Resources\TestCode\TestLiteral.cs" />
+      <Compile Remove="Resources\TestCode\TestExtension.cs" />
+      <None Include="Resources\TestCode\TestExtension.cs" />
+      <Compile Remove="Resources\TestCode\TestInnerClass.cs" />
+      <None Include="Resources\TestCode\TestInnerClass.cs" />
+      <Compile Remove="Resources\TestCode\TestIsGenericType.cs" />
+      <None Include="Resources\TestCode\TestIsGenericType.cs" />
+      <Compile Remove="Resources\TestCode\TestOverloads.cs" />
+      <None Include="Resources\TestCode\TestOverloads.cs" />
+      <Compile Remove="Resources\TestCode\TestRefArg.cs" />
+      <Compile Remove="Resources\TestCode\TestGenericNew.cs" />
+      <None Include="Resources\TestCode\TestGenericNew.cs" />
+      <Compile Remove="Resources\TestCode\TestTask.cs" />
+      <None Include="Resources\TestCode\TestTask.cs" />
+      <Compile Remove="Resources\TestCode\TestCast.cs" />
+      <None Include="Resources\TestCode\TestCast.cs" />
+      <Compile Remove="Resources\TestCode\TestYield.cs" />
+      <None Include="Resources\TestCode\TestYield.cs" />
+      <Compile Remove="Resources\TestCode\TestInnerFunction.cs" />
+      <None Include="Resources\TestCode\TestInnerFunction.cs" />
+      <Compile Remove="Resources\TestCode\TestLinqSelect.cs" />
+      <Compile Remove="Resources\TestCode\TestRemoveNewLine.cs" />
+      <None Include="Resources\TestCode\TestRemoveNewLine.cs" />
+      <Compile Remove="Resources\TestCode\TestDictionary.cs" />
+      <None Include="Resources\TestCode\TestDictionary.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Resources\TestCode\TestIndexer.cs" />
+      <EmbeddedResource Include="Resources\TestCode\TestIndexer.cs" />
+    </ItemGroup>
+
+</Project>

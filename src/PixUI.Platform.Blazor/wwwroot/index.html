@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PixUI Blazor Application</title>
+    <link rel="icon" type="image/png" href="favicon.png"/>
+    <style>
+        .loading-progress {
+            position: relative;
+            display: block;
+            width: 8rem;
+            height: 8rem;
+            margin: 20vh auto 1rem auto;
+        }
+
+        .loading-progress circle {
+            fill: none;
+            stroke: #e0e0e0;
+            stroke-width: 0.6rem;
+            transform-origin: 50% 50%;
+            transform: rotate(-90deg);
+        }
+
+        .loading-progress circle:last-child {
+            stroke: #1b6ec2;
+            stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
+            transition: stroke-dasharray 0.05s ease-in-out;
+        }
+    </style>
+</head>
+<body style="width: 100%; height: 100%; margin: 0; position: relative">
+<div id="loading">
+    <svg class="loading-progress">
+        <circle r="40%" cx="50%" cy="50%"/>
+        <circle r="40%" cx="50%" cy="50%"/>
+    </svg>
+    <div class="loading-progress-text"></div>
+</div>
+
+<script src="_framework/blazor.webassembly.js" autostart="false"></script>
+
+<script>
+    let _htmlCanvas;
+    let _htmlInput;
+    let _asmName = "PixUI.Platform.Blazor";
+
+    function CreateCanvas() {
+        _htmlCanvas = document.createElement("canvas")
+        _htmlCanvas.style.position = "absolute"
+        _htmlCanvas.style.zIndex = "1"
+        UpdateCanvasSize()
+        document.body.append(_htmlCanvas)
+    }
+
+    function CreateInput() {
+        let input = document.createElement('input')
+        input.id = '_i'
+        input.style.position = 'absolute'
+        input.style.width = input.style.height = input.style.padding = '0'
+        input.type = 'text'
+        input.style.border = 'none'
+        input.style.zIndex = '3'
+
+        document.body.appendChild(input);
+
+        input.addEventListener('input', ev => {
+            if (ev.data && !ev.isComposing) { //非IME输入
+                OnTextInput(ev.data);
+            }
+        });
+        input.addEventListener('compositionend', ev => {
+            // this._input.value = '';
+            if (ev.data) { //IME输入
+                OnTextInput(ev.data);
+            }
+        });
+
+        _htmlInput = input;
+    }
+
+    function UpdateCanvasSize() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const ratio = window.devicePixelRatio;
+        //set physical size
+        _htmlCanvas.width = width * ratio;
+        _htmlCanvas.height = height * ratio;
+        //set logical size
+        _htmlCanvas.style.width = width + "px";
+        _htmlCanvas.style.height = height + "px";
+    }
+
+    function GetGLContext() {
+        let contextAttributes = {
+            'alpha': 1,
+            'depth': 1,
+            'stencil': 8,
+            'antialias': 0,
+            'premultipliedAlpha': 1,
+            'preserveDrawingBuffer': 0,
+            'preferLowPowerToHighPerformance': 0,
+            'failIfMajorPerformanceCaveat': 0,
+            'enableExtensionsByDefault': 1,
+            'explicitSwapControl': 0,
+            'renderViaOffscreenBackBuffer': 0,
+        }
+        contextAttributes['majorVersion'] = (typeof WebGL2RenderingContext !== 'undefined') ? 2 : 1
+        let handle = Module.GL.createContext(_htmlCanvas, contextAttributes)
+        if (handle) {
+            Module.GL.makeContextCurrent(handle)
+            Module.GL.currentContext.GLctx.getExtension('WEBGL_debug_renderer_info')
+            //https://github.com/dotnet/runtime/issues/76077
+            window.GL = Module.GL
+            window.GLctx = Module.GL.currentContext.GLctx
+        } else {
+            //TODO: fallback to software surface
+            alert("Can't use gpu")
+        }
+
+        return handle;
+    }
+
+    function BindEvents() {
+        window.onresize = ev => {
+            UpdateCanvasSize()
+            DotNet.invokeMethod(_asmName, "OnResize", window.innerWidth, window.innerHeight, window.devicePixelRatio)
+        }
+
+        window.onmousemove = ev => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            DotNet.invokeMethod(_asmName, "OnMouseMove", ev.buttons, ev.x, ev.y, ev.movementX, ev.movementY)
+        }
+        window.onmouseout = ev => {
+            DotNet.invokeMethod(_asmName, "OnMouseMoveOutWindow")
+        }
+        window.onmousedown = ev => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            DotNet.invokeMethod(_asmName, "OnMouseDown", ev.buttons, ev.x, ev.y, ev.movementX, ev.movementY)
+        }
+        window.onmouseup = ev => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            DotNet.invokeMethod(_asmName, "OnMouseUp", ev.buttons, ev.x, ev.y, ev.movementX, ev.movementY)
+        }
+        window.oncontextmenu = ev => {
+            ev.preventDefault();
+            ev.stopPropagation();
+        }
+        window.onkeydown = ev => {
+            // console.log(`KeyDown: '${ev.key}' keyCode=${ev.code}`)
+            DotNet.invokeMethod(_asmName, "OnKeyDown", ev.key, ev.code, ev.altKey, ev.ctrlKey, ev.shiftKey)
+            if (ev.code === 'Tab') {
+                ev.preventDefault();
+            }
+        }
+        window.onkeyup = ev => {
+            DotNet.invokeMethod(_asmName, "OnKeyUp", ev.key, ev.code, ev.altKey, ev.ctrlKey, ev.shiftKey)
+            if (ev.code === 'Tab') {
+                ev.preventDefault();
+            }
+        }
+
+        window.onpopstate = ev => {
+            //console.log("location: " + document.location + ", state: " + JSON.stringify(ev.state));
+
+            if (typeof ev.state === 'number') {
+                //浏览器前进或后退跳转的
+                DotNet.invokeMethod(_asmName, "RouteGoto", ev.state)
+            } else {
+                //直接在浏览器地址栏输入的
+                let path = "/"
+                if (document.location.hash.length > 0) {
+                    path = document.location.hash.substring(1)
+                }
+                //同步替换浏览器的历史记录
+                let url = document.location.origin + '/#' + path
+                let id = DotNet.invokeMethod(_asmName, "NewRouteId")
+                history.replaceState(id, "", url)
+                DotNet.invokeMethod(_asmName, "RoutePush", path)
+            }
+        }
+
+        //注意onwheel事件附加在画布元素上
+        _htmlCanvas.onwheel = ev => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            DotNet.invokeMethod(_asmName, "OnScroll", ev.x, ev.y, ev.deltaX, ev.deltaY)
+        }
+    }
+
+    function SetCursor(name) {
+        window.document.body.style.cursor = name
+    }
+
+    function StartTextInput() {
+        setTimeout(() => {
+            _htmlInput.focus({preventScroll: true});
+        }, 0);
+    }
+
+    function OnTextInput(s) {
+        DotNet.invokeMethod(_asmName, "OnTextInput", s)
+    }
+
+    function StopTextInput() {
+        _htmlInput.blur();
+        _htmlInput.value = '';
+    }
+
+    function PostInvalidateEvent() {
+        requestAnimationFrame(() => {
+            //console.log(GL);
+            DotNet.invokeMethod(_asmName, "OnInvalidate")
+        });
+    }
+
+    window.onload = async function () {
+        await Blazor.start()
+
+        let loadingEl = document.getElementById("loading")
+        loadingEl.remove()
+
+        CreateCanvas()
+        CreateInput()
+        let glHandel = GetGLContext()
+        let routePath = document.location.hash.length > 0 ? document.location.hash.substring(1) : null
+        await DotNet.invokeMethodAsync(_asmName, "Run", glHandel, window.innerWidth, window.innerHeight, window.devicePixelRatio, routePath)
+        BindEvents()
+    }
+</script>
+</body>
+</html>

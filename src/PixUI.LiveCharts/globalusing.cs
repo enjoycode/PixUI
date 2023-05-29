@@ -1,0 +1,17 @@
+global using SKPaintStyle = PixUI.PaintStyle;
+global using SKPaint = PixUI.Paint;
+global using SKTypeface = PixUI.Typeface;
+global using SKPoint = PixUI.Point;
+global using SKRect = PixUI.Rect;
+global using SKColor = PixUI.Color;
+global using SKImageInfo = PixUI.ImageInfo;
+global using SKImageFilter = PixUI.ImageFilter;
+global using SKMatrix = PixUI.Matrix4;
+global using SKPath = PixUI.Path;
+global using SKPathEffect = PixUI.PathEffect;
+global using SKShader = PixUI.Shader;
+global using SKCanvas = PixUI.Canvas;
+global using SKStrokeCap = PixUI.StrokeCap;
+global using SKStrokeJoin = PixUI.StrokeJoin;
+global using SKShaderTileMode = PixUI.TileMode;
+global using SKFontStyle = PixUI.FontStyle;
