@@ -3,7 +3,7 @@
 
 ## Mac
 ```shell
-clang -fPIC -shared -o tree-sitter.dll lib/src/lib.c -Ilib/src -Ilib/include -std=c99 -O3
+clang -fPIC -shared lib/src/lib.c -Ilib/src -Ilib/include -std=c99 -O3 -o libtree-sitter.dylib
 ```
 ## For Blazor WebAssembly
 因目前blazor的native回调不支持封送struct，所以暂修改源码回调参数TSPoint改为指针
