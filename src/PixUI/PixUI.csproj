@@ -3,7 +3,7 @@
     <PropertyGroup>
         <Nullable>enable</Nullable>
         <TargetFramework>netstandard2.1</TargetFramework>
-        <LangVersion>9</LangVersion>
+        <LangVersion>10</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Configurations>Debug;Release;DebugWeb</Configurations>
         <Platforms>AnyCPU;ARM64</Platforms>
@@ -12,16 +12,7 @@
     <PropertyGroup Condition=" '$(Configuration)' == 'DebugWeb' ">
       <DefineConstants>TRACE;__WEB__</DefineConstants>
     </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-      <LangVersion>10.0</LangVersion>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-      <LangVersion>10.0</LangVersion>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DebugWeb|AnyCPU' ">
-      <LangVersion>10.0</LangVersion>
-    </PropertyGroup>
+    
     <ItemGroup>
       <None Remove="Assets\MaterialIcons.woff2" />
       <EmbeddedResource Include="Assets\MaterialIcons.woff2" />

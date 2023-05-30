@@ -476,6 +476,11 @@ gclient
 python3 tools/git-sync-deps
 ```
 
+找不到ninja
+```shell
+python3 bin\fetch-ninja
+```
+
 ```bash
 bin\gn gen out/win-arm64 --args="target_cpu=\"arm64\" is_official_build=true is_component_build=true skia_use_gl=true skia_use_metal=false skia_use_vulkan=false skia_use_angle=true skia_use_direct3d=true skia_enable_tools=false skia_use_xps=false skia_enable_pdf=true skia_pdf_subset_harfbuzz=true skia_use_zlib=true skia_use_icu=true skia_use_harfbuzz=true skia_use_piex=false skia_use_dng_sdk=false skia_use_sfntly=false skia_use_system_icu=false skia_use_system_harfbuzz=false skia_use_system_expat=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false skia_enable_fontmgr_win=true skia_enable_fontmgr_win_gdi=true extra_cflags=[\"-DSKIA_C_DLL\"]"
 
