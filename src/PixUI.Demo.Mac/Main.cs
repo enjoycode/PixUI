@@ -7,10 +7,7 @@ namespace PixUI.Demo.Mac
     {
         private static void Main(string[] args)
         {
-            // MacApplication.Run(new DemoRoute());
-            MacApplication.Run(new DemoPage());
-            // MacApplication.Run(new DemoListView());
-            // MacApplication.Run(new DemoFlowDocEditor());
+            MacApplication.Run(new DemoRoute());
         }
     }
 }
