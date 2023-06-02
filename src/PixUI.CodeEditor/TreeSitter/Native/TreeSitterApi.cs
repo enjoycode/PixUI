@@ -111,7 +111,7 @@ namespace CodeEditor
         
         //TODO: 临时使用，待使用NativeMemory.Free()
         [LibraryImport(LibTreeSitter)]
-        internal static extern void ts_util_free(IntPtr ptr);
+        internal static partial void ts_util_free(IntPtr ptr);
 
         #region ====Parser====
 
