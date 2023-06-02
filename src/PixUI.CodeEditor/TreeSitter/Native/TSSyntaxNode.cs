@@ -35,7 +35,7 @@ namespace CodeEditor
         /// <summary>
         /// Get the <see cref="TSLanguage"/> that was used to parse this node's syntax tree.
         /// </summary>
-        public TSLanguage Language => new TSLanguage(ts_tree_language(NativeTsNode.tree));
+        public TSLanguage Language => TSLanguage.Get(ts_tree_language(NativeTsNode.tree));
 
         /// <summary>
         /// Check if this node is named.

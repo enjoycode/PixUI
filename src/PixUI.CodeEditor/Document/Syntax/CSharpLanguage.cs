@@ -116,61 +116,44 @@ namespace CodeEditor
             { "let", TokenType.Keyword },
             { "var", TokenType.Keyword },
             { "this", TokenType.Keyword },
+
+            //----Named----
+            { "implicit_type", TokenType.BuiltinType },
+            { "pointer_type", TokenType.BuiltinType },
+            { "function_pointer_type", TokenType.BuiltinType },
+            { "predefined_type", TokenType.BuiltinType },
+
+            { "real_literal", TokenType.LiteralNumber },
+            { "integer_literal", TokenType.LiteralNumber },
+
+            { "string_literal", TokenType.LiteralString },
+            { "character_literal", TokenType.LiteralString },
+
+            { "null_literal", TokenType.Constant },
+            { "boolean_literal", TokenType.Constant },
+
+            { "modifier", TokenType.Keyword },
+            { "void_keyword", TokenType.Keyword },
+
+            { "comment", TokenType.Comment },
+
+            { "Error", TokenType.Unknown }
         };
 
         public bool IsLeafNode(TSSyntaxNode node)
         {
-            var type = node.Type;
+            var typeId = node.TypeId;
+            var type = TSCSharpLanguage.Get().GetType(typeId);
             return type == "modifier" || type == "string_literal" || type == "character_literal";
         }
 
         public TokenType GetTokenType(TSSyntaxNode node)
         {
-            var type = node.Type;
-            if (type == "Error")
-                return TokenType.Unknown;
-
-            if (!node.IsNamed())
-            {
-                if (TokenMap.TryGetValue(type, out var res))
-                    return res;
-                return TokenType.Unknown;
-            }
-
-            // is named node
-            switch (type)
-            {
-                case "identifier":
-                    return GetIdentifierTokenType(node);
-
-                case "implicit_type":
-                case "pointer_type":
-                case "function_pointer_type":
-                case "predefined_type":
-                    return TokenType.BuiltinType;
-
-                case "real_literal":
-                case "integer_literal":
-                    return TokenType.LiteralNumber;
-
-                case "string_literal":
-                case "character_literal":
-                    return TokenType.LiteralString;
-
-                case "null_literal":
-                case "boolean_literal":
-                    return TokenType.Constant;
-
-                case "modifier":
-                case "void_keyword":
-                    return TokenType.Keyword;
-
-                case "comment":
-                    return TokenType.Comment;
-                default:
-                    return TokenType.Unknown;
-                //throw new NotImplementedException(node.Type);
-            }
+            var typeId = node.TypeId;
+            var type = TSCSharpLanguage.Get().GetType(typeId);
+            if (type == "identifier")
+                return GetIdentifierTokenType(node); //300ms
+            return TokenMap.TryGetValue(type, out var res) ? res : TokenType.Unknown;
         }
 
         private static TokenType GetIdentifierTokenType(TSSyntaxNode node)

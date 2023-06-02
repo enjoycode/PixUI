@@ -15,6 +15,12 @@ namespace CodeEditor
         [DllImport(LibTreeSitterCSharp)]
         internal static extern void ts_util_free(IntPtr ptr);
 
+        public static TSLanguage Get(IntPtr ptr)
+        {
+            //always return TSCSharpLanguage instance now
+            return TSCSharpLanguage.Get();
+        }
+
         #endregion
 
         internal IntPtr Handle;

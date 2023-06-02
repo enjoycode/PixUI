@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 using PixUI;
 
@@ -153,11 +154,14 @@ namespace CodeEditor
                 encoding = TsInputEncoding.Utf16
             };
 
-            var sw = Stopwatch.StartNew();
+#if DEBUG
+            var ts = Stopwatch.GetTimestamp();
+#endif
             var newTree = _parser.Parse(tsInput, reset ? null : _oldTree);
-            sw.Stop();
             gcHandle.Free();
-            Console.WriteLine($"Parse syntax tree: {sw.ElapsedMilliseconds} ms");
+#if DEBUG
+            Console.WriteLine($"SyntaxParser.Parse: 耗时{Stopwatch.GetElapsedTime(ts).TotalMilliseconds}ms");
+#endif
 
             //获取变动范围
             if (_oldTree != null && !reset)
@@ -167,7 +171,6 @@ namespace CodeEditor
                     newTree.Handle, ref rangeCount);
 
                 _oldTree!.Dispose();
-
 
                 _startLineOfChanged = (int)_edit.startPosition.row; //设为当前行
                 _endLineOfChanged = _startLineOfChanged + 1;
@@ -194,10 +197,18 @@ namespace CodeEditor
 
         internal void Tokenize(int startLine, int endLine)
         {
+#if DEBUG
+            var ts = Stopwatch.GetTimestamp();
+#endif
             for (var i = startLine; i < endLine; i++)
             {
                 TokenizeLine(i);
             }
+
+#if DEBUG
+            Console.WriteLine(
+                $"SyntaxParser.Tokenize [{startLine}-{endLine}] 耗时: {Stopwatch.GetElapsedTime(ts).TotalMilliseconds}ms");
+#endif
         }
 
         internal void TokenizeLine(int line)
@@ -228,22 +239,33 @@ namespace CodeEditor
             //CodeToken.DumpLineTokens(lineSegment, _document);
         }
 
-        private void VisitChildren(TSSyntaxNode node, LineSegment lineSegment)
+        private void VisitChildren(TSSyntaxNode node, int count, LineSegment lineSegment)
         {
-            foreach (var child in node.Children)
+            var cursor = new TSTreeCursor(node);
+            cursor.GotoFirstChild();
+            for (var i = 0; i < count; i++)
             {
-                if (BeforeLine(child, lineSegment)) continue;
+                var child = cursor.Current;
+                if (BeforeLine(child, lineSegment))
+                {
+                    cursor.GotoNextSibling();
+                    continue;
+                }
+
                 if (AfterLine(child, lineSegment)) break;
                 VisitNode(child, lineSegment);
+                cursor.GotoNextSibling();
             }
+
+            cursor.Dispose();
         }
 
         private void VisitNode(TSSyntaxNode node, LineSegment lineSegment)
         {
             var childrenCount = node.ChildCount;
-            if (!Language.IsLeafNode(node) && childrenCount > 0)
+            if (childrenCount > 0 && !Language.IsLeafNode(node))
             {
-                VisitChildren(node, lineSegment);
+                VisitChildren(node, childrenCount, lineSegment);
                 return;
             }
 
@@ -257,8 +279,7 @@ namespace CodeEditor
 
             var tokenType = Language.GetTokenType(node);
             var startOffset = Math.Max(node.StartIndex / ParserEncoding, lineSegment.Offset);
-            var length = Math.Min((node.EndIndex - node.StartIndex) / ParserEncoding,
-                lineSegment.Length);
+            var length = Math.Min((node.EndIndex - node.StartIndex) / ParserEncoding, lineSegment.Length);
             lineSegment.AddToken(tokenType, startOffset, length);
         }
 
