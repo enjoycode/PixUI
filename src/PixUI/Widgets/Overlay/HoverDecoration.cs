@@ -52,7 +52,7 @@ internal sealed class HoverDecorator : FlowDecorator<Widget>
     private readonly HoverDecoration _owner;
     private readonly ShapeBorder _shape;
 
-    internal HoverDecorator(HoverDecoration owner): base(owner.Widget, true)
+    internal HoverDecorator(HoverDecoration owner) : base(owner.Widget, true)
     {
         _owner = owner;
         _shape = owner.ShapeBuilder();
@@ -78,8 +78,7 @@ internal sealed class HoverDecorator : FlowDecorator<Widget>
         {
             canvas.Save();
             canvas.ClipPath(path, ClipOp.Difference, false);
-            canvas.DrawShadow(path, Colors.Black, _owner.Elevation, false,
-                Root!.Window.ScaleFactor);
+            canvas.DrawShadow(path, Colors.Black, _owner.Elevation, false, Root!.Window.ScaleFactor);
             canvas.Restore();
         }
 

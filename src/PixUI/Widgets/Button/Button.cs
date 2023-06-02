@@ -88,7 +88,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     {
         //Icon only 特殊处理
         if (_iconWidget != null && _textWidget == null && Style == ButtonStyle.Transparent)
-            return Rect.FromLTWH(0, 0, _iconWidget.W, _iconWidget.H);
+            return Rect.FromLTWH(_iconWidget.X, _iconWidget.Y, _iconWidget.W, _iconWidget.H);
         return Rect.FromLTWH(0, 0, W, H);
     }
 
