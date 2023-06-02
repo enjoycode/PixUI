@@ -23,10 +23,11 @@ namespace CodeEditor
         [UnmanagedCallersOnly]
         internal static unsafe void* Read(void* payload, uint byteIndex, TSPoint* position, uint* bytesRead)
         {
-            Console.WriteLine($"Parse read: {byteIndex}");
+#if DEBUG
+            Console.WriteLine($"ParserInput.Read: index={byteIndex}");
+#endif
             var gcHandle = GCHandle.FromIntPtr(new IntPtr(payload));
-            var input = (ParserInput)gcHandle.Target;
-            // uint* bytesReadPtr = (uint*)bytesRead.ToPointer();
+            var input = (ParserInput)gcHandle.Target!;
 
             var offset = (int)(byteIndex / SyntaxParser.ParserEncoding); //utf16
             if (offset >= input._textBuffer.Length)
@@ -44,10 +45,7 @@ namespace CodeEditor
             return input._nativeBuffer.ToPointer();
         }
 
-        public void Dispose()
-        {
-            Marshal.FreeHGlobal(_nativeBuffer);
-        }
+        public void Dispose() => Marshal.FreeHGlobal(_nativeBuffer);
     }
 }
 #endif
