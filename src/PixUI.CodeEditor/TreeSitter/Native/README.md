@@ -38,6 +38,10 @@ static void ts_lexer__get_chunk(Lexer *self) {
 另因为不支持返回struct，所以修改lib.c添加包装方法
 ```c++
 //====Rick Add For Blazor WASM====
+void ts_util_free(void* ptr) {
+	free(ptr);
+}
+
 void ts_tree_root_node_wasm(const TSTree *tree, TSNode* node) {
 	*node = ts_tree_root_node(tree);
 }
