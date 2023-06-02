@@ -184,7 +184,7 @@ namespace CodeEditor
                     //     $"{rangesPtr[i]} {rangesPtr[i].StartIndex}-{rangesPtr[i].EndIndex}");
                 }
 
-                TSLanguage.ts_util_free(new IntPtr(rangesPtr));
+                TreeSitterApi.ts_util_free(new IntPtr(rangesPtr));
             }
 
             _oldTree = newTree;

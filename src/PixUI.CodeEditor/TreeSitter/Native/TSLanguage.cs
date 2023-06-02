@@ -11,10 +11,6 @@ namespace CodeEditor
 
         internal const string LibTreeSitterCSharp = "tree-sitter-csharp";
 
-        //TODO: 临时使用，待使用NativeMemory.Free()
-        [DllImport(LibTreeSitterCSharp)]
-        internal static extern void ts_util_free(IntPtr ptr);
-
         public static TSLanguage Get(IntPtr ptr)
         {
             //always return TSCSharpLanguage instance now
