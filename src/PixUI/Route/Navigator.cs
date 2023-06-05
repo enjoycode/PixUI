@@ -148,14 +148,22 @@ public sealed class Navigator
                 //排除 eg: asnPath=/一级路由 但当前路径=/一级路由/当前路由
                 if (asnPath.Length > parentPath.Length)
                 {
-                    var thisPath = asnPath.Substring(asnPath.IndexOf(parentPath) + 1);
-                    var pss = thisPath.Split('/');
-                    var matchRoute = _routes.Find(r => r.Name == pss[0]);
+                    var thisPath = asnPath.Substring(parentPath.Length);
+                    var thisName = thisPath;
+                    string? thisArg = null;
+                    if (thisPath.IndexOf('/') >= 0)
+                    {
+                        var pss = thisPath.Split('/');
+                        thisName = pss[0];
+                        thisArg = pss[1];
+                    }
+                    
+                    var matchRoute = _routes.Find(r => r.Name == thisName);
                     if (matchRoute == null) //TODO: 404
-                        throw new Exception("Can't find route: " + pss[0]);
+                        throw new Exception("Can't find route: " + thisName);
                     ActiveRoute = matchRoute;
-                    if (ActiveRoute.Dynamic && pss.Length > 1)
-                        ActiveArgument = pss[1];
+                    if (ActiveRoute.Dynamic)
+                        ActiveArgument = thisArg;
                 }
             }
         }
