@@ -125,19 +125,20 @@ public abstract class DynamicView : SingleChildWidget
         return base.HitTest(x, y, result);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)
     {
-        //TODO:暂简单clip
-        if (Parent != null)
+        base.BeforePaint(canvas, onlyTransform, dirtyRect);
+        if (!onlyTransform)
         {
             canvas.Save();
             canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
         }
+    }
 
-        PaintChildren(canvas, area);
-
-        if (Parent != null)
-            canvas.Restore();
+    protected internal override void AfterPaint(Canvas canvas)
+    {
+        canvas.Restore();
+        base.AfterPaint(canvas);
     }
 
     #endregion

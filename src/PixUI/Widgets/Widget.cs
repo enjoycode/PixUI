@@ -494,7 +494,7 @@ public abstract class Widget : IStateBindable, IDisposable
         if (dirtyRect.HasValue)
         {
             Debug.Assert(onlyTransform == false);
-            canvas.ClipRect(dirtyRect.Value, ClipOp.Intersect, false);
+            canvas.ClipRect(dirtyRect.Value, ClipOp.Intersect, false); //TODO: check need save
         }
     }
 
