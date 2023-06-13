@@ -15,6 +15,7 @@ public static class InputUtils
 
     internal static Keys ConvertKeys(string key, string code, bool alt, bool control, bool shift)
     {
+        // Console.WriteLine($"ConvertKeys: key={key} code={code} alt={alt} ctrl={control}, shift={shift}");
         var keys = Keys.None;
         if (alt) keys |= Keys.Alt;
         if (control) keys |= Keys.Control;

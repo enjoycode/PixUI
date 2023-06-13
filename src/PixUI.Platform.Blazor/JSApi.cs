@@ -43,14 +43,14 @@ public static class JSApi
     }
 
     [JSInvokable]
-    public static void OnKeyDown(string key, string code, bool alt, bool shift, bool control)
+    public static void OnKeyDown(string key, string code, bool alt, bool control, bool shift)
     {
         var args = KeyEvent.UseDefault(ConvertKeys(key, code, alt, control, shift));
         BlazorApplication.Window.OnKeyDown(args);
     }
 
     [JSInvokable]
-    public static void OnKeyUp(string key, string code, bool alt, bool shift, bool control)
+    public static void OnKeyUp(string key, string code, bool alt, bool control, bool shift)
     {
         var args = KeyEvent.UseDefault(ConvertKeys(key, code, alt, control, shift));
         BlazorApplication.Window.OnKeyUp(args);

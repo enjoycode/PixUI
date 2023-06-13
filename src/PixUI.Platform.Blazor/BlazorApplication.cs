@@ -15,6 +15,7 @@ public sealed class BlazorApplication : UIApplication
     {
         //TODO: 其他平台支持
         Cursor.PlatformCursors = new BlazorCursors();
+        Clipboard.Init(new BlazorClipboard());
 
         var app = new BlazorApplication();
         UIApplication.Current = app;

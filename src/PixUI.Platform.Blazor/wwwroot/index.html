@@ -149,7 +149,6 @@
             ev.stopPropagation();
         }
         window.onkeydown = ev => {
-            // console.log(`KeyDown: '${ev.key}' keyCode=${ev.code}`)
             DotNet.invokeMethod(_asmName, "OnKeyDown", ev.key, ev.code, ev.altKey, ev.ctrlKey, ev.shiftKey)
             if (ev.code === 'Tab') {
                 ev.preventDefault();
@@ -214,6 +213,14 @@
             //console.log(GL);
             DotNet.invokeMethod(_asmName, "OnInvalidate")
         });
+    }
+    
+    async function ClipboardWriteText(text) {
+        await navigator.clipboard.writeText(text)
+    }
+    
+    async function ClipboardReadText() {
+        return await navigator.clipboard.readText()
     }
 
     window.onload = async function () {
