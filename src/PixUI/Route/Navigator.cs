@@ -16,12 +16,12 @@ public enum RouteChangeAction
 /// </summary>
 public sealed class Navigator
 {
-    public Navigator(IEnumerable<Route> routes)
+    public Navigator(IEnumerable<RouteBase> routes)
     {
         _routes.AddRange(routes);
     }
 
-    private readonly List<Route> _routes = new List<Route>();
+    private readonly List<RouteBase> _routes = new();
     internal RouteHistoryManager? HistoryManager;
 
     /// <summary>
@@ -37,7 +37,7 @@ public sealed class Navigator
     /// </summary>
     internal string? NameOfRouteView { get; private set; }
 
-    internal Route ActiveRoute { get; private set; }
+    internal RouteBase ActiveRoute { get; private set; } = null!;
     internal string? ActiveArgument { get; private set; }
 
     #region ====命名路由视图相关====
@@ -110,7 +110,7 @@ public sealed class Navigator
     /// <summary>
     /// 获取默认路由(第一个路由)
     /// </summary>
-    internal Route GetDefaultRoute() => _routes[0];
+    internal RouteBase GetDefaultRoute() => _routes[0];
 
     /// <summary>
     /// 指定名称的路由是否动态路由

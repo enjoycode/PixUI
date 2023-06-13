@@ -61,9 +61,8 @@ namespace PixUI.CS2TS
                 AddUsedModelInterceptor(modelFullName);
                 return;
             }
-            
-            if (!UsedModels.Contains(modelFullName))
-                UsedModels.Add(modelFullName);
+
+            UsedModels.Add(modelFullName);
         }
     }
 }

@@ -8,7 +8,7 @@ public abstract class UIApplication
 
     public static UIApplication Current { get; protected set; } = null!;
 
-    public virtual bool IsWasm => false;
+    public virtual bool IsWasm => false; //TODO: remove use OperatingSystem.IsBrowser()
 
     /// <summary>
     /// Post invalidate event to main loop, maybe called by none UI thread

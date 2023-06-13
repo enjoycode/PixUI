@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace PixUI;
 
 public sealed class RouteView : DynamicView
@@ -51,21 +49,13 @@ public sealed class RouteView : DynamicView
         Navigator.HistoryManager = null;
     }
 
-#if __WEB__
-        private async void OnRouteChanged(RouteChangeAction action)
-#else
-    private void OnRouteChanged(RouteChangeAction action)
-#endif
+    private async void OnRouteChanged(RouteChangeAction action)
     {
         //TODO: stop running transition and check is 404.
         //TODO: if action is Goto, and route is keepalive, try get widget instance from cache
         var route = Navigator.ActiveRoute;
-#if __WEB__
-            var widget = await route.BuildWidgetAsync(Navigator.ActiveArgument);
-#else
-        var widget = route.Builder(Navigator.ActiveArgument);
-#endif
-            
+        var widget = await route.BuildWidgetAsync(Navigator.ActiveArgument);
+
         if (action == RouteChangeAction.Init || route.EnteringBuilder == null)
         {
             ReplaceTo(widget);
