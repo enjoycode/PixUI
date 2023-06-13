@@ -1,6 +1,6 @@
 namespace PixUI;
 
-public sealed class RouteView : DynamicView
+public class RouteView : DynamicView //Don't sealed this class
 {
     public RouteView(Navigator navigator, string? name = null)
     {
@@ -15,7 +15,7 @@ public sealed class RouteView : DynamicView
 
     //OnNavigateIn, OnNavigateOut
 
-    protected override void OnMounted()
+    protected sealed override void OnMounted()
     {
         base.OnMounted();
 
@@ -39,7 +39,7 @@ public sealed class RouteView : DynamicView
         Navigator.InitRouteWidget();
     }
 
-    protected override void OnUnmounted()
+    protected sealed override void OnUnmounted()
     {
         base.OnUnmounted();
 

@@ -250,7 +250,7 @@ cl lib/src/lib.c /I lib/src /I lib/include /O2 /link /dll /def:lib.def /out:tree
 ## MAC
 ```shell
 cd tree-sitter-c-sharp
-clang -fPIC -shared -o ~/Desktop/tree-sitter-c-sharp.dylib src/parser.c src/scanner.c -Isrc -O2
+clang -fPIC -shared -o ~/Desktop/libtree-sitter-csharp.dylib src/parser.c src/scanner.c -Isrc -O3
 ```
 
 ## For Blazor WebAssembly
