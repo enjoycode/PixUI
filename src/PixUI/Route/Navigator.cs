@@ -40,6 +40,18 @@ public sealed class Navigator
     internal RouteBase ActiveRoute { get; private set; } = null!;
     internal string? ActiveArgument { get; private set; }
 
+    public void AddRoute(RouteBase route)
+    {
+        if (!_routes.Exists(r => r.Name == route.Name))
+            _routes.Add(route);
+    }
+
+    public void RemoveRoute(string name)
+    {
+        var lowerCase = name.ToLower();
+        _routes.RemoveAll(r => r.Name == lowerCase);
+    }
+
     #region ====命名路由视图相关====
 
     internal bool IsNamed => NameOfRouteView != null;
