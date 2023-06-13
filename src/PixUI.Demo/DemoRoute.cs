@@ -58,15 +58,15 @@ namespace PixUI.Demo
         {
             return new MenuItem[]
             {
-                MenuItem.SubMenu("Route", Icons.Filled.Map, new MenuItem[]
+                MenuItem.SubMenu("Route", MaterialIcons.Map, new MenuItem[]
                 {
-                    MenuItem.Item("Back", Icons.Filled.ArrowBack, action: _navigator.Pop),
-                    MenuItem.Item("Forward", Icons.Filled.ArrowForward, null),
+                    MenuItem.Item("Back", MaterialIcons.ArrowBack, action: _navigator.Pop),
+                    MenuItem.Item("Forward", MaterialIcons.ArrowForward, null),
                 }),
-                MenuItem.SubMenu("Debug", Icons.Filled.BugReport, new MenuItem[]
+                MenuItem.SubMenu("Debug", MaterialIcons.BugReport, new MenuItem[]
                 {
                     MenuItem.Item("Outline", null, PaintDebugger.Switch),
-                    MenuItem.SubMenu("Help", Icons.Filled.HelpOutline, new MenuItem[]
+                    MenuItem.SubMenu("Help", MaterialIcons.HelpOutline, new MenuItem[]
                     {
                         MenuItem.Item("About"),
                         MenuItem.Item("Window")
@@ -79,11 +79,11 @@ namespace PixUI.Demo
                 MenuItem.Item("Transform", null, () => _navigator.Push("transform")),
                 MenuItem.Item("TabView", null, () => _navigator.Push("tabview")),
                 MenuItem.Item("TreeView",
-                    Icons.Filled.AccountTree, () => _navigator.Push("treeView")),
+                    MaterialIcons.AccountTree, () => _navigator.Push("treeView")),
                 MenuItem.Item("DataGrid",
-                    Icons.Filled.TableView, () => _navigator.Push("datagrid")),
+                    MaterialIcons.TableView, () => _navigator.Push("datagrid")),
                 MenuItem.Item("CodeEditor",
-                    Icons.Filled.Edit, () => _navigator.Push("codeEditor")),
+                    MaterialIcons.Edit, () => _navigator.Push("codeEditor")),
             };
         }
     }

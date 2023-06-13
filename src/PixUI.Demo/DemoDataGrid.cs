@@ -22,7 +22,7 @@ namespace PixUI.Demo.Mac
                         new DataGridGroupColumn<Person>("Gender", new DataGridColumn<Person>[]
                         {
                             new DataGridIconColumn<Person>("Icon", cellValueGetter: p =>
-                                p.Female ? Icons.Outlined.Woman : Icons.Outlined.Man)
+                                p.Female ? MaterialIcons.Woman : MaterialIcons.Man)
                             {
                                 Width = ColumnWidth.Fixed(60)
                             },

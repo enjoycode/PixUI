@@ -12,22 +12,9 @@
     <PropertyGroup Condition=" '$(Configuration)' == 'DebugWeb' ">
       <DefineConstants>TRACE;__WEB__</DefineConstants>
     </PropertyGroup>
-    
-    <ItemGroup>
-      <None Remove="Assets\MaterialIcons.woff2" />
-      <EmbeddedResource Include="Assets\MaterialIcons.woff2" />
-      <None Remove="Assets\MaterialIconsOutlined.woff2" />
-      <EmbeddedResource Include="Assets\MaterialIconsOutlined.woff2" />
-      <EmbeddedResource Remove="obj\**" />
-      <None Remove="obj\**" />
-    </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\PixUI.TSAttributes\PixUI.TSAttributes.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="obj\**" />
     </ItemGroup>
 
 </Project>

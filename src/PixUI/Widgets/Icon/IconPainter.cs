@@ -19,14 +19,14 @@ public sealed class IconPainter : IDisposable
     {
         if (_cachedFont == null)
         {
-            var typeface = FontCollection.Instance.TryMatchFamilyFromAsset(data.FontFamily);
+            var typeface = FontCollection.Instance.TryMatchFamilyFromAsset(data.Asset.FontFamily);
             if (typeface == null)
             {
                 if (!_loading)
                 {
                     _loading = true;
-                    FontCollection.Instance.StartLoadFontFromAsset(data.AssemblyName,
-                        data.AssetPath, data.FontFamily);
+                    FontCollection.Instance.StartLoadFontFromAsset(data.Asset.AssemblyName,
+                        data.Asset.AssetPath, data.Asset.FontFamily);
                     FontCollection.Instance.FontChanged += _OnFontChanged;
                 }
                 return;

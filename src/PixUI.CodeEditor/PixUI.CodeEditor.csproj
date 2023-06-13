@@ -21,6 +21,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\PixUI.Widgets\PixUI.Widgets.csproj" />
       <ProjectReference Include="..\PixUI\PixUI.csproj" />
     </ItemGroup>
 

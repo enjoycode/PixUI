@@ -8,29 +8,29 @@ namespace PixUI.Demo.Mac
         {
             new TreeData
             {
-                Icon = Icons.Filled.Cloud, Text = "Cloud", Children = new List<TreeData>
+                Icon = MaterialIcons.Cloud, Text = "Cloud", Children = new List<TreeData>
                 {
-                    new TreeData { Icon = Icons.Filled.Train, Text = "Train" },
-                    new TreeData { Icon = Icons.Filled.AirplanemodeOn, Text = "AirPlane" },
+                    new TreeData { Icon = MaterialIcons.Train, Text = "Train" },
+                    new TreeData { Icon = MaterialIcons.AirplanemodeOn, Text = "AirPlane" },
                 }
             },
             new TreeData
             {
-                Icon = Icons.Filled.BeachAccess, Text = "Beach",
+                Icon = MaterialIcons.BeachAccess, Text = "Beach",
                 Children = new List<TreeData>
                 {
                     new TreeData
                     {
-                        Icon = Icons.Filled.Cake, Text = "Cake", Children = new List<TreeData>
+                        Icon = MaterialIcons.Cake, Text = "Cake", Children = new List<TreeData>
                         {
-                            new TreeData { Icon = Icons.Filled.Apple, Text = "Apple" },
-                            new TreeData { Icon = Icons.Filled.Adobe, Text = "Adobe" },
+                            new TreeData { Icon = MaterialIcons.Apple, Text = "Apple" },
+                            new TreeData { Icon = MaterialIcons.Adobe, Text = "Adobe" },
                         }
                     },
-                    new TreeData { Icon = Icons.Filled.Camera, Text = "Camera" },
+                    new TreeData { Icon = MaterialIcons.Camera, Text = "Camera" },
                 }
             },
-            new TreeData { Icon = Icons.Filled.Sunny, Text = "Sunny" }
+            new TreeData { Icon = MaterialIcons.Sunny, Text = "Sunny" }
         };
 
         private readonly TreeController<TreeData> _treeController1;
@@ -97,7 +97,7 @@ namespace PixUI.Demo.Mac
         {
             var parentNode = _treeController1.FindNode(t => t.Text == "Cake");
             var childNode = _treeController1.InsertNode(
-                new TreeData() { Icon = Icons.Filled.Start, Text = "AppBox" }, parentNode, 1);
+                new TreeData() { Icon = MaterialIcons.Start, Text = "AppBox" }, parentNode, 1);
             _treeController1.ExpandTo(childNode);
             _treeController1.SelectNode(childNode);
         }

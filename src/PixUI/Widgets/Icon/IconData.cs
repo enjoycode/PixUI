@@ -3,17 +3,15 @@ namespace PixUI;
 public readonly struct IconData
 {
     public readonly int CodePoint;
-    public readonly string FontFamily;
-    public readonly string AssemblyName;
-    public readonly string AssetPath;
+    public readonly IconAsset Asset;
 
-    public IconData(int codePoint, string fontFamily, string assemblyName, string assetPath)
+    public IconData(int codePoint, IconAsset asset)
     {
         CodePoint = codePoint;
-        FontFamily = fontFamily;
-        AssemblyName = assemblyName;
-        AssetPath = assetPath;
+        Asset = asset;
     }
 
+#if __WEB__    
     public IconData Clone() => new IconData(CodePoint, FontFamily, AssemblyName, AssetPath);
+#endif
 }

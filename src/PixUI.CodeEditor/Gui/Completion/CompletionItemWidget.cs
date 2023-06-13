@@ -38,9 +38,9 @@ namespace CodeEditor
             switch (kind)
             {
                 case CompletionItemKind.Function:
-                case CompletionItemKind.Method: return Icons.Filled.Functions;
-                case CompletionItemKind.Event: return Icons.Filled.Bolt;
-                default: return Icons.Filled.Title;
+                case CompletionItemKind.Method: return MaterialIcons.Functions;
+                case CompletionItemKind.Event: return MaterialIcons.Bolt;
+                default: return MaterialIcons.Title;
             }
         }
     }

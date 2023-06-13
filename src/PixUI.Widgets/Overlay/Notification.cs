@@ -22,7 +22,7 @@ internal sealed class NotificationEntry : SingleChildWidget
                 {
                     icon,
                     new Expanded() { Child = text },
-                    new Button(null, Icons.Filled.Close)
+                    new Button(null, MaterialIcons.Close)
                     {
                         Style = ButtonStyle.Transparent,
                         Shape = ButtonShape.Pills,
@@ -155,21 +155,21 @@ public sealed class Notification : Popup
     public static void Info(string message)
     {
         State<Color> color = Colors.Gray;
-        Show(new Icon(Icons.Filled.Info) { Size = 18, Color = color },
+        Show(new Icon(MaterialIcons.Info) { Size = 18, Color = color },
             new Text(message) { TextColor = color, MaxLines = 5});
     }
 
     public static void Success(string message)
     {
         State<Color> color = Colors.Green;
-        Show(new Icon(Icons.Filled.Error) { Size = 18, Color = color },
+        Show(new Icon(MaterialIcons.Error) { Size = 18, Color = color },
             new Text(message) { TextColor = color, MaxLines = 5});
     }
 
     public static void Error(string message)
     {
         State<Color> color = Colors.Red;
-        Show(new Icon(Icons.Filled.Error) { Size = 18, Color = color },
+        Show(new Icon(MaterialIcons.Error) { Size = 18, Color = color },
             new Text(message) { TextColor = color, MaxLines = 5 });
     }
 

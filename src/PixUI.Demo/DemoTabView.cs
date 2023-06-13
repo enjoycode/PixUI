@@ -6,9 +6,9 @@ namespace PixUI.Demo.Mac
     {
         private readonly List<TabItem> _icons = new()
         {
-            new TabItem { Icon = Icons.Filled.Cloud, Text = "Cloud" },
-            new TabItem { Icon = Icons.Filled.BeachAccess, Text = "Long Beach" },
-            new TabItem { Icon = Icons.Filled.Sunny, Text = "Sunny" }
+            new TabItem { Icon = MaterialIcons.Cloud, Text = "Cloud" },
+            new TabItem { Icon = MaterialIcons.BeachAccess, Text = "Long Beach" },
+            new TabItem { Icon = MaterialIcons.Sunny, Text = "Sunny" }
         };
 
         private readonly TabController<TabItem> _tabController;

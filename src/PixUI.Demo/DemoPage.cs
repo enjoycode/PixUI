@@ -42,7 +42,7 @@ namespace PixUI.Demo
                                 new Text(_firstName) { FontSize = 20, TextColor = Colors.Red },
                                 new Text(_lastName) { FontSize = 20, TextColor = Colors.Red },
                                 new Text(_fullName) { FontSize = 50, TextColor = Colors.Red },
-                                new Button("Click Me", Icons.Filled.Search) { OnTap = OnButtonTap },
+                                new Button("Click Me", MaterialIcons.Search) { OnTap = OnButtonTap },
                                 new ButtonGroup()
                                 {
                                     Children = new[]
@@ -72,13 +72,13 @@ namespace PixUI.Demo
                                 new Input("Hello World!")
                                 {
                                     Width = 200,
-                                    Prefix = new Icon(Icons.Filled.Person),
-                                    Suffix = new Icon(Icons.Filled.Search)
+                                    Prefix = new Icon(MaterialIcons.Person),
+                                    Suffix = new Icon(MaterialIcons.Search)
                                 },
                                 new Input("")
                                 {
                                     Width = 200, IsObscure = true,
-                                    Prefix = new Icon(Icons.Filled.Lock),
+                                    Prefix = new Icon(MaterialIcons.Lock),
                                     HintText = "Password",
                                 },
                                 new Card

@@ -18,7 +18,7 @@ public sealed class ExpandIcon : SingleChildWidget, IMouseRegion
 
         Child = new RotationTransition(turns)
         {
-            Child = new Icon(Icons.Filled.ExpandMore) { Size = size, Color = color }
+            Child = new Icon(MaterialIcons.ExpandMore) { Size = size, Color = color }
         };
     }
 }

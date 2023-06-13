@@ -45,7 +45,7 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
 
         if (MenuItem.Type == MenuItemType.SubMenu)
         {
-            _expander = new Icon(inPopup ? Icons.Filled.ChevronRight : Icons.Filled.ExpandMore)
+            _expander = new Icon(inPopup ? MaterialIcons.ChevronRight : MaterialIcons.ExpandMore)
                 { Color = _controller.TextColor };
             _expander.Parent = this;
         }

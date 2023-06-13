@@ -11,12 +11,10 @@ namespace PixUI.Tools.Icons
             output.WriteLine("namespace PixUI");
             output.WriteLine("{");
 
-            output.WriteLine($"    public sealed class {className}");
+            output.WriteLine($"    public static class {className}");
             output.WriteLine("    {");
 
-            output.WriteLine($"        private const string FontFamily = \"{fontFamily}\";");
-            output.WriteLine($"        private const string AssemblyName = \"{asmName}\";");
-            output.WriteLine($"        private const string AssetPath = \"{assetPath}\";");
+            output.WriteLine($"        private static readonly IconAsset _asset = new (\"{fontFamily}\", \"{asmName}\", \"{assetPath}\");");
 
             var asm = typeof(IconsCodeGenerator).Assembly;
             using var stream =
@@ -30,11 +28,11 @@ namespace PixUI.Tools.Icons
                     break;
 
                 var whiteSpace = line.AsSpan().IndexOf(' ');
-                output.Write("        public IconData ");
+                output.Write("        public static IconData ");
                 WriteName(line.AsSpan(0, whiteSpace), output);
                 output.Write(" => new IconData(0x");
                 output.Write(line.AsSpan(whiteSpace + 1));
-                output.WriteLine(", FontFamily, AssemblyName, AssetPath);");
+                output.WriteLine(", _asset);");
             }
 
             output.WriteLine("    }");

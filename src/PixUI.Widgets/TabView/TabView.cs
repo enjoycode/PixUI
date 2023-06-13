@@ -26,7 +26,7 @@ public sealed class TabView<T> : Widget
                         Children = new Widget[]
                         {
                             tabBuilder(data, tab.IsSelected),
-                            new Button(null, Icons.Filled.Close)
+                            new Button(null, MaterialIcons.Close)
                             {
                                 Style = ButtonStyle.Transparent,
                                 Shape = ButtonShape.Pills,

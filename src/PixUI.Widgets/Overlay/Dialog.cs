@@ -50,7 +50,7 @@ public abstract class Dialog : Popup
                 {
                     Child = new Center() { Child = new Text(Title) }
                 },
-                new Button(null, Icons.Filled.Close)
+                new Button(null, MaterialIcons.Close)
                 {
                     Style = ButtonStyle.Transparent,
                     OnTap = _ => Close(true),
