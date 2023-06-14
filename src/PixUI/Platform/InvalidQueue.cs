@@ -307,10 +307,8 @@ internal sealed class InvalidQueue
             temp = temp.Parent;
         }
 
-        opaque ??= temp; ////没找到指向RootWidget
-#if DEBUG
-        Console.WriteLine($"InvalidQueue.Repaint: from:{opaque} to:{widget} dirty={dirtyArea}");
-#endif
+        opaque ??= temp; //没找到指向RootWidget
+        Log.Debug($"from:{opaque} to:{widget} dirty={dirtyArea}");
 
         //转换坐标并裁剪绘制区域
         var saveCount = canvas.Save();
@@ -324,9 +322,7 @@ internal sealed class InvalidQueue
                 temp.BeforePaint(canvas, false, dirtyRect);
                 if (canvas.IsClipEmpty)
                 {
-#if DEBUG
-                    Console.WriteLine("重绘裁剪区域为空");
-#endif
+                    Log.Debug("重绘裁剪区域为空");
                     canvas.RestoreToCount(saveCount);
                     return;
                 }

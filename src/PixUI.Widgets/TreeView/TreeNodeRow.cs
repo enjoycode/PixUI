@@ -36,7 +36,7 @@ internal sealed class TreeNodeRow<T> : Widget, IMouseRegion
             _checkbox.Parent = this;
         }
     }
-        
+
     internal Icon Icon
     {
         get => _icon!;
@@ -67,8 +67,7 @@ internal sealed class TreeNodeRow<T> : Widget, IMouseRegion
     {
         _isHover = hover;
         Invalidate(InvalidAction.Repaint,
-            new RepaintArea(Rect.FromLTWH(0, 0, Controller.TreeView!.W,
-                Controller.NodeHeight)));
+            new RepaintArea(Rect.FromLTWH(0, 0, Controller.TreeView!.W, Controller.NodeHeight)));
     }
 
     private void _OnTap(PointerEvent e) => Controller.SelectNode(TreeNode);
@@ -114,6 +113,7 @@ internal sealed class TreeNodeRow<T> : Widget, IMouseRegion
             _expander?.Layout(Controller.NodeHeight, Controller.NodeHeight);
             _expander?.SetPosition(indentation, (Controller.NodeHeight - _expander.H) / 2);
         }
+
         indentation += Controller.NodeIndent; //always keep expand icon size
 
         // Icon or Checkbox
@@ -130,6 +130,7 @@ internal sealed class TreeNodeRow<T> : Widget, IMouseRegion
                 _icon.Layout(Controller.NodeHeight, Controller.NodeHeight);
                 _icon.SetPosition(indentation, (Controller.NodeHeight - _icon.H) / 2);
             }
+
             indentation += Controller.NodeIndent; //always keep icon size
         }
 

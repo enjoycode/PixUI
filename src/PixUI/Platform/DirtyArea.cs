@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System;
+using System.Diagnostics;
 
 namespace PixUI;
 
@@ -58,7 +59,7 @@ public sealed class RepaintArea : IDirtyArea
             _rect.Width, _rect.Height);
         return new RepaintArea(childRect);
     }
-        
+
     public override string ToString() => $"RepaintArea[{_rect}]";
 }
 
@@ -81,10 +82,18 @@ internal sealed class RepaintChild : IDirtyArea
             _path.Add(temp);
             temp = temp.Parent!;
         }
+
         _current = _path.Count - 1;
     }
 
-    public Widget Child => _path[_current];
+    public Widget Child
+    {
+        get
+        {
+            Debug.Assert(_current >= 0 && _current < _path.Count);
+            return _path[_current];
+        }
+    }
 
     public void Merge(IDirtyArea? newArea) => throw new NotSupportedException();
 
@@ -103,11 +112,16 @@ internal sealed class RepaintChild : IDirtyArea
 
     public IDirtyArea? ToChild(Widget child)
     {
-        //注意目前实现重用现有实例
+        //防止重写了具备多个子组件的Paint方法，但忘了处理RepaintChild的情况
+        if (!ReferenceEquals(_path[_current], child))
+        {
+            Log.Debug($"[{child.Parent!.GetType().Name}]重写了Paint，但未处理RepaintChild");
+            return null;
+        }
+
         _current--;
-        if (_current < 0)
-            return _lastDirtyArea;
-        return this;
+        //Console.WriteLine($"ToChild CUR={_current} Child={child.GetType().Name} Parent={child.Parent!.GetType().Name}");
+        return _current < 0 ? _lastDirtyArea : this;
     }
 
     public override string ToString()
@@ -118,5 +132,4 @@ internal sealed class RepaintChild : IDirtyArea
         var cur = _path[_current];
         return $"RepaintChild[{cur}]";
     }
-
 }

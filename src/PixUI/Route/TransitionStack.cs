@@ -37,8 +37,7 @@ internal sealed class TransitionStack : Widget
         _to.SetPosition(0, 0);
     }
 
-    protected internal override void OnChildSizeChanged(Widget child, float dx, float dy,
-        AffectsByRelayout affects)
+    protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
     {
         //do nothing
     }
@@ -46,10 +45,10 @@ internal sealed class TransitionStack : Widget
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
         _from.BeforePaint(canvas);
-        _from.Paint(canvas, area);
+        _from.Paint(canvas, null /*Paint all, area?.ToChild(_from)*/);
         _from.AfterPaint(canvas);
         _to.BeforePaint(canvas);
-        _to.Paint(canvas, area);
+        _to.Paint(canvas, null /*Paint all, area?.ToChild(_to)*/);
         _to.AfterPaint(canvas);
     }
 }

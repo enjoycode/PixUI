@@ -12,8 +12,7 @@ internal interface ITabBar
 
 public sealed class TabBar<T> : Widget, ITabBar
 {
-    public TabBar(TabController<T> controller, Action<T, Tab> tabBuilder,
-        bool scrollable = false)
+    public TabBar(TabController<T> controller, Action<T, Tab> tabBuilder, bool scrollable = false)
     {
         _controller = controller;
         _controller.BindTabBar(this);
@@ -90,11 +89,12 @@ public sealed class TabBar<T> : Widget, ITabBar
     public override void VisitChildren(Func<Widget, bool> action)
     {
         if (_tabs.Count == 0) return;
-        foreach(var tab in _tabs)
+        foreach (var tab in _tabs)
         {
             if (action(tab)) break;
         }
     }
+
     protected internal override bool HitTest(float x, float y, HitTestResult result)
     {
         if (!ContainsPoint(x, y)) return false;
@@ -151,15 +151,24 @@ public sealed class TabBar<T> : Widget, ITabBar
     {
         if (BgColor != null)
             canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PaintUtils.Shared(BgColor.Value));
-            
-        foreach (var tab in _tabs) //TODO: check visible
+        
+        if (area is RepaintChild repaintChild)
         {
-            canvas.Translate(tab.X, tab.Y);
-            tab.Paint(canvas, area?.ToChild(tab));
-            canvas.Translate(-tab.X, -tab.Y);
+            var child = repaintChild.Child;
+            child.BeforePaint(canvas, true);
+            child.Paint(canvas, repaintChild.ToChild(child));
+        }
+        else
+        {
+            foreach (var tab in _tabs) //TODO: check visible
+            {
+                canvas.Translate(tab.X, tab.Y);
+                tab.Paint(canvas, area?.ToChild(tab));
+                canvas.Translate(-tab.X, -tab.Y);
+            }
         }
 
-        //TODO: paint indicator
+        //TODO: paint indicator(因为动画移动需要)
     }
 
     #endregion

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 namespace PixUI;
 
@@ -31,7 +32,10 @@ public abstract class UIApplication
 
         var ctx = PaintContext.Default;
         ctx.Window = window;
-        var beginTime = DateTime.UtcNow;
+
+#if DEBUG
+        var start = DateTime.UtcNow;
+#endif
 
         //先绘制WidgetsCanvas
         if (!window.WidgetsInvalidQueue.IsEmpty)
@@ -73,8 +77,11 @@ public abstract class UIApplication
 
         window.HasPostInvalidateEvent = false;
 
-        var duration = DateTime.UtcNow - beginTime;
-        Console.WriteLine($"Draw frame: {duration.TotalMilliseconds}ms");
+
+#if DEBUG
+        var duration = DateTime.UtcNow - start;
+        Log.Debug($"DrawFrame: {duration.TotalMilliseconds}ms");
+#endif
 
         window.Present();
     }

@@ -73,14 +73,12 @@ public sealed class Tab : SingleChildWidget, IMouseRegion
         if (IsSelected.Value)
         {
             if (TabBar.SelectedColor != null)
-                canvas.DrawRect(Rect.FromLTWH(0, 0, W, H),
-                    PaintUtils.Shared(TabBar.SelectedColor.Value));
+                canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PaintUtils.Shared(TabBar.SelectedColor.Value));
         }
         else if (_isHover)
         {
             if (TabBar.HoverColor != null)
-                canvas.DrawRect(Rect.FromLTWH(0, 0, W, H),
-                    PaintUtils.Shared(TabBar.HoverColor.Value));
+                canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PaintUtils.Shared(TabBar.HoverColor.Value));
         }
 
         if (Child == null) return;
@@ -91,7 +89,6 @@ public sealed class Tab : SingleChildWidget, IMouseRegion
 
         //TODO:暂在这里画指示器，待TabBar实现后移除
         if (IsSelected.Value)
-            canvas.DrawRect(Rect.FromLTWH(0, H - 4, W, 4),
-                PaintUtils.Shared(Theme.FocusedColor));
+            canvas.DrawRect(Rect.FromLTWH(0, H - 4, W, 4), PaintUtils.Shared(Theme.FocusedColor));
     }
 }
