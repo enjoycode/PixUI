@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace PixUI;
 
@@ -15,7 +16,7 @@ public abstract class MultiChildWidget<T> : Widget where T : Widget
     // ReSharper disable once InconsistentNaming
     protected readonly WidgetList<T> _children;
 
-    public T[] Children
+    public IEnumerable<T> Children
     {
         set
         {
