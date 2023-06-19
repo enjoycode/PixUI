@@ -253,6 +253,8 @@ namespace CodeEditor
 
         #region ====Actions====
 
+        public int GetCaretOffset() => TextEditor.Caret.Offset;
+
         /// <summary>
         /// 设置光标位置
         /// </summary>

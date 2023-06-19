@@ -69,14 +69,12 @@ namespace CodeEditor
         /// 在编辑器上的位置(像素)
         /// </summary>
         internal float CanvasPosX =>
-            _textEditor.TextView.Bounds.Left + _caretPosX - _textEditor.VirtualTop.X -
-            0.5f /*offset*/;
+            _textEditor.TextView.Bounds.Left + _caretPosX - _textEditor.VirtualTop.X - 0.5f /*offset*/;
 
         /// <summary>
         /// 在编辑器上的位置(像素)
         /// </summary>
-        internal float CanvasPosY =>
-            _textEditor.TextView.Bounds.Top + _caretPosY - _textEditor.VirtualTop.Y;
+        internal float CanvasPosY => _textEditor.TextView.Bounds.Top + _caretPosY - _textEditor.VirtualTop.Y;
 
         internal TextLocation Position
         {

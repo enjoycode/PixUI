@@ -15,8 +15,7 @@ namespace CodeEditor
     {
         IEnumerable<char> TriggerCharacters { get; }
 
-        Task<IList<ICompletionItem>?> ProvideCompletionItems(Document document,
-            int offset, string? completionWord);
+        Task<IList<ICompletionItem>?> ProvideCompletionItems(Document document, int offset, string? completionWord);
     }
 
     public readonly struct CompletionWord
