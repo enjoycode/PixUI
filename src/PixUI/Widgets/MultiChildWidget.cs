@@ -16,8 +16,9 @@ public abstract class MultiChildWidget<T> : Widget where T : Widget
     // ReSharper disable once InconsistentNaming
     protected readonly WidgetList<T> _children;
 
-    public IEnumerable<T> Children
+    public IList<T> Children
     {
+        get => _children;
         set
         {
             _children.Clear();
