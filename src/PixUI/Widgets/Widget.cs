@@ -290,8 +290,7 @@ public abstract class Widget : IStateBindable, IDisposable
             scrollOffsetY = scrollable.ScrollOffsetY;
         }
 
-        var hit = child.HitTest(x - child.X + scrollOffsetX, y - child.Y + scrollOffsetY,
-            result);
+        var hit = child.HitTest(x - child.X + scrollOffsetX, y - child.Y + scrollOffsetY, result);
         return hit;
     }
 

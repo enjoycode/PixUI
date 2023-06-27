@@ -95,11 +95,9 @@ public abstract class DataGridColumn<T>
         PaintCellParagraph(canvas, cellRect, cellStyle, ph);
     }
 
-    internal virtual void PaintCell(Canvas canvas, DataGridController<T> controller,
-        int rowIndex, Rect cellRect) { }
+    internal virtual void PaintCell(Canvas canvas, DataGridController<T> controller, int rowIndex, Rect cellRect) { }
 
-    internal static Paragraph BuildCellParagraph(Rect rect, CellStyle style,
-        string text, int maxLines)
+    internal static Paragraph BuildCellParagraph(Rect rect, CellStyle style, string text, int maxLines)
     {
         using var ts = new TextStyle
         {
@@ -134,8 +132,7 @@ public abstract class DataGridColumn<T>
     /// <summary>
     /// 根据上下对齐方式画文本
     /// </summary>
-    internal static void PaintCellParagraph(Canvas canvas, Rect rect, CellStyle style,
-        Paragraph paragraph)
+    internal static void PaintCellParagraph(Canvas canvas, Rect rect, CellStyle style, Paragraph paragraph)
     {
         if (style.VerticalAlignment == VerticalAlignment.Middle)
         {

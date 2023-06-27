@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace PixUI;
 
@@ -14,15 +15,13 @@ public class DataGridHostColumn<T> : DataGridColumn<T>
     }
 
     private readonly Func<T, int, Widget> _cellBuilder;
-    private readonly List<CellCache<Widget>> _cellWidgets = new List<CellCache<Widget>>();
+    private readonly List<CellCache<Widget>> _cellWidgets = new();
 
-    private static readonly CellCacheComparer<Widget> _cellCacheComparer =
-        new CellCacheComparer<Widget>();
+    private static readonly CellCacheComparer<Widget> _cellCacheComparer = new();
 
-    internal override void PaintCell(Canvas canvas, DataGridController<T> controller,
-        int rowIndex, Rect cellRect)
+    internal override void PaintCell(Canvas canvas, DataGridController<T> controller, int rowIndex, Rect cellRect)
     {
-        var cellWidget = GetCellWidget(rowIndex, controller, cellRect);
+        var cellWidget = GetOrMakeCellWidget(rowIndex, controller, cellRect);
         //TODO:对齐cellWidget
         canvas.Translate(cellRect.Left, cellRect.Top);
         cellWidget.Paint(canvas, null);
@@ -32,8 +31,7 @@ public class DataGridHostColumn<T> : DataGridColumn<T>
     /// <summary>
     /// 从缓存中获取承载的Widget,没有则新建并加入缓存
     /// </summary>
-    private Widget GetCellWidget(int rowIndex, DataGridController<T> controller,
-        in Rect cellRect)
+    private Widget GetOrMakeCellWidget(int rowIndex, DataGridController<T> controller, in Rect cellRect)
     {
         var pattern = new CellCache<Widget>(rowIndex, null);
         var index = _cellWidgets.BinarySearch(pattern, _cellCacheComparer);
@@ -46,9 +44,19 @@ public class DataGridHostColumn<T> : DataGridColumn<T>
         var cellWidget = _cellBuilder(row, rowIndex);
         cellWidget.Parent = controller.DataGrid;
         cellWidget.Layout(cellRect.Width, cellRect.Height);
+        //需要设置相对于DataGrid的位置(不考虑滚动变量)
+        cellWidget.SetPosition(cellRect.Left, cellRect.Top + controller.ScrollController.OffsetY);
         var cellCachedWidget = new CellCache<Widget>(rowIndex, cellWidget);
         _cellWidgets.Insert(index, cellCachedWidget);
         return cellWidget;
+    }
+
+    internal Widget GetCellWidget(int rowIndex)
+    {
+        var pattern = new CellCache<Widget>(rowIndex, null);
+        var index = _cellWidgets.BinarySearch(pattern, _cellCacheComparer);
+        Debug.Assert(index >= 0);
+        return _cellWidgets[index].CachedItem!;
     }
 
     internal override void ClearCacheOnScroll(bool isScrollDown, int rowIndex)

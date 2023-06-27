@@ -204,45 +204,25 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
     internal void OnPointerMove(PointerEvent e)
     {
-        if (e.Buttons == PointerButtons.None)
+        if (e.Buttons == PointerButtons.Left && e.DeltaX != 0 && _cachedHitInHeader != null)
         {
-            if (e.Y <= TotalHeaderHeight)
+            //TODO:根据列宽定义改变
+            var col = _cachedHitInHeader.Value.Column;
+            if (col.Width.Type == ColumnWidthType.Fixed)
             {
-                _cachedHitInHeader = HitTestInHeader(e.X, e.Y);
-                if (_cachedHitInHeader != null && _cachedHitInHeader.Value.IsColumnResizer)
-                    Cursor.Current = Cursors.ResizeLR;
-                else
-                    Cursor.Current = Cursors.Arrow;
-            }
-            else if (_cachedHitInHeader != null)
-            {
-                Cursor.Current = Cursors.Arrow;
-                _cachedHitInHeader = null;
-            }
-        }
-        else if (e.Buttons == PointerButtons.Left)
-        {
-            if (e.DeltaX != 0 && _cachedHitInHeader != null)
-            {
-                //TODO:根据列宽定义改变
-                var col = _cachedHitInHeader.Value.Column;
-                if (col.Width.Type == ColumnWidthType.Fixed)
+                var delta = e.DeltaX;
+                var newWidth = col.Width.Value + delta;
+                col.Width.ChangeValue(newWidth);
+                col.ClearAllCache(); //固定列暂需要
+                if (delta < 0 && ScrollController.OffsetX > 0)
                 {
-                    var delta = e.DeltaX;
-                    var newWidth = col.Width.Value + delta;
-                    col.Width.ChangeValue(newWidth);
-                    col.ClearAllCache(); //固定列暂需要
-                    if (delta < 0 && ScrollController.OffsetX > 0)
-                    {
-                        //减小需要重设滚动位置
-                        ScrollController.OffsetX =
-                            Math.Max(ScrollController.OffsetX + delta, 0f);
-                    }
-
-                    //重新计算所有列宽并重绘
-                    CalcColumnsWidth(_cachedWidgetSize, true);
-                    _owner?.Invalidate(InvalidAction.Repaint);
+                    //减小需要重设滚动位置
+                    ScrollController.OffsetX = Math.Max(ScrollController.OffsetX + delta, 0f);
                 }
+
+                //重新计算所有列宽并重绘
+                CalcColumnsWidth(_cachedWidgetSize, true);
+                _owner?.Invalidate(InvalidAction.Repaint);
             }
         }
     }
@@ -257,7 +237,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
         //TODO:暂仅支持单选
         var oldRowIndex = CurrentRowIndex;
-        _cachedHitInRows = HitTestInRows(e.X, e.Y);
+        //TODO: 如果移动端则需要 _cachedHitInRows = HitTestInRows(e.X, e.Y);
         var newRowIndex = _cachedHitInRows != null ? _cachedHitInRows.Value.RowIndex : -1;
         TrySelectRow(oldRowIndex, newRowIndex);
         //TODO: if (res == _cachedHitInRows) return;
@@ -276,21 +256,45 @@ public sealed class DataGridController<T> /* where T : notnull*/
         _owner?.Invalidate(InvalidAction.Repaint);
     }
 
-    private DataGridHitTestResult<T>? HitTestInHeader(float x, float y)
+    internal bool HitTestInHeader(float x, float y)
     {
-        foreach (var col in _cachedVisibleColumns)
+        if (y <= TotalHeaderHeight)
         {
-            if (col.CachedVisibleLeft <= x && x <= col.CachedVisibleRight)
+            foreach (var col in _cachedVisibleColumns)
             {
-                var isColumnResizer = col.CachedVisibleRight - x <= 5;
-                return new DataGridHitTestResult<T>(col, -1, 0f, 0f, isColumnResizer);
+                if (col.CachedVisibleLeft <= x && x <= col.CachedVisibleRight)
+                {
+                    var isColumnResizer = col.CachedVisibleRight - x <= 5;
+                    _cachedHitInHeader = new DataGridHitTestResult<T>(col, -1, 0f, 0f, isColumnResizer);
+                    break;
+                }
             }
+
+            if (_cachedHitInHeader != null && _cachedHitInHeader.Value.IsColumnResizer)
+                Cursor.Current = Cursors.ResizeLR;
+            else
+                Cursor.Current = Cursors.Arrow;
+
+            return true;
         }
 
-        return null;
+        //没有命中
+        if (_cachedHitInHeader != null)
+        {
+            Cursor.Current = Cursors.Arrow;
+            _cachedHitInHeader = null;
+        }
+
+        return false;
     }
 
-    private DataGridHitTestResult<T>? HitTestInRows(float x, float y)
+    internal DataGridHitTestResult<T>? HitTestInRows(float x, float y)
+    {
+        _cachedHitInRows = HitTestInRowsInternal(x, y);
+        return _cachedHitInRows;
+    }
+
+    private DataGridHitTestResult<T>? HitTestInRowsInternal(float x, float y)
     {
         //TODO:先判断仍旧在缓存的范围内，是则直接返回
 
@@ -299,9 +303,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
         var scrollX = 0f;
         var scrollY = 0f;
 
-        var rowIndex =
-            (int)Math.Truncate((y - TotalHeaderHeight + ScrollController.OffsetY) /
-                               Theme.RowHeight);
+        var rowIndex = (int)Math.Truncate((y - TotalHeaderHeight + ScrollController.OffsetY) / Theme.RowHeight);
         //判断是否超出范围
         if (rowIndex >= DataView.Count)
             return _cachedHitInRows;
@@ -471,12 +473,10 @@ public sealed class DataGridController<T> /* where T : notnull*/
             var col = _cachedLeafColumns[i];
             col.CachedLeft = offsetX;
             col.CachedVisibleLeft = Math.Max(_cachedScrollLeft, col.CachedLeft);
-            col.CachedVisibleRight =
-                Math.Min(_cachedScrollRight, col.CachedLeft + col.LayoutWidth);
+            col.CachedVisibleRight = Math.Min(_cachedScrollRight, col.CachedLeft + col.LayoutWidth);
             _cachedVisibleColumns.Insert(insertIndex++, col);
 
-            // print(
-            //     "${col.label} offsetX=$offsetX VL=${col.cachedVisibleLeft} VR=${col.cachedVisibleRight}");
+            // print("${col.label} offsetX=$offsetX VL=${col.cachedVisibleLeft} VR=${col.cachedVisibleRight}");
 
             offsetX += col.LayoutWidth;
             if (offsetX >= _cachedScrollRight) break;
@@ -486,8 +486,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
     }
 
     internal Rect GetScrollClipRect(float top, float height) =>
-        Rect.FromLTWH(_cachedScrollLeft, top, _cachedScrollRight - _cachedScrollLeft,
-            height);
+        Rect.FromLTWH(_cachedScrollLeft, top, _cachedScrollRight - _cachedScrollLeft, height);
 
     internal Rect? GetCurrentRowRect()
     {

@@ -11,6 +11,7 @@ public sealed class DataGridCheckboxColumn<T> : DataGridHostColumn<T>
         {
             var state = new RxProperty<bool>(() => cellValueGetter(data),
                 cellValueSetter == null ? null : v => cellValueSetter(data, v));
+            //TODO: no cellValueSetter set to readonly
             return new Checkbox(state);
         }) { }
 }

@@ -13,7 +13,7 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
 
         Theme = theme ?? DataGridTheme.Default;
 
-        MouseRegion = new MouseRegion();
+        MouseRegion = new MouseRegion(null, false);
         MouseRegion.PointerMove += _controller.OnPointerMove;
         MouseRegion.PointerDown += _controller.OnPointerDown;
     }
@@ -71,6 +71,26 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
 
     #region ====Overrides====
 
+    protected internal override bool HitTest(float x, float y, HitTestResult result)
+    {
+        if (!ContainsPoint(x, y)) return false;
+
+        result.Add(this);
+
+        //先判断是否命中表头
+        if (_controller.HitTestInHeader(x, y)) return true;
+        //再判断是否命中行
+        var hitRow = _controller.HitTestInRows(x, y);
+        if (hitRow != null && !hitRow.Value.IsColumnResizer && hitRow.Value.RowIndex >= 0 &&
+            hitRow.Value.Column is DataGridHostColumn<T> hostColumn)
+        {
+            var cellWidget = hostColumn.GetCellWidget(hitRow.Value.RowIndex);
+            HitTestChild(cellWidget, x, y, result);
+        }
+
+        return true;
+    }
+
     public override void Layout(float availableWidth, float availableHeight)
     {
         var width = CacheAndCheckAssignWidth(availableWidth);
@@ -79,6 +99,18 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
         SetSize(width, height);
         _controller.CalcColumnsWidth(new Size(width, height));
     }
+
+    // protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)
+    // {
+    //     base.BeforePaint(canvas, onlyTransform, dirtyRect);
+    //     
+    //     if (onlyTransform) //仅处理转换坐标，因HostColumn内的CellWidget需要处理滚动偏移量
+    //     {
+    //         Log.Debug($"偏移量: {ScrollOffsetY}");
+    //         canvas.Translate(-ScrollOffsetX, -ScrollOffsetY);
+    //     }
+    //     //TODO:考虑始终clip，这样Hosted CellWidget的某些装饰器不会超出范围
+    // }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
@@ -199,8 +231,7 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
         return Rect.FromLTWH(column.CachedLeft, cellTop, column.LayoutWidth, cellHeight);
     }
 
-    private void PaintRows(Canvas canvas, Size size, float totalColumnsWidth,
-        IList<DataGridColumn<T>> visibleColumns)
+    private void PaintRows(Canvas canvas, Size size, float totalColumnsWidth, IList<DataGridColumn<T>> visibleColumns)
     {
         var headerHeight = _controller.TotalHeaderHeight;
         var deltaY = _controller.ScrollDeltaY;
@@ -216,8 +247,7 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
             }
 
             //clip scroll region
-            var clipRect =
-                _controller.GetScrollClipRect(headerHeight, size.Height - headerHeight);
+            var clipRect = _controller.GetScrollClipRect(headerHeight, size.Height - headerHeight);
             canvas.Save();
             canvas.ClipRect(clipRect, ClipOp.Intersect, false);
 
@@ -225,8 +255,7 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
             var noneFrozenColumns = visibleColumns.Where(c => c.Frozen == false);
             foreach (var col in noneFrozenColumns)
             {
-                PaintColumnCells(
-                    canvas, col, startRowIndex, headerHeight, deltaY, size.Height);
+                PaintColumnCells(canvas, col, startRowIndex, headerHeight, deltaY, size.Height);
             }
 
             canvas.Restore();
@@ -235,8 +264,7 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
         {
             foreach (var col in visibleColumns)
             {
-                PaintColumnCells(
-                    canvas, col, startRowIndex, headerHeight, deltaY, size.Height);
+                PaintColumnCells(canvas, col, startRowIndex, headerHeight, deltaY, size.Height);
             }
         }
     }
@@ -247,8 +275,7 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
         var rowHeight = Theme.RowHeight;
         for (var j = startRow; j < _controller.DataView!.Count; j++)
         {
-            var cellRect = Rect.FromLTWH(
-                col.CachedLeft, offsetY - deltaY, col.LayoutWidth, rowHeight);
+            var cellRect = Rect.FromLTWH(col.CachedLeft, offsetY - deltaY, col.LayoutWidth, rowHeight);
 
             //TODO:暂在这里画stripe背景
             if (Theme.StripeRows && j % 2 != 0)
