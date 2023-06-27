@@ -4,8 +4,10 @@ namespace PixUI;
 
 public sealed class DataGridIconColumn<T> : DataGridColumn<T>
 {
-    public DataGridIconColumn(string label, Func<T, IconData?> cellValueGetter) : base(label)
+    public DataGridIconColumn(string label, Func<T, IconData?> cellValueGetter, ColumnWidth? width = null) : base(label)
     {
+        if (width != null)
+            Width = width;
         _cellValueGetter = cellValueGetter;
     }
 

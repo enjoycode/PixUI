@@ -6,9 +6,13 @@ namespace PixUI;
 
 public sealed class DataGridController<T> /* where T : notnull*/
 {
+    public DataGridController()
+    {
+        Columns = new DataGridColumns<T>(this);
+    }
+
     internal readonly ScrollController ScrollController = new(ScrollDirection.Both);
 
-    private DataGridColumn<T>[] _columns = null!;
     private DataGrid<T>? _owner;
 
     internal void Attach(DataGrid<T> dataGrid) => _owner = dataGrid;
@@ -17,28 +21,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
     internal DataGrid<T> DataGrid => _owner!;
 
-    public DataGridColumn<T>[] Columns
-    {
-        get => _columns;
-        set
-        {
-            _columns = value;
-
-            //展开非分组列
-            HeaderRows = 1;
-            _cachedLeafColumns.Clear();
-            foreach (var column in _columns)
-            {
-                GetLeafColumns(column, _cachedLeafColumns, null);
-            }
-
-            //TODO:纠正一些错误的冻结列设置,如全部冻结，中间有冻结等
-            HasFrozen = _cachedLeafColumns.Any(c => c.Frozen);
-
-            if (_owner != null && _owner.IsMounted)
-                _owner.Invalidate(InvalidAction.Relayout);
-        }
-    }
+    public DataGridColumns<T> Columns { get; }
 
     #region ----Layout Properties----
 
@@ -112,11 +95,9 @@ public sealed class DataGridController<T> /* where T : notnull*/
     #region ----Cached Properties----
 
     // 所有非分组的列集合
-    private readonly IList<DataGridColumn<T>>
-        _cachedLeafColumns = new List<DataGridColumn<T>>();
+    private readonly IList<DataGridColumn<T>> _cachedLeafColumns = new List<DataGridColumn<T>>();
 
-    private readonly IList<DataGridColumn<T>> _cachedVisibleColumns =
-        new List<DataGridColumn<T>>();
+    private readonly IList<DataGridColumn<T>> _cachedVisibleColumns = new List<DataGridColumn<T>>();
 
     // 缓存的组件尺寸
     private Size _cachedWidgetSize = new Size(0, 0);
@@ -358,6 +339,12 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
     #region ====Layout Methods====
 
+    internal void RelayoutIfMounted()
+    {
+        if (_owner is { IsMounted: true })
+            _owner.Invalidate(InvalidAction.Relayout);
+    }
+
     /// <summary>
     ///  计算所有列宽度
     /// </summary>
@@ -520,14 +507,14 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
         var hitColumn = _cachedHitInRows.Value.Column;
         var top = TotalHeaderHeight +
-            (_cachedHitInRows.Value.RowIndex - VisibleStartRowIndex) *
-            Theme.RowHeight - ScrollDeltaY;
+            (_cachedHitInRows.Value.RowIndex - VisibleStartRowIndex) * Theme.RowHeight - ScrollDeltaY;
         return new Rect(hitColumn.CachedVisibleLeft + 1, top + 1,
             hitColumn.CachedVisibleRight - 2, top + Theme.RowHeight - 1);
     }
 
-    private void GetLeafColumns(DataGridColumn<T> column, IList<DataGridColumn<T>> leafColumns,
-        bool? parentFrozen)
+    internal void ClearLeafColumns() => _cachedLeafColumns.Clear();
+
+    internal void GetLeafColumns(DataGridColumn<T> column, bool? parentFrozen)
     {
         if (parentFrozen != null)
             column.Frozen = parentFrozen.Value;
@@ -538,13 +525,35 @@ public sealed class DataGridController<T> /* where T : notnull*/
             foreach (var child in groupColumn.Children)
             {
                 child.Parent = groupColumn;
-                GetLeafColumns(child, leafColumns, column.Frozen);
+                GetLeafColumns(child, column.Frozen);
             }
         }
         else
         {
-            leafColumns.Add(column);
+            _cachedLeafColumns.Add(column);
         }
+    }
+
+    internal void RemoveLeafColumns(DataGridColumn<T> column)
+    {
+        if (column is DataGridGroupColumn<T> groupColumn)
+        {
+            HeaderRows -= 1;
+            foreach (var child in groupColumn.Children)
+            {
+                RemoveLeafColumns(child);
+            }
+        }
+        else
+        {
+            _cachedLeafColumns.Remove(column);
+        }
+    }
+
+    internal void CheckHasFrozen()
+    {
+        //TODO:纠正一些错误的冻结列设置,如全部冻结，中间有冻结等
+        HasFrozen = _cachedLeafColumns.Any(c => c.Frozen);
     }
 
     #endregion

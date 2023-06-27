@@ -42,8 +42,7 @@ public abstract class DataGridColumn<T>
     /// <summary>
     /// 经过布局计算后的实际像素宽度
     /// </summary>
-    internal virtual float LayoutWidth
-        => Width.Type == ColumnWidthType.Fixed ? Width.Value : _cachedWidth;
+    internal virtual float LayoutWidth => Width.Type == ColumnWidthType.Fixed ? Width.Value : _cachedWidth;
 
     /// <summary>
     /// 非分组列计算实际像素宽度
@@ -148,13 +147,11 @@ public abstract class DataGridColumn<T>
         {
             var x = rect.Left;
             var y = rect.Bottom;
-            canvas.DrawParagraph(paragraph, x + CellStyle.CellPadding,
-                y - CellStyle.CellPadding - paragraph.Height);
+            canvas.DrawParagraph(paragraph, x + CellStyle.CellPadding, y - CellStyle.CellPadding - paragraph.Height);
         }
         else
         {
-            canvas.DrawParagraph(paragraph, rect.Left + CellStyle.CellPadding,
-                rect.Top + CellStyle.CellPadding);
+            canvas.DrawParagraph(paragraph, rect.Left + CellStyle.CellPadding, rect.Top + CellStyle.CellPadding);
         }
     }
 }

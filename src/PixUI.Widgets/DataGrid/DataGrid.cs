@@ -21,11 +21,7 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
     private readonly DataGridController<T> _controller;
     internal readonly DataGridTheme Theme;
 
-    public DataGridColumn<T>[] Columns
-    {
-        get => _controller.Columns;
-        set => _controller.Columns = value;
-    }
+    public DataGridColumns<T> Columns => _controller.Columns;
 
     public MouseRegion MouseRegion { get; }
 
@@ -179,7 +175,7 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
         {
             //因为布局时没有计算parent的位置
             var parent = column.Parent!;
-            var index = Array.IndexOf(parent.Children, column);
+            var index = parent.Children.IndexOf(column);
             var offsetLeft = 0.0f;
             for (var i = 0; i < index; i++)
             {
@@ -213,7 +209,7 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
         if (size.Width < totalColumnsWidth && _controller.HasFrozen)
         {
             //先画冻结列
-            var frozenColumns = visibleColumns.Where(c => c.Frozen == true);
+            var frozenColumns = visibleColumns.Where(c => c.Frozen);
             foreach (var col in frozenColumns)
             {
                 PaintColumnCells(canvas, col, startRowIndex, headerHeight, deltaY, size.Height);

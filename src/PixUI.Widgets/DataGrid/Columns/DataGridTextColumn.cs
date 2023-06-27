@@ -12,11 +12,9 @@ public sealed class DataGridTextColumn<T> : DataGridColumn<T>
 
     private readonly Func<T, string> _cellValueGetter;
 
-    private readonly List<CellCache<Paragraph>> _cellParagraphs =
-        new List<CellCache<Paragraph>>();
+    private readonly List<CellCache<Paragraph>> _cellParagraphs = new();
 
-    private static readonly CellCacheComparer<Paragraph> _cellCacheComparer
-        = new CellCacheComparer<Paragraph>();
+    private static readonly CellCacheComparer<Paragraph> _cellCacheComparer = new();
 
     internal override void PaintCell(Canvas canvas, DataGridController<T> controller,
         int rowIndex, Rect cellRect)

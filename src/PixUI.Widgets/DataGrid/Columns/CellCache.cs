@@ -16,6 +16,5 @@ internal readonly struct CellCache<T>
 
 internal sealed class CellCacheComparer<T> : IComparer<CellCache<T>>
 {
-    public int Compare(CellCache<T> x, CellCache<T> y)
-        => x.RowIndex.CompareTo(y.RowIndex);
+    public int Compare(CellCache<T> x, CellCache<T> y) => x.RowIndex.CompareTo(y.RowIndex);
 }

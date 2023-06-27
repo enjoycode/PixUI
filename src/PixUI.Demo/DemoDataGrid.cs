@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace PixUI.Demo.Mac
 {
     public sealed class DemoDataGrid : View
@@ -11,25 +9,21 @@ namespace PixUI.Demo.Mac
             _controller = new DataGridController<Person>();
             _controller.DataSource = Person.GeneratePersons(1000);
 
-            Child = new Container()
+            Child = new Container
             {
                 Padding = EdgeInsets.All(20),
                 Child = new DataGrid<Person>(_controller)
                 {
-                    Columns = new DataGridColumn<Person>[]
+                    Columns =
                     {
-                        new DataGridTextColumn<Person>("Name", cellValueGetter: p => p.Name),
-                        new DataGridGroupColumn<Person>("Gender", new DataGridColumn<Person>[]
+                        new DataGridTextColumn<Person>("Name", p => p.Name),
+                        new DataGridGroupColumn<Person>("Gender")
                         {
-                            new DataGridIconColumn<Person>("Icon", cellValueGetter: p =>
-                                p.Female ? MaterialIcons.Woman : MaterialIcons.Man)
-                            {
-                                Width = ColumnWidth.Fixed(60)
-                            },
+                            new DataGridIconColumn<Person>("Icon", p =>
+                                p.Female ? MaterialIcons.Woman : MaterialIcons.Man, ColumnWidth.Fixed(60)),
                             new DataGridCheckboxColumn<Person>("IsMan", p => !p.Female),
-                        }),
-                        new DataGridTextColumn<Person>("Score",
-                            cellValueGetter: p => p.Score.ToString()),
+                        },
+                        new DataGridTextColumn<Person>("Score", p => p.Score.ToString()),
                     }
                 }
             };
