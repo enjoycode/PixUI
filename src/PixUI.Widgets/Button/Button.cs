@@ -118,8 +118,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         var contentOffsetX = (W - contentWidth) / 2;
         // var contentOffsetY = (H - contentHeight) / 2;
         _iconWidget?.SetPosition(contentOffsetX, (H - _iconWidget!.H) / 2);
-        _textWidget?.SetPosition(contentOffsetX + (_iconWidget?.W ?? 0),
-            (H - _textWidget!.H) / 2);
+        _textWidget?.SetPosition(contentOffsetX + (_iconWidget?.W ?? 0), (H - _textWidget!.H) / 2);
     }
 
     private void TryBuildContent()

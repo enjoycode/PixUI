@@ -12,15 +12,19 @@ internal interface IDataGridHostColumn
 /// <summary>
 /// 用于DataGridHostColumn承载单元格组件
 /// </summary>
-internal sealed class HostedCellWidget : SingleChildWidget
+internal sealed class HostedCellWidget : Widget
 {
     public HostedCellWidget(IScrollable dataGrid, IDataGridHostColumn column, Widget child, float offsetYToDataGrid)
     {
-        Child = child;
+        IsLayoutTight = false; //充满单元格
+        child.Parent = this;
+        _hostedWidget = child;
         _dataGrid = dataGrid;
         _column = column;
         _offsetYToDataGrid = offsetYToDataGrid;
     }
+
+    private readonly Widget _hostedWidget;
 
     /// <summary>
     /// 不包含滚动偏移量的相对于DataGrid的Y位置
@@ -33,6 +37,19 @@ internal sealed class HostedCellWidget : SingleChildWidget
     protected internal override float X => _column.LeftToDataGrid;
 
     protected internal override float Y => _offsetYToDataGrid - _dataGrid.ScrollOffsetY;
+
+    public override void VisitChildren(Func<Widget, bool> action) => action(_hostedWidget);
+
+    public override void Layout(float availableWidth, float availableHeight)
+    {
+        var width = CacheAndCheckAssignWidth(availableWidth);
+        var height = CacheAndCheckAssignHeight(availableHeight);
+
+        SetSize(width, height);
+        _hostedWidget.Layout(width, height);
+        //TODO:根据对齐方式设置位置，暂简单居中
+        _hostedWidget.SetPosition((width - _hostedWidget.W) / 2, 0);
+    }
 }
 
 /// <summary>
@@ -55,7 +72,6 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
     internal override void PaintCell(Canvas canvas, DataGridController<T> controller, int rowIndex, Rect cellRect)
     {
         var cellWidget = GetOrMakeCellWidget(rowIndex, controller, cellRect);
-        //TODO:对齐cellWidget
         canvas.Translate(cellRect.Left, cellRect.Top);
         cellWidget.Paint(canvas, null);
         canvas.Translate(-cellRect.Left, -cellRect.Top);
@@ -93,7 +109,16 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
         return _cellWidgets[index].CachedItem!;
     }
 
-    internal override void ClearCacheOnScroll(bool isScrollDown, int rowIndex)
+    protected internal override void OnWidthChanged(float width, float height)
+    {
+        //尽量重用缓存的Widget，所以不用ClearAllCache
+        foreach (var cellWidget in _cellWidgets)
+        {
+            cellWidget.CachedItem?.Layout(width, height);
+        }
+    }
+
+    protected internal override void ClearCacheOnScroll(bool isScrollDown, int rowIndex)
     {
         if (isScrollDown)
             _cellWidgets.RemoveAll(t => t.RowIndex < rowIndex);

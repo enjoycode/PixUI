@@ -44,19 +44,19 @@ public sealed class DataGridTextColumn<T> : DataGridColumn<T>
 
         index = ~index;
         //没找到开始新建
-        var row = controller.DataView![rowIndex];
+        // var row = controller.DataView![rowIndex];
         var ph = BuildCellParagraph(cellRect, style, cellValue, 1);
         var cellCachedWidget = new CellCache<Paragraph>(rowIndex, ph);
         _cellParagraphs.Insert(index, cellCachedWidget);
         return ph;
     }
 
-    internal override void ClearAllCache()
+    protected internal override void ClearAllCache()
     {
         _cellParagraphs.Clear();
     }
 
-    internal override void ClearCacheOnScroll(bool isScrollDown, int rowIndex)
+    protected internal override void ClearCacheOnScroll(bool isScrollDown, int rowIndex)
     {
         if (isScrollDown)
             _cellParagraphs.RemoveAll(t => t.RowIndex < rowIndex);

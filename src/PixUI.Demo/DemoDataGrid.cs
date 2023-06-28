@@ -24,8 +24,9 @@ namespace PixUI.Demo.Mac
                             new DataGridCheckboxColumn<Person>("IsMan", p => !p.Female),
                         },
                         new DataGridTextColumn<Person>("Score", p => p.Score.ToString()),
-                        new DataGridButtonColumn<Person>("",
-                            (person, index) => new Button("删除") { OnTap = _ => Notification.Info(person.Name) },
+                        new DataGridButtonColumn<Person>("Action",
+                            (person, index) => new Button(icon: MaterialIcons.ShoppingCart)
+                                { OnTap = _ => Notification.Info(person.Name) },
                             ColumnWidth.Fixed(80)),
                     }
                 }

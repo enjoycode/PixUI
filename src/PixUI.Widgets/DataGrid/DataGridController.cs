@@ -212,7 +212,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
                 var delta = e.DeltaX;
                 var newWidth = col.Width.Value + delta;
                 col.Width.ChangeValue(newWidth);
-                col.ClearAllCache(); //固定列暂需要
+                col.OnWidthChanged(newWidth, Theme.RowHeight); //固定列暂需要
                 if (delta < 0 && ScrollController.OffsetX > 0)
                 {
                     //减小需要重设滚动位置
@@ -374,7 +374,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
             .Where(c => c.Width.Type == ColumnWidthType.Percent).ToArray();
         var percentWidth = percentColumns.Sum(c =>
         {
-            c.CalcWidth(leftWidth, leftColumns);
+            c.CalcWidth(leftWidth, leftColumns, Theme.RowHeight);
             return c.LayoutWidth;
         });
         leftWidth -= percentWidth;
@@ -385,7 +385,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
             .Where(c => c.Width.Type == ColumnWidthType.Auto).ToArray();
         foreach (var col in autoColumns)
         {
-            col.CalcWidth(leftWidth, leftColumns);
+            col.CalcWidth(leftWidth, leftColumns, Theme.RowHeight);
         }
     }
 

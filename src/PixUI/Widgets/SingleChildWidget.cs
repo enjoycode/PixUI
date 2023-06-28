@@ -8,7 +8,7 @@ namespace PixUI;
 /// </summary>
 public abstract class SingleChildWidget : Widget
 {
-    public /*public for web*/ SingleChildWidget()
+    protected SingleChildWidget()
     {
         IsLayoutTight = true;
     }
@@ -63,19 +63,16 @@ public abstract class SingleChildWidget : Widget
             return;
         }
 
-        Child.Layout(width - padding.Left - padding.Right,
-            height - padding.Top - padding.Bottom);
+        Child.Layout(width - padding.Left - padding.Right, height - padding.Top - padding.Bottom);
         Child.SetPosition(padding.Left, padding.Top);
 
         if (IsLayoutTight)
-            SetSize(Child.W + padding.Left + padding.Right,
-                Child.H + padding.Top + padding.Bottom);
+            SetSize(Child.W + padding.Left + padding.Right, Child.H + padding.Top + padding.Bottom);
         else
             SetSize(width, height);
     }
 
-    protected internal override void OnChildSizeChanged(Widget child, float dx, float dy,
-        AffectsByRelayout affects)
+    protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
     {
         Debug.Assert(AutoSize);
 

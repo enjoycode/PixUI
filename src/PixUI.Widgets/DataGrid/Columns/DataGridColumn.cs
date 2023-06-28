@@ -47,7 +47,7 @@ public abstract class DataGridColumn<T>
     /// <summary>
     /// 非分组列计算实际像素宽度
     /// </summary>
-    internal void CalcWidth(float leftWidth, int leftColumns)
+    internal void CalcWidth(float leftWidth, int leftColumns, float rowHeight)
     {
         var widthChanged = false;
         if (Width.Type == ColumnWidthType.Percent)
@@ -63,18 +63,20 @@ public abstract class DataGridColumn<T>
             _cachedWidth = newWidth;
         }
 
-        if (widthChanged) ClearAllCache();
+        if (widthChanged) OnWidthChanged(_cachedWidth, rowHeight);
     }
 
     /// <summary>
     /// 改变列宽或重设数据源后清除所有缓存
     /// </summary>
-    internal virtual void ClearAllCache() { }
+    protected internal virtual void ClearAllCache() { }
+
+    protected internal virtual void OnWidthChanged(float width, float height) => ClearAllCache();
 
     /// <summary>
     /// 滚动后清除相关缓存
     /// </summary>
-    internal virtual void ClearCacheOnScroll(bool isScrollDown, int rowIndex) { }
+    protected internal virtual void ClearCacheOnScroll(bool isScrollDown, int rowIndex) { }
 
     /// <summary>
     ///  画标题，允许子类特殊绘制(如CheckBoxColumn)
