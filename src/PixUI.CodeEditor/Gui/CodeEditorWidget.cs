@@ -27,10 +27,16 @@ namespace CodeEditor
         public MouseRegion MouseRegion { get; }
         public FocusNode FocusNode { get; }
 
+        #region ====IScrollable====
+
         public float ScrollOffsetX => Controller.TextEditor.VirtualTop.X;
 
         public float ScrollOffsetY => Controller.TextEditor.VirtualTop.Y;
 
+        public bool IgnoreScrollOffsetForHitTest => false;
+
+        #endregion
+        
         #region ====EventHandles====
 
         internal void RequestInvalidate(bool all, IDirtyArea? dirtyArea)

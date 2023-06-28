@@ -29,6 +29,7 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
 
     public float ScrollOffsetX => _controller.ScrollController.OffsetX;
     public float ScrollOffsetY => _controller.ScrollController.OffsetY;
+    public bool IgnoreScrollOffsetForHitTest => true;
 
     public Offset OnScroll(float dx, float dy)
     {
@@ -100,18 +101,6 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
         _controller.CalcColumnsWidth(new Size(width, height));
     }
 
-    // protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)
-    // {
-    //     base.BeforePaint(canvas, onlyTransform, dirtyRect);
-    //     
-    //     if (onlyTransform) //仅处理转换坐标，因HostColumn内的CellWidget需要处理滚动偏移量
-    //     {
-    //         Log.Debug($"偏移量: {ScrollOffsetY}");
-    //         canvas.Translate(-ScrollOffsetX, -ScrollOffsetY);
-    //     }
-    //     //TODO:考虑始终clip，这样Hosted CellWidget的某些装饰器不会超出范围
-    // }
-
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
         var size = new Size(W, H);
@@ -159,8 +148,7 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
         canvas.Restore();
     }
 
-    private void PaintHeader(Canvas canvas, Size size, float totalColumnsWidth,
-        IList<DataGridColumn<T>> visibleColumns)
+    private void PaintHeader(Canvas canvas, Size size, float totalColumnsWidth, IList<DataGridColumn<T>> visibleColumns)
     {
         var paintedGroupColumns = new List<DataGridGroupColumn<T>>();
 

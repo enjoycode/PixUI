@@ -8,6 +8,11 @@ public interface IScrollable
     float ScrollOffsetX { get; }
 
     float ScrollOffsetY { get; }
+    
+    /// <summary>
+    /// 在HitTest时忽略滚动量，用于如DataGrid自己处理Hosted CellWidget的位置
+    /// </summary>
+    bool IgnoreScrollOffsetForHitTest { get; }
         
     /// <summary>
     /// 处理滚动事件的偏移量

@@ -33,17 +33,15 @@ public sealed class HitTestResult
 
         LastHitWidget = widget;
         _transform.Translate(-widget.X, -widget.Y);
-        if (widget.Parent != null)
+        if (widget.Parent is IScrollable scrollable && !scrollable.IgnoreScrollOffsetForHitTest)
         {
-            var parent = widget.Parent!;
-            if (parent is IScrollable scrollable) //不要合并条件，Web暂不支持
-                _transform.Translate(scrollable.ScrollOffsetX, scrollable.ScrollOffsetY);
+            _transform.Translate(scrollable.ScrollOffsetX, scrollable.ScrollOffsetY);
         }
 
         var isOpaqueMouseRegion = false;
         if (widget is IMouseRegion mouseRegion)
         {
-            _path.Add(new HitTestEntry(mouseRegion, _transform /*TODO:确认Web clone*/));
+            _path.Add(new HitTestEntry(mouseRegion, _transform));
             isOpaqueMouseRegion = mouseRegion.MouseRegion.Opaque;
         }
 
@@ -66,8 +64,7 @@ public sealed class HitTestResult
     /// 滚动时判断是否超出已命中的范围，没有则更新Transform
     /// </summary>
     /// <returns>false=已失效，需要重新HitTest</returns>
-    internal bool TranslateOnScroll(Widget scrollable, float dx, float dy, float winX,
-        float winY)
+    internal bool TranslateOnScroll(Widget scrollable, float dx, float dy, float winX, float winY)
     {
         //如果scrollable就是LastHitWidget，不需要处理
         if (ReferenceEquals(LastHitWidget, scrollable))
@@ -195,8 +192,7 @@ public sealed class HitTestResult
     /// <summary>
     /// 向上(冒泡)传播PointerEvent
     /// </summary>
-    internal void PropagatePointerEvent(PointerEvent e,
-        Action<MouseRegion, PointerEvent> handler)
+    internal void PropagatePointerEvent(PointerEvent e, Action<MouseRegion, PointerEvent> handler)
     {
         for (var i = _path.Count - 1; i >= 0; i--)
         {

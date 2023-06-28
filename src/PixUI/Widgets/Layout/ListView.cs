@@ -131,8 +131,11 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
         }
     }
 
+    #region ====IScrollable====
+
     public float ScrollOffsetX => _controller.ScrollController.OffsetX;
     public float ScrollOffsetY => _controller.ScrollController.OffsetY;
+    public bool IgnoreScrollOffsetForHitTest => false;
 
     public Offset OnScroll(float dx, float dy)
     {
@@ -149,4 +152,6 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
             Invalidate(InvalidAction.Repaint);
         return offset;
     }
+
+    #endregion
 }

@@ -107,9 +107,15 @@ public abstract class Widget : IStateBindable, IDisposable
 
     #region ----Layout Bounds----
 
-    protected internal float X { get; private set; }
+    /// <summary>
+    /// 布局计算后相对于上级的位置，允许覆写以支持动态计算
+    /// </summary>
+    protected internal virtual float X { get; private set; }
 
-    protected internal float Y { get; private set; }
+    /// <summary>
+    /// 布局计算后相对于上级的位置，允许覆写以支持动态计算
+    /// </summary>
+    protected internal virtual float Y { get; private set; }
 
     /// <summary>
     /// 布局计算后的可视宽度
@@ -284,14 +290,13 @@ public abstract class Widget : IStateBindable, IDisposable
     {
         var scrollOffsetX = 0f;
         var scrollOffsetY = 0f;
-        if (this is IScrollable scrollable)
+        if (this is IScrollable scrollable && !scrollable.IgnoreScrollOffsetForHitTest)
         {
             scrollOffsetX = scrollable.ScrollOffsetX;
             scrollOffsetY = scrollable.ScrollOffsetY;
         }
 
-        var hit = child.HitTest(x - child.X + scrollOffsetX, y - child.Y + scrollOffsetY, result);
-        return hit;
+        return child.HitTest(x - child.X + scrollOffsetX, y - child.Y + scrollOffsetY, result);
     }
 
     #endregion

@@ -10,7 +10,7 @@ public abstract class UIWindow
         //在构建WidgetTree前设置初始路由路径
         if (!string.IsNullOrEmpty(initRoutePath))
             RouteHistoryManager.AssignedPath = initRoutePath;
-            
+
         Overlay = new Overlay(this);
         RootWidget = new Root(this, child);
 
@@ -132,17 +132,20 @@ public abstract class UIWindow
         LastMouseX = e.X;
         LastMouseY = e.Y;
 
-        if (_oldHitResult.StillInLastRegion(e.X, e.Y))
+        if (e.Buttons == PointerButtons.None) //无按键开始HitTest
         {
-            OldHitTest(e.X, e.Y); //仍在旧的命中范围内
-        }
-        else
-        {
-            NewHitTest(e.X, e.Y); //重新开始检测
-        }
+            if (_oldHitResult.StillInLastRegion(e.X, e.Y))
+            {
+                OldHitTest(e.X, e.Y); //仍在旧的命中范围内
+            }
+            else
+            {
+                NewHitTest(e.X, e.Y); //重新开始检测
+            }
 
-        //开始比较新旧命中结果，激发相应的HoverChanged事件
-        CompareAndSwapHitTestResult();
+            //开始比较新旧命中结果，激发相应的HoverChanged事件
+            CompareAndSwapHitTestResult();
+        }
 
         //如果命中MouseRegion，则向上传播事件(TODO: 考虑不传播)
         if (_oldHitResult.IsHitAnyMouseRegion)
@@ -163,7 +166,7 @@ public abstract class UIWindow
         //TODO:移动端强制HitTest
         if (!_oldHitResult.IsHitAnyWidget)
         {
-            //TODO: overlay first
+            //TODO: overlay first,另考虑向上逐级判断是否在旧命中区域内以避免从根节点重新开始
             RootWidget.HitTest(pointerEvent.X, pointerEvent.Y, _oldHitResult);
         }
 
@@ -274,8 +277,7 @@ public abstract class UIWindow
     public void AfterScrollDone(Widget scrollable, Offset offset)
     {
         //判断旧HitResult是否隶属于当前IScrollable的子级
-        if (_oldHitResult.IsHitAnyWidget &&
-            scrollable.IsAnyParentOf(_oldHitResult.LastHitWidget))
+        if (_oldHitResult.IsHitAnyWidget && scrollable.IsAnyParentOf(_oldHitResult.LastHitWidget))
         {
             AfterScrollDoneInternal(scrollable, offset.Dx, offset.Dy);
         }
@@ -285,8 +287,7 @@ public abstract class UIWindow
     {
         Debug.Assert(dx != 0 || dy != 0);
         //Translate HitTestResult and Rerun hit test.
-        var stillInLastRegion =
-            _oldHitResult.TranslateOnScroll(scrollable, dx, dy, LastMouseX, LastMouseY);
+        var stillInLastRegion = _oldHitResult.TranslateOnScroll(scrollable, dx, dy, LastMouseX, LastMouseY);
         if (stillInLastRegion)
             OldHitTest(LastMouseX, LastMouseY);
         else

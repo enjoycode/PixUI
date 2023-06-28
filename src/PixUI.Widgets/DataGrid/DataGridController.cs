@@ -195,8 +195,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
     internal void ClearCacheOnScroll(bool isScrollDown, int rowIndex)
     {
         //Console.WriteLine($"---------->ClearCache: down={isScrollDown} row={rowIndex}");
-        //TODO:暂所有列，考虑仅可见列
-        foreach (var column in _cachedLeafColumns)
+        foreach (var column in _cachedLeafColumns /*TODO:暂所有列，考虑仅可见列*/)
         {
             column.ClearCacheOnScroll(isScrollDown, rowIndex);
         }
