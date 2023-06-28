@@ -194,11 +194,14 @@ public sealed class HitTestResult
     /// </summary>
     internal void PropagatePointerEvent(PointerEvent e, Action<MouseRegion, PointerEvent> handler)
     {
+        var winX = e.X;
+        var winY = e.Y;
         for (var i = _path.Count - 1; i >= 0; i--)
         {
             var transformed = MatrixUtils.TransformPoint(_path[i].Transform, e.X, e.Y);
             e.SetPoint(transformed.Dx, transformed.Dy);
             handler(_path[i].Widget.MouseRegion, e);
+            e.SetPoint(winX, winY); //Reset for reuse PointerEvent
             if (e.IsHandled)
                 return; //Stop propagate
         }

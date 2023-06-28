@@ -266,9 +266,7 @@ public abstract class UIWindow
 
         //重置并交换
         _oldHitResult.Reset();
-        var temp = _oldHitResult;
-        _oldHitResult = _newHitResult;
-        _newHitResult = temp;
+        (_oldHitResult, _newHitResult) = (_newHitResult, _oldHitResult);
     }
 
     /// <summary>
