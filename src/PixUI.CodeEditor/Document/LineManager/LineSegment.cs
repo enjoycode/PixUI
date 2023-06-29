@@ -423,14 +423,12 @@ namespace CodeEditor
                 if (column == 0) return 0;
 
                 var columnStart = column - 1;
-                if (column > 1 &&
-                    TextUtils.IsMultiCodeUnit(editor.Document.GetCharAt(Offset + column - 2)))
+                if (column > 1 && TextUtils.IsMultiCodeUnit(editor.Document.GetCharAt(Offset + column - 2)))
                 {
                     columnStart -= 1;
                 }
 
-                var box1 = para.GetRectForPosition(columnStart, BoxHeightStyle.Tight,
-                    BoxWidthStyle.Tight);
+                var box1 = para.GetRectForPosition(columnStart, BoxHeightStyle.Tight, BoxWidthStyle.Tight);
                 return box1.Rect.Right;
             }
 

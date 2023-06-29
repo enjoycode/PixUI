@@ -97,7 +97,7 @@ public abstract class DataGridColumn<T>
         PaintCellParagraph(canvas, cellRect, cellStyle, ph);
     }
 
-    internal virtual void PaintCell(Canvas canvas, DataGridController<T> controller, int rowIndex, Rect cellRect) { }
+    protected internal virtual void PaintCell(Canvas canvas, DataGridController<T> controller, int rowIndex, Rect cellRect) { }
 
     internal static Paragraph BuildCellParagraph(Rect rect, CellStyle style, string text, int maxLines)
     {

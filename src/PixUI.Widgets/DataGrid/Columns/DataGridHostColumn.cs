@@ -69,7 +69,8 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
 
     public float LeftToDataGrid => CachedLeft;
 
-    internal override void PaintCell(Canvas canvas, DataGridController<T> controller, int rowIndex, Rect cellRect)
+    protected internal override void PaintCell(Canvas canvas, DataGridController<T> controller, int rowIndex,
+        Rect cellRect)
     {
         var cellWidget = GetOrMakeCellWidget(rowIndex, controller, cellRect);
         canvas.Translate(cellRect.Left, cellRect.Top);
@@ -108,6 +109,8 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
         Debug.Assert(index >= 0);
         return _cellWidgets[index].CachedItem!;
     }
+
+    protected internal override void ClearAllCache() => _cellWidgets.Clear();
 
     protected internal override void OnWidthChanged(float width, float height)
     {

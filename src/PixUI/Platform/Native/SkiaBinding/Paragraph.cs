@@ -36,8 +36,7 @@ namespace PixUI
             TextBox textBox;
             unsafe
             {
-                SkiaApi.sk_paragraph_get_rect_for_position(Handle, pos,
-                    (int)heightStyle, (int)widthStyle, &textBox);
+                SkiaApi.sk_paragraph_get_rect_for_position(Handle, pos, (int)heightStyle, (int)widthStyle, &textBox);
             }
 
             return textBox;

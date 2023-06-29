@@ -57,6 +57,9 @@ namespace CodeEditor
         /// <summary>
         /// Clears the selection and sets a new selection
         /// </summary>
+        /// <remarks>
+        /// 不判断新的Selection是否为空，由调用者判断
+        /// </remarks>
         internal void SetSelection(TextLocation startPosition, TextLocation endPosition)
         {
             if (SelectionCollection.Count == 1 &&
@@ -65,8 +68,8 @@ namespace CodeEditor
                 return;
 
             SelectionCollection.Clear(); //clearWithoutUpdate();
-            SelectionCollection.Add(new Selection(_textEditor.Document, startPosition,
-                endPosition));
+            SelectionCollection.Add(new Selection(_textEditor.Document, startPosition, endPosition));
+
             SelectionChanged?.Invoke();
         }
 

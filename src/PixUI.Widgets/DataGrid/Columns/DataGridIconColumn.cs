@@ -13,8 +13,8 @@ public sealed class DataGridIconColumn<T> : DataGridColumn<T>
 
     private readonly Func<T, IconData?> _cellValueGetter;
 
-    internal override void PaintCell(Canvas canvas, DataGridController<T> controller,
-        int rowIndex, Rect cellRect)
+    protected internal override void PaintCell(Canvas canvas, DataGridController<T> controller, int rowIndex,
+        Rect cellRect)
     {
         var row = controller.DataView![rowIndex];
         var icon = _cellValueGetter(row);

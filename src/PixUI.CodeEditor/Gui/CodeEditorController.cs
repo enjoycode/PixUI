@@ -272,6 +272,8 @@ namespace CodeEditor
         public void SetSelection(TextLocation start, TextLocation end) =>
             TextEditor.SelectionManager.SetSelection(start, end);
 
+        public void ClearSelection() => TextEditor.SelectionManager.ClearSelection();
+
         public void ScrollTo(int line) => TextEditor.ScrollTo(line);
 
         #endregion

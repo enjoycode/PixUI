@@ -16,8 +16,8 @@ public sealed class DataGridTextColumn<T> : DataGridColumn<T>
 
     private static readonly CellCacheComparer<Paragraph> _cellCacheComparer = new();
 
-    internal override void PaintCell(Canvas canvas, DataGridController<T> controller,
-        int rowIndex, Rect cellRect)
+    protected internal override void PaintCell(Canvas canvas, DataGridController<T> controller, int rowIndex,
+        Rect cellRect)
     {
         var row = controller.DataView![rowIndex];
         var cellValue = _cellValueGetter(row);
