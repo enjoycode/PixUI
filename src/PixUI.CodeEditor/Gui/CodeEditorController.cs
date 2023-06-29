@@ -109,8 +109,8 @@ namespace CodeEditor
             var oldX = TextEditor.VirtualTop.X;
             var oldY = TextEditor.VirtualTop.Y;
 
-            var newX = Math.Clamp(oldX + dx, 0, TextEditor.MaxHScrollValue);
-            var newY = Math.Clamp(oldY + dy, 0, TextEditor.MaxVScrollValue);
+            var newX = dx == 0 ? oldX : Math.Clamp(oldX + dx, 0, TextEditor.MaxHScrollValue);
+            var newY = dy == 0 ? oldY : Math.Clamp(oldY + dy, 0, TextEditor.MaxVScrollValue);
 
             var offset = new Offset(newX - oldX, newY - oldY);
             if (offset.Dx != 0 || offset.Dy != 0)
@@ -266,13 +266,13 @@ namespace CodeEditor
         {
             TextEditor.Caret.Position = new TextLocation(column, line);
 
-            //TODO: anminate scroll to caret position
+            //TODO: animate scroll to caret position
         }
 
-        public void SetSelection(TextLocation start, TextLocation end)
-        {
+        public void SetSelection(TextLocation start, TextLocation end) =>
             TextEditor.SelectionManager.SetSelection(start, end);
-        }
+
+        public void ScrollTo(int line) => TextEditor.ScrollTo(line);
 
         #endregion
 

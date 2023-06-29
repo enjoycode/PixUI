@@ -18,64 +18,51 @@ namespace CodeEditor
 
         private readonly TextEditor _textEditor;
         private int _line = 0;
-
         private int _column = 0;
-        // private int _oldLine = -1;
 
+        private float _caretPosX = 0;
+        private float _caretPosY = 0;
+        
+        internal event Action? PositionChanged;
+
+        // private TextLocation _currentPos = new TextLocation(-1, -1);
+
+        // /// <summary>
+        // /// The 'prefered' xPos in which the caret moves, when it is moved
+        // /// up/down. Measured in pixels, not in characters!
+        // /// </summary>
+        // private float _desiredXPos = 0;
+        
         public int Line
         {
             get => _line;
-            internal set
-            {
-                if (_line != value)
-                {
-                    _line = value;
-                    ValidateCaretPos();
-                    UpdateCaretPosition();
-                    OnPositionChanged();
-                }
-            }
+            // internal set
+            // {
+            //     if (_line != value)
+            //     {
+            //         _line = value;
+            //         ValidateCaretPos();
+            //         UpdateCaretPosition();
+            //         OnPositionChanged();
+            //     }
+            // }
         }
 
         public int Column
         {
             get => _column;
-            internal set
-            {
-                if (_column != value)
-                {
-                    _column = value;
-                    ValidateCaretPos();
-                    UpdateCaretPosition();
-                    OnPositionChanged();
-                }
-            }
+            // internal set
+            // {
+            //     if (_column != value)
+            //     {
+            //         _column = value;
+            //         ValidateCaretPos();
+            //         UpdateCaretPosition();
+            //         OnPositionChanged();
+            //     }
+            // }
         }
-
-        private float _caretPosX = 0;
-        private float _caretPosY = 0;
-
-        private TextLocation _currentPos = new TextLocation(-1, -1);
-
-        /// <summary>
-        /// The 'prefered' xPos in which the caret moves, when it is moved
-        /// up/down. Measured in pixels, not in characters!
-        /// </summary>
-        private float _desiredXPos = 0;
-
-        internal CaretMode Mode { get; set; } = CaretMode.InsertMode;
-
-        /// <summary>
-        /// 在编辑器上的位置(像素)
-        /// </summary>
-        internal float CanvasPosX =>
-            _textEditor.TextView.Bounds.Left + _caretPosX - _textEditor.VirtualTop.X - 0.5f /*offset*/;
-
-        /// <summary>
-        /// 在编辑器上的位置(像素)
-        /// </summary>
-        internal float CanvasPosY => _textEditor.TextView.Bounds.Top + _caretPosY - _textEditor.VirtualTop.Y;
-
+        
         internal TextLocation Position
         {
             get => new TextLocation(_column, _line);
@@ -92,8 +79,38 @@ namespace CodeEditor
         }
 
         internal int Offset => _textEditor.Document.PositionToOffset(Position);
+        
+        internal CaretMode Mode { get; set; } = CaretMode.InsertMode;
 
-        internal event Action? PositionChanged;
+        private float CaretWidth => 2;
+        private float CaretHeight => _textEditor.TextView.FontHeight;
+
+        /// <summary>
+        /// 相对于编辑器(非TextView)的位置(像素)
+        /// </summary>
+        internal float CanvasPosX =>
+            _textEditor.TextView.Bounds.Left + _caretPosX - _textEditor.VirtualTop.X - 0.5f /*offset*/;
+
+        /// <summary>
+        /// 相对于编辑器(非TextView)的位置(像素)
+        /// </summary>
+        internal float CanvasPosY => _textEditor.TextView.Bounds.Top + _caretPosY - _textEditor.VirtualTop.Y;
+
+        /// <summary>
+        /// 光标在TextView内是否可见
+        /// </summary>
+        internal bool IsVisibleInCanvas
+        {
+            get
+            {
+                var textViewBounds = _textEditor.TextView.Bounds;
+                var cx = CanvasPosX;
+                var cy = CanvasPosY;
+                if (cx + CaretWidth <= textViewBounds.Left || cx >= textViewBounds.Right) return false;
+                if (cy + CaretHeight <= textViewBounds.Top || cy >= textViewBounds.Bottom) return false;
+                return true;
+            }
+        }
 
         internal TextLocation ValidatePosition(TextLocation pos)
         {
@@ -142,26 +159,27 @@ namespace CodeEditor
         private void OnPositionChanged()
         {
             PositionChanged?.Invoke();
-            //TODO: _textArea.ScrollToCaret();
+            //如果光标超出画布可见范围则滚动至可见
+            if (!IsVisibleInCanvas)
+                _textEditor.ScrollToCaret();
         }
 
         internal void Paint(Canvas canvas)
         {
-            var fontHeight = _textEditor.TextView.FontHeight;
-            var textViewArea = _textEditor.TextView.Bounds;
+            var textViewBounds = _textEditor.TextView.Bounds;
 
             // draw caret
             var cx = CanvasPosX;
             var cy = CanvasPosY;
-            if (cx >= textViewArea.Left - 0.5f) //TODO:进一步判断超出范围
+            if (IsVisibleInCanvas)
             {
                 var paint = PaintUtils.Shared(_textEditor.Theme.CaretColor);
-                canvas.DrawRect(Rect.FromLTWH(cx, cy, 2, fontHeight), paint);
+                canvas.DrawRect(Rect.FromLTWH(cx, cy, CaretWidth, CaretHeight), paint);
             }
 
             // draw highlight background
             var bgPaint = PaintUtils.Shared(_textEditor.Theme.LineHighlightColor);
-            canvas.DrawRect(Rect.FromLTWH(textViewArea.Left, cy, textViewArea.Width, fontHeight), bgPaint);
+            canvas.DrawRect(Rect.FromLTWH(textViewBounds.Left, cy, textViewBounds.Width, CaretHeight), bgPaint);
         }
     }
 }

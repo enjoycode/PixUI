@@ -8,6 +8,7 @@ namespace PixUI.Demo.Mac
     public sealed class DemoCodeEditor : View
     {
         private readonly CodeEditorController _controller;
+        private readonly State<string> _scrollTo = "0";
 
         private const string SrcCode = @"
 public sealed class Person
@@ -25,17 +26,37 @@ public sealed class Person
         {
             _controller = new CodeEditorController("Demo.cs", SrcCode, new MockCompletionProvider());
 
-            Child = new Container()
+            Child = new Column
             {
-                Padding = EdgeInsets.All(20),
-                Child = new CodeEditorWidget(_controller),
+                Children =
+                {
+                    new Row(VerticalAlignment.Middle, 20)
+                    {
+                        Children = new Widget[]
+                        {
+                            new Input(_scrollTo) { Width = 100 },
+                            new Button("ScrollTo")
+                            {
+                                OnTap = _ => _controller.ScrollTo(int.Parse(_scrollTo.Value))
+                            }
+                        }
+                    },
+                    new Expanded
+                    {
+                        Child = new Container
+                        {
+                            Padding = EdgeInsets.All(20),
+                            Child = new CodeEditorWidget(_controller),
+                        }
+                    }
+                }
             };
         }
     }
 
     internal sealed class MockCompletionProvider : ICompletionProvider
     {
-        public IEnumerable<char> TriggerCharacters => new char[] { '.' };
+        public IEnumerable<char> TriggerCharacters => new[] { '.' };
 
         public Task<IList<ICompletionItem>?> ProvideCompletionItems(Document document,
             int offset, string? completionWord)

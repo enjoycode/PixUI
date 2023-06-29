@@ -10,7 +10,7 @@ namespace PixUI.Demo.Mac
 
             Child = new Column()
             {
-                Children = new Widget[]
+                Children =
                 {
                     new Row(VerticalAlignment.Middle, 20)
                     {
@@ -24,8 +24,7 @@ namespace PixUI.Demo.Mac
                             }
                         }
                     },
-                    new Expanded()
-                        { Child = ListView<Widget>.From(BuildList(), listViewController) }
+                    new Expanded { Child = ListView<Widget>.From(BuildList(), listViewController) }
                 }
             };
         }

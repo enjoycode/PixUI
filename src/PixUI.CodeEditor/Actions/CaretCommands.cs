@@ -66,12 +66,11 @@ namespace CodeEditor
             else
             {
                 // no folding is interesting
-                if (position.Column < curLine.Length ||
-                    editor.Document.TextEditorOptions.AllowCaretBeyondEOL)
+                if (position.Column < curLine.Length || editor.Document.TextEditorOptions.AllowCaretBeyondEOL)
                 {
                     position.Column += 1;
                 }
-                else if (position.Column + 1 < editor.Document.TotalNumberOfLines)
+                else if (position.Line + 1 < editor.Document.TotalNumberOfLines)
                 {
                     position.Line += 1;
                     position.Column = 0;
@@ -92,10 +91,9 @@ namespace CodeEditor
             if (visualLine > 0)
             {
                 //暂用模拟点击位置
-                var vx = editor.TextView.GetDrawingXPos(position.Line, position.Column) +
-                         editor.VirtualTop.X;
-                var vy = editor.TextView.Bounds.Top +
-                    (visualLine - 1) * editor.TextView.FontHeight - editor.VirtualTop.Y;
+                var vx = editor.TextView.GetDrawingXPos(position.Line, position.Column) + editor.VirtualTop.X;
+                var vy = editor.TextView.Bounds.Top + (visualLine - 1) * editor.TextView.FontHeight -
+                         editor.VirtualTop.Y;
                 var logicalLine = editor.TextView.GetLogicalLine(vy);
                 var logicalColumn = editor.TextView.GetLogicalColumn(logicalLine, vx);
                 editor.Caret.Position = logicalColumn.Location;
@@ -112,11 +110,8 @@ namespace CodeEditor
             if (visualLine < editor.Document.GetVisibleLine(editor.Document.TotalNumberOfLines))
             {
                 //暂用模拟点击位置
-                var vx =
-                    editor.TextView.GetDrawingXPos(position.Line, position.Column) +
-                    editor.VirtualTop.X;
-                var vy = editor.TextView.Bounds.Top +
-                         (visualLine + 1) * editor.TextView.FontHeight -
+                var vx = editor.TextView.GetDrawingXPos(position.Line, position.Column) + editor.VirtualTop.X;
+                var vy = editor.TextView.Bounds.Top + (visualLine + 1) * editor.TextView.FontHeight -
                          editor.VirtualTop.Y;
                 var logicalLine = editor.TextView.GetLogicalLine(vy);
                 var logicalColumn = editor.TextView.GetLogicalColumn(logicalLine, vx);

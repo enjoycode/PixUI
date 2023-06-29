@@ -33,12 +33,10 @@ namespace CodeEditor
         public void Execute(TextEditor editor)
         {
             //TODO: return when readonly
-#pragma warning disable CS4014
             ExecInternal(editor);
-#pragma warning restore CS4014
         }
 
-        private static async ValueTask ExecInternal(TextEditor editor)
+        private static async void ExecInternal(TextEditor editor)
         {
             var text = await Clipboard.ReadText();
             if (string.IsNullOrEmpty(text)) return;
@@ -46,8 +44,7 @@ namespace CodeEditor
             editor.Document.UndoStack.StartUndoGroup();
             if (editor.SelectionManager.HasSomethingSelected)
             {
-                editor.Caret.Position =
-                    editor.SelectionManager.SelectionCollection[0].StartPosition;
+                editor.Caret.Position = editor.SelectionManager.SelectionCollection[0].StartPosition;
                 editor.SelectionManager.RemoveSelectedText();
             }
 

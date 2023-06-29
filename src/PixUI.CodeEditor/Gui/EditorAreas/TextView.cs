@@ -7,14 +7,26 @@ namespace CodeEditor
     {
         public TextView(TextEditor textEditor) : base(textEditor)
         {
+            //TODO: 从Theme取Font设置 and Web use FontCollection.DefaultFontFamily
+            var defaultFont = new Font(
+                FontCollection.Instance.DefaultFallback('X', null, false, false),
+                Theme.FontSize);
+
             FontHeight = textEditor.Theme.FontSize + textEditor.Theme.LineSpace * 2;
+            SpaceWidth = defaultFont.MeasureString(" ").Width;
+            WideSpaceWidth = Math.Max(SpaceWidth, defaultFont.MeasureString("x").Width);
+            //TODO: change theme font reset cached value
         }
 
-        private float _spaceWidth = 10; //TODO: fix
+        internal float SpaceWidth { get; private set; }
+
+        internal float WideSpaceWidth { get; private set; }
 
         internal float FontHeight { get; } //TODO: rename to LineHeight
 
         internal int VisibleLineCount => 1 + (int)Math.Round(Bounds.Height / FontHeight);
+
+        internal int VisibleColumnCount => (int)(Bounds.Width / WideSpaceWidth) - 1;
 
         internal int VisibleLineDrawingRemainder => (int)Math.Round(TextEditor.VirtualTop.Y % FontHeight);
 
@@ -36,6 +48,8 @@ namespace CodeEditor
 
         internal int FirstPhysicalLine => (int)(TextEditor.VirtualTop.Y / FontHeight);
 
+        internal int LineHeightRemainder => (int)(TextEditor.VirtualTop.Y % FontHeight);
+
         internal TextLocation GetLogicalPosition(float visualPosX, float visualPosY)
             => GetLogicalColumn(GetLogicalLine(visualPosY), visualPosX).Location;
 
@@ -44,9 +58,7 @@ namespace CodeEditor
             visualPosX += TextEditor.VirtualTop.X;
             if (lineNumber >= Document.TotalNumberOfLines)
             {
-                return new LogicalColumnInfo(
-                    new TextLocation((int)(visualPosX / _spaceWidth), lineNumber),
-                    null);
+                return new LogicalColumnInfo(new TextLocation((int)(visualPosX / SpaceWidth), lineNumber), null);
             }
 
             if (visualPosX <= 0)
@@ -89,11 +101,14 @@ namespace CodeEditor
         /// </summary>
         internal int GetLogicalLine(float visualPosY)
         {
-            var clickedVisualLine =
-                Math.Max(0, (int)((visualPosY + TextEditor.VirtualTop.Y) / FontHeight));
+            var clickedVisualLine = Math.Max(0, (int)((visualPosY + TextEditor.VirtualTop.Y) / FontHeight));
             return Document.GetFirstLogicalLine(clickedVisualLine);
         }
 
+        /// <summary>
+        /// 获取指定行列相对于TextView的X位置(像素)
+        /// </summary>
+        /// <returns>负值或大于TextView.Width表示超出可见范围(包括滚动偏移量 )</returns>
         internal float GetDrawingXPos(int logicalLine, int logicalColumn)
         {
             var foldings = Document.FoldingManager.GetTopLevelFoldedFoldings();
