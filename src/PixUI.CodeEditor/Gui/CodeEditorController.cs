@@ -109,12 +109,16 @@ namespace CodeEditor
             var oldX = TextEditor.VirtualTop.X;
             var oldY = TextEditor.VirtualTop.Y;
 
-            //TODO: low and high bound
-            TextEditor.VirtualTop = new Point(oldX + dx, oldY + dy);
+            var newX = Math.Clamp(oldX + dx, 0, TextEditor.MaxHScrollValue);
+            var newY = Math.Clamp(oldY + dy, 0, TextEditor.MaxVScrollValue);
 
-            var offset = new Offset(TextEditor.VirtualTop.X - oldX, TextEditor.VirtualTop.Y - oldY);
+            var offset = new Offset(newX - oldX, newY - oldY);
             if (offset.Dx != 0 || offset.Dy != 0)
+            {
+                TextEditor.VirtualTop = new Point(newX, newY);
                 Widget.RequestInvalidate(true, null);
+            }
+
             return offset;
         }
 

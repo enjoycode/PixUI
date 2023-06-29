@@ -34,6 +34,8 @@ namespace CodeEditor
         public float ScrollOffsetY => Controller.TextEditor.VirtualTop.Y;
 
         public bool IgnoreScrollOffsetForHitTest => false;
+        
+        public Offset OnScroll(float dx, float dy) => Controller.OnScroll(dx, dy);
 
         #endregion
         
@@ -55,8 +57,6 @@ namespace CodeEditor
             else
                 Root!.Window.StopTextInput();
         }
-
-        public Offset OnScroll(float dx, float dy) => Controller.OnScroll(dx, dy);
 
         protected override void OnMounted()
         {

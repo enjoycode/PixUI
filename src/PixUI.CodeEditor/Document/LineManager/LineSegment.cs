@@ -446,8 +446,7 @@ namespace CodeEditor
             }
 
             //TODO: find column start for multi code unit
-            var box2 = para.GetRectForPosition(offsetInLine - 1, BoxHeightStyle.Tight,
-                BoxWidthStyle.Tight);
+            var box2 = para.GetRectForPosition(offsetInLine - 1, BoxHeightStyle.Tight, BoxWidthStyle.Tight);
             return box2.Rect.Right;
         }
 

@@ -33,14 +33,14 @@ namespace CodeEditor
         internal readonly EditorArea[] LeftAreas;
 
         private Point _virtualTop = Point.Empty;
+        internal Point PointerPos = Point.Empty; //缓存位置
 
         internal Point VirtualTop
         {
             get => _virtualTop;
             set
             {
-                var newVirtualTop = new Point(Math.Max(0, value.X),
-                    Math.Min(MaxVScrollValue, Math.Max(0, value.Y)));
+                var newVirtualTop = new Point(Math.Max(0, value.X), Math.Min(MaxVScrollValue, Math.Max(0, value.Y)));
                 if (_virtualTop != newVirtualTop)
                     _virtualTop = newVirtualTop;
 
@@ -50,10 +50,32 @@ namespace CodeEditor
 
         internal float MaxVScrollValue =>
             (Document.GetVisibleLine(Document.TotalNumberOfLines - 1) + 1 +
-             TextView.VisibleLineCount * 2 / 3) * TextView.FontHeight;
+             TextView.VisibleLineCount * 2f / 3) * TextView.FontHeight;
 
-        internal Point PointerPos = Point.Empty; //缓存位置
+        internal float MaxHScrollValue
+        {
+            get
+            {
+                var max = 0f;
+                var firstLine = TextView.FirstVisibleLine;
+                var lastLine = Document.GetFirstLogicalLine(TextView.FirstPhysicalLine + TextView.VisibleLineCount);
+                if (lastLine >= Document.TotalNumberOfLines)
+                    lastLine = Document.TotalNumberOfLines - 1;
 
+                for (var i = firstLine; i <= lastLine; i++)
+                {
+                    if (!Document.FoldingManager.IsLineVisible(i)) continue;
+
+                    var lineSegment = Document.GetLineSegment(i);
+                    if (lineSegment.Length == 0) continue;
+
+                    var para = lineSegment.GetLineParagraph(this);
+                    max = Math.Max(max, para.MaxIntrinsicWidth);
+                }
+
+                return Math.Min(0, TextView.Bounds.Width - max);
+            }
+        }
 
         /// <summary>
         /// Inserts or replace text at the caret position

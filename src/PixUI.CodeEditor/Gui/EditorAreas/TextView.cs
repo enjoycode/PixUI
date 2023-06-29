@@ -3,7 +3,7 @@ using PixUI;
 
 namespace CodeEditor
 {
-    internal sealed class TextView : EditorArea
+    internal sealed class TextView : EditorArea //TODO: rename to TextArea
     {
         public TextView(TextEditor textEditor) : base(textEditor)
         {
@@ -14,11 +14,9 @@ namespace CodeEditor
 
         internal float FontHeight { get; } //TODO: rename to LineHeight
 
-        internal int VisibleLineCount =>
-            1 + (int)Math.Round(Bounds.Height / FontHeight);
+        internal int VisibleLineCount => 1 + (int)Math.Round(Bounds.Height / FontHeight);
 
-        internal int VisibleLineDrawingRemainder =>
-            (int)Math.Round(TextEditor.VirtualTop.Y % FontHeight);
+        internal int VisibleLineDrawingRemainder => (int)Math.Round(TextEditor.VirtualTop.Y % FontHeight);
 
         /// <summary>
         /// Gets the first visible <b>logical</b> line.
@@ -189,8 +187,7 @@ namespace CodeEditor
                     FontHeight);
                 //TODO: check lineRect overlaps with dirty area.
 
-                var currentLine = Document.GetFirstLogicalLine(
-                    Document.GetVisibleLine(FirstVisibleLine) + y);
+                var currentLine = Document.GetFirstLogicalLine(Document.GetVisibleLine(FirstVisibleLine) + y);
                 if (currentLine >= Document.TotalNumberOfLines) return;
                 var lineSegment = Document.GetLineSegment(currentLine);
                 if (lineSegment.Length == 0) continue;

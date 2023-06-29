@@ -132,10 +132,8 @@ namespace CodeEditor
 
             ValidateCaretPos();
 
-            _caretPosX = _textEditor.TextView.GetDrawingXPos(_line, _column) +
-                         _textEditor.VirtualTop.X;
-            _caretPosY = _textEditor.Document.GetVisibleLine(_line) *
-                         _textEditor.TextView.FontHeight;
+            _caretPosX = _textEditor.TextView.GetDrawingXPos(_line, _column) + _textEditor.VirtualTop.X;
+            _caretPosY = _textEditor.Document.GetVisibleLine(_line) * _textEditor.TextView.FontHeight;
 
             // Console.WriteLine(
             //     "UpdateCaretPosition: line=$_line col=$_column offset=$Offset x=$_caretPosX y=$_caretPosY");
@@ -163,8 +161,7 @@ namespace CodeEditor
 
             // draw highlight background
             var bgPaint = PaintUtils.Shared(_textEditor.Theme.LineHighlightColor);
-            canvas.DrawRect(Rect.FromLTWH(textViewArea.Left, cy, textViewArea.Width, fontHeight),
-                bgPaint);
+            canvas.DrawRect(Rect.FromLTWH(textViewArea.Left, cy, textViewArea.Width, fontHeight), bgPaint);
         }
     }
 }
