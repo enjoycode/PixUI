@@ -117,11 +117,9 @@ public sealed class TextEditor
             var curLineMax = curLineMin + TextView.VisibleLineCount;
             if (line + 2 > curLineMax)
             {
-                var offsetY = 0f;
-                if (TextView.VisibleLineCount == 1)
-                    offsetY = Math.Max(0, Math.Min(maxVScrollValue, (line - 4) * TextView.FontHeight));
-                else
-                    offsetY = Math.Min(maxVScrollValue, (line - TextView.VisibleLineCount + 2) * TextView.FontHeight);
+                var offsetY = TextView.VisibleLineCount == 1
+                    ? Math.Max(0, Math.Min(maxVScrollValue, (line - 4) * TextView.FontHeight))
+                    : Math.Min(maxVScrollValue, (line - TextView.VisibleLineCount + 2) * TextView.FontHeight);
                 Controller.OnScroll(0, offsetY - _virtualTop.Y);
             }
         }
@@ -203,8 +201,7 @@ public sealed class TextEditor
         {
             if (!area.IsVisible) continue;
 
-            var areaRect = Rect.FromLTWH(currentXPos, currentYPos, area.Size.Width,
-                size.Height - currentYPos);
+            var areaRect = Rect.FromLTWH(currentXPos, currentYPos, area.Size.Width, size.Height - currentYPos);
             if (areaRect != area.Bounds)
             {
                 //adjustScrollBars = true;
@@ -216,8 +213,7 @@ public sealed class TextEditor
         }
 
         // paint text area
-        var textRect = Rect.FromLTWH(currentXPos, currentYPos,
-            size.Width - currentXPos, size.Height - currentYPos);
+        var textRect = Rect.FromLTWH(currentXPos, currentYPos, size.Width - currentXPos, size.Height - currentYPos);
         if (textRect != TextView.Bounds)
         {
             //adjustScrollBars = true;
