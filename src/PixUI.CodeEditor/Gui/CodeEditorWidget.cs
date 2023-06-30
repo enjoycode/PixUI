@@ -34,11 +34,11 @@ namespace CodeEditor
         public float ScrollOffsetY => Controller.TextEditor.VirtualTop.Y;
 
         public bool IgnoreScrollOffsetForHitTest => false;
-        
+
         public Offset OnScroll(float dx, float dy) => Controller.OnScroll(dx, dy);
 
         #endregion
-        
+
         #region ====EventHandles====
 
         internal void RequestInvalidate(bool all, IDirtyArea? dirtyArea)
@@ -82,6 +82,9 @@ namespace CodeEditor
             var width = CacheAndCheckAssignWidth(availableWidth);
             var height = CacheAndCheckAssignHeight(availableHeight);
             SetSize(width, height);
+
+            //布局各个EditorArea
+            Controller.TextEditor.Layout(width, height);
         }
 
         public override void Paint(Canvas canvas, IDirtyArea? area = null)

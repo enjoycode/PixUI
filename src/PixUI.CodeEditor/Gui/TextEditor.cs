@@ -187,41 +187,39 @@ public sealed class TextEditor
 
     #endregion
 
-    #region ====Paint all Area====
+    #region ====Layout & Paint====
+
+    internal void Layout(float width, float height)
+    {
+        var currentXPos = 0f;
+        var currentYPos = 0f;
+
+        foreach (var area in LeftAreas)
+        {
+            var areaRect = Rect.FromLTWH(currentXPos, currentYPos, area.Size.Width, height - currentYPos);
+            area.Bounds = areaRect;
+            currentXPos += area.Bounds.Width;
+        }
+
+        var textRect = Rect.FromLTWH(currentXPos, currentYPos, width - currentXPos, height - currentYPos);
+        TextView.Bounds = textRect;
+
+        //TODO: adjust scroll bars
+    }
 
     internal void Paint(Canvas canvas, Size size, IDirtyArea? dirtyArea)
     {
         //TODO: check dirtyArea
-        var currentXPos = 0f;
-        var currentYPos = 0f;
-        //var adjustScrollBars = false;
 
         // paint left areas
         foreach (var area in LeftAreas)
         {
             if (!area.IsVisible) continue;
-
-            var areaRect = Rect.FromLTWH(currentXPos, currentYPos, area.Size.Width, size.Height - currentYPos);
-            if (areaRect != area.Bounds)
-            {
-                //adjustScrollBars = true;
-                area.Bounds = areaRect;
-            }
-
-            currentXPos += area.Bounds.Width;
-            area.Paint(canvas, areaRect);
+            area.Paint(canvas, area.Bounds);
         }
 
         // paint text area
-        var textRect = Rect.FromLTWH(currentXPos, currentYPos, size.Width - currentXPos, size.Height - currentYPos);
-        if (textRect != TextView.Bounds)
-        {
-            //adjustScrollBars = true;
-            TextView.Bounds = textRect;
-            //TODO: updateCaretPosition
-        }
-
-        TextView.Paint(canvas, textRect);
+        TextView.Paint(canvas, TextView.Bounds);
     }
 
     #endregion
