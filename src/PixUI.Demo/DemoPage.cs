@@ -16,8 +16,7 @@ namespace PixUI.Demo
 
         public DemoPage()
         {
-            _fullName = Compute(_firstName, _lastName,
-                (first, last) => "Full:" + first + "-" + last);
+            _fullName = Compute(_firstName, _lastName, (first, last) => "Full:" + first + "-" + last);
 
             var imgData = ResourceLoad.LoadBytes("Resources.Cat.webp");
             Rx<ImageSource> defaultImgSrc = ImageSource.FromEncodedData(imgData);
@@ -30,72 +29,86 @@ namespace PixUI.Demo
         {
             return new Column(debugLabel: "DemoMain")
             {
-                Children = new Widget[]
+                Children =
                 {
                     //Body
-                    new Expanded
+                    new Expanded { Child = BuildBody() },
+                    //Footer
+                    new Container { Height = 20, BgColor = new Color(0xFFCA673B), DebugLabel = "DemoFooter" }
+                }
+            };
+        }
+
+        private Widget BuildBody()
+        {
+            return new Row(spacing: 8)
+            {
+                Children =
+                {
+                    new Column(spacing: 8, debugLabel: "DemoBodyColumn1")
                     {
-                        Child = new Column(spacing: 8, debugLabel: "DemoBody")
+                        Children =
                         {
-                            Children = new Widget[]
+                            new Text(_firstName) { FontSize = 20, TextColor = Colors.Red },
+                            new Text(_lastName) { FontSize = 20, TextColor = Colors.Red },
+                            new Text(_fullName) { FontSize = 50, TextColor = Colors.Red },
+                            new Button("Click Me", MaterialIcons.Search) { OnTap = OnButtonTap },
+                            new ButtonGroup()
                             {
-                                new Text(_firstName) { FontSize = 20, TextColor = Colors.Red },
-                                new Text(_lastName) { FontSize = 20, TextColor = Colors.Red },
-                                new Text(_fullName) { FontSize = 50, TextColor = Colors.Red },
-                                new Button("Click Me", MaterialIcons.Search) { OnTap = OnButtonTap },
-                                new ButtonGroup()
+                                Children = new[]
                                 {
-                                    Children = new[]
-                                    {
-                                        new Button("Button1") { OnTap = OnButton1Tap, Ref = _buttonRef },
-                                        new Button("Button2") { OnTap = OnButton2Tap },
-                                        new Button("Button3") { OnTap = OnButton3Tap },
-                                    },
+                                    new Button("Button1") { OnTap = OnButton1Tap, Ref = _buttonRef },
+                                    new Button("Button2") { OnTap = OnButton2Tap },
+                                    new Button("Button3") { OnTap = OnButton3Tap },
                                 },
-                                new Row(VerticalAlignment.Middle, 10)
+                            },
+                            new Row(VerticalAlignment.Middle, 10)
+                            {
+                                Children = new Widget[]
                                 {
-                                    Children = new Widget[]
-                                    {
-                                        new Switch(false),
-                                        new Checkbox(false),
-                                        Checkbox.Tristate(false),
-                                        new Radio(false),
-                                    }
-                                },
-                                new Select<string>(_selectedValue)
+                                    new Switch(false),
+                                    new Checkbox(false),
+                                    Checkbox.Tristate(false),
+                                    new Radio(false),
+                                }
+                            },
+                            new Select<string>(_selectedValue)
+                            {
+                                Width = 200, Options = new[]
                                 {
-                                    Width = 200, Options = new[]
-                                    {
-                                        "无锡", "上海", "苏州"
-                                    }
-                                },
-                                new Input("Hello World!")
+                                    "无锡", "上海", "苏州"
+                                }
+                            },
+                            new Input("Hello World!")
+                            {
+                                Width = 200,
+                                Prefix = new Icon(MaterialIcons.Person),
+                                Suffix = new Icon(MaterialIcons.Search)
+                            },
+                            new Input("")
+                            {
+                                Width = 200, IsObscure = true,
+                                Prefix = new Icon(MaterialIcons.Lock),
+                                HintText = "Password",
+                            },
+                            new Card
+                            {
+                                Elevation = 2, Width = 200, Height = 266,
+                                Child = new ImageBox(_imgSrc)
                                 {
                                     Width = 200,
-                                    Prefix = new Icon(MaterialIcons.Person),
-                                    Suffix = new Icon(MaterialIcons.Search)
-                                },
-                                new Input("")
-                                {
-                                    Width = 200, IsObscure = true,
-                                    Prefix = new Icon(MaterialIcons.Lock),
-                                    HintText = "Password",
-                                },
-                                new Card
-                                {
-                                    Elevation = 2, Width = 200, Height = 266,
-                                    Child = new ImageBox(_imgSrc)
-                                    {
-                                        Width = 200,
-                                        Height = 266
-                                    }
+                                    Height = 266
                                 }
                             }
                         }
                     },
-                    //Footer
-                    new Container
-                        { Height = 20, BgColor = new Color(0xFFCA673B), DebugLabel = "DemoFooter" }
+                    new Column(spacing: 8, debugLabel: "DemoBodyColumn2")
+                    {
+                        Children =
+                        {
+                            new Card() { Width = 350, Height = 260, Child = new MonthView() }
+                        }
+                    }
                 }
             };
         }
@@ -110,7 +123,7 @@ namespace PixUI.Demo
         private void OnButton1Tap(PointerEvent e)
         {
             _listPopup ??= new ListPopup<Person>(Overlay!, BuidPopupItem, 200, 25)
-            { OnSelectionChanged = OnListPopupSelectionChanged };
+                { OnSelectionChanged = OnListPopupSelectionChanged };
             _listPopup.DataSource ??= Person.GeneratePersons(10);
             if (!_listPopup.IsMounted)
                 _listPopup.Show(_buttonRef.Widget, new Offset(-4, -2),

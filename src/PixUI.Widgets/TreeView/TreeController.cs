@@ -39,7 +39,7 @@ public sealed class TreeController<T> //: IStateBindable
 
     #endregion
 
-    internal Color HoverColor = new Color(0xFFAAAAAA); //TODO:
+    internal Color HoverColor = new Color(0xFFAAAAAA); //TODO: use Theme.HoverColor
     internal float NodeIndent = 20;
     internal float NodeHeight;
     internal float TotalWidth = 0;
