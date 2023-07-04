@@ -188,7 +188,15 @@ public abstract class UIWindow
         if (_hitResultOnPointDown != null)
         {
             if (_hitResultOnPointDown.Value.ContainsPoint(pointerEvent.X, pointerEvent.Y))
+            {
+                var winX = pointerEvent.X;
+                var winY = pointerEvent.Y;
+                var local = MatrixUtils.TransformPoint(_hitResultOnPointDown.Value.Transform, winX, winY);
+                pointerEvent.SetPoint(local.Dx, local.Dy);
                 _hitResultOnPointDown.Value.Widget.MouseRegion.RaisePointerTap(pointerEvent);
+                pointerEvent.SetPoint(winX, winY);
+            }
+
             _hitResultOnPointDown = null;
         }
 
