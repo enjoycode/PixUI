@@ -2,13 +2,14 @@ using System;
 
 namespace PixUI;
 
-public sealed class MonthView : Widget
+public sealed class MonthView : Widget, IMouseRegion
 {
     public MonthView()
     {
         var today = DateTime.Now;
         _year = (ushort)today.Year;
         _month = (ushort)today.Month;
+        InitMouseRegion();
     }
 
     public MonthView(int year, int month)
@@ -17,6 +18,7 @@ public sealed class MonthView : Widget
 
         _year = (ushort)year;
         _month = (ushort)month;
+        InitMouseRegion();
     }
 
     private ushort _year;
@@ -26,6 +28,67 @@ public sealed class MonthView : Widget
     private Paragraph[]? _numberCache;
     private Paragraph[]? _weekCache;
     private byte _hitDay; //当前命中的日期，没有命中等于0
+    private byte _selectedDay; //当前选择的日期，没有等于0
+
+    public MouseRegion MouseRegion { get; private set; } = null!;
+
+    private void InitMouseRegion()
+    {
+        MouseRegion = new MouseRegion();
+        MouseRegion.PointerMove += OnPointerMove;
+        MouseRegion.HoverChanged += OnHoverChanged;
+        MouseRegion.PointerTap += OnPointerTap;
+    }
+
+    private byte HitTestForDay(float x, float y)
+    {
+        if (y > _headerHeight)
+        {
+            var hitRow = (int)Math.Truncate((y - _headerHeight) / _cellSize.Height);
+            var hitCol = (int)Math.Truncate(x / _cellSize.Width);
+            var firstDay = new DateTime(_year, _month, 1);
+            var firstDayOffset = ((int)firstDay.DayOfWeek);
+            var hitDay = (byte)(hitRow * 7 + hitCol - firstDayOffset + 1);
+            if (hitDay < 1 || hitDay > DateTime.DaysInMonth(_year, _month)) hitDay = 0;
+            //Log.Debug($"Hit row={hitRow} col={hitCol} hitDay={hitDay}");
+            return hitDay;
+        }
+
+        return 0;
+    }
+
+    private void OnPointerMove(PointerEvent e)
+    {
+        if (e.Buttons != PointerButtons.None) return;
+
+        var oldHitDay = _hitDay;
+        _hitDay = HitTestForDay(e.X, e.Y);
+
+        Cursor.Current = _hitDay != 0 ? Cursors.Hand : Cursors.Arrow;
+
+        if (_hitDay != oldHitDay)
+            Invalidate(InvalidAction.Repaint);
+    }
+
+    private void OnHoverChanged(bool isHover)
+    {
+        if (!isHover && _hitDay != 0)
+        {
+            _hitDay = 0;
+            Cursor.Current = Cursors.Arrow;
+            Invalidate(InvalidAction.Repaint);
+        }
+    }
+
+    private void OnPointerTap(PointerEvent e)
+    {
+        var hitDay = HitTestForDay(e.X, e.Y);
+        if (hitDay == _hitDay && _selectedDay != _hitDay)
+        {
+            _selectedDay = _hitDay;
+            Invalidate(InvalidAction.Repaint);
+        }
+    }
 
     private Paragraph[] GenerateNumberCache()
     {
@@ -64,33 +127,6 @@ public sealed class MonthView : Widget
         return cache;
     }
 
-    protected internal override bool HitTest(float x, float y, HitTestResult result)
-    {
-        var res = base.HitTest(x, y, result);
-
-        var oldHitDay = _hitDay;
-
-        if (res && y > _headerHeight)
-        {
-            var hitRow = (int)Math.Truncate((y - _headerHeight) / _cellSize.Height);
-            var hitCol = (int)Math.Truncate(x / _cellSize.Width);
-            var firstDay = new DateTime(_year, _month, 1);
-            var firstDayOffset = ((int)firstDay.DayOfWeek);
-            _hitDay = (byte)(hitRow * 7 + hitCol - firstDayOffset + 1);
-            if (_hitDay < 1 || _hitDay > DateTime.DaysInMonth(_year, _month)) _hitDay = 0;
-            //Log.Debug($"Hit row={hitRow} col={hitCol} hitDay={_hitDay}");
-        }
-        else
-        {
-            _hitDay = 0;
-        }
-
-        if (_hitDay != oldHitDay)
-            Invalidate(InvalidAction.Repaint);
-
-        return res;
-    }
-
     public override void Layout(float availableWidth, float availableHeight)
     {
         var width = CacheAndCheckAssignWidth(availableWidth);
@@ -112,6 +148,7 @@ public sealed class MonthView : Widget
 
         var xIndex = ((int)firstDay.DayOfWeek);
         var yIndex = 0;
+        var radius = _cellSize.Height / 2 - 2;
         for (var i = 0; i < daysInMonth; i++)
         {
             var para = _numberCache[i];
@@ -120,13 +157,31 @@ public sealed class MonthView : Widget
             var cx = (_cellSize.Width - paraWidth) / 2;
             var cy = (_cellSize.Height - paraHeight) / 2;
 
-            if (_hitDay == i + 1)
+            if (_hitDay == i + 1 && _selectedDay != i + 1)
             {
                 var paint = PaintUtils.Shared(new Color(0xFFAAAAAA) /*TODO: use Theme.HoverColor*/);
                 paint.AntiAlias = true;
                 canvas.DrawCircle(xIndex * _cellSize.Width + _cellSize.Width / 2,
                     _headerHeight + yIndex * _cellSize.Height + _cellSize.Height / 2,
-                    _cellSize.Height / 2, paint);
+                    radius, paint);
+            }
+
+            if (_selectedDay == i + 1)
+            {
+                var paint = PaintUtils.Shared(Theme.AccentColor);
+                paint.AntiAlias = true;
+                canvas.DrawCircle(xIndex * _cellSize.Width + _cellSize.Width / 2,
+                    _headerHeight + yIndex * _cellSize.Height + _cellSize.Height / 2,
+                    radius, paint);
+            }
+
+            if (i + 1 == DateTime.Today.Day)
+            {
+                var paint = PaintUtils.Shared(Colors.Red, PaintStyle.Stroke, 1.5f);
+                paint.AntiAlias = true;
+                canvas.DrawCircle(xIndex * _cellSize.Width + _cellSize.Width / 2,
+                    _headerHeight + yIndex * _cellSize.Height + _cellSize.Height / 2,
+                    radius, paint);
             }
 
             canvas.DrawParagraph(para, xIndex * _cellSize.Width + cx, _headerHeight + yIndex * _cellSize.Height + cy);
