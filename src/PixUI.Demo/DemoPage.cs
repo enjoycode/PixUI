@@ -106,7 +106,7 @@ namespace PixUI.Demo
                     {
                         Children =
                         {
-                            new Card() { Width = 350, Height = 260, Child = new MonthView() }
+                            new Card { Width = 350, Height = 260, Child = new Calendar(1977, 3) }
                         }
                     }
                 }

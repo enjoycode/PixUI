@@ -4,31 +4,46 @@ namespace PixUI;
 
 public sealed class MonthView : Widget, IMouseRegion
 {
-    public MonthView()
+    public MonthView(State<int> year, State<int> month)
     {
-        var today = DateTime.Now;
-        _year = (ushort)today.Year;
-        _month = (ushort)today.Month;
+        if (year.Value < 1 || year.Value > 9999 || month.Value < 1 || month.Value > 12)
+            throw new ArgumentOutOfRangeException();
+
+        Year = Bind(year);
+        Month = Bind(month);
+        _selectedDate = Bind(new Rx<DateTime?>(null));
+
         InitMouseRegion();
     }
 
-    public MonthView(int year, int month)
+    public MonthView(State<DateTime?> selectedDate)
     {
-        if (year < 1 || year > 9999 || month < 1 || month > 12) throw new ArgumentOutOfRangeException();
+        if (selectedDate.Value == null)
+        {
+            var today = DateTime.Today;
+            Year = Bind(new Rx<int>(today.Year));
+            Month = Bind(new Rx<int>(today.Month));
+        }
+        else
+        {
+            Year = Bind(new Rx<int>(selectedDate.Value.Value.Year));
+            Month = Bind(new Rx<int>(selectedDate.Value.Value.Month));
+        }
 
-        _year = (ushort)year;
-        _month = (ushort)month;
+        _selectedDate = Bind(selectedDate);
+
         InitMouseRegion();
     }
 
-    private ushort _year;
-    private ushort _month;
-    private float _headerHeight = 26;
+    private readonly State<DateTime?> _selectedDate;
+    public readonly State<int> Year;
+    public readonly State<int> Month;
+    private byte _hitDay; //当前命中的日期，没有命中等于0
+    private readonly float _headerHeight = 26;
+
     private Size _cellSize;
     private Paragraph[]? _numberCache;
     private Paragraph[]? _weekCache;
-    private byte _hitDay; //当前命中的日期，没有命中等于0
-    private byte _selectedDay; //当前选择的日期，没有等于0
 
     public MouseRegion MouseRegion { get; private set; } = null!;
 
@@ -46,10 +61,10 @@ public sealed class MonthView : Widget, IMouseRegion
         {
             var hitRow = (int)Math.Truncate((y - _headerHeight) / _cellSize.Height);
             var hitCol = (int)Math.Truncate(x / _cellSize.Width);
-            var firstDay = new DateTime(_year, _month, 1);
+            var firstDay = new DateTime(Year.Value, Month.Value, 1);
             var firstDayOffset = ((int)firstDay.DayOfWeek);
             var hitDay = (byte)(hitRow * 7 + hitCol - firstDayOffset + 1);
-            if (hitDay < 1 || hitDay > DateTime.DaysInMonth(_year, _month)) hitDay = 0;
+            if (hitDay < 1 || hitDay > DateTime.DaysInMonth(Year.Value, Month.Value)) hitDay = 0;
             //Log.Debug($"Hit row={hitRow} col={hitCol} hitDay={hitDay}");
             return hitDay;
         }
@@ -83,10 +98,9 @@ public sealed class MonthView : Widget, IMouseRegion
     private void OnPointerTap(PointerEvent e)
     {
         var hitDay = HitTestForDay(e.X, e.Y);
-        if (hitDay == _hitDay && _selectedDay != _hitDay)
+        if (hitDay == _hitDay && hitDay != 0 && (_selectedDate.Value == null || !IsSelectedDate(hitDay)))
         {
-            _selectedDay = _hitDay;
-            Invalidate(InvalidAction.Repaint);
+            _selectedDate.Value = new DateTime(Year.Value, Month.Value, hitDay);
         }
     }
 
@@ -127,6 +141,15 @@ public sealed class MonthView : Widget, IMouseRegion
         return cache;
     }
 
+    private bool IsSelectedDate(int day)
+    {
+        if (_selectedDate.Value == null) return false;
+        return _selectedDate.Value == new DateTime(Year.Value, Month.Value, day);
+    }
+
+    private bool IsToday(int day)
+        => new DateTime(Year.Value, Month.Value, day) == DateTime.Today;
+
     public override void Layout(float availableWidth, float availableHeight)
     {
         var width = CacheAndCheckAssignWidth(availableWidth);
@@ -143,8 +166,8 @@ public sealed class MonthView : Widget, IMouseRegion
 
         _numberCache ??= GenerateNumberCache();
 
-        var daysInMonth = DateTime.DaysInMonth(_year, _month);
-        var firstDay = new DateTime(_year, _month, 1);
+        var daysInMonth = DateTime.DaysInMonth(Year.Value, Month.Value);
+        var firstDay = new DateTime(Year.Value, Month.Value, 1);
 
         var xIndex = ((int)firstDay.DayOfWeek);
         var yIndex = 0;
@@ -157,7 +180,7 @@ public sealed class MonthView : Widget, IMouseRegion
             var cx = (_cellSize.Width - paraWidth) / 2;
             var cy = (_cellSize.Height - paraHeight) / 2;
 
-            if (_hitDay == i + 1 && _selectedDay != i + 1)
+            if (_hitDay == i + 1 && !IsSelectedDate(i + 1))
             {
                 var paint = PaintUtils.Shared(new Color(0xFFAAAAAA) /*TODO: use Theme.HoverColor*/);
                 paint.AntiAlias = true;
@@ -166,7 +189,7 @@ public sealed class MonthView : Widget, IMouseRegion
                     radius, paint);
             }
 
-            if (_selectedDay == i + 1)
+            if (IsSelectedDate(i + 1))
             {
                 var paint = PaintUtils.Shared(Theme.AccentColor);
                 paint.AntiAlias = true;
@@ -175,7 +198,7 @@ public sealed class MonthView : Widget, IMouseRegion
                     radius, paint);
             }
 
-            if (i + 1 == DateTime.Today.Day)
+            if (IsToday(i + 1))
             {
                 var paint = PaintUtils.Shared(Colors.Red, PaintStyle.Stroke, 1.5f);
                 paint.AntiAlias = true;
