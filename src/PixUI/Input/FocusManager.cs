@@ -15,16 +15,18 @@ public sealed class FocusManager
         if (ReferenceEquals(FocusedWidget, widget))
             return; //Already focused
 
+        var oldFocused = FocusedWidget;
+
         if (FocusedWidget != null)
         {
-            ((IFocusable)FocusedWidget).FocusNode.RaiseFocusChanged(false);
+            ((IFocusable)FocusedWidget).FocusNode.RaiseFocusChanged(new FocusChangedEvent(false, oldFocused, widget));
             FocusedWidget = null;
         }
 
-        if (widget is IFocusable)
+        if (widget is IFocusable focusable)
         {
             FocusedWidget = widget;
-            ((IFocusable)FocusedWidget).FocusNode.RaiseFocusChanged(true);
+            focusable.FocusNode.RaiseFocusChanged(new FocusChangedEvent(true, oldFocused, widget));
         }
     }
 
@@ -182,7 +184,7 @@ internal sealed class FocusManagerStack
     internal void OnKeyUp(KeyEvent e) => GetFocusManagerWithFocused().OnKeyUp(e);
 
     internal void OnTextInput(string text) => GetFocusManagerWithFocused().OnTextInput(text);
-        
+
     internal FocusManager GetFocusManagerByWidget(Widget widget)
     {
         var temp = widget;
@@ -206,5 +208,4 @@ internal sealed class FocusManagerStack
 
         return _stack[0];
     }
-    
 }

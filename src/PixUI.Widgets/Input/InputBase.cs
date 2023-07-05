@@ -100,14 +100,11 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
 
     public override void VisitChildren(Func<Widget, bool> action)
     {
-        if (_prefix != null)
-            if (action(_prefix))
-                return;
+        if (_prefix != null && action(_prefix)) return;
 
         if (action(_editor)) return;
 
-        if (_suffix != null)
-            action(_suffix);
+        if (_suffix != null) action(_suffix);
     }
 
     public override void Layout(float availableWidth, float availableHeight)
@@ -144,8 +141,7 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
         // 设置子组件位置(暂以editor为中心上下居中对齐, TODO:考虑基线对齐)
         var maxChildHeight = _editor.H;
         _prefix?.SetPosition(padding.Left, (maxChildHeight - _prefix.H) / 2 + padding.Top);
-        _suffix?.SetPosition(width - padding.Right - _suffix.W,
-            (maxChildHeight - _suffix.H) / 2 + padding.Top);
+        _suffix?.SetPosition(width - padding.Right - _suffix.W, (maxChildHeight - _suffix.H) / 2 + padding.Top);
         _editor.SetPosition(padding.Left + (_prefix?.W ?? 0), padding.Top + 1 /*offset*/);
 
         // 设置自身宽高

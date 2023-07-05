@@ -49,10 +49,10 @@ namespace CodeEditor
                 _decoration.Invalidate(InvalidAction.Repaint);
         }
 
-        private void _OnFocusChanged(bool focused)
+        private void _OnFocusChanged(FocusChangedEvent e)
         {
             // Focused.Value = focused;
-            if (focused)
+            if (e.IsFocused)
                 Root!.Window.StartTextInput();
             else
                 Root!.Window.StopTextInput();

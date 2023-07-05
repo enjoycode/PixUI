@@ -50,10 +50,10 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
 
     #region ====Event Handlers====
 
-    private void _OnFocusChanged(bool focused)
+    private void _OnFocusChanged(FocusChangedEvent e)
     {
-        Focused.Value = focused;
-        if (focused)
+        Focused.Value = e.IsFocused;
+        if (e.IsFocused)
         {
             if (!IsReadonly)
                 Root!.Window.StartTextInput();

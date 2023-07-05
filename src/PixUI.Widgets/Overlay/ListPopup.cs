@@ -75,7 +75,7 @@ public class ListPopup<T> : Popup
         _maxShowItems = maxShowItems;
         _itemBuilder = itemBuilder;
         _listViewController = new ListViewController<T>();
-        _child = new Card()
+        _child = new Card
         {
             Width = popupWidth, Elevation = 8,
             Child = new ListView<T>(BuildItem, null, _listViewController)

@@ -28,9 +28,9 @@ public sealed class FocusedDecoration
             focusable.FocusNode.FocusChanged += _OnFocusChanged;
     }
 
-    private void _OnFocusChanged(bool focused)
+    private void _OnFocusChanged(FocusChangedEvent e)
     {
-        if (focused)
+        if (e.IsFocused)
         {
             _decorator = new FocusedDecorator(this);
             Widget.Overlay?.Show(_decorator);
