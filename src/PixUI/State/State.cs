@@ -70,17 +70,15 @@ public abstract class State<T> : StateBase
     /// <summary>
     /// 转换为State&lt;string&gt;的计算属性
     /// </summary>
-    public State<string> AsStateOfString(Func<T, string>? formatter = null,
-        Func<string, T>? parser = null)
-        => RxComputed<string>.MakeAsString(this, formatter, parser);
-        
+    public State<string> ToStateOfString(Func<T, string>? formatter = null, Func<string, T>? parser = null) =>
+        RxComputed<string>.MakeAsString(this, formatter, parser);
+
     /// <summary>
     /// 转换为State&lt;bool&gt;的计算属性
     /// </summary>
-    public State<bool> AsStateOfBool(Func<T, bool> getter)
-        => RxComputed<bool>.Make<T,bool>(this, getter);
+    public State<bool> ToStateOfBool(Func<T, bool> getter) => RxComputed<bool>.Make<T, bool>(this, getter);
 
-    // public State<T> AsNonNullable()
+    // public State<T> ToNonNullable()
     //     => RxComputed<T>.Make(this, v => v == null ? default(T) : v, v => Value = v);
 
     public static implicit operator State<T>(T value) => new Rx<T>(value);
@@ -91,6 +89,12 @@ public abstract class State<T> : StateBase
             return new Rx<T>(value);
         }
 #endif
+}
+
+public static class StateExtensions
+{
+    public static State<bool> ToStateOfBoolReversed(this State<bool> s) =>
+        RxComputed<bool>.Make(s, v => !v, v => s.Value = !v);
 }
 
 // public sealed class StateProxy<T> : State<T>, IStateBindable

@@ -11,8 +11,8 @@ public sealed class Select<T> : InputBase<Widget>
 {
     public Select(State<T?> value, bool filterable = false)
         : base(filterable
-            ? new EditableText(value.AsStateOfString())
-            : new SelectText(value.AsStateOfString()))
+            ? new EditableText(value.ToStateOfString())
+            : new SelectText(value.ToStateOfString()))
     {
         _selectedValue = value;
 
