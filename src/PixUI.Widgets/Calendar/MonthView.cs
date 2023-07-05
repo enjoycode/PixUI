@@ -45,6 +45,11 @@ public sealed class MonthView : Widget, IMouseRegion
     private Paragraph[]? _numberCache;
     private Paragraph[]? _weekCache;
 
+    /// <summary>
+    /// 用户改变选择事件(点击或键盘)
+    /// </summary>
+    public event Action? SelectedChangedByUser;
+
     public MouseRegion MouseRegion { get; private set; } = null!;
 
     private void InitMouseRegion()
@@ -101,6 +106,7 @@ public sealed class MonthView : Widget, IMouseRegion
         if (hitDay == _hitDay && hitDay != 0 && (_selectedDate.Value == null || !IsSelectedDate(hitDay)))
         {
             _selectedDate.Value = new DateTime(Year.Value, Month.Value, hitDay);
+            SelectedChangedByUser?.Invoke();
         }
     }
 
@@ -147,8 +153,7 @@ public sealed class MonthView : Widget, IMouseRegion
         return _selectedDate.Value == new DateTime(Year.Value, Month.Value, day);
     }
 
-    private bool IsToday(int day)
-        => new DateTime(Year.Value, Month.Value, day) == DateTime.Today;
+    private bool IsToday(int day) => new DateTime(Year.Value, Month.Value, day) == DateTime.Today;
 
     public override void Layout(float availableWidth, float availableHeight)
     {

@@ -28,6 +28,11 @@ public sealed class Calendar : Widget
     private readonly MonthView _monthView;
     internal readonly State<string> NaviBarTitle;
 
+    public Action OnSelectedChangedByUser
+    {
+        set => _monthView.SelectedChangedByUser += value;
+    }
+
     public override void VisitChildren(Func<Widget, bool> action)
     {
         if (action(_naviBar)) return;
@@ -144,17 +149,17 @@ internal sealed class CalendarNaviBar : Widget
         const float offsetY = 5f;
         const float space = 5f;
         _btPrevYear.SetPosition(offsetX, offsetY);
-        offsetX += _btPrevYear.W + space;
+        offsetX += _btPrevYear.W;
         _btPrevMonth.SetPosition(offsetX, offsetY);
-        offsetX += _btPrevMonth.W + space;
+        offsetX += _btPrevMonth.W;
 
-        var centerWidth = W - _btPrevYear.W * 4 - space * 6;
+        var centerWidth = W - _btPrevYear.W * 4 - space * 2;
         _title.Layout(centerWidth, height);
         _title.SetPosition(offsetX + (centerWidth - _title.W) / 2, offsetY + 4 /*基线偏移*/);
         offsetX += centerWidth;
 
         _btNextMonth.SetPosition(offsetX, offsetY);
-        offsetX += _btNextMonth.W + space;
+        offsetX += _btNextMonth.W;
         _btNextYear.SetPosition(offsetX, offsetY);
     }
 }

@@ -106,7 +106,8 @@ namespace PixUI.Demo
                     {
                         Children =
                         {
-                            new Card { Width = 350, Height = 260, Child = new Calendar(1977, 3) }
+                            new Card { Width = 250, Height = 220, Child = new Calendar(1977, 3) },
+                            new DatePicker(new DateTime(1977, 3, 16)) {Width = 200},
                         }
                     }
                 }
@@ -126,8 +127,7 @@ namespace PixUI.Demo
                 { OnSelectionChanged = OnListPopupSelectionChanged };
             _listPopup.DataSource ??= Person.GeneratePersons(10);
             if (!_listPopup.IsMounted)
-                _listPopup.Show(_buttonRef.Widget, new Offset(-4, -2),
-                    Popup.DefaultTransitionBuilder);
+                _listPopup.Show(_buttonRef.Widget, new Offset(-4, -2), Popup.DefaultTransitionBuilder);
             else
                 _listPopup?.Hide();
         }

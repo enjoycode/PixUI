@@ -57,9 +57,9 @@ public sealed class Select<T> : InputBase<Widget>
         }
     }
 
-    private void OnFocusChanged(bool focused)
+    private void OnFocusChanged(FocusChangedEvent e)
     {
-        if (!focused)
+        if (!e.IsFocused)
             HidePopup();
     }
 
