@@ -93,7 +93,10 @@ public abstract class State<T> : StateBase
 
 public static class StateExtensions
 {
-    public static State<bool> ToStateOfBoolReversed(this State<bool> s) =>
+    /// <summary>
+    /// 简化生成反转bool值的计算状态
+    /// </summary>
+    public static State<bool> ToReversed(this State<bool> s) =>
         RxComputed<bool>.Make(s, v => !v, v => s.Value = !v);
 }
 
