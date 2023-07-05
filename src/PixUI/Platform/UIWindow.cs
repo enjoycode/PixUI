@@ -95,7 +95,7 @@ public abstract class UIWindow
     /// </summary>
     protected
 #if __WEB__
-             internal
+    internal
 #endif
         void OnFirstShow()
     {
@@ -110,7 +110,7 @@ public abstract class UIWindow
             FlushOffscreenSurface();
             DrawOffscreenSurface();
 #else
-        widgetsCanvas.Surface.Draw(overlayCanvas, 0, 0, null);
+        widgetsCanvas.Surface?.Draw(overlayCanvas, 0, 0, null);
 #endif
 
         //TODO: maybe paint Overlay
@@ -187,11 +187,11 @@ public abstract class UIWindow
         //先尝试激发PointerTap事件
         if (_hitResultOnPointDown != null)
         {
-            if (_hitResultOnPointDown.Value.ContainsPoint(pointerEvent.X, pointerEvent.Y))
+            var winX = pointerEvent.X;
+            var winY = pointerEvent.Y;
+            var local = _hitResultOnPointDown.Value.ToLocalPoint(winX, winY);
+            if (((Widget)_hitResultOnPointDown.Value.Widget).ContainsPoint(local.Dx, local.Dy))
             {
-                var winX = pointerEvent.X;
-                var winY = pointerEvent.Y;
-                var local = MatrixUtils.TransformPoint(_hitResultOnPointDown.Value.Transform, winX, winY);
                 pointerEvent.SetPoint(local.Dx, local.Dy);
                 _hitResultOnPointDown.Value.Widget.MouseRegion.RaisePointerTap(pointerEvent);
                 pointerEvent.SetPoint(winX, winY);

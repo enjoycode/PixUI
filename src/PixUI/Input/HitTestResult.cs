@@ -234,11 +234,7 @@ internal readonly struct HitTestEntry
         Transform = transform;
     }
 
-    internal bool ContainsPoint(float winX, float winY)
-    {
-        var transformedPosition = MatrixUtils.TransformPoint(Transform, winX, winY);
-        return ((Widget)Widget).ContainsPoint(transformedPosition.Dx, transformedPosition.Dy);
-    }
+    internal Offset ToLocalPoint(float winX, float winY) => MatrixUtils.TransformPoint(Transform, winX, winY);
 
 #if __WEB__
     public HitTestEntry Clone() => new(Widget, Transform);

@@ -6,8 +6,7 @@ public abstract class TextBase : Widget
 {
     protected TextBase(State<string> text)
     {
-        Text = Bind(text,
-            this is EditableText ? BindingOptions.AffectsVisual : BindingOptions.AffectsLayout);
+        Text = Bind(text, this is EditableText ? BindingOptions.AffectsVisual : BindingOptions.AffectsLayout);
     }
 
     public State<string> Text { get; }

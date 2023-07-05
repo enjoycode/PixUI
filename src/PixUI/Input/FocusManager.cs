@@ -158,7 +158,7 @@ internal sealed class FocusManagerStack
         _stack.Add(new FocusManager()); // for UIWindow
     }
 
-    private readonly List<FocusManager> _stack = new List<FocusManager>();
+    private readonly List<FocusManager> _stack = new();
 
     internal void Push(FocusManager manager) => _stack.Add(manager);
 
@@ -206,4 +206,5 @@ internal sealed class FocusManagerStack
 
         return _stack[0];
     }
+    
 }

@@ -2,8 +2,7 @@ using System;
 
 namespace PixUI;
 
-public delegate Widget PopupTransitionBuilder(Animation<double> animation, Widget child,
-    Offset? origin);
+public delegate Widget PopupTransitionBuilder(Animation<double> animation, Widget child, Offset? origin);
 
 public abstract class Popup : Widget, IEventHook
 {
