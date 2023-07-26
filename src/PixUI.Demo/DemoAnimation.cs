@@ -26,7 +26,7 @@ namespace PixUI.Demo.Mac
         {
             return new Column
             {
-                Children = new Widget[]
+                Children =
                 {
                     new Button("Play") { OnTap = _ => Play() },
                     new Text(_title) { FontSize = _fontSize, TextColor = _color },

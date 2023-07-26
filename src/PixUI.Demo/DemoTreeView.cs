@@ -49,11 +49,11 @@ namespace PixUI.Demo.Mac
                 Padding = EdgeInsets.All(20),
                 Child = new Column()
                 {
-                    Children = new Widget[]
+                    Children =
                     {
                         new Row(VerticalAlignment.Middle, 20)
                         {
-                            Children = new Widget[]
+                            Children =
                             {
                                 new Button("Insert") { OnTap = OnInsert },
                                 new Button("Remove") { OnTap = OnRemove },
@@ -65,7 +65,7 @@ namespace PixUI.Demo.Mac
                         {
                             Child = new Row(VerticalAlignment.Middle, 20)
                             {
-                                Children = new Widget[]
+                                Children =
                                 {
                                     new Expanded()
                                     {

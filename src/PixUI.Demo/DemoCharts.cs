@@ -40,7 +40,7 @@ public sealed class DemoCharts : View
     {
         Child = new Row
         {
-            Children = new Widget[]
+            Children =
             {
                 new Card
                 {

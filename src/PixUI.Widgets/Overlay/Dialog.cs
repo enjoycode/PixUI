@@ -27,7 +27,7 @@ public abstract class Dialog : Popup
             Elevation = 20,
             Child = new Column()
             {
-                Children = new[]
+                Children =
                 {
                     BuildTitle(),
                     new Expanded(BuildBody()),
@@ -43,7 +43,7 @@ public abstract class Dialog : Popup
         return new Row()
         {
             Height = 25,
-            Children = new Widget[]
+            Children =
             {
                 new Container() { Width = 35 }, //TODO: SizeBox
                 new Expanded()
@@ -72,7 +72,7 @@ public abstract class Dialog : Popup
             Padding = EdgeInsets.All(20),
             Child = new Row(VerticalAlignment.Middle, 20)
             {
-                Children = new Widget[]
+                Children =
                 {
                     new Expanded(),
                     new Button("Cancel") { Width = 80, OnTap = _ => Close(true) },

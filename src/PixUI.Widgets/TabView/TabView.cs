@@ -23,7 +23,7 @@ public sealed class TabView<T> : Widget
                 Child = closable
                     ? new Row()
                     {
-                        Children = new Widget[]
+                        Children =
                         {
                             tabBuilder(data, tab.IsSelected),
                             new Button(null, MaterialIcons.Close)

@@ -55,7 +55,7 @@ namespace PixUI.Demo
                             new Button("Click Me", MaterialIcons.Search) { OnTap = OnButtonTap },
                             new ButtonGroup()
                             {
-                                Children = new[]
+                                Children =
                                 {
                                     new Button("Button1") { OnTap = OnButton1Tap, Ref = _buttonRef },
                                     new Button("Button2") { OnTap = OnButton2Tap },
@@ -64,7 +64,7 @@ namespace PixUI.Demo
                             },
                             new Row(VerticalAlignment.Middle, 10)
                             {
-                                Children = new Widget[]
+                                Children =
                                 {
                                     new Switch(false),
                                     new Checkbox(false),

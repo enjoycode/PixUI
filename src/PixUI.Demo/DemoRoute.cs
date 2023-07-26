@@ -21,12 +21,13 @@ namespace PixUI.Demo
                 new("treeView", s => new DemoTreeView(), false, BuildDefaultTransition),
                 new("datagrid", s => new DemoDataGrid(), false, BuildDefaultTransition),
                 new("codeEditor", s => new DemoCodeEditor(), false, BuildDefaultTransition),
+                new("designer", s => new DemoDesigner()),
             };
             _navigator = new Navigator(routes);
 
             Child = new Column(debugLabel: "DemoRouteColumn")
             {
-                Children = new[]
+                Children =
                 {
                     BuildMainMenu(),
                     new Expanded(new RouteView(_navigator)) { DebugLabel = "RouteView" }
@@ -71,6 +72,7 @@ namespace PixUI.Demo
                         MenuItem.Item("About"),
                         MenuItem.Item("Window")
                     }),
+                    MenuItem.Item("Designer", null, () => _navigator.Push("designer")),
                 }),
                 // MenuItem.Item("Form", null, () => _navigator.Push("form")),
                 MenuItem.Item("Charts", null, () => _navigator.Push("charts")),
@@ -78,12 +80,9 @@ namespace PixUI.Demo
                 MenuItem.Item("ListView", null, () => _navigator.Push("list")),
                 MenuItem.Item("Transform", null, () => _navigator.Push("transform")),
                 MenuItem.Item("TabView", null, () => _navigator.Push("tabview")),
-                MenuItem.Item("TreeView",
-                    MaterialIcons.AccountTree, () => _navigator.Push("treeView")),
-                MenuItem.Item("DataGrid",
-                    MaterialIcons.TableView, () => _navigator.Push("datagrid")),
-                MenuItem.Item("CodeEditor",
-                    MaterialIcons.Edit, () => _navigator.Push("codeEditor")),
+                MenuItem.Item("TreeView", MaterialIcons.AccountTree, () => _navigator.Push("treeView")),
+                MenuItem.Item("DataGrid", MaterialIcons.TableView, () => _navigator.Push("datagrid")),
+                MenuItem.Item("CodeEditor", MaterialIcons.Edit, () => _navigator.Push("codeEditor")),
             };
         }
     }

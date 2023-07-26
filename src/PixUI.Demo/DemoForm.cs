@@ -9,7 +9,7 @@ namespace PixUI.Demo
                 Padding = EdgeInsets.All(20),
                 LabelWidth = 80,
                 Columns = 2,
-                Children = new FormItem[]
+                Children =
                 {
                     new("姓名:", new Input("")),
                     new("性别:", new Input("")),

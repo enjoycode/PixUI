@@ -21,7 +21,7 @@ namespace PixUI.Demo
                 Padding = EdgeInsets.All(20),
                 Child = new Column(HorizontalAlignment.Center, 20)
                 {
-                    Children = new Widget[]
+                    Children =
                     {
                         new Input(_user) { HintText = "User" },
                         new Input(_password) { HintText = "Password", IsObscure = true }

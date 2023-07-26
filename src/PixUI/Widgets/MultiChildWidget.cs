@@ -40,6 +40,5 @@ public abstract class MultiChildWidget<T> : Widget where T : Widget
         }
     }
 
-    protected internal sealed override int IndexOfChild(Widget child) =>
-        _children.IndexOf((T)child);
+    protected internal sealed override int IndexOfChild(Widget child) => _children.IndexOf((T)child);
 }

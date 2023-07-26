@@ -253,7 +253,7 @@ public abstract class UIWindow
 
     private void NewHitTest(float winX, float winY)
     {
-        Console.WriteLine($"========NewHitTest:({winX},{winY}) ========");
+        Log.Debug($"========NewHitTest:({winX},{winY}) ========");
         //先检测Overlay，没有命中再从RootWidget开始
         if (Overlay.HasEntry)
             Overlay.HitTest(winX, winY, _newHitResult);
@@ -266,11 +266,10 @@ public abstract class UIWindow
         _oldHitResult.ExitOldRegion(_newHitResult);
         _newHitResult.EnterNewRegion(_oldHitResult);
 
+#if DEBUG
         if (_oldHitResult.LastHitWidget != _newHitResult.LastHitWidget)
-        {
-            Console.WriteLine(
-                $"Hit: {_newHitResult.LastHitWidget} {_newHitResult.LastWidgetWithMouseRegion}");
-        }
+            Log.Debug($"Hit: {_newHitResult.LastHitWidget} {_newHitResult.LastWidgetWithMouseRegion}");
+#endif
 
         //重置并交换
         _oldHitResult.Reset();

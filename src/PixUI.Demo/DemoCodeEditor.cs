@@ -32,7 +32,7 @@ public sealed class Person
                 {
                     new Row(VerticalAlignment.Middle, 20)
                     {
-                        Children = new Widget[]
+                        Children =
                         {
                             new Input(_scrollTo) { Width = 100 },
                             new Button("ScrollTo")

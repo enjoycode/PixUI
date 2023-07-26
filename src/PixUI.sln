@@ -43,6 +43,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.MaterialIcons", "PixU
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.MaterialIconsOutlined", "PixUI.MaterialIconsOutlined\PixUI.MaterialIconsOutlined.csproj", "{3CD2D756-87CD-4AEA-B47D-22448D166088}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.Dynamic", "PixUI.Dynamic\PixUI.Dynamic.csproj", "{12050961-0E77-4622-8D97-52129A1C973B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.Dynamic.Design", "PixUI.Dynamic.Design\PixUI.Dynamic.Design.csproj", "{2832F09B-893C-4F29-89EB-45DF58729E75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -222,6 +226,26 @@ Global
 		{3CD2D756-87CD-4AEA-B47D-22448D166088}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3CD2D756-87CD-4AEA-B47D-22448D166088}.Release|ARM64.ActiveCfg = Release|Any CPU
 		{3CD2D756-87CD-4AEA-B47D-22448D166088}.Release|ARM64.Build.0 = Release|Any CPU
+		{12050961-0E77-4622-8D97-52129A1C973B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12050961-0E77-4622-8D97-52129A1C973B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12050961-0E77-4622-8D97-52129A1C973B}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{12050961-0E77-4622-8D97-52129A1C973B}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{12050961-0E77-4622-8D97-52129A1C973B}.DebugWeb|Any CPU.ActiveCfg = Debug|Any CPU
+		{12050961-0E77-4622-8D97-52129A1C973B}.DebugWeb|Any CPU.Build.0 = Debug|Any CPU
+		{12050961-0E77-4622-8D97-52129A1C973B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12050961-0E77-4622-8D97-52129A1C973B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12050961-0E77-4622-8D97-52129A1C973B}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{12050961-0E77-4622-8D97-52129A1C973B}.Release|ARM64.Build.0 = Release|Any CPU
+		{2832F09B-893C-4F29-89EB-45DF58729E75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2832F09B-893C-4F29-89EB-45DF58729E75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2832F09B-893C-4F29-89EB-45DF58729E75}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{2832F09B-893C-4F29-89EB-45DF58729E75}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{2832F09B-893C-4F29-89EB-45DF58729E75}.DebugWeb|Any CPU.ActiveCfg = Debug|Any CPU
+		{2832F09B-893C-4F29-89EB-45DF58729E75}.DebugWeb|Any CPU.Build.0 = Debug|Any CPU
+		{2832F09B-893C-4F29-89EB-45DF58729E75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2832F09B-893C-4F29-89EB-45DF58729E75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2832F09B-893C-4F29-89EB-45DF58729E75}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{2832F09B-893C-4F29-89EB-45DF58729E75}.Release|ARM64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

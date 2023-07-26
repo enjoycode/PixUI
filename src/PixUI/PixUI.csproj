@@ -17,4 +17,8 @@
       <ProjectReference Include="..\PixUI.TSAttributes\PixUI.TSAttributes.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Design\" />
+    </ItemGroup>
+
 </Project>

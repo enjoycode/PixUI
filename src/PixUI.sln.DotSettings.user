@@ -5,15 +5,7 @@
 &lt;/AssemblyExplorer&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a58cc5d0_002D5832_002D407a_002Db44b_002D89255f8aa24a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="FindTypefaceTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
-    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net6.0::PixUI.UnitTests.FontTest.FindTypefaceTest&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net6.0::PixUI.UnitTests.FontTest.FintTypefaceNotExistsTest&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net6.0::PixUI.UnitTests.FontTest.TestFontHeight&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net6.0::PixUI.UnitTests.FontTest.FontMetricsTest&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net6.0::PixUI.UnitTests.Docs.DocumentModelTests.TestFontInfo&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net6.0::PixUI.UnitTests.Docs.DocumentModelTests.TestDocuemntModel&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net6.0::PixUI.UnitTests.Docs.DocumentModelTests.TestImport&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net6.0::PixUI.UnitTests.PathTest.IsClosedTest&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net6.0::PixUI.UnitTests.FontTest.ParagraphTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.Tests.DynamicTest&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	

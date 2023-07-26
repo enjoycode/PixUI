@@ -28,7 +28,7 @@ namespace PixUI.Demo.Mac
                     // }
                     Child = new Column
                     {
-                        Children = new Widget[]
+                        Children =
                         {
                             new Input("Hello"),
                             new Button("Click")

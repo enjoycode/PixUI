@@ -18,7 +18,7 @@ internal sealed class NotificationEntry : SingleChildWidget
             Width = 280,
             Child = new Row(VerticalAlignment.Middle, 5)
             {
-                Children = new Widget[]
+                Children =
                 {
                     icon,
                     new Expanded() { Child = text },
