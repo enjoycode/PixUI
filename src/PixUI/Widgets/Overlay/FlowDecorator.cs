@@ -16,9 +16,9 @@ public abstract class FlowDecorator<T> : Widget where T : Widget
     private readonly bool _onlyTransform;
     public T Target { get; }
 
-    protected internal sealed override bool HitTest(float x, float y, HitTestResult result)
+    protected internal override bool HitTest(float x, float y, HitTestResult result)
     {
-        return false; // Can't hit
+        return false; // Default can't hit
     }
 
     public sealed override void Layout(float availableWidth, float availableHeight)

@@ -61,7 +61,9 @@ internal sealed class InvalidWidget
     /// </summary>
     internal IDirtyArea? Area;
 
+#if __WEB__
     internal InvalidWidget() { } //Need for web now, TODO:use TSRecordAttribute
+#endif
 }
 
 /// <summary>
@@ -109,6 +111,12 @@ internal sealed class InvalidQueue
 
     internal bool IsEmpty => _queue.Count == 0;
 
+    private static bool CanMerge(InvalidAction parent, InvalidAction child)
+    {
+        return parent == InvalidAction.Relayout ||
+               (parent == InvalidAction.Repaint && child == InvalidAction.Repaint);
+    }
+
     /// <summary>
     /// Add dirty widget to queue.
     /// </summary>
@@ -124,7 +132,21 @@ internal sealed class InvalidQueue
         {
             if (exist.Level > level)
             {
-                //TODO:判断新项是否现存项的任意上级，是则尝试合并
+                //判断新项是否现存项的任意上级，是则尝试合并
+                if (widget.IsAnyParentOf(exist.Widget))
+                {
+                    if (CanMerge(action, exist.Action))
+                    {
+                        exist.Widget = widget;
+                        insertPos = -1;
+                        break;
+                    }
+
+                    //新的上级要求重绘，旧的子级要求重新布局的情况，尽可能标记子级为RelayoutOnly
+                    exist.RelayoutOnly = true;
+                    exist.Area = null;
+                }
+
                 break;
             }
 
@@ -147,14 +169,13 @@ internal sealed class InvalidQueue
             // check is any parent of current
             if (exist.Widget.IsAnyParentOf(widget))
             {
-                if (exist.Action == InvalidAction.Relayout ||
-                    (exist.Action == InvalidAction.Repaint && action == InvalidAction.Repaint))
+                if (CanMerge(exist.Action, action))
                 {
                     insertPos = -1;
                     break;
                 }
 
-                //上级要求重绘，子级要求重新布局的情况，尽可能标记当前项为RelayoutOnly
+                //旧的上级要求重绘，新的子级要求重新布局的情况，尽可能标记当前项为RelayoutOnly
                 relayoutOnly = true;
                 exist.Area = null; //TODO:合并脏区域
             }
