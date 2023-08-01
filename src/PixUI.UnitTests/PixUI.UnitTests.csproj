@@ -19,6 +19,7 @@
     <ItemGroup>
       <ProjectReference Include="..\PixUI.CodeEditor\PixUI.CodeEditor.csproj" />
       <ProjectReference Include="..\PixUI.CS2TS\PixUI.CS2TS.csproj" />
+      <ProjectReference Include="..\PixUI.Dynamic\PixUI.Dynamic.csproj" />
       <ProjectReference Include="..\PixUI\PixUI.csproj" />
     </ItemGroup>
 

@@ -137,7 +137,11 @@ public sealed class DesignElement : Widget, IMouseRegion
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
         if (_wrapTarget != null)
+        {
+            if (IsSelected) canvas.Save();
             base.Paint(canvas, area);
+            if (IsSelected) canvas.Restore();
+        }
         else
             DrawPlaceholder(canvas);
 

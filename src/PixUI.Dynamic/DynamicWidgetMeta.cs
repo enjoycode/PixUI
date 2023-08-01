@@ -77,6 +77,14 @@ public sealed class DynamicValueMeta
     public bool IsState { get; set; }
 
     public Func<object>? DefaultValue { get; set; }
+
+    public object? GetValue(in ValueSource source /*, IDynamicStateProvider stateProvider*/)
+    {
+        if (source.From != ValueFrom.Const) throw new NotImplementedException();
+
+        //from const value
+        return source.Value;
+    }
 }
 
 public sealed class DynamicCtorArgMeta
