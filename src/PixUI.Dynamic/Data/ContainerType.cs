@@ -1,4 +1,4 @@
-namespace PixUI.Design;
+namespace PixUI.Dynamic;
 
 public enum ContainerType
 {

@@ -21,7 +21,7 @@ public sealed class MouseRegion
     /// <summary>
     /// false会继续检测子级嵌套的MouseRegion
     /// </summary>
-    public readonly bool Opaque;
+    public bool Opaque { get; set; }
 
     public event Action<PointerEvent>? PointerDown;
     public event Action<PointerEvent>? PointerUp;

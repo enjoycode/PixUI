@@ -6,21 +6,14 @@ namespace PixUI.Design;
 public sealed class DesignElementData
 {
     
-
-    public ContainerType ContainerType { get; set; }
-
-    /// <summary>
-    /// 用于如Expanded特例，反向向上包装
-    /// </summary>
-    public bool IsWrapReversed { get; set; }
 }
 
 /// <summary>
 /// 组件构造参数信息
 /// </summary>
-public sealed class CtorArgInfo { }
+public sealed class CtorArgValue { }
 
 /// <summary>
 /// 设计时组件的属性信息
 /// </summary>
-public sealed class PropertyInfo { }
+public sealed class PropertyValue { }
