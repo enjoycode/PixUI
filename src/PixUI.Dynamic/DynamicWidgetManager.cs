@@ -7,44 +7,22 @@ namespace PixUI.Dynamic;
 /// <summary>
 /// 管理设计时与运行时的DynamicWidget
 /// </summary>
-public static class DynamicWidgetManager
+public static partial class DynamicWidgetManager
 {
     static DynamicWidgetManager()
     {
-        Register(new DynamicWidgetMeta
-        {
-            Catelog = "Common", Name = "Button", WidgetType = typeof(Button), ContainerType = ContainerType.None,
-            Icon = MaterialIcons.SmartButton, CtorArgs = new[]
-            {
-                new DynamicCtorArgMeta()
-                {
-                    Name = "Text", AllowNull = true,
-                    Value = new DynamicValueMeta
-                        { ValueType = typeof(string), IsState = true, DefaultValue = () => new Rx<string>("Button") }
-                },
-                new DynamicCtorArgMeta()
-                {
-                    Name = "Icon", AllowNull = true,
-                    Value = new DynamicValueMeta { ValueType = typeof(IconData), IsState = true }
-                }
-            }
-        });
-        Register(new DynamicWidgetMeta
-        {
-            Catelog = "Layout", Name = "Center", WidgetType = typeof(Center), ContainerType = ContainerType.SingleChild,
-            Icon = MaterialIcons.CenterFocusStrong,
-            AddChild = (parent, child) => ((Center)parent).Child = child,
-        });
+        Register(MakeButtonMeta());
+        Register(MakeCenterMeta());
     }
 
     private static readonly Dictionary<string, DynamicWidgetMeta> _dynamicWidgets = new();
 
-    public static void Register(DynamicWidgetMeta dynamicWidgetMeta)
+    public static void Register(DynamicWidgetMeta dynamicWidgetMeta, bool replaceExists = false)
     {
-        if (_dynamicWidgets.ContainsKey(dynamicWidgetMeta.Name))
-            throw new Exception("Already exists."); //TODO:考虑替换
+        if (_dynamicWidgets.ContainsKey(dynamicWidgetMeta.Name) && !replaceExists)
+            throw new Exception("Already exists.");
 
-        _dynamicWidgets.Add(dynamicWidgetMeta.Name, dynamicWidgetMeta);
+        _dynamicWidgets[dynamicWidgetMeta.Name] = dynamicWidgetMeta;
     }
 
     public static IList<DynamicWidgetMeta> GetAll() => _dynamicWidgets.Values.ToList();

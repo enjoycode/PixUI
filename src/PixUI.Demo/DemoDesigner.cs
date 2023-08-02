@@ -48,8 +48,7 @@ public sealed class DemoDesigner : View
         if (_designController.FirstSelected == null) return;
 
         var active = _designController.FirstSelected!;
-        active.Meta = DynamicWidgetManager.GetByName("Center");
-        active.Meta!.AddChild!(active.Target!,
-            new DesignElement(_designController, DynamicWidgetManager.GetByName("Button")));
+        active.OnDrop(DynamicWidgetManager.GetByName("Center"));
+        active.AddChild(new DesignElement(_designController, DynamicWidgetManager.GetByName("Button")));
     }
 }

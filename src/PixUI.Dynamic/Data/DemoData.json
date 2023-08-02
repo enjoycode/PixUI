@@ -13,33 +13,27 @@
       "Type": "Button",
       "CtorArgs": [
         {
-          "From": "State",
+          "From": 1,
           "Value": "title"
         },
         {
-          "From": "Const",
+          "From": 0,
           "Value": null
         }
       ],
-      "Properties": [
-        {
-          "Name": "TextColor",
-          "Value": {
-            "From": "Const",
-            "Value": "00FF0000"
-          }
+      "Properties": {
+        "TextColor": {
+          "From": 0,
+          "Value": "00FF0000"
         }
-      ],
-      "Events": [
-        {
-          "Name": "OnTap",
-          "Handler": {
-            "Type": "SetState",
-            "Name": "title",
-            "Value": "Clicked"
-          }
+      },
+      "Events": {
+        "OnTap": {
+          "Handler": "SetState",
+          "Name": "title",
+          "Value": "Clicked"
         }
-      ]
+      }
     }
   }
 }

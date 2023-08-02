@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace PixUI.Dynamic;
@@ -37,6 +38,14 @@ public sealed class DynamicWidgetMeta
 
     public Action<Widget, Widget>? AddChild { get; set; }
 
+    /// <summary>
+    /// 根据名称查找属性定义，找不到报错
+    /// </summary>
+    public DynamicPropertyMeta GetPropertyMeta(string name)
+    {
+        if (Properties == null || Properties.Length == 0) throw new Exception();
+        return Properties.First(p => p.Name == name);
+    }
 
     /// <summary>
     /// 设计时实例创建,工具箱拖至设计界面时
@@ -66,6 +75,19 @@ public sealed class DynamicWidgetMeta
 
         return res;
     }
+
+    public Widget MakeInstance(ValueSource[] args)
+    {
+        if (CtorArgs == null || CtorArgs.Length != args.Length) throw new ArgumentException();
+
+        var ctorArgs = new object?[args.Length];
+        for (var i = 0; i < ctorArgs.Length; i++)
+        {
+            ctorArgs[i] = CtorArgs[i].Value.GetValue(ref args[i]);
+        }
+
+        return (Widget)Activator.CreateInstance(WidgetType, ctorArgs);
+    }
 }
 
 public sealed class DynamicValueMeta
@@ -78,11 +100,11 @@ public sealed class DynamicValueMeta
 
     public Func<object>? DefaultValue { get; set; }
 
-    public object? GetValue(in ValueSource source /*, IDynamicStateProvider stateProvider*/)
+    public object? GetValue(ref ValueSource source /*, IDynamicStateProvider stateProvider*/)
     {
         if (source.From != ValueFrom.Const) throw new NotImplementedException();
 
-        //from const value
+        //from const value, 已经在读取时转换类型为ValueType
         return source.Value;
     }
 }

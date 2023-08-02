@@ -18,20 +18,27 @@ public sealed class DesignElement : Widget, IMouseRegion
     }
 
     /// <summary>
-    /// Ctor for design time make default
+    /// Ctor for designtime make default
     /// </summary>
     public DesignElement(DesignController controller, DynamicWidgetMeta meta) : this(controller)
     {
-        Meta = meta;
+        ChangeMeta(meta, true);
     }
 
     private static readonly Lazy<Paragraph> _hint = new(() =>
         TextPainter.BuildParagraph("Drag Widget Here", float.PositiveInfinity, 16, Colors.Gray));
 
     private readonly DesignController _controller;
-    private DynamicWidgetMeta? _meta;
-    private Widget? _wrapTarget;
     private bool _isSelected;
+
+    public DynamicWidgetMeta? Meta { get; private set; }
+
+    public DynamicWidgetData Data { get; } = new();
+
+    /// <summary>
+    /// 包装的目标组件
+    /// </summary>
+    public Widget? Target { get; private set; }
 
     public MouseRegion MouseRegion { get; }
 
@@ -47,46 +54,46 @@ public sealed class DesignElement : Widget, IMouseRegion
         }
     }
 
-    public bool IsContainer => _meta == null /*Root*/ ||
-                               _meta.ContainerType != ContainerType.None;
+    public bool IsContainer => Meta == null /*Root*/ ||
+                               Meta.ContainerType != ContainerType.None;
 
-    public DynamicWidgetMeta? Meta
+    internal void ChangeMeta(DynamicWidgetMeta? meta, bool makeDefaultTarget)
     {
-        get => _meta;
-        set
-        {
-            _meta = value;
-            MouseRegion.Opaque = !IsContainer;
-            Target = _meta?.MakeDefaultInstance();
-        }
+        Meta = meta;
+        Data.Type = Meta == null ? string.Empty : Meta.Name;
+        MouseRegion.Opaque = !IsContainer;
+        if (makeDefaultTarget || (Meta == null && Target != null))
+            ChangeTarget(Target, Meta?.MakeDefaultInstance());
     }
 
-    /// <summary>
-    /// 包装的目标组件
-    /// </summary>
-    public Widget? Target
-    {
-        get => _wrapTarget;
-        private set
-        {
-            ChangeTarget(_wrapTarget, value);
-            Invalidate(InvalidAction.Relayout);
-        }
-    }
-
-    private void ChangeTarget(Widget? oldTarget, Widget? newTarget)
+    internal void ChangeTarget(Widget? oldTarget, Widget? newTarget)
     {
         if (oldTarget != null) oldTarget.Parent = null;
 
-        _wrapTarget = newTarget;
+        Target = newTarget;
 
-        if (_wrapTarget != null)
+        if (Target != null)
         {
-            _wrapTarget.Parent = this;
+            Target.Parent = this;
 #if DEBUG
-            DebugLabel = _wrapTarget.GetType().Name;
+            DebugLabel = Target.GetType().Name;
 #endif
         }
+
+        if (IsMounted) Invalidate(InvalidAction.Relayout);
+    }
+
+    public void AddChild(Widget child)
+    {
+        if (!IsContainer) throw new InvalidOperationException();
+        if (Meta == null || Target == null) throw new Exception();
+
+        Meta.AddChild!(Target, child);
+    }
+
+    public void SetPropertyValue(PropertyValue propertyValue)
+    {
+        //TODO:
     }
 
     #region ====Event Handler====
@@ -97,14 +104,19 @@ public sealed class DesignElement : Widget, IMouseRegion
         _controller.Select(this);
     }
 
+    public void OnDrop(DynamicWidgetMeta meta)
+    {
+        ChangeMeta(meta, true);
+    }
+
     #endregion
 
     #region ====Widget Overrides====
 
     public override void VisitChildren(Func<Widget, bool> action)
     {
-        if (_wrapTarget != null)
-            action(_wrapTarget);
+        if (Target != null)
+            action(Target);
     }
 
     protected internal override bool HitTest(float x, float y, HitTestResult result)
@@ -124,19 +136,19 @@ public sealed class DesignElement : Widget, IMouseRegion
         var width = CacheAndCheckAssignWidth(availableWidth);
         var height = CacheAndCheckAssignHeight(availableHeight);
 
-        if (_wrapTarget == null)
+        if (Target == null)
         {
             SetSize(width, height);
             return;
         }
 
-        _wrapTarget.Layout(availableWidth, availableHeight);
-        SetSize(_wrapTarget.W, _wrapTarget.H);
+        Target.Layout(availableWidth, availableHeight);
+        SetSize(Target.W, Target.H);
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
-        if (_wrapTarget != null)
+        if (Target != null)
         {
             if (IsSelected) canvas.Save();
             base.Paint(canvas, area);

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -10,6 +11,16 @@ namespace PixUI.Dynamic;
 public sealed class DynamicWidgetData
 {
     public string Type { get; set; }
+
+    public ValueSource[]? CtorArgs { get; set; }
+
+    public List<PropertyValue>? Properties { get; private set; }
+
+    public void AddPropertyValue(PropertyValue propertyValue)
+    {
+        Properties ??= new List<PropertyValue>();
+        Properties.Add(propertyValue);
+    }
 }
 
 public enum ValueFrom
@@ -23,13 +34,29 @@ public struct ValueSource
 {
     public ValueFrom From { get; set; }
     public object? Value { get; set; }
+
+    public void Read(ref Utf8JsonReader reader, DynamicValueMeta valueMeta)
+    {
+        reader.Read(); // {
+        reader.Read(); //From
+        reader.Read();
+        From = (ValueFrom)reader.GetInt32();
+        reader.Read(); //Value
+        var valueType = valueMeta.ValueType;
+        if (valueMeta.ValueType.IsValueType && valueMeta.ValueNullable)
+            valueType = typeof(Nullable<>).MakeGenericType(valueType);
+        if (valueMeta.IsState)
+            
+        Value = JsonSerializer.Deserialize(ref reader, valueMeta.ValueType /*TODO: options*/);
+        reader.Read(); // }
+    }
 }
 
 public sealed class ValueSourceJsonConverter : JsonConverter<ValueSource>
 {
     public override ValueSource Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public override void Write(Utf8JsonWriter writer, ValueSource value, JsonSerializerOptions options)
