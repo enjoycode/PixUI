@@ -1,38 +1,15 @@
 {
   "State": [
-    {
-      "Name": "title",
-      "Type": "System.String",
-      "Value": "Click Me"
-    }
+    { "Name": "title", "Type": "System.String", "Value": "Click Me" }
   ],
-  "DataSource": [],
   "View": {
     "Type": "Center",
     "Child": {
       "Type": "Button",
-      "CtorArgs": [
-        {
-          "From": 1,
-          "Value": "title"
-        },
-        {
-          "From": 0,
-          "Value": null
-        }
-      ],
-      "Properties": {
-        "TextColor": {
-          "From": 0,
-          "Value": "00FF0000"
-        }
-      },
+      "CtorArgs": [ { "State": "title" }, { "Const": null } ],
+      "Properties": { "TextColor": { "Const": "00FF0000" } },
       "Events": {
-        "OnTap": {
-          "Handler": "SetState",
-          "Name": "title",
-          "Value": "Clicked"
-        }
+        "OnTap": { "Handler": "SetState", "Name": "title", "Value": "Clicked" }
       }
     }
   }

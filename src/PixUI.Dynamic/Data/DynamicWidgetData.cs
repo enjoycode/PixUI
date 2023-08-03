@@ -12,7 +12,7 @@ public sealed class DynamicWidgetData
 {
     public string Type { get; set; }
 
-    public ValueSource[]? CtorArgs { get; set; }
+    public DynamicValue[]? CtorArgs { get; set; }
 
     public List<PropertyValue>? Properties { get; private set; }
 
@@ -23,27 +23,47 @@ public sealed class DynamicWidgetData
     }
 }
 
-public enum ValueFrom
+public enum ValueSource
 {
     Const,
     State
 }
 
-[JsonConverter(typeof(ValueSourceJsonConverter))]
-public struct ValueSource //TODO: rename to AnyValue or DynamicValue?
+public struct DynamicValue
 {
-    public ValueFrom From { get; set; }
+    public ValueSource From { get; set; }
     public object? Value { get; set; }
 
-    public static implicit operator ValueSource(string any) => new() { From = ValueFrom.Const, Value = any };
+    public static implicit operator DynamicValue(string any) => new() { From = ValueSource.Const, Value = any };
+
+    public void Write(Utf8JsonWriter writer)
+    {
+        writer.WriteStartObject();
+
+        var propName = From switch
+        {
+            ValueSource.Const => nameof(ValueSource.Const),
+            ValueSource.State => nameof(ValueSource.State),
+            _ => throw new JsonException($"Unknown ValueSource")
+        };
+        writer.WritePropertyName(propName);
+
+        JsonSerializer.Serialize(writer, Value);
+        writer.WriteEndObject();
+    }
 
     public void Read(ref Utf8JsonReader reader, DynamicValueMeta valueMeta)
     {
         reader.Read(); // {
-        reader.Read(); //From
-        reader.Read();
-        From = (ValueFrom)reader.GetInt32();
-        reader.Read(); //Value
+        reader.Read(); // ValueSource
+        var sourceName = reader.GetString()!;
+        From = sourceName switch
+        {
+            nameof(ValueSource.Const) => ValueSource.Const,
+            nameof(ValueSource.State) => ValueSource.State,
+            _ => throw new JsonException($"Unknown ValueSource: [{sourceName}]")
+        };
+
         var valueType = valueMeta.ValueType;
         if (valueMeta.ValueType.IsValueType && valueMeta.IsState) //TODO:排除本身就是Nullable<>
             valueType = typeof(Nullable<>).MakeGenericType(valueType);
@@ -53,28 +73,11 @@ public struct ValueSource //TODO: rename to AnyValue or DynamicValue?
     }
 }
 
-public sealed class ValueSourceJsonConverter : JsonConverter<ValueSource>
-{
-    public override ValueSource Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    {
-        throw new NotSupportedException();
-    }
-
-    public override void Write(Utf8JsonWriter writer, ValueSource value, JsonSerializerOptions options)
-    {
-        writer.WriteStartObject();
-        writer.WriteNumber(nameof(ValueSource.From), (int)value.From);
-        writer.WritePropertyName(nameof(ValueSource.Value));
-        JsonSerializer.Serialize(writer, value.Value, options);
-        writer.WriteEndObject();
-    }
-}
-
 /// <summary>
 /// 设计时组件的属性数据
 /// </summary>
 public sealed class PropertyValue
 {
     public string Name { get; set; }
-    public ValueSource Value { get; set; }
+    public DynamicValue Value { get; set; }
 }

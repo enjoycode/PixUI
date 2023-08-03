@@ -83,7 +83,7 @@ public sealed class DesignController
         var data = element.Data;
         if (meta.CtorArgs == null || meta.CtorArgs.Length == 0) throw new InvalidOperationException();
 
-        var args = new ValueSource[meta.CtorArgs.Length];
+        var args = new DynamicValue[meta.CtorArgs.Length];
         reader.Read(); //[
         for (var i = 0; i < args.Length; i++)
         {

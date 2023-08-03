@@ -76,7 +76,7 @@ public sealed class DynamicWidgetMeta
         return res;
     }
 
-    public Widget MakeInstance(ValueSource[] args)
+    public Widget MakeInstance(DynamicValue[] args)
     {
         if (CtorArgs == null || CtorArgs.Length != args.Length) throw new ArgumentException();
 
@@ -92,7 +92,7 @@ public sealed class DynamicWidgetMeta
 
 public sealed class DynamicValueMeta
 {
-    public DynamicValueMeta(Type runtimeType, ValueSource? defautValue = null)
+    public DynamicValueMeta(Type runtimeType, DynamicValue? defautValue = null)
     {
         //先判断是否状态类型
         if (typeof(StateBase).IsAssignableFrom(runtimeType))
@@ -118,11 +118,11 @@ public sealed class DynamicValueMeta
 
     public readonly Type ValueType;
     public readonly bool IsState;
-    public readonly ValueSource? DefaultValue;
+    public readonly DynamicValue? DefaultValue;
 
-    public object? GetRuntimeValue(in ValueSource source /*, IDynamicStateProvider stateProvider*/)
+    public object? GetRuntimeValue(in DynamicValue source /*, IDynamicStateProvider stateProvider*/)
     {
-        if (source.From != ValueFrom.Const) throw new NotImplementedException();
+        if (source.From != ValueSource.Const) throw new NotImplementedException();
 
         //from const value, 已经在读取时转换类型为ValueType
         if (IsState)
@@ -136,7 +136,7 @@ public sealed class DynamicValueMeta
 
 public sealed class DynamicCtorArgMeta
 {
-    public DynamicCtorArgMeta(string name, Type runtimeType, bool allowNull, ValueSource? defaultValue = null)
+    public DynamicCtorArgMeta(string name, Type runtimeType, bool allowNull, DynamicValue? defaultValue = null)
     {
         Name = name;
         AllowNull = allowNull;
@@ -150,7 +150,7 @@ public sealed class DynamicCtorArgMeta
 
 public sealed class DynamicPropertyMeta
 {
-    public DynamicPropertyMeta(string name, Type runtimeType, bool allowNull, ValueSource? defaultValue = null)
+    public DynamicPropertyMeta(string name, Type runtimeType, bool allowNull, DynamicValue? defaultValue = null)
     {
         Name = name;
         AllowNull = allowNull;
