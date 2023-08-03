@@ -8,17 +8,23 @@ namespace PixUI.Dynamic.Design;
 public sealed class DesignElement : Widget, IMouseRegion
 {
     /// <summary>
-    /// Ctor for Root DesignElement
+    /// Ctor for Root DesignElement or Deserialize
     /// </summary>
-    public DesignElement(DesignController controller)
+    public DesignElement(DesignController controller, bool isRoot = false)
     {
         _controller = controller;
         MouseRegion = new MouseRegion(opaque: false);
         MouseRegion.PointerDown += OnPointerDown;
+
+        if (isRoot)
+        {
+            controller.RootElement = this;
+            DebugLabel = "Root";
+        }
     }
 
     /// <summary>
-    /// Ctor for designtime make default
+    /// Ctor for designtime with default instance
     /// </summary>
     public DesignElement(DesignController controller, DynamicWidgetMeta meta) : this(controller)
     {

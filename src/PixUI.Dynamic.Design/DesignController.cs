@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -11,6 +12,8 @@ public sealed class DesignController
     /// 设计画布缩放百分比
     /// </summary>
     public readonly State<int> Zoom = 100;
+
+    public DesignElement RootElement { get; internal set; } = null!;
 
     private readonly List<DesignElement> _selection = new();
 
@@ -27,6 +30,10 @@ public sealed class DesignController
 
     public void Load(byte[] json)
     {
+#if DEBUG
+        var ts = Stopwatch.GetTimestamp();
+#endif
+        DesignElement? rootElement = null;
         var reader = new Utf8JsonReader(json);
         while (reader.Read())
         {
@@ -36,10 +43,23 @@ public sealed class DesignController
             switch (propName)
             {
                 case "View":
-                    ReadView(ref reader);
+                    rootElement = ReadView(ref reader);
                     break;
             }
         }
+
+        if (rootElement != null)
+        {
+            var parent = (SingleChildWidget)RootElement.Parent!;
+            parent.Child = rootElement;
+            RootElement = rootElement;
+            parent.Invalidate(InvalidAction.Relayout);
+        }
+        //TODO: clear old selection
+
+#if DEBUG
+        Log.Debug($"加载耗时: {Stopwatch.GetElapsedTime(ts).TotalMilliseconds}ms");
+#endif
     }
 
     private DesignElement ReadView(ref Utf8JsonReader reader)
@@ -100,7 +120,7 @@ public sealed class DesignController
     {
         var meta = element.Meta!;
         var data = element.Data;
-        
+
         if (element.Target == null)
             element.ChangeTarget(null, meta.MakeDefaultInstance());
 
@@ -112,7 +132,7 @@ public sealed class DesignController
             var prop = new PropertyValue { Name = reader.GetString()! };
             var propMeta = meta.GetPropertyMeta(prop.Name);
             prop.Value.Read(ref reader, propMeta.Value);
-            
+
             data.AddPropertyValue(prop);
             element.SetPropertyValue(prop);
         }
@@ -122,7 +142,7 @@ public sealed class DesignController
     {
         if (element.Target == null)
             element.ChangeTarget(null, element.Meta!.MakeDefaultInstance());
-        
+
         var childElement = ReadView(ref reader);
         element.AddChild(childElement);
     }

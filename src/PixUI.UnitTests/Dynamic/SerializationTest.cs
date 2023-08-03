@@ -26,8 +26,7 @@ public class SerializationTest
                      }
                    }
                    """;
-        var jsonBytes = Encoding.UTF8.GetBytes(json);
         var controller = new DesignController();
-        controller.Load(jsonBytes);
+        controller.Load(Encoding.UTF8.GetBytes(json));
     }
 }

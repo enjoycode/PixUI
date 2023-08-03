@@ -125,7 +125,7 @@ public sealed class DynamicValueMeta
         if (source.From != ValueSource.Const) throw new NotImplementedException();
 
         //from const value, 已经在读取时转换类型为ValueType
-        if (IsState)
+        if (IsState && source.Value != null) //TODO: check Nullable of value
         {
             var rxType = typeof(Rx<>).MakeGenericType(ValueType);
             return Activator.CreateInstance(rxType, source.Value);

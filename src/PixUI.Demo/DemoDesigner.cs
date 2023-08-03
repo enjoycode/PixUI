@@ -1,3 +1,4 @@
+using System.Text;
 using PixUI.Dynamic;
 using PixUI.Dynamic.Design;
 
@@ -21,7 +22,7 @@ public sealed class DemoDesigner : View
                     {
                         Children =
                         {
-                            new Button("Load"),
+                            new Button("Load") { OnTap = OnLoad },
                             new Button("Save"),
                             new Button("Test") { OnTap = OnTest },
                         }
@@ -42,6 +43,24 @@ public sealed class DemoDesigner : View
     }
 
     private readonly DesignController _designController = new();
+
+    private void OnLoad(PointerEvent e)
+    {
+        const string json = """
+                            {
+                              "View": {
+                                "Type": "Center",
+                                "Child": {
+                                  "Type": "Button",
+                                  "CtorArgs": [ { "Const": "Button1" }, { "Const": null } ],
+                                  "Properties": { "TextColor": { "Const": "00FF0000" } }
+                                }
+                              }
+                            }
+                            """;
+
+        _designController.Load(Encoding.UTF8.GetBytes(json));
+    }
 
     private void OnTest(PointerEvent e)
     {
