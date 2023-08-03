@@ -52,12 +52,14 @@ public struct DynamicValue
         writer.WriteEndObject();
     }
 
-    public void Read(ref Utf8JsonReader reader, DynamicValueMeta valueMeta)
+    public static DynamicValue Read(ref Utf8JsonReader reader, DynamicValueMeta valueMeta)
     {
+        var v = new DynamicValue();
+
         reader.Read(); // {
         reader.Read(); // ValueSource
         var sourceName = reader.GetString()!;
-        From = sourceName switch
+        v.From = sourceName switch
         {
             nameof(ValueSource.Const) => ValueSource.Const,
             nameof(ValueSource.State) => ValueSource.State,
@@ -68,8 +70,10 @@ public struct DynamicValue
         if (valueMeta.ValueType.IsValueType && valueMeta.IsState) //TODO:排除本身就是Nullable<>
             valueType = typeof(Nullable<>).MakeGenericType(valueType);
 
-        Value = JsonSerializer.Deserialize(ref reader, valueType /*TODO: options*/);
+        v.Value = JsonSerializer.Deserialize(ref reader, valueType /*TODO: options*/);
         reader.Read(); // }
+
+        return v;
     }
 }
 

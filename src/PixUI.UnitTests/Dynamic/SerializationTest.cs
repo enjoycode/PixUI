@@ -21,7 +21,7 @@ public class SerializationTest
                        "Child": {
                          "Type": "Button",
                          "CtorArgs": [ { "Const": "Button1" }, { "Const": null } ],
-                         "Properties": { "TextColor": { "Const": "00FF0000" } }
+                         "Properties": { "TextColor": { "Const": "FFFF0000" } }
                        }
                      }
                    }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 
 namespace PixUI.Dynamic.Design;
 
@@ -107,7 +106,7 @@ public sealed class DesignController
         reader.Read(); //[
         for (var i = 0; i < args.Length; i++)
         {
-            args[i].Read(ref reader, meta.CtorArgs[i].Value);
+            args[i] = DynamicValue.Read(ref reader, meta.CtorArgs[i].Value);
         }
 
         reader.Read(); //]
@@ -131,7 +130,7 @@ public sealed class DesignController
 
             var prop = new PropertyValue { Name = reader.GetString()! };
             var propMeta = meta.GetPropertyMeta(prop.Name);
-            prop.Value.Read(ref reader, propMeta.Value);
+            prop.Value = DynamicValue.Read(ref reader, propMeta.Value);
 
             data.AddPropertyValue(prop);
             element.SetPropertyValue(prop);

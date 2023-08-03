@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 
 namespace PixUI.Dynamic.Design;
 
@@ -99,7 +100,13 @@ public sealed class DesignElement : Widget, IMouseRegion
 
     public void SetPropertyValue(PropertyValue propertyValue)
     {
-        //TODO:
+        if (Meta == null || Target == null) throw new Exception();
+
+        //TODO: emit 优化，暂用反射
+        var propMeta = Meta.GetPropertyMeta(propertyValue.Name);
+        var propValue = propMeta.Value.GetRuntimeValue(propertyValue.Value);
+        var propInfo = Meta.WidgetType.GetProperty(propertyValue.Name);
+        propInfo!.SetValue(Target, propValue);
     }
 
     #region ====Event Handler====
