@@ -34,6 +34,7 @@ public sealed class RxProperty<T> : State<T>
     }
 }
 
+// ReSharper disable once UnusedType.Global
 public abstract class RxObject<T> where T : class
 {
     protected T _target = null!;

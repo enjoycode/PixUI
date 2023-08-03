@@ -30,10 +30,12 @@ public enum ValueFrom
 }
 
 [JsonConverter(typeof(ValueSourceJsonConverter))]
-public struct ValueSource
+public struct ValueSource //TODO: rename to AnyValue or DynamicValue?
 {
     public ValueFrom From { get; set; }
     public object? Value { get; set; }
+
+    public static implicit operator ValueSource(string any) => new() { From = ValueFrom.Const, Value = any };
 
     public void Read(ref Utf8JsonReader reader, DynamicValueMeta valueMeta)
     {
@@ -43,11 +45,10 @@ public struct ValueSource
         From = (ValueFrom)reader.GetInt32();
         reader.Read(); //Value
         var valueType = valueMeta.ValueType;
-        if (valueMeta.ValueType.IsValueType && valueMeta.ValueNullable)
+        if (valueMeta.ValueType.IsValueType && valueMeta.IsState) //TODO:排除本身就是Nullable<>
             valueType = typeof(Nullable<>).MakeGenericType(valueType);
-        if (valueMeta.IsState)
-            
-        Value = JsonSerializer.Deserialize(ref reader, valueMeta.ValueType /*TODO: options*/);
+
+        Value = JsonSerializer.Deserialize(ref reader, valueType /*TODO: options*/);
         reader.Read(); // }
     }
 }

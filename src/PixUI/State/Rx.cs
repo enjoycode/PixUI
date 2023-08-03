@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace PixUI;
 
-public sealed class Rx<T> : State<T>
+public sealed class Rx<T> : State<T> //TODO: rename to RxValue
 {
     public Rx(T value)
     {

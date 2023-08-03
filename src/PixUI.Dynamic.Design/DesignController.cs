@@ -66,8 +66,7 @@ public sealed class DesignController
                     ReadProperties(element, ref reader);
                     break;
                 case "Child":
-                    var childElement = ReadView(ref reader);
-                    element.AddChild(childElement);
+                    ReadChild(element, ref reader);
                     break;
                 case "Children":
                     throw new NotImplementedException();
@@ -117,5 +116,14 @@ public sealed class DesignController
             data.AddPropertyValue(prop);
             element.SetPropertyValue(prop);
         }
+    }
+
+    private void ReadChild(DesignElement element, ref Utf8JsonReader reader)
+    {
+        if (element.Target == null)
+            element.ChangeTarget(null, element.Meta!.MakeDefaultInstance());
+        
+        var childElement = ReadView(ref reader);
+        element.AddChild(childElement);
     }
 }

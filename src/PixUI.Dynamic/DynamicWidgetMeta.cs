@@ -66,7 +66,7 @@ public sealed class DynamicWidgetMeta
             {
                 var m = CtorArgs[i];
                 if (m.Value.DefaultValue != null)
-                    ctorArgs[i] = m.Value.DefaultValue();
+                    ctorArgs[i] = m.Value.GetRuntimeValue(m.Value.DefaultValue.Value);
                 //TODO:None nullable to default value
             }
 
@@ -83,7 +83,7 @@ public sealed class DynamicWidgetMeta
         var ctorArgs = new object?[args.Length];
         for (var i = 0; i < ctorArgs.Length; i++)
         {
-            ctorArgs[i] = CtorArgs[i].Value.GetValue(ref args[i]);
+            ctorArgs[i] = CtorArgs[i].Value.GetRuntimeValue(args[i]);
         }
 
         return (Widget)Activator.CreateInstance(WidgetType, ctorArgs);
@@ -92,39 +92,74 @@ public sealed class DynamicWidgetMeta
 
 public sealed class DynamicValueMeta
 {
-    public Type ValueType { get; set; }
+    public DynamicValueMeta(Type runtimeType, ValueSource? defautValue = null)
+    {
+        //先判断是否状态类型
+        if (typeof(StateBase).IsAssignableFrom(runtimeType))
+        {
+            if (runtimeType.IsGenericType && runtimeType.GetGenericTypeDefinition() == typeof(State<>))
+            {
+                ValueType = runtimeType.GenericTypeArguments[0];
+                IsState = true;
+            }
+            else
+            {
+                throw new NotSupportedException("Only State<> supported");
+            }
+        }
+        else
+        {
+            ValueType = runtimeType;
+            IsState = false;
+        }
 
-    public bool ValueNullable { get; set; }
+        DefaultValue = defautValue;
+    }
 
-    public bool IsState { get; set; }
+    public readonly Type ValueType;
+    public readonly bool IsState;
+    public readonly ValueSource? DefaultValue;
 
-    public Func<object>? DefaultValue { get; set; }
-
-    public object? GetValue(ref ValueSource source /*, IDynamicStateProvider stateProvider*/)
+    public object? GetRuntimeValue(in ValueSource source /*, IDynamicStateProvider stateProvider*/)
     {
         if (source.From != ValueFrom.Const) throw new NotImplementedException();
 
         //from const value, 已经在读取时转换类型为ValueType
+        if (IsState)
+        {
+            var rxType = typeof(Rx<>).MakeGenericType(ValueType);
+            return Activator.CreateInstance(rxType, source.Value);
+        }
         return source.Value;
     }
 }
 
 public sealed class DynamicCtorArgMeta
 {
-    public string Name { get; set; }
+    public DynamicCtorArgMeta(string name, Type runtimeType, bool allowNull, ValueSource? defaultValue = null)
+    {
+        Name = name;
+        AllowNull = allowNull;
+        Value = new DynamicValueMeta(runtimeType, defaultValue);
+    }
 
-    public DynamicValueMeta Value { get; set; }
-
-    public bool AllowNull { get; set; }
+    public readonly string Name;
+    public readonly DynamicValueMeta Value;
+    public readonly bool AllowNull;
 }
 
 public sealed class DynamicPropertyMeta
 {
-    public string Name { get; set; }
+    public DynamicPropertyMeta(string name, Type runtimeType, bool allowNull, ValueSource? defaultValue = null)
+    {
+        Name = name;
+        AllowNull = allowNull;
+        Value = new DynamicValueMeta(runtimeType, defaultValue);
+    }
 
-    public DynamicValueMeta Value { get; set; }
-
-    public bool AllowNull { get; set; }
+    public readonly string Name;
+    public readonly DynamicValueMeta Value;
+    public readonly bool AllowNull;
 }
 
 public sealed class DynamicEventMeta
