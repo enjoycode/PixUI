@@ -6,7 +6,7 @@ namespace PixUI.Demo
         {
             Child = new Form()
             {
-                Padding = EdgeInsets.All(20),
+                //Padding = EdgeInsets.All(20),
                 LabelWidth = 50,
                 Columns = 2,
                 Children =

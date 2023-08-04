@@ -12,8 +12,10 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         Height = DefaultHeight; //TODO: 默认字体高+padding
 
         MouseRegion = new MouseRegion(() => Cursors.Hand);
-        FocusNode = new FocusNode();
+        MouseRegion.PointerDown += OnPointerDown;
+        MouseRegion.PointerUp += OnPointerUp;
 
+        FocusNode = new FocusNode();
         _hoverDecoration = new HoverDecoration(this, GetHoverShaper, GetHoverBounds);
         _hoverDecoration.AttachHoverChangedEvent(this);
     }
@@ -26,6 +28,8 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     private State<float>? _outlineWidth;
     private State<Color>? _textColor;
     private State<float>? _fontSize;
+
+    private bool _drawMask;
 
     public ButtonStyle Style { get; set; } = ButtonStyle.Solid;
     public ButtonShape Shape { get; set; } = ButtonShape.Standard;
@@ -65,6 +69,26 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         set => MouseRegion.PointerTap += value;
     }
 
+    #region ====EventHandlers====
+
+    private void OnPointerDown(PointerEvent e)
+    {
+        if (e.Buttons != PointerButtons.Left) return;
+
+        _drawMask = true;
+        Invalidate(InvalidAction.Repaint);
+    }
+
+    private void OnPointerUp(PointerEvent e)
+    {
+        if (e.Buttons != PointerButtons.Left) return;
+
+        _drawMask = false;
+        Invalidate(InvalidAction.Repaint);
+    }
+
+    #endregion
+
     #region ====HoverDecoration====
 
     private ShapeBorder GetHoverShaper()
@@ -74,11 +98,9 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
             case ButtonShape.Square:
                 return new RoundedRectangleBorder(); //TODO: use RectangleBorder
             case ButtonShape.Standard:
-                return new RoundedRectangleBorder(
-                    null, BorderRadius.All(Radius.Circular(StandardRadius)));
+                return new RoundedRectangleBorder(null, BorderRadius.All(Radius.Circular(StandardRadius)));
             case ButtonShape.Pills:
-                return new RoundedRectangleBorder(
-                    null, BorderRadius.All(Radius.Circular(H / 2)));
+                return new RoundedRectangleBorder(null, BorderRadius.All(Radius.Circular(H / 2)));
             default:
                 throw new NotImplementedException();
         }
@@ -160,6 +182,8 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
             _textWidget.Paint(canvas, area);
             canvas.Translate(-_textWidget.X, -_textWidget.Y);
         }
+
+        PaintMask(canvas);
     }
 
     private void PaintShape(Canvas canvas)
@@ -186,6 +210,47 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
             }
             default:
                 throw new NotImplementedException();
+        }
+    }
+
+    private void PaintMask(Canvas canvas)
+    {
+        if (!_drawMask) return;
+
+        var paint = PaintUtils.Shared(Colors.Gray.WithAlpha(128));
+        paint.AntiAlias = Shape != ButtonShape.Square;
+
+        var x = 0f;
+        var y = 0f;
+        var w = W;
+        var h = H;
+        if (_iconWidget != null && _textWidget == null && Style == ButtonStyle.Transparent)
+        {
+            x = _iconWidget.X;
+            y = _iconWidget.Y;
+            w = _iconWidget.W;
+            h = _iconWidget.H;
+        }
+
+        switch (Shape)
+        {
+            case ButtonShape.Standard:
+            {
+                using var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(x, y, w, h),
+                    StandardRadius, StandardRadius);
+                canvas.DrawRRect(rrect, paint);
+                break;
+            }
+            case ButtonShape.Pills:
+            {
+                using var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(x, y, w, h),
+                    h / 2f, h / 2f);
+                canvas.DrawRRect(rrect, paint);
+                break;
+            }
+            default:
+                canvas.DrawRect(Rect.FromLTWH(x, y, w, h), paint);
+                break;
         }
     }
 
