@@ -58,7 +58,7 @@ public sealed class TreeNode<T> : Widget
 
     public bool IsLeaf { get; set; }
     public bool IsLazyLoad { get; set; }
-    public bool IsExpanded { get; set; } = false;
+    public bool IsExpanded { get; set; }
 
 
     private int _animationFlag = 0; //0=none,1=expand,-1=collapse

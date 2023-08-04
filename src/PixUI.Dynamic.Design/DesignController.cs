@@ -54,7 +54,7 @@ public sealed class DesignController
             RootElement = rootElement;
             parent.Invalidate(InvalidAction.Relayout);
         }
-        //TODO: clear old selection
+        Select(RootElement); // always select root element
 
 #if DEBUG
         Log.Debug($"加载耗时: {Stopwatch.GetElapsedTime(ts).TotalMilliseconds}ms");

@@ -11,8 +11,7 @@ public sealed class ExpandIcon : SingleChildWidget, IMouseRegion
         set => MouseRegion.PointerDown += value;
     }
 
-    public ExpandIcon(Animation<float> turns, State<float>? size = null,
-        State<Color>? color = null)
+    public ExpandIcon(Animation<float> turns, State<float>? size = null, State<Color>? color = null)
     {
         MouseRegion = new MouseRegion();
 

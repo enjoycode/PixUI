@@ -106,8 +106,9 @@ namespace PixUI.Demo
                     {
                         Children =
                         {
+                            new Collapse { Width = 300, Title = new Text("Collapse"), Body = new DemoForm() },
                             new Card { Width = 250, Height = 220, Child = new Calendar(1977, 3) },
-                            new DatePicker(new DateTime(1977, 3, 16)) {Width = 200},
+                            new DatePicker(new DateTime(1977, 3, 16)) { Width = 200 },
                         }
                     }
                 }
