@@ -35,7 +35,7 @@ public sealed class DemoDesigner : View
                     {
                         new Container { Padding = EdgeInsets.All(8), Width = 200, Child = new Toolbox() },
                         new Expanded { Child = new DesignCanvas(_designController) },
-                        new Container { Width = 200 }
+                        new Container { Width = 200, Child = new PropertyPanel(_designController) }
                     }
                 },
             }

@@ -415,10 +415,9 @@ public abstract class Widget : IStateBindable, IDisposable
     }
 
     /// <summary>
-    /// 子项尺寸变更后通知父项更新布局, 子类重写更新布局以减少布局计算
+    /// 子组件尺寸变更后通知父项更新布局, 子类重写更新布局以减少布局计算
     /// </summary>
-    protected internal virtual void OnChildSizeChanged(Widget child,
-        float dx, float dy, AffectsByRelayout affects)
+    protected internal virtual void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
     {
         Debug.Assert(AutoSize);
 
@@ -433,8 +432,7 @@ public abstract class Widget : IStateBindable, IDisposable
     /// <summary>
     /// 如果自己的尺寸发生变更且上级是AutoSize的则通知上级
     /// </summary>
-    protected internal void TryNotifyParentIfSizeChanged(float oldWidth, float oldHeight,
-        AffectsByRelayout affects)
+    protected internal void TryNotifyParentIfSizeChanged(float oldWidth, float oldHeight, AffectsByRelayout affects)
     {
         var dx = W - oldWidth;
         var dy = H - oldHeight;

@@ -14,7 +14,11 @@ public sealed class DesignController
 
     public DesignElement RootElement { get; internal set; } = null!;
 
+    #region ====Selection====
+
     private readonly List<DesignElement> _selection = new();
+
+    public event Action? SelectionChanged;
 
     public DesignElement? FirstSelected => _selection.Count > 0 ? _selection[0] : null;
 
@@ -25,7 +29,13 @@ public sealed class DesignController
 
         _selection.Add(element);
         element.IsSelected = true;
+
+        SelectionChanged?.Invoke();
     }
+
+    #endregion
+
+    #region ====Json Serialization====
 
     public void Load(byte[] json)
     {
@@ -54,6 +64,7 @@ public sealed class DesignController
             RootElement = rootElement;
             parent.Invalidate(InvalidAction.Relayout);
         }
+
         Select(RootElement); // always select root element
 
 #if DEBUG
@@ -145,4 +156,6 @@ public sealed class DesignController
         var childElement = ReadView(ref reader);
         element.AddChild(childElement);
     }
+
+    #endregion
 }

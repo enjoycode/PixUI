@@ -48,9 +48,8 @@ public sealed class ListViewController<T> : WidgetController<ListView<T>>
 
 public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
 {
-    public static ListView<Widget> From(IList<Widget> widgets,
-        ListViewController<Widget>? controller = null)
-        => new ListView<Widget>((w, i) => w, widgets, controller);
+    public static ListView<Widget> From(IList<Widget> widgets, ListViewController<Widget>? controller = null) =>
+        new((w, i) => w, widgets, controller);
 
     public ListView(Func<T, int, Widget> itemBuilder, IList<T>? dataSource = null,
         ListViewController<T>? controller = null)
@@ -95,6 +94,18 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
         }
 
         SetSize(width, height);
+    }
+
+    protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
+    {
+        //TODO:暂全部重新布局并设脏区域为全部重绘，可优化
+        Layout(CachedAvailableWidth, CachedAvailableHeight);
+        affects.Widget = this;
+        affects.OldX = 0;
+        affects.OldY = 0;
+        affects.OldW = W;
+        affects.OldH = H;
+        //不需要再通知上级了
     }
 
     protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)

@@ -95,8 +95,7 @@ public sealed class Column : MultiChildWidget<Widget>
         SetSize(maxWidthOfChild, Math.Min(height, totalHeight));
     }
 
-    protected internal override void OnChildSizeChanged(Widget child,
-        float dx, float dy, AffectsByRelayout affects)
+    protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
     {
         Debug.Assert(AutoSize);
 
