@@ -5,6 +5,8 @@ namespace PixUI;
 public sealed class ButtonGroup : MultiChildWidget<Button>
 {
     public ButtonGroup() {}
+
+    private readonly State<float> _buttonHeight = Button.DefaultHeight;
         
     #region ====Widget Overrides====
 
@@ -14,18 +16,18 @@ public sealed class ButtonGroup : MultiChildWidget<Button>
         var height = CacheAndCheckAssignHeight(availableHeight);
 
         var xPos = 0f;
-        State<float> buttonHeight = Math.Min(height, Button.DefaultHeight); //暂强制同高
+        _buttonHeight.Value = Math.Min(height, Button.DefaultHeight); //暂强制同高
         for (var i = 0; i < _children.Count; i++)
         {
-            _children[i].Height = buttonHeight;
+            _children[i].Height = _buttonHeight;
             _children[i].Shape = ButtonShape.Square;
-            _children[i].Layout(Math.Max(0, width - xPos), buttonHeight.Value);
+            _children[i].Layout(Math.Max(0, width - xPos), _buttonHeight.Value);
             _children[i].SetPosition(xPos, 0);
 
             xPos += _children[i].W;
         }
 
-        SetSize(xPos, buttonHeight.Value);
+        SetSize(xPos, _buttonHeight.Value);
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
