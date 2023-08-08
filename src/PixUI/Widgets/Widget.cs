@@ -7,7 +7,7 @@ namespace PixUI;
 public abstract class Widget : IStateBindable, IDisposable
 {
     // 绑定的状态列表,目前仅用于dispose时解除绑定关系
-    private List<StateBase>? _states;
+    private List<StateBase>? _states; //TODO: ?remove this, 改为在绑定时监听Widget.Disposing事件后移除绑定关系
 
     /// <summary>
     /// 是否不透明的
@@ -324,23 +324,31 @@ public abstract class Widget : IStateBindable, IDisposable
     /// <summary>
     /// 重新绑定状态
     /// </summary>
-    protected T? Rebind<T>(T? oldState, T? newState,
-        BindingOptions options = BindingOptions.AffectsVisual)
+    protected T? Rebind<T>(T? oldState, T? newState, BindingOptions options = BindingOptions.AffectsVisual)
         where T : StateBase
     {
-        oldState?.RemoveBinding(this);
+        if (ReferenceEquals(oldState, newState)) return newState;
 
-        if (newState == null) return newState;
+        if (oldState != null)
+        {
+            oldState.RemoveBinding(this);
+            _states!.Remove(oldState);
+        }
 
-        newState.AddBinding(this, options);
-        if (_states == null)
+        if (newState != null)
         {
-            _states = new List<StateBase> { newState };
+            newState.AddBinding(this, options);
+            if (_states == null)
+                _states = new List<StateBase> { newState };
+            else if (!_states.Contains(newState))
+                _states.Add(newState);
         }
-        else if (!_states.Contains(newState))
-        {
-            _states.Add(newState);
-        }
+
+        //暂强制重新布局或重绘
+        if (options == BindingOptions.AffectsLayout)
+            Invalidate(InvalidAction.Relayout);
+        else if (options == BindingOptions.AffectsVisual)
+            Invalidate(InvalidAction.Repaint);
 
         return newState;
     }

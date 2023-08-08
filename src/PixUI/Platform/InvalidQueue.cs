@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace PixUI;
 
@@ -62,7 +63,7 @@ internal sealed class InvalidWidget
     internal IDirtyArea? Area;
 
 #if __WEB__
-    internal InvalidWidget() { } //Need for web now, TODO:use TSRecordAttribute
+    internal InvalidWidget() { } //Need for web now
 #endif
 }
 
@@ -83,22 +84,50 @@ internal sealed class InvalidQueue
         //暂在这里判断Widget是否已挂载
         if (!widget.IsMounted) return false;
 
+#if DEBUG
+        if (Thread.CurrentThread.ManagedThreadId != UIApplication.Current.UIThread.ManagedThreadId)
+            throw new InvalidOperationException("Only allow invalidate on ui thread.");
+#endif
+
         //根据Widget所在的画布加入相应的队列
-        var root = widget.Root!;
-        if (root is Overlay)
+#if DEBUG
+        if (widget.Root == null)
+            throw new Exception("Widget without root");
+#else
+        if (widget.Root == null)
         {
+            Log.Warn("Widget without root");
+            return false;
+        }
+#endif
+
+        var win = widget.Root.Window;
+        if (widget.Root is Overlay)
+        {
+            if (win.OverlayInvalidQueue.IsSuspended)
+            {
+                Log.Debug("Add when queue is suspended");
+                return false;
+            }
+
             //When used for overlay, only Relayout invalid add to queue.
             if (action == InvalidAction.Relayout)
-                root.Window.OverlayInvalidQueue.AddInternal(widget, action, item);
+                win.OverlayInvalidQueue.AddInternal(widget, action, item);
         }
         else
         {
-            root.Window.WidgetsInvalidQueue.AddInternal(widget, action, item);
+            if (win.WidgetsInvalidQueue.IsSuspended)
+            {
+                Log.Debug("Add when queue is suspended");
+                return false;
+            }
+
+            win.WidgetsInvalidQueue.AddInternal(widget, action, item);
         }
 
-        if (!root.Window.HasPostInvalidateEvent)
+        if (!win.HasPostInvalidateEvent)
         {
-            root.Window.HasPostInvalidateEvent = true;
+            win.HasPostInvalidateEvent = true;
             UIApplication.Current.PostInvalidateEvent();
         }
 
@@ -107,7 +136,12 @@ internal sealed class InvalidQueue
 
     #endregion
 
-    private readonly List<InvalidWidget> _queue = new List<InvalidWidget>(32);
+    private readonly List<InvalidWidget> _queue = new(32);
+
+    /// <summary>
+    /// 防止队列在消费时改动队列
+    /// </summary>
+    private bool IsSuspended { get; set; } = false;
 
     internal bool IsEmpty => _queue.Count == 0;
 
@@ -234,6 +268,7 @@ internal sealed class InvalidQueue
     internal void RenderFrame(PaintContext context)
     {
         var hasRelayout = false;
+        IsSuspended = true;
 
         foreach (var item in _queue)
         {
@@ -257,8 +292,9 @@ internal sealed class InvalidQueue
             }
         }
 
-        // clear items
+        // clear items and restore suspended
         _queue.Clear();
+        IsSuspended = false;
 
         // 通知重新进行HitTest TODO:确认布局影响，eg:Input重布局没有改变大小，则不需要重新HitTest
         if (hasRelayout)
@@ -270,6 +306,7 @@ internal sealed class InvalidQueue
     /// </summary>
     internal void RelayoutAll()
     {
+        IsSuspended = true;
         foreach (var item in _queue)
         {
             if (item.Action == InvalidAction.Relayout)
@@ -283,8 +320,9 @@ internal sealed class InvalidQueue
             }
         }
 
-        // clear items
+        // clear items and restore suspended
         _queue.Clear();
+        IsSuspended = false;
     }
 
     private static void RelayoutWidget(Widget widget, AffectsByRelayout affects)

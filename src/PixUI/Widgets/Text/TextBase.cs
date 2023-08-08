@@ -36,7 +36,7 @@ public abstract class TextBase : Widget
     public State<Color>? TextColor
     {
         get => _textColor;
-        set => _textColor = Rebind(_textColor, value, BindingOptions.AffectsVisual);
+        set => _textColor = Rebind(_textColor, value, BindingOptions.AffectsLayout);
     }
 
     public int MaxLines

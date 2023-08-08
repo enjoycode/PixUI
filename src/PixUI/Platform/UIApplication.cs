@@ -1,10 +1,12 @@
 using System;
-using System.Diagnostics;
+using System.Threading;
 
 namespace PixUI;
 
 public abstract class UIApplication
 {
+    public readonly Thread UIThread = Thread.CurrentThread;
+    
     protected UIWindow MainWindow = null!; //目前仅支持单一Window
 
     public static UIApplication Current { get; protected set; } = null!;
