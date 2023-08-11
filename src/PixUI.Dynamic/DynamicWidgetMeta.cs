@@ -95,7 +95,7 @@ public sealed class DynamicValueMeta
     public DynamicValueMeta(Type runtimeType, DynamicValue? defautValue = null)
     {
         //先判断是否状态类型
-        if (typeof(StateBase).IsAssignableFrom(runtimeType))
+        if (typeof(State).IsAssignableFrom(runtimeType))
         {
             if (runtimeType.IsGenericType && runtimeType.GetGenericTypeDefinition() == typeof(State<>))
             {
@@ -127,7 +127,7 @@ public sealed class DynamicValueMeta
         //from const value, 已经在读取时转换类型为ValueType
         if (IsState && source.Value != null) //TODO: check Nullable of value
         {
-            var rxType = typeof(Rx<>).MakeGenericType(ValueType);
+            var rxType = typeof(RxValue<>).MakeGenericType(ValueType);
             return Activator.CreateInstance(rxType, source.Value);
         }
         return source.Value;

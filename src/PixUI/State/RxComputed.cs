@@ -62,5 +62,5 @@ public sealed class RxComputed<T> : State<T>, IStateBindable
         }
     }
 
-    public void OnStateChanged(StateBase state, BindingOptions options) => NotifyValueChanged();
+    public void OnStateChanged(State state, BindingOptions options) => NotifyValueChanged();
 }

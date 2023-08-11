@@ -42,9 +42,9 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         get => _textColor;
         set
         {
-            _textColor = value;
-            if (_textWidget != null) _textWidget.TextColor = value;
-            if (_iconWidget != null) _iconWidget.Color = value;
+            _textColor = value ?? (Style == ButtonStyle.Solid ? Colors.White : Colors.Black);
+            if (_textWidget != null) _textWidget.TextColor = _textColor;
+            if (_iconWidget != null) _iconWidget.Color = _textColor;
         }
     }
 
@@ -252,6 +252,13 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
                 canvas.DrawRect(Rect.FromLTWH(x, y, w, h), paint);
                 break;
         }
+    }
+
+    public override string ToString()
+    {
+        if (DebugLabel != null || _text == null)
+            return base.ToString();
+        return $"{nameof(Button)}[\"{_text.Value}\"]";
     }
 
     protected override void OnUnmounted()

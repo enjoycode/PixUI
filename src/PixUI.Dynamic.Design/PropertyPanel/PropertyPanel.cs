@@ -37,8 +37,8 @@ public sealed class PropertyPanel : SingleChildWidget
             return;
         }
 
-        var meta = _controller.FirstSelected!.Meta!;
-        var data = _controller.FirstSelected!.Data;
+        var element = _controller.FirstSelected!;
+        var meta = element.Meta!;
 
         //Widget Group
         _widgetGroup.SetItems(new FormItem[]
@@ -53,7 +53,7 @@ public sealed class PropertyPanel : SingleChildWidget
             var propItems = new FormItem[meta.Properties!.Length];
             for (var i = 0; i < propItems.Length; i++)
             {
-                propItems[i] = new($"{meta.Properties[i].Name}:", new Input("12345"));
+                propItems[i] = new($"{meta.Properties[i].Name}:", new PropertyEditor(element, meta.Properties[i]));
             }
 
             _propGroup.SetItems(propItems);

@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 namespace PixUI;
 
 // @ts-ignore for IList implements
-public sealed class RxList<T> : StateBase
+public sealed class RxList<T> : State
 #if !__WEB__
     , IList<T>
 #endif

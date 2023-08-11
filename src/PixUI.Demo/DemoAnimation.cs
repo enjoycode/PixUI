@@ -2,9 +2,9 @@ namespace PixUI.Demo.Mac
 {
     public sealed class DemoAnimation : View
     {
-        private readonly Rx<string> _title = "Hello World!";
-        private readonly Rx<float> _fontSize = 30;
-        private readonly Rx<Color> _color = Colors.Black;
+        private readonly RxValue<string> _title = "Hello World!";
+        private readonly RxValue<float> _fontSize = 30;
+        private readonly RxValue<Color> _color = Colors.Black;
 
         private readonly AnimationController _controller;
         private readonly Animation<Color> _colorAnimation;

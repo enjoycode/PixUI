@@ -11,7 +11,7 @@ public sealed class MonthView : Widget, IMouseRegion
 
         Year = Bind(year);
         Month = Bind(month);
-        _selectedDate = Bind(new Rx<DateTime?>(null));
+        _selectedDate = Bind(new RxValue<DateTime?>(null));
 
         InitMouseRegion();
     }
@@ -21,13 +21,13 @@ public sealed class MonthView : Widget, IMouseRegion
         if (selectedDate.Value == null)
         {
             var today = DateTime.Today;
-            Year = Bind(new Rx<int>(today.Year));
-            Month = Bind(new Rx<int>(today.Month));
+            Year = Bind(new RxValue<int>(today.Year));
+            Month = Bind(new RxValue<int>(today.Month));
         }
         else
         {
-            Year = Bind(new Rx<int>(selectedDate.Value.Value.Year));
-            Month = Bind(new Rx<int>(selectedDate.Value.Value.Month));
+            Year = Bind(new RxValue<int>(selectedDate.Value.Value.Year));
+            Month = Bind(new RxValue<int>(selectedDate.Value.Value.Month));
         }
 
         _selectedDate = Bind(selectedDate);

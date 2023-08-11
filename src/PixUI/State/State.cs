@@ -12,10 +12,11 @@ public interface IStateBindable
     /// <summary>
     /// 绑定的状态发生变更
     /// </summary>
-    void OnStateChanged(StateBase state, BindingOptions options);
+    void OnStateChanged(State state, BindingOptions options);
 }
 
-public abstract class StateBase
+[TSRename("StateBase")]
+public abstract class State
 {
     private List<Binding>? _bindings;
 
@@ -61,7 +62,7 @@ public abstract class StateBase
     }
 }
 
-public abstract class State<T> : StateBase
+public abstract class State<T> : State
 {
     public abstract T Value { get; set; }
 
@@ -78,10 +79,7 @@ public abstract class State<T> : StateBase
     /// </summary>
     public State<bool> ToStateOfBool(Func<T, bool> getter) => RxComputed<bool>.Make<T, bool>(this, getter);
 
-    // public State<T> ToNonNullable()
-    //     => RxComputed<T>.Make(this, v => v == null ? default(T) : v, v => Value = v);
-
-    public static implicit operator State<T>(T value) => new Rx<T>(value);
+    public static implicit operator State<T>(T value) => new RxValue<T>(value);
 
 #if __WEB__
         //TODO:临时解决隐式转换
@@ -98,6 +96,12 @@ public static class StateExtensions
     /// </summary>
     public static State<bool> ToReversed(this State<bool> s) =>
         RxComputed<bool>.Make(s, v => !v, v => s.Value = !v);
+
+    public static State<T> ToNoneNullable<T>(this State<T?> s) where T : struct =>
+        RxComputed<T>.Make(s, v => v ?? default(T), v => s.Value = v);
+
+    public static State<T> ToNoneNullable<T>(this State<T?> s, T defaultValue) where T : struct =>
+        RxComputed<T>.Make(s, v => v ?? defaultValue, v => s.Value = v);
 }
 
 // public sealed class StateProxy<T> : State<T>, IStateBindable

@@ -184,7 +184,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         BuildParagraph(text, float.PositiveInfinity);
     }
 
-    public override void OnStateChanged(StateBase state, BindingOptions options)
+    public override void OnStateChanged(State state, BindingOptions options)
     {
         if (ReferenceEquals(state, _readonly))
         {

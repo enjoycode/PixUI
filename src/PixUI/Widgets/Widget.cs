@@ -7,7 +7,7 @@ namespace PixUI;
 public abstract class Widget : IStateBindable, IDisposable
 {
     // 绑定的状态列表,目前仅用于dispose时解除绑定关系
-    private List<StateBase>? _states; //TODO: ?remove this, 改为在绑定时监听Widget.Disposing事件后移除绑定关系
+    private List<State>? _states; //TODO: ?remove this, 改为在绑定时监听Widget.Disposing事件后移除绑定关系
 
     /// <summary>
     /// 是否不透明的
@@ -316,7 +316,7 @@ public abstract class Widget : IStateBindable, IDisposable
     /// 绑定状态至Widget
     /// </summary>
     protected T Bind<T>(T newState, BindingOptions options = BindingOptions.AffectsVisual)
-        where T : StateBase
+        where T : State
     {
         return Rebind(null, newState, options)!;
     }
@@ -325,7 +325,7 @@ public abstract class Widget : IStateBindable, IDisposable
     /// 重新绑定状态
     /// </summary>
     protected T? Rebind<T>(T? oldState, T? newState, BindingOptions options = BindingOptions.AffectsVisual)
-        where T : StateBase
+        where T : State
     {
         if (ReferenceEquals(oldState, newState)) return newState;
 
@@ -339,7 +339,7 @@ public abstract class Widget : IStateBindable, IDisposable
         {
             newState.AddBinding(this, options);
             if (_states == null)
-                _states = new List<StateBase> { newState };
+                _states = new List<State> { newState };
             else if (!_states.Contains(newState))
                 _states.Add(newState);
         }
@@ -558,7 +558,7 @@ public abstract class Widget : IStateBindable, IDisposable
         InvalidQueue.Add(this, action, area);
     }
 
-    public virtual void OnStateChanged(StateBase state, BindingOptions options)
+    public virtual void OnStateChanged(State state, BindingOptions options)
     {
         if (options == BindingOptions.AffectsLayout)
         {
@@ -603,5 +603,7 @@ public abstract class Widget : IStateBindable, IDisposable
     [TSRawScript(@"public toString(): string {
     return `${this.constructor.name}[${this.DebugLabel ?? ''}]`;
 }")]
-    public override string ToString() => $"{GetType().Name}[\"{DebugLabel}\"]";
+    public override string ToString() => string.IsNullOrEmpty(DebugLabel)
+        ? $"{GetType().Name}"
+        : $"{GetType().Name}[\"{DebugLabel}\"]";
 }

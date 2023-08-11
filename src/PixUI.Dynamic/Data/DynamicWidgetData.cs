@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -20,6 +21,39 @@ public sealed class DynamicWidgetData
     {
         Properties ??= new List<PropertyValue>();
         Properties.Add(propertyValue);
+    }
+
+    public bool TryGetPropertyValue(string name, out PropertyValue? value)
+    {
+        if (Properties == null || Properties.Count == 0)
+        {
+            value = null;
+            return false;
+        }
+
+        var exists = Properties.FirstOrDefault(p => p.Name == name);
+        value = exists;
+        return exists != null;
+    }
+
+    public PropertyValue SetPropertyValue(string name, DynamicValue value)
+    {
+        Properties ??= new List<PropertyValue>();
+        var exists = Properties.FirstOrDefault(p => p.Name == name);
+        if (exists != null)
+        {
+            exists.Value = value;
+            return exists;
+        }
+
+        var newPropValue = new PropertyValue { Name = name, Value = value };
+        AddPropertyValue(newPropValue);
+        return newPropValue;
+    }
+
+    public void RemovePropertyValue(string name)
+    {
+        Properties?.RemoveAll(p => p.Name == name);
     }
 }
 

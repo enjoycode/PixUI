@@ -12,8 +12,5 @@
       <ProjectReference Include="..\PixUI\PixUI.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="PropertyEditors\" />
-    </ItemGroup>
 
 </Project>

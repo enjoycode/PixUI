@@ -25,7 +25,7 @@ public sealed class TabController<T> : IStateBindable
     internal void BindTabBar(TabBar<T> tabBar) => _tabBar = tabBar;
     internal void BindTabBody(TabBody<T> tabBody) => _tabBody = tabBody;
 
-    public void OnStateChanged(StateBase state, BindingOptions options) { }
+    public void OnStateChanged(State state, BindingOptions options) { }
 
     #region ====Events====
 

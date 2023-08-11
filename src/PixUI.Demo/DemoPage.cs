@@ -19,7 +19,7 @@ namespace PixUI.Demo
             _fullName = Compute(_firstName, _lastName, (first, last) => "Full:" + first + "-" + last);
 
             var imgData = ResourceLoad.LoadBytes("Resources.Cat.webp");
-            Rx<ImageSource> defaultImgSrc = ImageSource.FromEncodedData(imgData);
+            RxValue<ImageSource> defaultImgSrc = ImageSource.FromEncodedData(imgData);
             _imgSrc = Bind(defaultImgSrc, BindingOptions.AffectsVisual);
 
             Child = BuildChild();

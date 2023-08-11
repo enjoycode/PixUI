@@ -24,6 +24,8 @@ public sealed class DesignController
 
     internal void Select(DesignElement element)
     {
+        if (_selection.Count == 1 && ReferenceEquals(_selection[0], element)) return;
+
         _selection.ForEach(o => o.IsSelected = false);
         _selection.Clear();
 

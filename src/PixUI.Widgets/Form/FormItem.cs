@@ -64,5 +64,7 @@ public sealed class FormItem : Widget
         PaintChildren(canvas, area);
     }
 
+    public override string ToString() => $"{nameof(FormItem)}[\"{_label}\"]";
+
     #endregion
 }

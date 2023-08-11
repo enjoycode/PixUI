@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace PixUI;
 
-public sealed class Rx<T> : State<T> //TODO: rename to RxValue
+public sealed class RxValue<T> : State<T>
 {
-    public Rx(T value)
+    public RxValue(T value)
     {
         _value = value;
     }
@@ -27,5 +27,5 @@ public sealed class Rx<T> : State<T> //TODO: rename to RxValue
     //类似Nullable<T>暂不支持隐式转换为相应的值
     //public static implicit operator T(Rx<T> rx) => rx.Value;
 
-    public static implicit operator Rx<T>(T value) => new Rx<T>(value);
+    public static implicit operator RxValue<T>(T value) => new RxValue<T>(value);
 }

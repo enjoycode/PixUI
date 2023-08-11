@@ -81,7 +81,7 @@ public abstract class RxObject<T> where T : class
             var fieldType = field.FieldType;
             if (fieldType.Name == "RxProperty`1")
             {
-                var state = (StateBase)field.GetValue(this);
+                var state = (State)field.GetValue(this);
                 state.NotifyValueChanged();
             }
         }

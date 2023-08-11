@@ -60,7 +60,7 @@ public class Conditional<T> : DynamicView //where T: IEquatable<T>
         return this;
     }
 
-    public override void OnStateChanged(StateBase state, BindingOptions options)
+    public override void OnStateChanged(State state, BindingOptions options)
     {
         if (ReferenceEquals(state, _state))
         {

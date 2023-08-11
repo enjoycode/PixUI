@@ -109,6 +109,16 @@ public sealed class DesignElement : Widget, IMouseRegion
         propInfo!.SetValue(Target, propValue);
     }
 
+    public void RemovePropertyValue(string name)
+    {
+        if (Meta == null || Target == null) throw new Exception();
+        
+        //TODO: emit 优化，暂用反射
+        var propMeta = Meta.GetPropertyMeta(name);
+        var propInfo = Meta.WidgetType.GetProperty(name);
+        propInfo!.SetValue(Target, null);
+    }
+
     #region ====Event Handler====
 
     private void OnPointerDown(PointerEvent e)

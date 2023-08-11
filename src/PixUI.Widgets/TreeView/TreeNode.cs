@@ -374,7 +374,7 @@ public sealed class TreeNode<T> : Widget
     {
         if (!Controller.ShowCheckbox) return;
 
-        _checkState = new Rx<bool?>(false);
+        _checkState = new RxValue<bool?>(false);
         var checkbox = Checkbox.Tristate(_checkState);
         checkbox.ValueChanged += OnCheckChanged;
         _row.Checkbox = checkbox;

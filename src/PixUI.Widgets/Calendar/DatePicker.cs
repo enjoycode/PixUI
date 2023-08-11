@@ -11,7 +11,7 @@ public sealed class DatePicker : InputBase<EditableText>
         _textValue = Bind(_editor.Text, BindingOptions.None);
         if (value.Value != null) _textValue.Value = value.Value.Value.ToString(format);
 
-        Padding = new Rx<EdgeInsets>(EdgeInsets.Only(4, 4, 0, 4));
+        Padding = new RxValue<EdgeInsets>(EdgeInsets.Only(4, 4, 0, 4));
         SuffixWidget = new Button(icon: MaterialIcons.CalendarMonth)
         {
             Style = ButtonStyle.Transparent,
@@ -68,7 +68,7 @@ public sealed class DatePicker : InputBase<EditableText>
         }
     }
 
-    public override void OnStateChanged(StateBase state, BindingOptions options)
+    public override void OnStateChanged(State state, BindingOptions options)
     {
         if (ReferenceEquals(state, _value))
             _textValue.Value = _value.Value == null ? string.Empty : _value.Value.Value.ToString(format);

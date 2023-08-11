@@ -58,7 +58,7 @@ public abstract class TextBase : Widget
         }
     }
 
-    public override void OnStateChanged(StateBase state, BindingOptions options)
+    public override void OnStateChanged(State state, BindingOptions options)
     {
         //TODO: fast update font size or color use skia paragraph
         _cachedParagraph?.Dispose();
