@@ -9,6 +9,7 @@
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.Dynamic.SerializationTest.ValueSerializationTest&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.Dynamic.SerializationTest.ReadArrayTest&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.Dynamic.SerializationTest.LoadTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.MatrixTest.Test&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	

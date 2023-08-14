@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace PixUI.Dynamic.Design;
 
@@ -29,7 +30,7 @@ public sealed class PropertyPanel : SingleChildWidget
 
     private void OnSelectionChanged()
     {
-        if (_controller.FirstSelected == null)
+        if (_controller.FirstSelected == null || _controller.FirstSelected.Meta == null)
         {
             _widgetGroup.SetItems(Array.Empty<FormItem>());
             _propGroupVisible.Value = false;
@@ -38,13 +39,13 @@ public sealed class PropertyPanel : SingleChildWidget
         }
 
         var element = _controller.FirstSelected!;
-        var meta = element.Meta!;
+        var meta = element.Meta;
 
         //Widget Group
-        _widgetGroup.SetItems(new FormItem[]
-        {
-            new("Type:", new Input(meta.Name))
-        });
+        var widgetGroupItems = new List<FormItem>();
+        widgetGroupItems.Add(new FormItem("Type:", new Text(meta.Name)));
+        
+        _widgetGroup.SetItems(widgetGroupItems);
 
         //Properties Group
         _propGroupVisible.Value = meta.Properties != null && meta.Properties.Length > 0;

@@ -21,9 +21,14 @@ public sealed class PropertyEditor : Widget
         if (propertyMeta.AllowNull)
         {
             _deleteButton = BuildDeleteButton();
-            _deleteButton.OnTap = _ => OnDeletePropertyValue(element, propertyMeta, editingValue);
+            _deleteButton.OnTap = _ => DeletePropertyValue(element, propertyMeta, editingValue);
         }
     }
+
+    /// <summary>
+    /// 新建构造参数编辑器
+    /// </summary>
+    public PropertyEditor(DesignElement element, DynamicCtorArgMeta ctorArgMeta) { }
 
     private readonly Widget _targetEditor;
     private readonly Button? _deleteButton;
@@ -64,34 +69,16 @@ public sealed class PropertyEditor : Widget
         return valueType;
     }
 
+    #region ====PropertyValue====
+
     private static Widget GetPropertyValueEditor(Type valueType, DesignElement element,
         DynamicPropertyMeta propertyMeta, out State? editingValue)
     {
         //TODO: test only now
         if (valueType == typeof(Color))
         {
-            var rxProp = new RxProperty<Color?>(() =>
-                {
-                    var exists = element.Data.TryGetPropertyValue(propertyMeta.Name, out var currentValue);
-                    if (exists)
-                    {
-                        if (currentValue!.Value.From != ValueSource.Const) throw new NotImplementedException();
-                        return (Color?)currentValue.Value.Value;
-                    }
-
-                    if (propertyMeta.Value.DefaultValue != null)
-                        return (Color?)propertyMeta.Value.DefaultValue.Value.Value;
-
-                    return null;
-                },
-                (newValue) =>
-                {
-                    //TODO: check null && clear it
-                    var dynamicValue = new DynamicValue { From = ValueSource.Const, Value = newValue };
-                    var propertyValue = element.Data.SetPropertyValue(propertyMeta.Name, dynamicValue);
-                    element.SetPropertyValue(propertyValue);
-                }
-            );
+            var rxProp = new RxProperty<Color?>(() => (Color?)GetPropertyValue(element, propertyMeta),
+                (newValue) => SetPropertyValue(element, propertyMeta, newValue));
             editingValue = rxProp;
             return new ColorEditor(rxProp);
         }
@@ -100,7 +87,30 @@ public sealed class PropertyEditor : Widget
         return new Input("12345");
     }
 
-    private static void OnDeletePropertyValue(DesignElement element, DynamicPropertyMeta propertyMeta,
+    private static object? GetPropertyValue(DesignElement element, DynamicPropertyMeta propertyMeta)
+    {
+        var exists = element.Data.TryGetPropertyValue(propertyMeta.Name, out var currentValue);
+        if (exists)
+        {
+            if (currentValue!.Value.From != ValueSource.Const) throw new NotImplementedException();
+            return currentValue.Value.Value;
+        }
+
+        if (propertyMeta.Value.DefaultValue != null)
+            return propertyMeta.Value.DefaultValue.Value.Value;
+
+        return null;
+    }
+
+    private static void SetPropertyValue(DesignElement element, DynamicPropertyMeta propertyMeta, object? newValue)
+    {
+        //属性编辑器设置的值不可能为null
+        var dynamicValue = new DynamicValue { From = ValueSource.Const, Value = newValue };
+        var propertyValue = element.Data.SetPropertyValue(propertyMeta.Name, dynamicValue);
+        element.SetPropertyValue(propertyValue);
+    }
+
+    private static void DeletePropertyValue(DesignElement element, DynamicPropertyMeta propertyMeta,
         State? editingValue)
     {
         element.Data.RemovePropertyValue(propertyMeta.Name);
@@ -108,6 +118,8 @@ public sealed class PropertyEditor : Widget
 
         editingValue?.NotifyValueChanged();
     }
+
+    #endregion
 
     #region ====Widget Overrides====
 

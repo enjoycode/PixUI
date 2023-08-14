@@ -8,9 +8,8 @@ public sealed class ColorEditor : SingleChildWidget
     {
         _color = color;
 
-        State<Color> colorState = color.ToNoneNullable(Colors.Black);
-        State<IconData> iconState =
-            RxComputed<IconData>.Make(color, v => v.HasValue ? MaterialIcons.Square : MaterialIcons.Clear);
+        var colorState = color.ToNoneNullable(Colors.Black);
+        var iconState = color.ToComputed(v => v.HasValue ? MaterialIcons.Square : MaterialIcons.Clear);
 
         Child = new Button(icon: iconState) { TextColor = colorState, Style = ButtonStyle.Outline, OnTap = OnTap };
     }

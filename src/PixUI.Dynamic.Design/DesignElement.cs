@@ -112,7 +112,7 @@ public sealed class DesignElement : Widget, IMouseRegion
     public void RemovePropertyValue(string name)
     {
         if (Meta == null || Target == null) throw new Exception();
-        
+
         //TODO: emit 优化，暂用反射
         var propMeta = Meta.GetPropertyMeta(name);
         var propInfo = Meta.WidgetType.GetProperty(name);
