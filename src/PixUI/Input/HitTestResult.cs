@@ -33,7 +33,7 @@ public sealed class HitTestResult
 
         LastHitWidget = widget;
         _transform.Translate(-widget.X, -widget.Y);
-        if (widget.Parent is IScrollable scrollable && !scrollable.IgnoreScrollOffsetForHitTest)
+        if (widget.Parent is IScrollable { IgnoreScrollOffsetForHitTest: false } scrollable)
         {
             _transform.Translate(scrollable.ScrollOffsetX, scrollable.ScrollOffsetY);
         }
@@ -51,8 +51,10 @@ public sealed class HitTestResult
     /// <summary>
     /// 仅用于[Transform] Widget命中子级后转换
     /// </summary>
-    internal void ConcatLastTransform(in Matrix4 transform)
+    internal void ConcatLastTransform(in Matrix4 transform, float dx, float dy)
     {
+        if (dx != 0 || dy != 0)
+            _transform.Translate(-dx, -dy);
         _transform.PreConcat(transform);
         if (ReferenceEquals(LastHitWidget, LastWidgetWithMouseRegion))
         {
@@ -91,8 +93,7 @@ public sealed class HitTestResult
     /// <summary>
     /// 最后命中的实现了MouseRegion的Widget
     /// </summary>
-    public Widget? LastWidgetWithMouseRegion =>
-        _path.Count == 0 ? null : (Widget)_path[_path.Count - 1].Widget;
+    public Widget? LastWidgetWithMouseRegion => _path.Count == 0 ? null : (Widget)_path[_path.Count - 1].Widget;
 
     internal HitTestEntry? LastEntry => _path.Count == 0 ? null : _path[_path.Count - 1];
 
@@ -112,8 +113,7 @@ public sealed class HitTestResult
         if (scrollableParent == null) return true;
 
         var scrollableToWin = scrollableParent.LocalToWindow(0, 0);
-        return scrollableParent.ContainsPoint(winX - scrollableToWin.X,
-            winY - scrollableToWin.Y);
+        return scrollableParent.ContainsPoint(winX - scrollableToWin.X, winY - scrollableToWin.Y);
     }
 
     /// <summary>

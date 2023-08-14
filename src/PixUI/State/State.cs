@@ -79,6 +79,9 @@ public abstract class State<T> : State
     /// </summary>
     public State<bool> ToStateOfBool(Func<T, bool> getter) => RxComputed<bool>.Make<T, bool>(this, getter);
 
+    public State<TR> ToComputed<TR>(Func<T, TR> getter, Action<TR>? setter = null) =>
+        RxComputed<TR>.Make(this, getter, setter);
+
     public static implicit operator State<T>(T value) => new RxValue<T>(value);
 
 #if __WEB__
@@ -102,6 +105,12 @@ public static class StateExtensions
 
     public static State<T> ToNoneNullable<T>(this State<T?> s, T defaultValue) where T : struct =>
         RxComputed<T>.Make(s, v => v ?? defaultValue, v => s.Value = v);
+
+    public static State<T> ToNoneNullable<T>(this State<T?> s, T defaultValue) where T : class =>
+        RxComputed<T>.Make(s, v => v ?? defaultValue, v => s.Value = v);
+
+    public static State<string> ToNoneNullable(this State<string?> s) =>
+        RxComputed<string>.Make(s, v => v ?? string.Empty, v => s.Value = v);
 }
 
 // public sealed class StateProxy<T> : State<T>, IStateBindable

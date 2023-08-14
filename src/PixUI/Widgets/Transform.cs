@@ -83,6 +83,7 @@ public class Transform : SingleChildWidget
         if (Child == null) return false;
 
         var effectiveTransform = EffectiveTransform;
+        //TODO: short path for effectiveTransform is Identity
 
         // The provided paint `transform` (which describes the transform from the
         // child to the parent in 3D) is processed by
@@ -97,10 +98,7 @@ public class Transform : SingleChildWidget
         //不要加入 result.Add(this, effectiveTransform);
         var hitChild = Child.HitTest(transformed.Dx, transformed.Dy, result);
         if (hitChild)
-        {
-            //TODO: 忽略transform.Value is Identity
-            result.ConcatLastTransform(transform.Value);
-        }
+            result.ConcatLastTransform(transform.Value, X, Y);
 
         return hitChild;
     }
