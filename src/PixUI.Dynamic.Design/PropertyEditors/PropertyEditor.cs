@@ -13,6 +13,7 @@ public sealed class PropertyEditor : Widget
 {
     static PropertyEditor()
     {
+        RegisterClassValueEditor<string, TextEditor>(true);
         RegisterStructValueEditor<Color, ColorEditor>(true);
     }
 
@@ -37,7 +38,20 @@ public sealed class PropertyEditor : Widget
     /// <summary>
     /// 新建构造参数编辑器
     /// </summary>
-    public PropertyEditor(DesignElement element, DynamicCtorArgMeta ctorArgMeta) { }
+    public PropertyEditor(DesignElement element, DynamicCtorArgMeta ctorArgMeta)
+    {
+        var valueType = GetValueType(ctorArgMeta.Value);
+        _targetEditor = GetCtorArgValueEditor(valueType, element, ctorArgMeta, out var editingValue);
+        _targetEditor.Parent = this;
+
+        if (ctorArgMeta.Value.IsState)
+            _bindButton = BuildBindButton();
+        if (ctorArgMeta.AllowNull)
+        {
+            _deleteButton = BuildDeleteButton();
+            _deleteButton.OnTap = _ => DeleteCtorArgValue(element, ctorArgMeta, editingValue);
+        }
+    }
 
     private readonly Widget _targetEditor;
     private readonly Button? _deleteButton;
@@ -102,12 +116,17 @@ public sealed class PropertyEditor : Widget
         var valueType = typeof(TValue);
         valueType = typeof(Nullable<>).MakeGenericType(valueType);
 
-        var editor = new ValueEditorInfo(typeof(TEditor).Name, isDefault, typeof(TValue),
+        var editor = new ValueEditorInfo(
+            typeof(TEditor).Name, isDefault, typeof(TValue),
+            CreateEditorMaker(valueType, typeof(TEditor)),
+            (element, ctorArgMeta, index) => new RxProperty<TValue?>(
+                () => (TValue?)GetCtorArgValue(element, ctorArgMeta, index),
+                newValue => SetCtorArgValue(element, ctorArgMeta, index, newValue)
+            ),
             (element, propertyMeta) => new RxProperty<TValue?>(
                 () => (TValue?)GetPropertyValue(element, propertyMeta),
                 newValue => SetPropertyValue(element, propertyMeta, newValue)
-            ),
-            CreateEditorMaker(valueType, typeof(TEditor))
+            )
         );
 
         _valueEditors.Add(editor);
@@ -117,12 +136,17 @@ public sealed class PropertyEditor : Widget
         where TValue : class
         where TEditor : Widget
     {
-        var editor = new ValueEditorInfo(typeof(TEditor).Name, isDefault, typeof(TValue),
+        var editor = new ValueEditorInfo(
+            typeof(TEditor).Name, isDefault, typeof(TValue),
+            CreateEditorMaker(typeof(TValue), typeof(TEditor)),
+            (element, ctorArgMeta, index) => new RxProperty<TValue?>(
+                () => (TValue?)GetCtorArgValue(element, ctorArgMeta, index),
+                newValue => SetCtorArgValue(element, ctorArgMeta, index, newValue)
+            ),
             (element, propertyMeta) => new RxProperty<TValue?>(
                 () => (TValue?)GetPropertyValue(element, propertyMeta),
                 newValue => SetPropertyValue(element, propertyMeta, newValue)
-            ),
-            CreateEditorMaker(typeof(TValue), typeof(TEditor))
+            )
         );
 
         _valueEditors.Add(editor);
@@ -136,6 +160,56 @@ public sealed class PropertyEditor : Widget
 
     #endregion
 
+    #region ====CtorArgValue====
+
+    private static Widget GetCtorArgValueEditor(Type valueType, DesignElement element, DynamicCtorArgMeta ctorArgMeta,
+        out State? editingValue)
+    {
+        //TODO:先判断是否指定编辑器
+
+        //获取注册的编辑器信息
+        var editorInfo = TryGetValueEditorByValueType(valueType);
+        if (editorInfo == null)
+        {
+            //TODO:
+            editingValue = null;
+            return new Input("None");
+        }
+
+        var index = Array.IndexOf(element.Meta!.CtorArgs!, ctorArgMeta);
+        editingValue = editorInfo.CtorArgStateMaker(element, ctorArgMeta, index);
+        return editorInfo.EditorMaker(editingValue);
+    }
+
+    private static object? GetCtorArgValue(DesignElement element, DynamicCtorArgMeta ctorArgMeta, int index)
+    {
+        var exists = element.Data.TryGetCtorArgValue(index);
+        if (exists != null)
+        {
+            if (exists.Value.From != ValueSource.Const) throw new NotImplementedException();
+            return exists.Value.Value;
+        }
+
+        return ctorArgMeta.Value.DefaultValue?.Value;
+    }
+
+    private static void SetCtorArgValue(DesignElement element, DynamicCtorArgMeta ctorArgMeta, int index,
+        object? newValue)
+    {
+        var dynamicValue = new DynamicValue { From = ValueSource.Const, Value = newValue };
+        element.Data.SetCtorArgValue(dynamicValue, index, element.Meta!.CtorArgs!.Length);
+        element.OnCtorArgValueChanged();
+    }
+
+    private static void DeleteCtorArgValue(DesignElement element, DynamicCtorArgMeta ctorArgMeta, State? editingValue)
+    {
+        SetCtorArgValue(element, ctorArgMeta, Array.IndexOf(element.Meta!.CtorArgs!, ctorArgMeta), null);
+        //TODO: 考虑恢复默认值
+        editingValue?.NotifyValueChanged();
+    }
+
+    #endregion
+
     #region ====PropertyValue====
 
     private static Widget GetPropertyValueEditor(Type valueType, DesignElement element,
@@ -143,13 +217,13 @@ public sealed class PropertyEditor : Widget
     {
         //TODO:先判断是否指定编辑器
 
-        //获取注册的值编辑器信息
+        //获取注册的编辑器信息
         var editorInfo = TryGetValueEditorByValueType(valueType);
         if (editorInfo == null)
         {
             //TODO:
             editingValue = null;
-            return new Input("12345");
+            return new Input("None");
         }
 
         editingValue = editorInfo.PropertyStateMaker(element, propertyMeta);
@@ -165,10 +239,7 @@ public sealed class PropertyEditor : Widget
             return currentValue.Value.Value;
         }
 
-        if (propertyMeta.Value.DefaultValue != null)
-            return propertyMeta.Value.DefaultValue.Value.Value;
-
-        return null;
+        return propertyMeta.Value.DefaultValue?.Value;
     }
 
     private static void SetPropertyValue(DesignElement element, DynamicPropertyMeta propertyMeta, object? newValue)

@@ -98,6 +98,26 @@ public sealed class DesignElement : Widget, IMouseRegion
         Meta.AddChild!(Target, child);
     }
 
+    /// <summary>
+    /// 构造参数改变后重新创建实例
+    /// </summary>
+    public void OnCtorArgValueChanged()
+    {
+        if (Meta == null) throw new Exception();
+
+        var newTarget = Data.CtorArgs == null ? Meta.MakeDefaultInstance() : Meta.MakeInstance(Data.CtorArgs);
+        ChangeTarget(Target, newTarget);
+
+        //重设属性值
+        if (Data.Properties != null)
+        {
+            foreach (var propertyValue in Data.Properties)
+            {
+                SetPropertyValue(propertyValue);
+            }
+        }
+    }
+
     public void SetPropertyValue(PropertyValue propertyValue)
     {
         if (Meta == null || Target == null) throw new Exception();

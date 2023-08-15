@@ -44,7 +44,14 @@ public sealed class PropertyPanel : SingleChildWidget
         //Widget Group
         var widgetGroupItems = new List<FormItem>();
         widgetGroupItems.Add(new FormItem("Type:", new Text(meta.Name)));
-        
+        if (meta.CtorArgs != null && meta.CtorArgs.Length > 0)
+        {
+            foreach (var ctorArgMeta in meta.CtorArgs)
+            {
+                widgetGroupItems.Add(new FormItem($"{ctorArgMeta.Name}:", new PropertyEditor(element, ctorArgMeta)));
+            }
+        }
+
         _widgetGroup.SetItems(widgetGroupItems);
 
         //Properties Group

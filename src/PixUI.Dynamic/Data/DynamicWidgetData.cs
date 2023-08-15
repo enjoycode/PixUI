@@ -17,6 +17,18 @@ public sealed class DynamicWidgetData
 
     public List<PropertyValue>? Properties { get; private set; }
 
+    public DynamicValue? TryGetCtorArgValue(int index)
+    {
+        return CtorArgs?[index];
+    }
+
+    public void SetCtorArgValue(DynamicValue value, int index, int count)
+    {
+        CtorArgs ??= new DynamicValue[count];
+        CtorArgs[index] = value;
+        //TODO: check all null or default, set CtorArgs = null
+    }
+
     public void AddPropertyValue(PropertyValue propertyValue)
     {
         Properties ??= new List<PropertyValue>();
