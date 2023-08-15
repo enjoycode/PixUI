@@ -6,7 +6,7 @@ namespace PixUI.Demo
     {
         private readonly State<string> _firstName = "Rick";
         private readonly State<string> _lastName = "Lg";
-        private readonly RxComputed<string> _fullName;
+        private readonly State<string> _fullName;
         private readonly State<ImageSource> _imgSrc;
 
         private readonly State<string?> _selectedValue = "";
@@ -16,7 +16,7 @@ namespace PixUI.Demo
 
         public DemoPage()
         {
-            _fullName = Compute(_firstName, _lastName, (first, last) => "Full:" + first + "-" + last);
+            _fullName = _firstName.ToComputed(_lastName, (first, last) => "Full:" + first + "-" + last);
 
             var imgData = ResourceLoad.LoadBytes("Resources.Cat.webp");
             RxValue<ImageSource> defaultImgSrc = ImageSource.FromEncodedData(imgData);

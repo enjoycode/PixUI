@@ -14,7 +14,7 @@ public sealed class TreeNode<T> : Widget
         _row = new TreeNodeRow<T>();
         _row.Parent = this;
 
-        _color = Compute(IsSelected, s => s ? Theme.FocusedColor : Colors.Black); //TODO:
+        _color = IsSelected.ToComputed(s => s ? Theme.FocusedColor : Colors.Black); //TODO: fix color
 
         Bind(IsSelected, BindingOptions.AffectsVisual);
     }

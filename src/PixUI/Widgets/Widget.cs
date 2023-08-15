@@ -34,7 +34,7 @@ public abstract class Widget : IStateBindable, IDisposable
     private int _flag;
     private const int MountedMask = 1;
     private const int HasLayoutMask = 2; //TODO:待实现自动判断是否需要重新布局后移除
-    protected const int LayoutTightMask = 1 << 3;
+    private const int LayoutTightMask = 1 << 3;
     private const int SuspendingMountMask = 1 << 20;
 
     private void SetFlagValue(bool value, int mask)
@@ -301,16 +301,7 @@ public abstract class Widget : IStateBindable, IDisposable
 
     #endregion
 
-    #region ====Bind & Compute====
-
-    [TSRename("Compute1")]
-    protected RxComputed<TR> Compute<T, TR>(State<T> s, Func<T, TR> getter)
-        => RxComputed<TR>.Make(s, getter);
-
-    [TSRename("Compute2")]
-    protected RxComputed<TR> Compute<T1, T2, TR>(State<T1> s1, State<T2> s2,
-        Func<T1, T2, TR> getter, Action<TR>? setter = null)
-        => RxComputed<TR>.Make(s1, s2, getter, setter);
+    #region ====Bind====
 
     /// <summary>
     /// 绑定状态至Widget

@@ -82,6 +82,9 @@ public abstract class State<T> : State
     public State<TR> ToComputed<TR>(Func<T, TR> getter, Action<TR>? setter = null) =>
         RxComputed<TR>.Make(this, getter, setter);
 
+    public State<TR> ToComputed<T1, TR>(State<T1> other, Func<T, T1, TR> getter, Action<TR>? setter = null) =>
+        RxComputed<TR>.Make(this, other, getter, setter);
+
     public static implicit operator State<T>(T value) => new RxValue<T>(value);
 
 #if __WEB__

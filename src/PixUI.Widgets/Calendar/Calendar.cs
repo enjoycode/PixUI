@@ -8,7 +8,7 @@ public sealed class Calendar : Widget
     {
         _monthView = new MonthView(year, month);
         _monthView.Parent = this;
-        NaviBarTitle = Compute(_monthView.Year, _monthView.Month, (y, m) => $"{y}年{m}月");
+        NaviBarTitle = _monthView.Year.ToComputed(_monthView.Month, (y, m) => $"{y}年{m}月");
 
         _naviBar = new CalendarNaviBar(this);
         _naviBar.Parent = this;
@@ -18,7 +18,7 @@ public sealed class Calendar : Widget
     {
         _monthView = new MonthView(selectedDate);
         _monthView.Parent = this;
-        NaviBarTitle = Compute(_monthView.Year, _monthView.Month, (y, m) => $"{y}年{m}月");
+        NaviBarTitle = _monthView.Year.ToComputed(_monthView.Month, (y, m) => $"{y}年{m}月");
 
         _naviBar = new CalendarNaviBar(this);
         _naviBar.Parent = this;
