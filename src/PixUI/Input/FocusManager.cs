@@ -10,7 +10,7 @@ public sealed class FocusManager
 {
     internal Widget? FocusedWidget { get; private set; }
 
-    public void Focus(Widget? widget)
+    public void Focus(Widget? widget, UIWindow window)
     {
         if (ReferenceEquals(FocusedWidget, widget))
             return; //Already focused
@@ -19,18 +19,19 @@ public sealed class FocusManager
 
         if (FocusedWidget != null)
         {
-            ((IFocusable)FocusedWidget).FocusNode.RaiseFocusChanged(new FocusChangedEvent(false, oldFocused, widget));
+            ((IFocusable)FocusedWidget).FocusNode.RaiseFocusChanged(
+                new FocusChangedEvent(false, oldFocused, widget, window));
             FocusedWidget = null;
         }
 
         if (widget is IFocusable focusable)
         {
             FocusedWidget = widget;
-            focusable.FocusNode.RaiseFocusChanged(new FocusChangedEvent(true, oldFocused, widget));
+            focusable.FocusNode.RaiseFocusChanged(new FocusChangedEvent(true, oldFocused, widget, window));
         }
     }
 
-    internal void OnKeyDown(KeyEvent e)
+    internal void OnKeyDown(KeyEvent e, UIWindow window)
     {
         //TODO:考虑FocusedWidget==null时且为Tab从根节点开始查找Focusable
         if (FocusedWidget == null) return;
@@ -40,13 +41,11 @@ public sealed class FocusManager
         if (!e.IsHandled && e.KeyCode == Keys.Tab)
         {
             var forward = !e.Shift;
-            Widget? found;
-            if (forward)
-                found = FindFocusableForward(FocusedWidget.Parent!, FocusedWidget);
-            else
-                found = FindFocusableBackward(FocusedWidget.Parent!, FocusedWidget);
+            var found = forward
+                ? FindFocusableForward(FocusedWidget.Parent!, FocusedWidget)
+                : FindFocusableBackward(FocusedWidget.Parent!, FocusedWidget);
             if (found != null)
-                Focus(found);
+                Focus(found, window);
         }
     }
 
@@ -59,11 +58,12 @@ public sealed class FocusManager
 
     internal void OnTextInput(string text)
     {
-        ((IFocusable)FocusedWidget!).FocusNode.RaiseTextInput(text);
+        var forcusable = FocusedWidget as IFocusable;
+        forcusable?.FocusNode.RaiseTextInput(text);
     }
 
-    private static void PropagateEvent<T>(Widget? widget, T theEvent,
-        Action<Widget, T> handler) where T : PropagateEvent
+    private static void PropagateEvent<T>(Widget? widget, T theEvent, Action<Widget, T> handler)
+        where T : PropagateEvent
     {
         while (true)
         {
@@ -170,16 +170,16 @@ internal sealed class FocusManagerStack
         _stack.Remove(manager);
     }
 
-    internal void Focus(Widget? widget)
+    internal void Focus(Widget? widget, UIWindow window)
     {
         if (widget == null)
             return; //TODO:考虑取消最后一层的FocusedWidget
 
         var manager = GetFocusManagerByWidget(widget);
-        manager.Focus(widget);
+        manager.Focus(widget, window);
     }
 
-    internal void OnKeyDown(KeyEvent e) => GetFocusManagerWithFocused().OnKeyDown(e);
+    internal void OnKeyDown(KeyEvent e, UIWindow window) => GetFocusManagerWithFocused().OnKeyDown(e, window);
 
     internal void OnKeyUp(KeyEvent e) => GetFocusManagerWithFocused().OnKeyUp(e);
 

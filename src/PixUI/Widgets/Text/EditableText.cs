@@ -56,13 +56,13 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         if (e.IsFocused)
         {
             if (!IsReadonly)
-                Root!.Window.StartTextInput();
+                e.Window.StartTextInput();
             _caret.Show();
         }
         else
         {
             if (!IsReadonly)
-                Root!.Window.StopTextInput();
+                e.Window.StopTextInput();
             _caret.Hide();
         }
     }

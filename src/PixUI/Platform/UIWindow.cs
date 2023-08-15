@@ -24,7 +24,7 @@ public abstract class UIWindow
     /// <summary>
     /// 当前激活的窗体
     /// </summary>
-    public static UIWindow Current { get; private set; } //TODO: 暂单窗体
+    public static UIWindow Current { get; private set; } = null!; //TODO: 暂单窗体
 
     public readonly Root RootWidget;
     public readonly Overlay Overlay;
@@ -176,7 +176,7 @@ public abstract class UIWindow
         _oldHitResult.PropagatePointerEvent(pointerEvent, (w, e) => w.RaisePointerDown(e));
 
         //Set focus widget after propagate event
-        FocusManagerStack.Focus(_oldHitResult.LastHitWidget);
+        FocusManagerStack.Focus(_oldHitResult.LastHitWidget, this);
     }
 
     public void OnPointerUp(PointerEvent pointerEvent)
@@ -221,7 +221,7 @@ public abstract class UIWindow
         if (EventHookManager.HookEvent(EventType.KeyDown, keyEvent))
             return;
 
-        FocusManagerStack.OnKeyDown(keyEvent);
+        FocusManagerStack.OnKeyDown(keyEvent, this);
     }
 
     public void OnKeyUp(KeyEvent keyEvent) => FocusManagerStack.OnKeyUp(keyEvent);
@@ -310,7 +310,7 @@ public abstract class UIWindow
         if (focusManger.FocusedWidget == null) return;
 
         if (dynamicView.IsAnyParentOf(focusManger.FocusedWidget))
-            focusManger.Focus(null);
+            focusManger.Focus(null, this);
     }
 
     /// <summary>

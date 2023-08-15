@@ -4,16 +4,18 @@ namespace PixUI;
 
 public readonly struct FocusChangedEvent
 {
-    public FocusChangedEvent(bool isFocused, Widget? oldFocusedWidget, Widget? newFocusedWidget)
+    public FocusChangedEvent(bool isFocused, Widget? oldFocusedWidget, Widget? newFocusedWidget, UIWindow window)
     {
         IsFocused = isFocused;
         OldFocusedWidget = oldFocusedWidget;
         NewFocusedWidget = newFocusedWidget;
+        Window = window;
     }
 
     public readonly bool IsFocused;
     public readonly Widget? OldFocusedWidget;
     public readonly Widget? NewFocusedWidget;
+    public readonly UIWindow Window;
 }
 
 public sealed class FocusNode
