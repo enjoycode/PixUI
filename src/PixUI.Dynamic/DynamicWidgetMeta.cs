@@ -12,16 +12,16 @@ public sealed class DynamicWidgetMeta
     /// <summary>
     /// 工具箱显示的分类 eg: Charts
     /// </summary>
-    public string Catelog { get; set; }
+    public string Catelog { get; set; } = null!;
 
     /// <summary>
     /// 工具箱显示的名称(惟一性) eg: PieChart
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     public IconData Icon { get; set; }
 
-    public Type WidgetType { get; set; }
+    public Type WidgetType { get; set; } = null!;
 
     public ContainerType ContainerType { get; set; }
 

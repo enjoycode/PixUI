@@ -21,6 +21,7 @@ namespace PixUI.Demo
                 new("treeView", s => new DemoTreeView(), false, BuildDefaultTransition),
                 new("datagrid", s => new DemoDataGrid(), false, BuildDefaultTransition),
                 new("codeEditor", s => new DemoCodeEditor(), false, BuildDefaultTransition),
+                new("stack", s => new DemoStack()),
                 new("designer", s => new DemoDesigner()),
             };
             _navigator = new Navigator(routes);
@@ -72,6 +73,7 @@ namespace PixUI.Demo
                         MenuItem.Item("About"),
                         MenuItem.Item("Window")
                     }),
+                    MenuItem.Item("Stack", null, () => _navigator.Push("stack")),
                     MenuItem.Item("Designer", null, () => _navigator.Push("designer")),
                 }),
                 // MenuItem.Item("Form", null, () => _navigator.Push("form")),
