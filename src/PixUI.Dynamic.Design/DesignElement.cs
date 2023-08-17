@@ -25,11 +25,11 @@ public sealed class DesignElement : Widget, IMouseRegion
     }
 
     /// <summary>
-    /// Ctor for designtime with default instance
+    /// Ctor for designtime
     /// </summary>
-    public DesignElement(DesignController controller, DynamicWidgetMeta meta) : this(controller)
+    private DesignElement(DesignController controller, DynamicWidgetMeta meta) : this(controller)
     {
-        ChangeMeta(meta, true);
+        ChangeMeta(meta, meta.ContainerType != ContainerType.SingleChildReversed);
     }
 
     private static readonly Lazy<Paragraph> _hint = new(() =>
@@ -45,7 +45,10 @@ public sealed class DesignElement : Widget, IMouseRegion
     /// <summary>
     /// 包装的目标组件
     /// </summary>
-    public Widget? Target { get; private set; }
+    /// <remarks>如果是反向包装，返回的是上级</remarks>
+    public Widget? Target => Meta?.ContainerType == ContainerType.SingleChildReversed ? Parent : Child;
+
+    public Widget? Child { get; private set; }
 
     public MouseRegion MouseRegion { get; }
 
@@ -69,21 +72,21 @@ public sealed class DesignElement : Widget, IMouseRegion
         Meta = meta;
         Data.Type = Meta == null ? string.Empty : Meta.Name;
         MouseRegion.Opaque = !IsContainer;
-        if (makeDefaultTarget || (Meta == null && Target != null))
-            ChangeTarget(Target, Meta?.MakeDefaultInstance());
+        if (makeDefaultTarget || (Meta == null && Child != null))
+            ChangeChild(Child, Meta?.MakeDefaultInstance());
     }
 
-    internal void ChangeTarget(Widget? oldTarget, Widget? newTarget)
+    internal void ChangeChild(Widget? oldChild, Widget? newChild)
     {
-        if (oldTarget != null) oldTarget.Parent = null;
+        if (oldChild != null) oldChild.Parent = null;
 
-        Target = newTarget;
+        Child = newChild;
 
-        if (Target != null)
+        if (Child != null)
         {
-            Target.Parent = this;
+            Child.Parent = this;
 #if DEBUG
-            DebugLabel = Target.GetType().Name;
+            DebugLabel = Child.GetType().Name;
 #endif
         }
 
@@ -93,9 +96,21 @@ public sealed class DesignElement : Widget, IMouseRegion
     public void AddChild(Widget child)
     {
         if (!IsContainer) throw new InvalidOperationException();
-        if (Meta == null || Target == null) throw new Exception();
+        if (Meta == null)
+            throw new Exception();
 
-        Meta.AddChild!(Target, child);
+        if (Meta.ContainerType == ContainerType.SingleChildReversed)
+        {
+            if (child is not DesignElement)
+                throw new InvalidOperationException();
+            ChangeChild(Child, child);
+        }
+        else
+        {
+            if (Child == null)
+                throw new InvalidOperationException();
+            Meta.AddChild(Child!, child);
+        }
     }
 
     /// <summary>
@@ -106,7 +121,7 @@ public sealed class DesignElement : Widget, IMouseRegion
         if (Meta == null) throw new Exception();
 
         var newTarget = Data.CtorArgs == null ? Meta.MakeDefaultInstance() : Meta.MakeInstance(Data.CtorArgs);
-        ChangeTarget(Target, newTarget);
+        ChangeChild(Target, newTarget);
 
         //重设属性值
         if (Data.Properties != null)
@@ -134,7 +149,7 @@ public sealed class DesignElement : Widget, IMouseRegion
         if (Meta == null || Target == null) throw new Exception();
 
         //TODO: emit 优化，暂用反射
-        var propMeta = Meta.GetPropertyMeta(name);
+        // var propMeta = Meta.GetPropertyMeta(name);
         var propInfo = Meta.WidgetType.GetProperty(name);
         propInfo!.SetValue(Target, null);
     }
@@ -147,9 +162,43 @@ public sealed class DesignElement : Widget, IMouseRegion
         _controller.Select(this);
     }
 
-    public void OnDrop(DynamicWidgetMeta meta)
+    public void OnDrop(DynamicWidgetMeta meta /*TODO: args for x, y*/)
     {
+        //先判断是否容器类型(暂特殊处理多子级的容器)
+        if (Meta?.ContainerType == ContainerType.MultiChild)
+        {
+            Widget childToBeAdded;
+            DesignElement childElement;
+            if (meta.ContainerType == ContainerType.SingleChildReversed)
+            {
+                childToBeAdded = meta.MakeDefaultInstance();
+                childElement = new DesignElement(_controller, meta);
+                meta.AddChild(childToBeAdded, childElement);
+            }
+            else
+            {
+                childElement = new DesignElement(_controller, meta);
+                childToBeAdded = childElement;
+            }
+
+            AddChild(childToBeAdded);
+            Invalidate(InvalidAction.Relayout);
+            _controller.Select(childElement);
+            return;
+        }
+
+        //判断是否反向包装
+        if (Meta?.ContainerType == ContainerType.SingleChildReversed)
+        {
+            var childToBeAdded = new DesignElement(_controller, meta);
+            AddChild(childToBeAdded);
+            Invalidate(InvalidAction.Relayout);
+            _controller.Select(childToBeAdded);
+            return;
+        }
+
         ChangeMeta(meta, true);
+        _controller.OnSelectionChanged(); //强制刷新属性面板
     }
 
     #endregion
@@ -158,8 +207,7 @@ public sealed class DesignElement : Widget, IMouseRegion
 
     public override void VisitChildren(Func<Widget, bool> action)
     {
-        if (Target != null)
-            action(Target);
+        if (Child != null) action(Child);
     }
 
     protected internal override bool HitTest(float x, float y, HitTestResult result)
@@ -176,22 +224,22 @@ public sealed class DesignElement : Widget, IMouseRegion
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var width = CachedAvailableWidth = availableWidth;
+        var height = CachedAvailableHeight = availableHeight;
 
-        if (Target == null)
+        if (Child == null)
         {
             SetSize(width, height);
             return;
         }
 
-        Target.Layout(availableWidth, availableHeight);
-        SetSize(Target.W, Target.H);
+        Child.Layout(width, height);
+        SetSize(Child.W, Child.H);
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
-        if (Target != null)
+        if (Child != null)
         {
             if (IsSelected) canvas.Save();
             base.Paint(canvas, area);

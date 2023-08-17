@@ -12,6 +12,8 @@ public static partial class DynamicWidgetManager
     static DynamicWidgetManager()
     {
         Register(MakeButtonMeta());
+        Register(MakeStackMeta());
+        Register(MakePositionedMeta());
         Register(MakeCenterMeta());
     }
 

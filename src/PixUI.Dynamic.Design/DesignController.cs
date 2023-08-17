@@ -14,7 +14,12 @@ public sealed class DesignController
 
     public DesignElement RootElement { get; internal set; } = null!;
 
-    #region ====Selection====
+    /// <summary>
+    /// 当前工具箱选择的项
+    /// </summary>
+    public DynamicWidgetMeta? CurrentToolboxItem { get; internal set; }
+
+    #region ====DesignElement Selection====
 
     private readonly List<DesignElement> _selection = new();
 
@@ -32,8 +37,10 @@ public sealed class DesignController
         _selection.Add(element);
         element.IsSelected = true;
 
-        SelectionChanged?.Invoke();
+        OnSelectionChanged();
     }
+
+    internal void OnSelectionChanged() => SelectionChanged?.Invoke();
 
     #endregion
 
@@ -125,7 +132,7 @@ public sealed class DesignController
         reader.Read(); //]
 
         data.CtorArgs = args;
-        element.ChangeTarget(null, meta.MakeInstance(data.CtorArgs!));
+        element.ChangeChild(null, meta.MakeInstance(data.CtorArgs!));
     }
 
     private static void ReadProperties(DesignElement element, ref Utf8JsonReader reader)
@@ -134,7 +141,7 @@ public sealed class DesignController
         var data = element.Data;
 
         if (element.Target == null)
-            element.ChangeTarget(null, meta.MakeDefaultInstance());
+            element.ChangeChild(null, meta.MakeDefaultInstance());
 
         while (reader.Read())
         {
@@ -153,7 +160,7 @@ public sealed class DesignController
     private void ReadChild(DesignElement element, ref Utf8JsonReader reader)
     {
         if (element.Target == null)
-            element.ChangeTarget(null, element.Meta!.MakeDefaultInstance());
+            element.ChangeChild(null, element.Meta!.MakeDefaultInstance());
 
         var childElement = ReadView(ref reader);
         element.AddChild(childElement);

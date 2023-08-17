@@ -33,9 +33,10 @@ public sealed class DemoDesigner : View
                 {
                     Children =
                     {
-                        new Container { Padding = EdgeInsets.All(8), Width = 200, Child = new Toolbox() },
+                        new Container
+                            { Padding = EdgeInsets.All(8), Width = 200, Child = new Toolbox(_designController) },
                         new Expanded { Child = new DesignCanvas(_designController) },
-                        new Container { Width = 200, Child = new PropertyPanel(_designController) }
+                        new Container { Width = 220, Child = new PropertyPanel(_designController) }
                     }
                 },
             }
@@ -66,8 +67,13 @@ public sealed class DemoDesigner : View
     {
         if (_designController.FirstSelected == null) return;
 
+        var meta = _designController.CurrentToolboxItem;
+        if (meta == null) return;
+
         var active = _designController.FirstSelected!;
-        active.OnDrop(DynamicWidgetManager.GetByName("Center"));
-        active.AddChild(new DesignElement(_designController, DynamicWidgetManager.GetByName("Button")));
+        active.OnDrop(meta);
+
+        //active.OnDrop(DynamicWidgetManager.GetByName("Center"));
+        //active.AddChild(new DesignElement(_designController, DynamicWidgetManager.GetByName("Button")));
     }
 }

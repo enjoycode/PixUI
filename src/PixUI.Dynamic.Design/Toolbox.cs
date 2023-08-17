@@ -6,8 +6,11 @@ namespace PixUI.Dynamic.Design;
 
 public sealed class Toolbox : View
 {
-    public Toolbox()
+    public Toolbox(DesignController designController)
     {
+        _designController = designController;
+        _treeController.SelectionChanged += OnSelectionChanged;
+
         BuildTreeDataSource();
 
         Child = new Column
@@ -20,6 +23,7 @@ public sealed class Toolbox : View
         };
     }
 
+    private readonly DesignController _designController;
     private readonly State<string> _searchKey = string.Empty;
 
     private readonly TreeController<ToolboxNode> _treeController = new(
@@ -53,6 +57,11 @@ public sealed class Toolbox : View
         }
 
         _treeController.DataSource = treeList;
+    }
+
+    private void OnSelectionChanged()
+    {
+        _designController.CurrentToolboxItem = _treeController.FirstSelectedNode?.Data.DynamicWidgetMeta;
     }
 }
 

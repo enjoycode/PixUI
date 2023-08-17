@@ -4,8 +4,11 @@ partial class DynamicWidgetManager
 {
     private static DynamicWidgetMeta MakeButtonMeta() => new()
     {
-        Catelog = "Common", Name = "Button", WidgetType = typeof(Button), ContainerType = ContainerType.None,
-        Icon = MaterialIcons.SmartButton,
+        Catelog = "Common",
+        Name = "Button",
+        WidgetType = typeof(Button),
+        ContainerType = ContainerType.None,
+        Icon = MaterialIcons.EditAttributes,
         CtorArgs = new DynamicCtorArgMeta[]
         {
             new("Text", typeof(State<string>), true, "Button"),

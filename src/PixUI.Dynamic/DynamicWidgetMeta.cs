@@ -25,18 +25,24 @@ public sealed class DynamicWidgetMeta
 
     public ContainerType ContainerType { get; set; }
 
-    /// <summary>
-    /// 用于如Expanded特例，反向向上包装
-    /// </summary>
-    public bool IsWrapReversed { get; set; }
-
     public DynamicCtorArgMeta[]? CtorArgs { get; set; }
 
     public DynamicPropertyMeta[]? Properties { get; set; }
 
     public DynamicEventMeta[]? Events { get; set; }
 
-    public Action<Widget, Widget>? AddChild { get; set; }
+    public Action<Widget, Widget>? AddChildAction { get; set; }
+
+    public void AddChild(Widget parent, Widget child)
+    {
+        if (AddChildAction != null)
+        {
+            AddChildAction(parent, child);
+            return;
+        }
+
+        throw new NotImplementedException();
+    }
 
     /// <summary>
     /// 根据名称查找属性定义，找不到报错
@@ -130,6 +136,7 @@ public sealed class DynamicValueMeta
             var rxType = typeof(RxValue<>).MakeGenericType(ValueType);
             return Activator.CreateInstance(rxType, source.Value);
         }
+
         return source.Value;
     }
 }
