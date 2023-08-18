@@ -187,7 +187,17 @@ public sealed class DesignElement : Widget, IMouseRegion
         {
             Widget childToBeAdded;
             DesignElement childElement;
-            if (meta.ContainerType == ContainerType.SingleChildReversed)
+
+            //TODO:暂简单特殊处理添加非Positioned至Stack内
+            if (Meta.WidgetType == typeof(Stack) && meta.WidgetType != typeof(Positioned))
+            {
+                var positionedMeta = DynamicWidgetManager.GetByName(nameof(Positioned));
+                childElement = new DesignElement(_controller, meta);
+                var positionedElement = new DesignElement(_controller, positionedMeta);
+                positionedElement.ChangeChild(null, childElement);
+                childToBeAdded = new Positioned { Child = positionedElement };
+            }
+            else if (meta.ContainerType == ContainerType.SingleChildReversed)
             {
                 childToBeAdded = meta.MakeDefaultInstance();
                 childElement = new DesignElement(_controller, meta);
@@ -195,8 +205,7 @@ public sealed class DesignElement : Widget, IMouseRegion
             }
             else
             {
-                childElement = new DesignElement(_controller, meta);
-                childToBeAdded = childElement;
+                childToBeAdded = childElement = new DesignElement(_controller, meta);
             }
 
             AddChild(childToBeAdded);

@@ -39,7 +39,10 @@ public sealed class Toolbox : View
 
     private void BuildTreeDataSource()
     {
-        var all = DynamicWidgetManager.GetAll().GroupBy(w => w.Catelog);
+        var all = DynamicWidgetManager.GetAll()
+            .Where(t => t.ShowOnToolbox)
+            .GroupBy(w => w.Catelog);
+
         var treeList = new List<ToolboxNode>();
         foreach (var group in all)
         {

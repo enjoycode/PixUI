@@ -23,7 +23,6 @@ partial class DynamicWidgetManager
 
     private static DynamicWidgetMeta MakePositionedMeta() => new()
     {
-        Catelog = "Layout",
         Name = "Positioned",
         WidgetType = typeof(Positioned),
         ContainerType = ContainerType.SingleChildReversed,

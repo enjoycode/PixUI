@@ -12,7 +12,9 @@ public sealed class DynamicWidgetMeta
     /// <summary>
     /// 工具箱显示的分类 eg: Charts
     /// </summary>
-    public string Catelog { get; set; } = null!;
+    public string Catelog { get; set; } = string.Empty;
+
+    public bool ShowOnToolbox => Catelog != string.Empty;
 
     /// <summary>
     /// 工具箱显示的名称(惟一性) eg: PieChart
