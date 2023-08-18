@@ -4,7 +4,7 @@ namespace PixUI.Dynamic.Design;
 
 public sealed class PropertyGroup : SingleChildWidget
 {
-    public PropertyGroup(string title)
+    public PropertyGroup(State<string> title)
     {
         Child = new Collapse
         {

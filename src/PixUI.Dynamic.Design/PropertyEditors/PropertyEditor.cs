@@ -22,9 +22,14 @@ public sealed class PropertyEditor : Widget
     /// </summary>
     public PropertyEditor(DesignElement element, DynamicPropertyMeta propertyMeta)
     {
+#if DEBUG
+        DebugLabel = propertyMeta.Name;
+#endif
+
         var valueType = GetValueType(propertyMeta.Value);
         _targetEditor = GetPropertyValueEditor(valueType, element, propertyMeta, out var editingValue);
         _targetEditor.Parent = this;
+        EditingValue = editingValue;
 
         if (propertyMeta.Value.IsState)
             _bindButton = BuildBindButton();
@@ -40,9 +45,14 @@ public sealed class PropertyEditor : Widget
     /// </summary>
     public PropertyEditor(DesignElement element, DynamicCtorArgMeta ctorArgMeta)
     {
+#if DEBUG
+        DebugLabel = ctorArgMeta.Name;
+#endif
+        
         var valueType = GetValueType(ctorArgMeta.Value);
         _targetEditor = GetCtorArgValueEditor(valueType, element, ctorArgMeta, out var editingValue);
         _targetEditor.Parent = this;
+        EditingValue = editingValue;
 
         if (ctorArgMeta.Value.IsState)
             _bindButton = BuildBindButton();
@@ -56,6 +66,8 @@ public sealed class PropertyEditor : Widget
     private readonly Widget _targetEditor;
     private readonly Button? _deleteButton;
     private readonly Button? _bindButton;
+
+    internal readonly State? EditingValue;
 
     private static readonly State<float> _buttonSize = 20f;
 
@@ -222,12 +234,12 @@ public sealed class PropertyEditor : Widget
         if (editorInfo == null)
         {
             //TODO:
-            editingValue = null;
-            return new Text(new RxProperty<string>(() =>
+            editingValue = new RxProperty<string>(() =>
             {
                 var propValue = GetPropertyValue(element, propertyMeta);
                 return propValue?.ToString() ?? string.Empty;
-            }));
+            });
+            return new Text((State<string>)editingValue);
         }
 
         editingValue = editorInfo.PropertyStateMaker(element, propertyMeta);

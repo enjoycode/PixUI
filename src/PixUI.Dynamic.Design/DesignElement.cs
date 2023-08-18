@@ -171,9 +171,11 @@ public sealed class DesignElement : Widget, IMouseRegion
         var oldX = positioned.Left?.Value ?? 0f;
         var oldY = positioned.Top?.Value ?? 0f;
 
-        Log.Debug($"old={oldX}, {oldY} delta={e.DeltaX}, {e.DeltaY}");
-        moveable.SetPropertyValue(new PropertyValue { Name = "Left", Value = oldX + e.DeltaX });
-        moveable.SetPropertyValue(new PropertyValue { Name = "Top", Value = oldY + e.DeltaY });
+        // Log.Debug($"old={oldX}, {oldY} delta={e.DeltaX}, {e.DeltaY}");
+        moveable.SetPropertyValue(moveable.Data.SetPropertyValue("Left", oldX + e.DeltaX));
+        _controller.NotifyLayoutPropertyChanged?.Invoke("Left");
+        moveable.SetPropertyValue(moveable.Data.SetPropertyValue("Top", oldY + e.DeltaY));
+        _controller.NotifyLayoutPropertyChanged?.Invoke("Top");
         //TODO: maybe clear Right & Bottom value
         e.IsHandled = true;
     }

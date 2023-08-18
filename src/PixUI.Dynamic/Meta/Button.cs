@@ -8,7 +8,7 @@ partial class DynamicWidgetManager
         Name = "Button",
         WidgetType = typeof(Button),
         ContainerType = ContainerType.None,
-        Icon = MaterialIcons.EditAttributes,
+        Icon = MaterialIcons.SmartButton,
         CtorArgs = new DynamicCtorArgMeta[]
         {
             new("Text", typeof(State<string>), true, "Button"),

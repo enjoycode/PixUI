@@ -19,6 +19,11 @@ public sealed class DesignController
     /// </summary>
     public DynamicWidgetMeta? CurrentToolboxItem { get; internal set; }
 
+    /// <summary>
+    /// 通知属性面板附加的布局属性发生了变更
+    /// </summary>
+    internal Action<string>? NotifyLayoutPropertyChanged;
+
     #region ====DesignElement Selection====
 
     private readonly List<DesignElement> _selection = new();

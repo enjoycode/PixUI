@@ -9,10 +9,13 @@ public sealed class PropertyPanel : SingleChildWidget
     {
         _controller = controller;
         _controller.SelectionChanged += OnSelectionChanged;
+        _controller.NotifyLayoutPropertyChanged = OnNotifyLayoutPropertyChanged;
 
+        _layoutGroup = new PropertyGroup(_layoutGroupTitle);
         _listView = ListView<Widget>.From(new Widget[]
         {
             _widgetGroup,
+            new IfConditional(_layoutGroupVisible, () => _layoutGroup),
             new IfConditional(_propGroupVisible, () => _propGroup),
             new IfConditional(_eventGroupVisible, () => _eventGroup)
         });
@@ -21,18 +24,36 @@ public sealed class PropertyPanel : SingleChildWidget
 
     private readonly DesignController _controller;
     private readonly ListView<Widget> _listView;
+    private readonly PropertyGroup _layoutGroup;
     private readonly PropertyGroup _widgetGroup = new("Widget");
     private readonly PropertyGroup _propGroup = new("Properties");
     private readonly PropertyGroup _eventGroup = new("Events");
 
+    private readonly State<string> _layoutGroupTitle = string.Empty;
+    private readonly State<bool> _layoutGroupVisible = false;
     private readonly State<bool> _propGroupVisible = false;
     private readonly State<bool> _eventGroupVisible = false;
+
+    /// <summary>
+    /// 附加的布局属性字典表
+    /// </summary>
+    private readonly Dictionary<string, State> _layoutProperties = new();
+
+    private void OnNotifyLayoutPropertyChanged(string layoutPropertyName)
+    {
+        if (_layoutProperties.TryGetValue(layoutPropertyName, out var editingValue))
+        {
+            editingValue.NotifyValueChanged();
+        }
+    }
 
     private void OnSelectionChanged()
     {
         if (_controller.FirstSelected == null || _controller.FirstSelected.Meta == null)
         {
             _widgetGroup.SetItems(Array.Empty<FormItem>());
+            _layoutProperties.Clear();
+            _layoutGroupVisible.Value = false;
             _propGroupVisible.Value = false;
             _eventGroupVisible.Value = false;
             return;
@@ -41,10 +62,17 @@ public sealed class PropertyPanel : SingleChildWidget
         var element = _controller.FirstSelected!;
         var meta = element.Meta;
 
-        //Widget Group
-        var widgetGroupItems = new List<FormItem>();
-        widgetGroupItems.Add(new FormItem("Type:", new Text(meta.Name)));
-        if (meta.CtorArgs != null && meta.CtorArgs.Length > 0)
+        BuildWidgetGroup(element, meta);
+        BuildLayoutGroup(element, meta);
+        BuildPropertyGroup(element, meta);
+
+        _listView.Invalidate(InvalidAction.Relayout);
+    }
+
+    private void BuildWidgetGroup(DesignElement element, DynamicWidgetMeta meta)
+    {
+        var widgetGroupItems = new List<FormItem> { new("Type:", new Text(meta.Name)) };
+        if (meta.CtorArgs is { Length: > 0 })
         {
             foreach (var ctorArgMeta in meta.CtorArgs)
             {
@@ -53,20 +81,41 @@ public sealed class PropertyPanel : SingleChildWidget
         }
 
         _widgetGroup.SetItems(widgetGroupItems);
+    }
 
-        //Properties Group
-        _propGroupVisible.Value = meta.Properties != null && meta.Properties.Length > 0;
-        if (_propGroupVisible.Value)
+    private void BuildLayoutGroup(DesignElement element, DynamicWidgetMeta meta)
+    {
+        _layoutGroupVisible.Value = element.Parent is DesignElement;
+        _layoutProperties.Clear();
+        if (!_layoutGroupVisible.Value) return;
+        
+        var parentElement = (DesignElement)element.Parent!;
+        var parentMeta = parentElement.Meta!;
+        _layoutGroupTitle.Value = parentMeta.Name;
+
+        var propItems = new FormItem[parentMeta.Properties!.Length];
+        for (var i = 0; i < propItems.Length; i++)
         {
-            var propItems = new FormItem[meta.Properties!.Length];
-            for (var i = 0; i < propItems.Length; i++)
-            {
-                propItems[i] = new($"{meta.Properties[i].Name}:", new PropertyEditor(element, meta.Properties[i]));
-            }
-
-            _propGroup.SetItems(propItems);
+            var propEditor = new PropertyEditor(parentElement, parentMeta.Properties[i]);
+            if (propEditor.EditingValue != null)
+                _layoutProperties.Add(parentMeta.Properties[i].Name, propEditor.EditingValue);
+            propItems[i] = new($"{parentMeta.Properties[i].Name}:", propEditor);
         }
 
-        _listView.Invalidate(InvalidAction.Relayout);
+        _layoutGroup.SetItems(propItems);
+    }
+
+    private void BuildPropertyGroup(DesignElement element, DynamicWidgetMeta meta)
+    {
+        _propGroupVisible.Value = meta.Properties is { Length: > 0 };
+        if (!_propGroupVisible.Value) return;
+        
+        var propItems = new FormItem[meta.Properties!.Length];
+        for (var i = 0; i < propItems.Length; i++)
+        {
+            propItems[i] = new($"{meta.Properties[i].Name}:", new PropertyEditor(element, meta.Properties[i]));
+        }
+
+        _propGroup.SetItems(propItems);
     }
 }
