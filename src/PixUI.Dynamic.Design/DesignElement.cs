@@ -16,6 +16,7 @@ public sealed class DesignElement : Widget, IMouseRegion
         _controller = controller;
         MouseRegion = new MouseRegion(opaque: false);
         MouseRegion.PointerDown += OnPointerDown;
+        MouseRegion.PointerMove += OnPointerMove;
 
         if (isRoot)
         {
@@ -60,12 +61,11 @@ public sealed class DesignElement : Widget, IMouseRegion
             if (_isSelected == value) return;
 
             _isSelected = value;
-            Invalidate(InvalidAction.Repaint);
+            //TODO: 使用选择装饰器
         }
     }
 
-    public bool IsContainer => Meta == null /*Root*/ ||
-                               Meta.ContainerType != ContainerType.None;
+    public bool IsContainer => Meta == null /*Root*/ || Meta.ContainerType != ContainerType.None;
 
     internal void ChangeMeta(DynamicWidgetMeta? meta, bool makeDefaultTarget)
     {
@@ -86,31 +86,23 @@ public sealed class DesignElement : Widget, IMouseRegion
         {
             Child.Parent = this;
 #if DEBUG
-            DebugLabel = Child.GetType().Name;
+            DebugLabel = Target?.GetType().Name;
 #endif
         }
 
         if (IsMounted) Invalidate(InvalidAction.Relayout);
     }
 
+    /// <summary>
+    /// 用于包装的目标添加子组件
+    /// </summary>
     public void AddChild(Widget child)
     {
         if (!IsContainer) throw new InvalidOperationException();
-        if (Meta == null)
-            throw new Exception();
+        if (Meta == null || Child == null || Meta.ContainerType == ContainerType.SingleChildReversed)
+            throw new InvalidOperationException();
 
-        if (Meta.ContainerType == ContainerType.SingleChildReversed)
-        {
-            if (child is not DesignElement)
-                throw new InvalidOperationException();
-            ChangeChild(Child, child);
-        }
-        else
-        {
-            if (Child == null)
-                throw new InvalidOperationException();
-            Meta.AddChild(Child!, child);
-        }
+        Meta.AddChild(Child, child);
     }
 
     /// <summary>
@@ -162,6 +154,30 @@ public sealed class DesignElement : Widget, IMouseRegion
         _controller.Select(this);
     }
 
+    private void OnPointerMove(PointerEvent e)
+    {
+        if (e.Buttons != PointerButtons.Left) return;
+
+        //判断是否可以移动，目前仅针对Stack下的Positioned组件,
+        //另需要注意如果位置属性绑定了状态不可手工移动
+        DesignElement? moveable = null;
+        if (Target?.GetType() == typeof(Positioned))
+            moveable = this;
+        else if (Parent is DesignElement parentElement && parentElement.Target?.GetType() == typeof(Positioned))
+            moveable = parentElement;
+        if (moveable == null) return;
+
+        var positioned = (Positioned)moveable.Target!;
+        var oldX = positioned.Left?.Value ?? 0f;
+        var oldY = positioned.Top?.Value ?? 0f;
+
+        Log.Debug($"old={oldX}, {oldY} delta={e.DeltaX}, {e.DeltaY}");
+        moveable.SetPropertyValue(new PropertyValue { Name = "Left", Value = oldX + e.DeltaX });
+        moveable.SetPropertyValue(new PropertyValue { Name = "Top", Value = oldY + e.DeltaY });
+        //TODO: maybe clear Right & Bottom value
+        e.IsHandled = true;
+    }
+
     public void OnDrop(DynamicWidgetMeta meta /*TODO: args for x, y*/)
     {
         //先判断是否容器类型(暂特殊处理多子级的容器)
@@ -190,10 +206,9 @@ public sealed class DesignElement : Widget, IMouseRegion
         //判断是否反向包装
         if (Meta?.ContainerType == ContainerType.SingleChildReversed)
         {
-            var childToBeAdded = new DesignElement(_controller, meta);
-            AddChild(childToBeAdded);
-            Invalidate(InvalidAction.Relayout);
-            _controller.Select(childToBeAdded);
+            var newChild = new DesignElement(_controller, meta);
+            ChangeChild(Child, newChild);
+            _controller.Select(newChild);
             return;
         }
 

@@ -81,6 +81,7 @@ public struct DynamicValue
     public object? Value { get; set; }
 
     public static implicit operator DynamicValue(string any) => new() { From = ValueSource.Const, Value = any };
+    public static implicit operator DynamicValue(float value) => new() { From = ValueSource.Const, Value = value };
 
     public void Write(Utf8JsonWriter writer)
     {

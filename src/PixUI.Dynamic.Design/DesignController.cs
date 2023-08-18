@@ -40,7 +40,11 @@ public sealed class DesignController
         OnSelectionChanged();
     }
 
-    internal void OnSelectionChanged() => SelectionChanged?.Invoke();
+    internal void OnSelectionChanged()
+    {
+        SelectionChanged?.Invoke();
+        RootElement.Invalidate(InvalidAction.Repaint); //暂在这里全部刷新，待实现选择装饰器后移除
+    }
 
     #endregion
 

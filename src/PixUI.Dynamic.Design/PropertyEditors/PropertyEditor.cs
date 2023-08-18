@@ -223,7 +223,11 @@ public sealed class PropertyEditor : Widget
         {
             //TODO:
             editingValue = null;
-            return new Input("None");
+            return new Text(new RxProperty<string>(() =>
+            {
+                var propValue = GetPropertyValue(element, propertyMeta);
+                return propValue?.ToString() ?? string.Empty;
+            }));
         }
 
         editingValue = editorInfo.PropertyStateMaker(element, propertyMeta);

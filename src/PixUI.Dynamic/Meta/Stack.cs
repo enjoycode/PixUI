@@ -28,6 +28,13 @@ partial class DynamicWidgetManager
         WidgetType = typeof(Positioned),
         ContainerType = ContainerType.SingleChildReversed,
         Icon = MaterialIcons.PictureInPicture,
-        AddChildAction = (parent, child) => ((Positioned)parent).Child = child
+        AddChildAction = (parent, child) => ((Positioned)parent).Child = child,
+        Properties = new DynamicPropertyMeta[]
+        {
+            new(nameof(Positioned.Left), typeof(State<float>), true),
+            new(nameof(Positioned.Top), typeof(State<float>), true),
+            new(nameof(Positioned.Right), typeof(State<float>), true),
+            new(nameof(Positioned.Bottom), typeof(State<float>), true),
+        }
     };
 }
