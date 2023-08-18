@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace PixUI;
@@ -55,6 +56,10 @@ internal sealed class InvalidWidget
     internal Widget Widget = null!;
     internal InvalidAction Action;
     internal int Level;
+
+    /// <summary>
+    /// 上级要求重绘，子级要求重新布局的情况
+    /// </summary>
     internal bool RelayoutOnly = false;
 
     /// <summary>
@@ -270,7 +275,17 @@ internal sealed class InvalidQueue
         var hasRelayout = false;
         IsSuspended = true;
 
-        foreach (var item in _queue)
+        //先重新布局子组件仅RelayoutOnly的
+        var relayoutOnlies = _queue.Where(t => t.RelayoutOnly);
+        foreach (var item in relayoutOnlies)
+        {
+            hasRelayout = true;
+            RelayoutWidget(item.Widget, AffectsByRelayout.Default);
+        }
+
+        //再处理其他的
+        var others = _queue.Where(t => !t.RelayoutOnly);
+        foreach (var item in others)
         {
             //Maybe removed from widget tree after added to InvalidQueue, so check again
             if (!item.Widget.IsMounted) continue;
@@ -280,11 +295,8 @@ internal sealed class InvalidQueue
                 hasRelayout = true;
                 var affects = AffectsByRelayout.Default;
                 RelayoutWidget(item.Widget, affects);
-                if (!item.RelayoutOnly)
-                {
-                    //注意: 以下重绘的是受影响Widget的上级，除非本身是根节点
-                    RepaintWidget(context, affects.Widget.Parent ?? affects.Widget, affects.GetDirtyArea());
-                }
+                //注意: 以下重绘的是受影响Widget的上级，除非本身是根节点
+                RepaintWidget(context, affects.Widget.Parent ?? affects.Widget, affects.GetDirtyArea());
             }
             else
             {

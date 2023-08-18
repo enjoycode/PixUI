@@ -31,8 +31,7 @@ public sealed class Positioned : Widget
         set
         {
             _left = Rebind(_left, value, BindingOptions.AffectsLayout);
-            if (Width != null && Right != null)
-                Width = null;
+            Parent?.Invalidate(InvalidAction.Repaint); //TODO: remove when impl OnChildBoundsChanged
         }
     }
 
@@ -42,8 +41,7 @@ public sealed class Positioned : Widget
         set
         {
             _right = Rebind(_right, value, BindingOptions.AffectsLayout);
-            if (Width != null && Left != null)
-                Width = null;
+            Parent?.Invalidate(InvalidAction.Repaint); //TODO:
         }
     }
 
