@@ -327,13 +327,28 @@ public abstract class UIWindow
     }
 
     /// <summary>
-    /// 布局变更后或Popup弹出关闭后重新进行
+    /// Popup弹出关闭后重新进行
     /// </summary>
-    internal void RunNewHitTest()
+    internal void NewHitTestForPopup()
     {
-        //始终重新开始检测，因为旧的命中的位置可能已改变
         NewHitTest(LastMouseX, LastMouseY);
         CompareAndSwapHitTestResult();
+    }
+
+    /// <summary>
+    /// 重新布局后尝试重新进行
+    /// </summary>
+    internal void NewHitTestForLayoutChanged()
+    {
+        if (_hitResultOnPointDown == null) //暂在这里排除按下左键的情况
+        {
+            NewHitTest(LastMouseX, LastMouseY);
+            CompareAndSwapHitTestResult();
+        }
+        else
+        {
+            _oldHitResult.IsInvalidated = true;
+        }
     }
 
     #endregion

@@ -310,7 +310,7 @@ internal sealed class InvalidQueue
 
         // 通知重新进行HitTest TODO:确认布局影响，eg:Input重布局没有改变大小，则不需要重新HitTest
         if (hasRelayout)
-            context.Window.RunNewHitTest();
+            context.Window.NewHitTestForLayoutChanged();
     }
 
     /// <summary>

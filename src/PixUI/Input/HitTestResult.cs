@@ -23,6 +23,11 @@ public sealed class HitTestResult
     public bool IsHitAnyWidget => LastHitWidget != null;
 
     /// <summary>
+    /// 是否已失效，目前主要由布局变更后标为失效状态
+    /// </summary>
+    internal bool IsInvalidated;
+
+    /// <summary>
     /// 添加命中的Widget
     /// </summary>
     /// <returns>true = Widget is opaque MouseRegion</returns>
@@ -129,13 +134,13 @@ public sealed class HitTestResult
             LastHitWidget!.HitTest(transformed.Dx, transformed.Dy, this);
     }
 
-    internal void ExitAll()
-    {
-        for (var i = _path.Count - 1; i >= 0; i--)
-        {
-            _path[i].Widget.MouseRegion.RaiseHoverChanged(false);
-        }
-    }
+    // internal void ExitAll()
+    // {
+    //     for (var i = _path.Count - 1; i >= 0; i--)
+    //     {
+    //         _path[i].Widget.MouseRegion.RaiseHoverChanged(false);
+    //     }
+    // }
 
     /// <summary>
     /// 与新的结果比较，激发旧的HoverChanged(false)事件
@@ -211,6 +216,7 @@ public sealed class HitTestResult
     {
         _path.Clear();
         LastHitWidget = null;
+        IsInvalidated = false;
         _transform = Matrix4.CreateIdentity();
     }
 

@@ -151,12 +151,12 @@ internal sealed class PopupTransitionWrap : SingleChildWidget
     {
         if (status == AnimationStatus.Completed)
         {
-            _overlay.Window.RunNewHitTest(); //打开后强制重新HitTest,考虑优化
+            _overlay.Window.NewHitTestForPopup(); //打开后强制重新HitTest,考虑优化
         }
         else if (status == AnimationStatus.Dismissed)
         {
             _overlay.Remove(this);
-            _overlay.Window.RunNewHitTest(); //关闭后强制重新HitTest,考虑优化
+            _overlay.Window.NewHitTestForPopup(); //关闭后强制重新HitTest,考虑优化
         }
     }
 
