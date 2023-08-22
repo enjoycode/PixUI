@@ -53,7 +53,7 @@ public sealed class NumberInput<T> : InputBase<EditableText> where T : struct, I
 
     public override void OnStateChanged(State state, BindingOptions options)
     {
-        if (ReferenceEquals(state, _editor.Text))
+        if (ReferenceEquals(state, _nullable) || ReferenceEquals(state, _noneNullable))
             _editor.Text.Value = state.ToString() ?? string.Empty;
         base.OnStateChanged(state, options);
     }

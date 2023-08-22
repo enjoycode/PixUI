@@ -14,6 +14,7 @@ public sealed class PropertyEditor : Widget
     static PropertyEditor()
     {
         RegisterClassValueEditor<string, TextEditor>(true);
+        RegisterStructValueEditor<float, NumberEditor<float>>(true);
         RegisterStructValueEditor<Color, ColorEditor>(true);
     }
 
@@ -48,7 +49,7 @@ public sealed class PropertyEditor : Widget
 #if DEBUG
         DebugLabel = ctorArgMeta.Name;
 #endif
-        
+
         var valueType = GetValueType(ctorArgMeta.Value);
         _targetEditor = GetCtorArgValueEditor(valueType, element, ctorArgMeta, out var editingValue);
         _targetEditor.Parent = this;
