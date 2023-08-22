@@ -2,6 +2,9 @@ using System;
 
 namespace PixUI;
 
+/// <summary>
+/// 通过源状态计算/转换而来的状态
+/// </summary>
 public sealed class RxComputed<T> : State<T>, IStateBindable
 {
     private readonly Func<T> _getter;
@@ -57,7 +60,7 @@ public sealed class RxComputed<T> : State<T>, IStateBindable
             }
             catch (Exception e)
             {
-                //TODO: Log it
+                Log.Warn($"Set value error: {e.Message}");
             }
         }
     }

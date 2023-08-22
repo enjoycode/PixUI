@@ -23,8 +23,8 @@ namespace PixUI.Demo
                 {
                     Children =
                     {
-                        new Input(_user) { HintText = "User" },
-                        new Input(_password) { HintText = "Password", IsObscure = true }
+                        new TextInput(_user) { HintText = "User" },
+                        new TextInput(_password) { HintText = "Password", IsObscure = true }
                     }
                 }
             };

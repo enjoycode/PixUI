@@ -185,7 +185,7 @@ public sealed class PropertyEditor : Widget
         {
             //TODO:
             editingValue = null;
-            return new Input("None");
+            return new TextInput("None");
         }
 
         var index = Array.IndexOf(element.Meta!.CtorArgs!, ctorArgMeta);

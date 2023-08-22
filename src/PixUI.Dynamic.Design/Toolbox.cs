@@ -17,7 +17,7 @@ public sealed class Toolbox : View
         {
             Children =
             {
-                new Input(_searchKey) { Suffix = new Icon(MaterialIcons.Search) },
+                new TextInput(_searchKey) { Suffix = new Icon(MaterialIcons.Search) },
                 new TreeView<ToolboxNode>(_treeController),
             }
         };

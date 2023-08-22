@@ -11,6 +11,8 @@ namespace PixUI.Demo
 
         private readonly State<string?> _selectedValue = "";
 
+        private readonly State<float> _numValue = 3f;
+
         private readonly WidgetRef<Button> _buttonRef = new();
         private ListPopup<Person>? _listPopup;
 
@@ -79,13 +81,13 @@ namespace PixUI.Demo
                                     "无锡", "上海", "苏州"
                                 }
                             },
-                            new Input("Hello World!")
+                            new TextInput("Hello World!")
                             {
                                 Width = 200,
                                 Prefix = new Icon(MaterialIcons.Person),
                                 Suffix = new Icon(MaterialIcons.Search)
                             },
-                            new Input("")
+                            new TextInput("")
                             {
                                 Width = 200, IsObscure = true,
                                 Prefix = new Icon(MaterialIcons.Lock),
@@ -109,6 +111,8 @@ namespace PixUI.Demo
                             new Collapse { Width = 300, Title = new Text("Collapse"), Body = new DemoForm() },
                             new Card { Width = 250, Height = 220, Child = new Calendar(1977, 3) },
                             new DatePicker(new DateTime(1977, 3, 16)) { Width = 200 },
+                            new Text(_numValue.ToStateOfString()),
+                            new NumberInput<float>(_numValue) { Width = 250 },
                         }
                     }
                 }

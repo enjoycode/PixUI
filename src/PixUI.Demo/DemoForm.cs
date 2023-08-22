@@ -11,11 +11,11 @@ namespace PixUI.Demo
                 Columns = 2,
                 Children =
                 {
-                    new("姓名:", new Input("")),
-                    new("性别:", new Input("")),
-                    new("电话:", new Input("")),
-                    new("城市:", new Input("")),
-                    new("住址:", new Input(""), 2),
+                    new("姓名:", new TextInput("")),
+                    new("性别:", new TextInput("")),
+                    new("电话:", new TextInput("")),
+                    new("城市:", new TextInput("")),
+                    new("住址:", new TextInput(""), 2),
                 }
             };
         }

@@ -16,7 +16,7 @@ namespace PixUI.Demo.Mac
                     {
                         Children =
                         {
-                            new Input(_scrollTo) { Width = 100 },
+                            new TextInput(_scrollTo) { Width = 100 },
                             new Button("ScrollTo")
                             {
                                 OnTap = e => listViewController.ScrollTo(

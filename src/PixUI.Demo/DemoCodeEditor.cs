@@ -34,7 +34,7 @@ public sealed class Person
                     {
                         Children =
                         {
-                            new Input(_scrollTo) { Width = 100 },
+                            new TextInput(_scrollTo) { Width = 100 },
                             new Button("ScrollTo")
                             {
                                 OnTap = _ => _controller.ScrollTo(int.Parse(_scrollTo.Value))

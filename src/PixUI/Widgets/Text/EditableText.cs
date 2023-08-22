@@ -48,6 +48,16 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
 
     public string? HintText { get; set; }
 
+    /// <summary>
+    /// 验证输入的内容，返回false不接受输入
+    /// </summary>
+    public Func<string, bool>? PreviewInput { get; set; }
+
+    /// <summary>
+    /// 按下回车键或失去焦点时递交变更
+    /// </summary>
+    public Action<string>? CommitChanges { get; set; }
+
     #region ====Event Handlers====
 
     private void _OnFocusChanged(FocusChangedEvent e)
@@ -64,6 +74,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
             if (!IsReadonly)
                 e.Window.StopTextInput();
             _caret.Hide();
+            Commit();
         }
     }
 
@@ -71,11 +82,11 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
     {
         if (IsReadonly) return;
 
-        if (Text.Value != null)
-            Text.Value = Text.Value.Insert(_caretPosition, text);
-        else
-            Text.Value = text;
+        var newText = Text.Value == null ? text : Text.Value.Insert(_caretPosition, text);
+        if (PreviewInput != null && !PreviewInput(newText))
+            return;
 
+        Text.Value = newText;
         _caretPosition += text.Length;
     }
 
@@ -85,7 +96,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         if (CachedParagraph != null)
         {
             var pos = CachedParagraph.GetGlyphPositionAtCoordinate(theEvent.X, theEvent.Y);
-            Console.WriteLine($"pos={pos.Position} affinity={pos.Affinity}");
+            Log.Debug($"pos={pos.Position} affinity={pos.Affinity}");
             newPos = pos.Position;
         }
 
@@ -108,6 +119,9 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
                 break;
             case Keys.Right:
                 MoveRight();
+                break;
+            case Keys.Return:
+                Commit();
                 break;
         }
     }
@@ -135,6 +149,11 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
 
         _caretPosition++;
         _caret.NotifyPositionChanged();
+    }
+
+    private void Commit()
+    {
+        CommitChanges?.Invoke(Text.Value);
     }
 
     #endregion
@@ -213,8 +232,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         {
             if (string.IsNullOrEmpty(HintText)) return;
 
-            _hintParagraph ??=
-                BuildParagraphInternal(HintText, float.PositiveInfinity, Colors.Gray);
+            _hintParagraph ??= BuildParagraphInternal(HintText, float.PositiveInfinity, Colors.Gray);
             canvas.DrawParagraph(_hintParagraph, 0, 2 /*offset*/);
         }
         else

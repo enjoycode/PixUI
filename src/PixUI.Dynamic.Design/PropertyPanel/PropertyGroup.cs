@@ -8,7 +8,7 @@ public sealed class PropertyGroup : SingleChildWidget
     {
         Child = new Collapse
         {
-            Title = new Text(title),
+            Title = new Text(title) { FontWeight = FontWeight.Bold },
             Body = new Form { Ref = _formRef, LabelWidth = 80 }
         };
     }

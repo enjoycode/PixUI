@@ -30,7 +30,7 @@ namespace PixUI.Demo.Mac
                     {
                         Children =
                         {
-                            new Input("Hello"),
+                            new TextInput("Hello"),
                             new Button("Click")
                         }
                     }
