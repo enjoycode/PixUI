@@ -65,10 +65,8 @@ public sealed class FocusManager
     private static void PropagateEvent<T>(Widget? widget, T theEvent, Action<Widget, T> handler)
         where T : PropagateEvent
     {
-        while (true)
+        while (widget != null)
         {
-            if (widget == null) return;
-
             if (widget is IFocusable)
             {
                 handler(widget, theEvent);

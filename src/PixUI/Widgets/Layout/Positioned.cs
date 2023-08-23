@@ -48,13 +48,21 @@ public sealed class Positioned : Widget
     public State<float>? Top
     {
         get => _top;
-        set => _top = Rebind(_top, value, BindingOptions.AffectsLayout);
+        set
+        {
+            _top = Rebind(_top, value, BindingOptions.AffectsLayout);
+            Parent?.Invalidate(InvalidAction.Repaint); //TODO:
+        }
     }
 
     public State<float>? Bottom
     {
         get => _bottom;
-        set => _bottom = Rebind(_bottom, value, BindingOptions.AffectsLayout);
+        set
+        {
+            _bottom = Rebind(_bottom, value, BindingOptions.AffectsLayout);
+            Parent?.Invalidate(InvalidAction.Repaint); //TODO:
+        }
     }
 
     public override void VisitChildren(Func<Widget, bool> action)

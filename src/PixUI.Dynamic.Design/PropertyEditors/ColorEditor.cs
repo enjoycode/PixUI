@@ -9,7 +9,7 @@ public sealed class ColorEditor : SingleChildWidget
         _color = color;
 
         var colorState = color.ToNoneNullable(Colors.Black);
-        var iconState = color.ToComputed(v => v.HasValue ? MaterialIcons.Square : MaterialIcons.Clear);
+        var iconState = color.ToComputed(v => v.HasValue ? MaterialIcons.Square : MaterialIcons.ColorLens);
 
         Child = new Button(icon: iconState) { TextColor = colorState, Style = ButtonStyle.Outline, OnTap = OnTap };
     }

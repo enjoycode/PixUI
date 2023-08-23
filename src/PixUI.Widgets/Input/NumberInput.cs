@@ -7,12 +7,7 @@ public sealed class NumberInput<T> : InputBase<EditableText> where T : struct, I
 {
     public NumberInput(T numberValue) : this(new RxValue<T>(numberValue)) { }
 
-    public NumberInput(State<T> number) : base(new EditableText(number.ToString()))
-    {
-        _noneNullable = Bind(number, BindingOptions.None);
-        _editor.PreviewInput = OnPreviewInput;
-        _editor.CommitChanges = OnCommitChanges;
-    }
+    public NumberInput(State<T> number) : this(number.ToNullable()) { }
 
     public NumberInput(State<T?> number) : base(new EditableText(number.ToString()))
     {
@@ -21,8 +16,7 @@ public sealed class NumberInput<T> : InputBase<EditableText> where T : struct, I
         _editor.CommitChanges = OnCommitChanges;
     }
 
-    private readonly State<T>? _noneNullable;
-    private readonly State<T?>? _nullable;
+    private readonly State<T?> _nullable;
 
     public override State<bool>? Readonly
     {
@@ -44,16 +38,21 @@ public sealed class NumberInput<T> : InputBase<EditableText> where T : struct, I
 
     private void OnCommitChanges(string text)
     {
+        if (string.IsNullOrEmpty(text))
+        {
+            _nullable.Value = null;
+            return;
+        }
+
         if (!T.TryParse(text, null, out var result))
             return;
 
-        if (_nullable != null) _nullable.Value = result;
-        else _noneNullable!.Value = result;
+        _nullable.Value = result;
     }
 
     public override void OnStateChanged(State state, BindingOptions options)
     {
-        if (ReferenceEquals(state, _nullable) || ReferenceEquals(state, _noneNullable))
+        if (ReferenceEquals(state, _nullable))
             _editor.Text.Value = state.ToString() ?? string.Empty;
         base.OnStateChanged(state, options);
     }

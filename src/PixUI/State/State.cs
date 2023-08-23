@@ -90,7 +90,7 @@ public abstract class State<T> : State
 #if __WEB__
         //TODO:临时解决隐式转换
         public static State<T> op_Implicit_From<T>(T value) {
-            return new Rx<T>(value);
+            return new RxValue<T>(value);
         }
 #endif
 }
@@ -102,6 +102,9 @@ public static class StateExtensions
     /// </summary>
     public static State<bool> ToReversed(this State<bool> s) =>
         RxComputed<bool>.Make(s, v => !v, v => s.Value = !v);
+
+    public static State<T?> ToNullable<T>(this State<T> s) where T : struct =>
+        new RxProperty<T?>(() => s.Value, v => s.Value = v ?? default(T));
 
     public static State<T> ToNoneNullable<T>(this State<T?> s) where T : struct =>
         RxComputed<T>.Make(s, v => v ?? default(T), v => s.Value = v);
