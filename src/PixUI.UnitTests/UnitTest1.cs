@@ -29,6 +29,15 @@ public class Tests
     [Test]
     public void DynamicTest()
     {
+        var s = new School() { Code = 123 };
+        //s.Code = 256; //Error
+
+        var type = typeof(School);
+        var s2 = Activator.CreateInstance(type);
+        var codePropInfo = type.GetProperty("Code");
+        codePropInfo!.SetValue(s2, 123);
+        Console.WriteLine(s2);
+
         // dynamic obj = new Person();
         // obj.Name = "Rick";
         // //obj["Name"] = "Rick";
@@ -55,6 +64,11 @@ internal class Person //: IDynamicMetaObjectProvider
     {
         throw new NotImplementedException();
     }
+}
+
+internal class School
+{
+    public required int Code { get; init; }
 }
 
 // internal abstract class S<T> where T : notnull

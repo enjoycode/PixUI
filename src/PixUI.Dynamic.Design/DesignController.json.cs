@@ -92,7 +92,7 @@ partial class DesignController
         reader.Read(); //]
 
         data.CtorArgs = args;
-        element.ChangeChild(null, meta.MakeInstance(data.CtorArgs!));
+        element.Child = meta.MakeInstance(data.CtorArgs!);
     }
 
     private static void ReadProperties(DesignElement element, ref Utf8JsonReader reader)
@@ -101,7 +101,7 @@ partial class DesignController
         var data = element.Data;
 
         if (element.Target == null)
-            element.ChangeChild(null, meta.MakeDefaultInstance());
+            element.Child = meta.MakeDefaultInstance();
 
         while (reader.Read())
         {
@@ -120,7 +120,7 @@ partial class DesignController
     private void ReadChild(DesignElement element, ref Utf8JsonReader reader)
     {
         if (element.Target == null)
-            element.ChangeChild(null, element.Meta!.MakeDefaultInstance());
+            element.Child = element.Meta!.MakeDefaultInstance();
 
         var childElement = ReadView(ref reader);
         element.AddChild(childElement);

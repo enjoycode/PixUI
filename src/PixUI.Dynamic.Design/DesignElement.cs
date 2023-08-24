@@ -34,10 +34,11 @@ public sealed class DesignElement : Widget, IMouseRegion
     }
 
     private static readonly Lazy<Paragraph> _hint = new(() =>
-        TextPainter.BuildParagraph("Drag Widget Here", float.PositiveInfinity, 16, Colors.Gray));
+        TextPainter.BuildParagraph("Drop Here", float.PositiveInfinity, 16, Colors.Gray));
 
     private readonly DesignController _controller;
     private bool _isSelected;
+    private Widget? _child;
 
     public DynamicWidgetMeta? Meta { get; private set; }
 
@@ -49,7 +50,27 @@ public sealed class DesignElement : Widget, IMouseRegion
     /// <remarks>如果是反向包装，返回的是上级</remarks>
     public Widget? Target => Meta?.ContainerType == ContainerType.SingleChildReversed ? Parent : Child;
 
-    public Widget? Child { get; private set; }
+    public Widget? Child
+    {
+        get => _child;
+        internal set
+        {
+            if (_child != null)
+                _child.Parent = null;
+
+            _child = value;
+
+            if (_child != null)
+            {
+                _child.Parent = this;
+#if DEBUG
+                DebugLabel = Target?.GetType().Name;
+#endif
+            }
+
+            if (IsMounted) Invalidate(InvalidAction.Relayout);
+        }
+    }
 
     public MouseRegion MouseRegion { get; }
 
@@ -73,24 +94,7 @@ public sealed class DesignElement : Widget, IMouseRegion
         Data.Type = Meta == null ? string.Empty : Meta.Name;
         MouseRegion.Opaque = !IsContainer;
         if (makeDefaultTarget || (Meta == null && Child != null))
-            ChangeChild(Child, Meta?.MakeDefaultInstance());
-    }
-
-    internal void ChangeChild(Widget? oldChild, Widget? newChild)
-    {
-        if (oldChild != null) oldChild.Parent = null;
-
-        Child = newChild;
-
-        if (Child != null)
-        {
-            Child.Parent = this;
-#if DEBUG
-            DebugLabel = Target?.GetType().Name;
-#endif
-        }
-
-        if (IsMounted) Invalidate(InvalidAction.Relayout);
+            Child = Meta?.MakeDefaultInstance();
     }
 
     /// <summary>
@@ -113,7 +117,7 @@ public sealed class DesignElement : Widget, IMouseRegion
         if (Meta == null) throw new Exception();
 
         var newTarget = Data.CtorArgs == null ? Meta.MakeDefaultInstance() : Meta.MakeInstance(Data.CtorArgs);
-        ChangeChild(Target, newTarget);
+        Child = newTarget;
 
         //重设属性值
         if (Data.Properties != null)
@@ -172,10 +176,9 @@ public sealed class DesignElement : Widget, IMouseRegion
             //TODO:暂简单特殊处理添加非Positioned至Stack内
             if (Meta.WidgetType == typeof(Stack) && meta.WidgetType != typeof(Positioned))
             {
-                var positionedMeta = DynamicWidgetManager.GetByName(nameof(Positioned));
                 childElement = new DesignElement(_controller, meta);
-                var positionedElement = new DesignElement(_controller, positionedMeta);
-                positionedElement.ChangeChild(null, childElement);
+                var positionedMeta = DynamicWidgetManager.GetByName(nameof(Positioned));
+                var positionedElement = new DesignElement(_controller, positionedMeta) { Child = childElement};
                 childToBeAdded = new Positioned { Child = positionedElement };
             }
             else if (meta.ContainerType == ContainerType.SingleChildReversed)
@@ -199,7 +202,7 @@ public sealed class DesignElement : Widget, IMouseRegion
         if (Meta?.ContainerType == ContainerType.SingleChildReversed)
         {
             var newChild = new DesignElement(_controller, meta);
-            ChangeChild(Child, newChild);
+            Child = newChild;
             _controller.Select(newChild);
             return;
         }
