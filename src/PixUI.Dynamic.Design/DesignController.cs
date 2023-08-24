@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text.Json;
 
 namespace PixUI.Dynamic.Design;
 
-public sealed class DesignController
+public sealed partial class DesignController
 {
     /// <summary>
     /// 设计画布缩放百分比
@@ -53,7 +51,7 @@ public sealed class DesignController
 
     #endregion
 
-    #region ====DesignElement Layout====
+    #region ====DesignElement Actions====
 
     /// <summary>
     /// 移动选择的位置，目前仅适用于Positioned组件
@@ -92,129 +90,17 @@ public sealed class DesignController
         }
     }
 
-    #endregion
-
-    #region ====Json Serialization====
-
-    public void Load(byte[] json)
+    /// <summary>
+    /// 删除选择的元素
+    /// </summary>
+    public void DeleteElements()
     {
-#if DEBUG
-        var ts = Stopwatch.GetTimestamp();
-#endif
-        DesignElement? rootElement = null;
-        var reader = new Utf8JsonReader(json);
-        while (reader.Read())
+        //TODO: maybe check can be deleted
+        foreach (var element in _selection)
         {
-            if (reader.TokenType != JsonTokenType.PropertyName) continue;
-
-            var propName = reader.GetString();
-            switch (propName)
-            {
-                case "View":
-                    rootElement = ReadView(ref reader);
-                    break;
-            }
-        }
-
-        if (rootElement != null)
-        {
-            var parent = (SingleChildWidget)RootElement.Parent!;
-            parent.Child = rootElement;
-            RootElement = rootElement;
-            parent.Invalidate(InvalidAction.Relayout);
-        }
-
-        Select(RootElement); // always select root element
-
-#if DEBUG
-        Log.Debug($"加载耗时: {Stopwatch.GetElapsedTime(ts).TotalMilliseconds}ms");
-#endif
-    }
-
-    private DesignElement ReadView(ref Utf8JsonReader reader)
-    {
-        var element = new DesignElement(this);
-
-        while (reader.Read())
-        {
-            if (reader.TokenType == JsonTokenType.EndObject) break;
-            if (reader.TokenType != JsonTokenType.PropertyName) continue;
-
-            var propName = reader.GetString()!;
-            switch (propName)
-            {
-                case nameof(DynamicWidgetData.Type):
-                    reader.Read();
-                    var meta = DynamicWidgetManager.GetByName(reader.GetString()!);
-                    element.ChangeMeta(meta, false);
-                    break;
-                case nameof(DynamicWidgetData.CtorArgs):
-                    ReadCtorArgs(element, ref reader);
-                    break;
-                case nameof(DynamicWidgetData.Properties):
-                    ReadProperties(element, ref reader);
-                    break;
-                case "Child":
-                    ReadChild(element, ref reader);
-                    break;
-                case "Children":
-                    throw new NotImplementedException();
-                    break;
-            }
-        }
-
-        return element;
-    }
-
-    private static void ReadCtorArgs(DesignElement element, ref Utf8JsonReader reader)
-    {
-        var meta = element.Meta!;
-        var data = element.Data;
-        if (meta.CtorArgs == null || meta.CtorArgs.Length == 0) throw new InvalidOperationException();
-
-        var args = new DynamicValue[meta.CtorArgs.Length];
-        reader.Read(); //[
-        for (var i = 0; i < args.Length; i++)
-        {
-            args[i] = DynamicValue.Read(ref reader, meta.CtorArgs[i].Value);
-        }
-
-        reader.Read(); //]
-
-        data.CtorArgs = args;
-        element.ChangeChild(null, meta.MakeInstance(data.CtorArgs!));
-    }
-
-    private static void ReadProperties(DesignElement element, ref Utf8JsonReader reader)
-    {
-        var meta = element.Meta!;
-        var data = element.Data;
-
-        if (element.Target == null)
-            element.ChangeChild(null, meta.MakeDefaultInstance());
-
-        while (reader.Read())
-        {
-            if (reader.TokenType == JsonTokenType.EndObject) break;
-            if (reader.TokenType != JsonTokenType.PropertyName) continue;
-
-            var prop = new PropertyValue { Name = reader.GetString()! };
-            var propMeta = meta.GetPropertyMeta(prop.Name);
-            prop.Value = DynamicValue.Read(ref reader, propMeta.Value);
-
-            data.AddPropertyValue(prop);
-            element.SetPropertyValue(prop);
+            
         }
     }
-
-    private void ReadChild(DesignElement element, ref Utf8JsonReader reader)
-    {
-        if (element.Target == null)
-            element.ChangeChild(null, element.Meta!.MakeDefaultInstance());
-
-        var childElement = ReadView(ref reader);
-        element.AddChild(childElement);
-    }
-
+    
     #endregion
 }
