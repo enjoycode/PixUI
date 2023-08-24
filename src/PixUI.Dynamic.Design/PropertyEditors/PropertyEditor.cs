@@ -132,11 +132,11 @@ public sealed class PropertyEditor : Widget
         var editor = new ValueEditorInfo(
             typeof(TEditor).Name, isDefault, typeof(TValue),
             CreateEditorMaker(valueType, typeof(TEditor)),
-            (element, ctorArgMeta, index) => new RxProperty<TValue?>(
+            (element, ctorArgMeta, index) => new RxProxy<TValue?>(
                 () => (TValue?)GetCtorArgValue(element, ctorArgMeta, index),
                 newValue => SetCtorArgValue(element, ctorArgMeta, index, newValue)
             ),
-            (element, propertyMeta) => new RxProperty<TValue?>(
+            (element, propertyMeta) => new RxProxy<TValue?>(
                 () => (TValue?)GetPropertyValue(element, propertyMeta),
                 newValue => SetPropertyValue(element, propertyMeta, newValue)
             )
@@ -152,11 +152,11 @@ public sealed class PropertyEditor : Widget
         var editor = new ValueEditorInfo(
             typeof(TEditor).Name, isDefault, typeof(TValue),
             CreateEditorMaker(typeof(TValue), typeof(TEditor)),
-            (element, ctorArgMeta, index) => new RxProperty<TValue?>(
+            (element, ctorArgMeta, index) => new RxProxy<TValue?>(
                 () => (TValue?)GetCtorArgValue(element, ctorArgMeta, index),
                 newValue => SetCtorArgValue(element, ctorArgMeta, index, newValue)
             ),
-            (element, propertyMeta) => new RxProperty<TValue?>(
+            (element, propertyMeta) => new RxProxy<TValue?>(
                 () => (TValue?)GetPropertyValue(element, propertyMeta),
                 newValue => SetPropertyValue(element, propertyMeta, newValue)
             )
@@ -235,7 +235,7 @@ public sealed class PropertyEditor : Widget
         if (editorInfo == null)
         {
             //TODO:
-            editingValue = new RxProperty<string>(() =>
+            editingValue = new RxProxy<string>(() =>
             {
                 var propValue = GetPropertyValue(element, propertyMeta);
                 return propValue?.ToString() ?? string.Empty;

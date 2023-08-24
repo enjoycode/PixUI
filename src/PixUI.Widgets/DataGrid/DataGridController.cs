@@ -123,7 +123,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
     /// </summary>
     public State<T?> ObserveCurrentRow()
     {
-        var state = new RxProperty<T?>(
+        var state = new RxProxy<T?>(
             () =>
             {
                 if (DataView == null || _selectedRows.Count == 0)

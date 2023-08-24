@@ -104,7 +104,7 @@ public static class StateExtensions
         RxComputed<bool>.Make(s, v => !v, v => s.Value = !v);
 
     public static State<T?> ToNullable<T>(this State<T> s) where T : struct =>
-        new RxProperty<T?>(() => s.Value, v => s.Value = v ?? default(T));
+        new RxProxy<T?>(() => s.Value, v => s.Value = v ?? default(T));
 
     public static State<T> ToNoneNullable<T>(this State<T?> s) where T : struct =>
         RxComputed<T>.Make(s, v => v ?? default(T), v => s.Value = v);

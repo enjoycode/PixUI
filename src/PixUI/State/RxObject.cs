@@ -2,38 +2,6 @@
 
 namespace PixUI;
 
-public sealed class RxProperty<T> : State<T>
-{
-    public RxProperty(Func<T> getter, Action<T>? setter = null, bool autoNotify = true)
-    {
-        _getter = getter;
-        if (setter == null || !autoNotify)
-            _setter = setter;
-        else
-            _setter = v =>
-            {
-                //TODO: compare old value
-                setter(v);
-                NotifyValueChanged();
-            };
-    }
-
-    private readonly Func<T> _getter;
-    private readonly Action<T>? _setter;
-
-    public override bool Readonly => _setter == null;
-
-    public override T Value
-    {
-        get => _getter();
-        set
-        {
-            if (_setter == null) throw new NotSupportedException();
-            _setter(value);
-        }
-    }
-}
-
 // ReSharper disable once UnusedType.Global
 public abstract class RxObject<T> where T : class
 {
