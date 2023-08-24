@@ -53,6 +53,47 @@ public sealed class DesignController
 
     #endregion
 
+    #region ====DesignElement Layout====
+
+    /// <summary>
+    /// 移动选择的位置，目前仅适用于Positioned组件
+    /// </summary>
+    internal void MoveElements(float dx, float dy)
+    {
+        //判断选择的是否可以移动，目前仅针对Stack下的Positioned组件,
+        //另需要注意如果位置属性绑定了状态不可手工移动
+
+        var canMove = true;
+        foreach (var element in _selection)
+        {
+            if (element.Target is Positioned ||
+                element.Parent is DesignElement { Target: Positioned })
+                continue;
+            canMove = false;
+            break;
+        }
+
+        if (!canMove) return;
+
+
+        foreach (var element in _selection)
+        {
+            var moveable = element.Target is Positioned ? element : (DesignElement)element.Parent!;
+            var positioned = (Positioned)moveable.Target!;
+            var oldX = positioned.Left?.Value ?? 0f;
+            var oldY = positioned.Top?.Value ?? 0f;
+
+            // Log.Debug($"old={oldX}, {oldY} delta={e.DeltaX}, {e.DeltaY}");
+            moveable.SetPropertyValue(moveable.Data.SetPropertyValue("Left", oldX + dx));
+            NotifyLayoutPropertyChanged?.Invoke("Left");
+            moveable.SetPropertyValue(moveable.Data.SetPropertyValue("Top", oldY + dy));
+            NotifyLayoutPropertyChanged?.Invoke("Top");
+            //TODO: maybe clear Right & Bottom value
+        }
+    }
+
+    #endregion
+
     #region ====Json Serialization====
 
     public void Load(byte[] json)

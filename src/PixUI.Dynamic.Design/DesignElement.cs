@@ -157,26 +157,7 @@ public sealed class DesignElement : Widget, IMouseRegion
     private void OnPointerMove(PointerEvent e)
     {
         if (e.Buttons != PointerButtons.Left) return;
-
-        //判断是否可以移动，目前仅针对Stack下的Positioned组件,
-        //另需要注意如果位置属性绑定了状态不可手工移动
-        DesignElement? moveable = null;
-        if (Target?.GetType() == typeof(Positioned))
-            moveable = this;
-        else if (Parent is DesignElement parentElement && parentElement.Target?.GetType() == typeof(Positioned))
-            moveable = parentElement;
-        if (moveable == null) return;
-
-        var positioned = (Positioned)moveable.Target!;
-        var oldX = positioned.Left?.Value ?? 0f;
-        var oldY = positioned.Top?.Value ?? 0f;
-
-        // Log.Debug($"old={oldX}, {oldY} delta={e.DeltaX}, {e.DeltaY}");
-        moveable.SetPropertyValue(moveable.Data.SetPropertyValue("Left", oldX + e.DeltaX));
-        _controller.NotifyLayoutPropertyChanged?.Invoke("Left");
-        moveable.SetPropertyValue(moveable.Data.SetPropertyValue("Top", oldY + e.DeltaY));
-        _controller.NotifyLayoutPropertyChanged?.Invoke("Top");
-        //TODO: maybe clear Right & Bottom value
+        _controller.MoveElements(e.DeltaX, e.DeltaY);
         e.IsHandled = true;
     }
 
