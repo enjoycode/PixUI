@@ -30,7 +30,7 @@ public sealed class DesignElement : Widget, IMouseRegion
     /// </summary>
     private DesignElement(DesignController controller, DynamicWidgetMeta meta) : this(controller)
     {
-        ChangeMeta(meta, meta.ContainerType != ContainerType.SingleChildReversed);
+        ChangeMeta(meta, !meta.IsReversedWrapElement);
     }
 
     private static readonly Lazy<Paragraph> _hint = new(() =>
@@ -48,7 +48,7 @@ public sealed class DesignElement : Widget, IMouseRegion
     /// 包装的目标组件
     /// </summary>
     /// <remarks>如果是反向包装，返回的是上级</remarks>
-    public Widget? Target => Meta?.ContainerType == ContainerType.SingleChildReversed ? Parent : Child;
+    public Widget? Target => Meta is { IsReversedWrapElement: true } ? Parent : Child;
 
     public Widget? Child
     {
@@ -86,7 +86,7 @@ public sealed class DesignElement : Widget, IMouseRegion
         }
     }
 
-    public bool IsContainer => Meta == null /*Root*/ || Meta.ContainerType != ContainerType.None;
+    public bool IsContainer => Meta == null /*Root*/ || Meta.IsContainer;
 
     internal void ChangeMeta(DynamicWidgetMeta? meta, bool makeDefaultTarget)
     {
@@ -97,17 +97,17 @@ public sealed class DesignElement : Widget, IMouseRegion
             Child = Meta?.MakeDefaultInstance();
     }
 
-    /// <summary>
-    /// 用于包装的目标添加子组件
-    /// </summary>
-    public void AddChild(Widget child)
-    {
-        if (!IsContainer) throw new InvalidOperationException();
-        if (Meta == null || Child == null || Meta.ContainerType == ContainerType.SingleChildReversed)
-            throw new InvalidOperationException();
-
-        Meta.AddChild(Child, child);
-    }
+    // /// <summary>
+    // /// 用于包装的目标添加子组件
+    // /// </summary>
+    // public void AddChild(Widget child)
+    // {
+    //     if (!IsContainer) throw new InvalidOperationException();
+    //     if (Meta == null || Child == null || Meta.ContainerType == ContainerType.SingleChildReversed)
+    //         throw new InvalidOperationException();
+    //
+    //     Meta.AddChild(Child, child);
+    // }
 
     /// <summary>
     /// 构造参数改变后重新创建实例
@@ -167,48 +167,50 @@ public sealed class DesignElement : Widget, IMouseRegion
 
     public void OnDrop(DynamicWidgetMeta meta /*TODO: args for x, y*/)
     {
-        //先判断是否容器类型(暂特殊处理多子级的容器)
-        if (Meta?.ContainerType == ContainerType.MultiChild)
-        {
-            Widget childToBeAdded;
-            DesignElement childElement;
+        throw new NotImplementedException();
 
-            //TODO:暂简单特殊处理添加非Positioned至Stack内
-            if (Meta.WidgetType == typeof(Stack) && meta.WidgetType != typeof(Positioned))
-            {
-                childElement = new DesignElement(_controller, meta);
-                var positionedMeta = DynamicWidgetManager.GetByName(nameof(Positioned));
-                var positionedElement = new DesignElement(_controller, positionedMeta) { Child = childElement};
-                childToBeAdded = new Positioned { Child = positionedElement };
-            }
-            else if (meta.ContainerType == ContainerType.SingleChildReversed)
-            {
-                childToBeAdded = meta.MakeDefaultInstance();
-                childElement = new DesignElement(_controller, meta);
-                meta.AddChild(childToBeAdded, childElement);
-            }
-            else
-            {
-                childToBeAdded = childElement = new DesignElement(_controller, meta);
-            }
-
-            AddChild(childToBeAdded);
-            Invalidate(InvalidAction.Relayout);
-            _controller.Select(childElement);
-            return;
-        }
-
-        //判断是否反向包装
-        if (Meta?.ContainerType == ContainerType.SingleChildReversed)
-        {
-            var newChild = new DesignElement(_controller, meta);
-            Child = newChild;
-            _controller.Select(newChild);
-            return;
-        }
-
-        ChangeMeta(meta, true);
-        _controller.OnSelectionChanged(); //强制刷新属性面板
+        // //先判断是否容器类型(暂特殊处理多子级的容器)
+        // if (Meta?.ContainerType == ContainerType.MultiChild)
+        // {
+        //     Widget childToBeAdded;
+        //     DesignElement childElement;
+        //
+        //     //TODO:暂简单特殊处理添加非Positioned至Stack内
+        //     if (Meta.WidgetType == typeof(Stack) && meta.WidgetType != typeof(Positioned))
+        //     {
+        //         childElement = new DesignElement(_controller, meta);
+        //         var positionedMeta = DynamicWidgetManager.GetByName(nameof(Positioned));
+        //         var positionedElement = new DesignElement(_controller, positionedMeta) { Child = childElement};
+        //         childToBeAdded = new Positioned { Child = positionedElement };
+        //     }
+        //     else if (meta.ContainerType == ContainerType.SingleChildReversed)
+        //     {
+        //         childToBeAdded = meta.MakeDefaultInstance();
+        //         childElement = new DesignElement(_controller, meta);
+        //         meta.AddChild(childToBeAdded, childElement);
+        //     }
+        //     else
+        //     {
+        //         childToBeAdded = childElement = new DesignElement(_controller, meta);
+        //     }
+        //
+        //     AddChild(childToBeAdded);
+        //     Invalidate(InvalidAction.Relayout);
+        //     _controller.Select(childElement);
+        //     return;
+        // }
+        //
+        // //判断是否反向包装
+        // if (Meta?.ContainerType == ContainerType.SingleChildReversed)
+        // {
+        //     var newChild = new DesignElement(_controller, meta);
+        //     Child = newChild;
+        //     _controller.Select(newChild);
+        //     return;
+        // }
+        //
+        // ChangeMeta(meta, true);
+        // _controller.OnSelectionChanged(); //强制刷新属性面板
     }
 
     #endregion

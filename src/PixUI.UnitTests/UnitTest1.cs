@@ -31,7 +31,8 @@ public class Tests
     {
         var s = new School() { Code = 123 };
         //s.Code = 256; //Error
-
+        // var s3 = new School(3); //Error
+        
         var type = typeof(School);
         var s2 = Activator.CreateInstance(type);
         var codePropInfo = type.GetProperty("Code");
@@ -68,6 +69,13 @@ internal class Person //: IDynamicMetaObjectProvider
 
 internal class School
 {
+    public School() { }
+
+    public School(int code)
+    {
+        Code = code;
+    }
+
     public required int Code { get; init; }
 }
 

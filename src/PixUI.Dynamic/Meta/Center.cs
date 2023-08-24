@@ -2,13 +2,11 @@ namespace PixUI.Dynamic;
 
 partial class DynamicWidgetManager
 {
-    private static DynamicWidgetMeta MakeCenterMeta() => new()
-    {
-        Catelog = "Layout",
-        Name = "Center",
-        WidgetType = typeof(Center),
-        ContainerType = ContainerType.SingleChild,
-        Icon = MaterialIcons.CenterFocusStrong,
-        AddChildAction = (parent, child) => ((Center)parent).Child = child,
-    };
+    private static DynamicWidgetMeta MakeCenterMeta() => new(
+        "Layout", "Center", typeof(Center), MaterialIcons.CenterFocusStrong,
+        slots: new ContainerSlot[]
+        {
+            new(nameof(Center.Child), ContainerType.SingleChild)
+        }
+    );
 }

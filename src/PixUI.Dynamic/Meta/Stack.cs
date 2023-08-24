@@ -4,36 +4,26 @@ namespace PixUI.Dynamic;
 
 partial class DynamicWidgetManager
 {
-    private static DynamicWidgetMeta MakeStackMeta() => new()
-    {
-        Catelog = "Layout",
-        Name = "Stack",
-        WidgetType = typeof(Stack),
-        ContainerType = ContainerType.MultiChild,
-        Icon = MaterialIcons.Layers,
-        AddChildAction = (parent, child) =>
+    private static DynamicWidgetMeta MakeStackMeta() => new(
+        "Layout", "Stack", typeof(Stack), MaterialIcons.Layers,
+        slots: new ContainerSlot[]
         {
-            var stack = (Stack)parent;
-            if (child is Positioned positioned)
-                stack.Children.Add(positioned);
-            else
-                throw new NotSupportedException("Only Positioned can be add to Stack");
+            new(nameof(Stack.Children), ContainerType.MultiChild)
         }
-    };
+    );
 
-    private static DynamicWidgetMeta MakePositionedMeta() => new()
-    {
-        Name = "Positioned",
-        WidgetType = typeof(Positioned),
-        ContainerType = ContainerType.SingleChildReversed,
-        Icon = MaterialIcons.PictureInPicture,
-        AddChildAction = (parent, child) => ((Positioned)parent).Child = child,
-        Properties = new DynamicPropertyMeta[]
+    private static DynamicWidgetMeta MakePositionedMeta() => new(
+        string.Empty, "Positioned", typeof(Positioned), MaterialIcons.PictureInPicture,
+        properties: new DynamicPropertyMeta[]
         {
             new(nameof(Positioned.Left), typeof(State<float>), true),
             new(nameof(Positioned.Top), typeof(State<float>), true),
             new(nameof(Positioned.Right), typeof(State<float>), true),
             new(nameof(Positioned.Bottom), typeof(State<float>), true),
+        },
+        slots: new ContainerSlot[]
+        {
+            new(nameof(Positioned.Child), ContainerType.SingleChildReversed)
         }
-    };
+    );
 }

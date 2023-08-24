@@ -9,42 +9,57 @@ namespace PixUI.Dynamic;
 /// </summary>
 public sealed class DynamicWidgetMeta
 {
+    public DynamicWidgetMeta(string catalog, string name, Type widgetType, IconData icon,
+        DynamicCtorArgMeta[]? ctorArgs = null,
+        DynamicPropertyMeta[]? properties = null,
+        DynamicEventMeta[]? events = null,
+        ContainerSlot[]? slots = null)
+    {
+        Catelog = catalog;
+        Name = name;
+        WidgetType = widgetType;
+        Icon = icon;
+        CtorArgs = ctorArgs;
+        Properties = properties;
+        Events = events;
+        Slots = slots;
+    }
+
     /// <summary>
     /// 工具箱显示的分类 eg: Charts
     /// </summary>
-    public string Catelog { get; set; } = string.Empty;
-
-    public bool ShowOnToolbox => Catelog != string.Empty;
+    public readonly string Catelog;
 
     /// <summary>
     /// 工具箱显示的名称(惟一性) eg: PieChart
     /// </summary>
-    public string Name { get; set; } = null!;
+    public readonly string Name;
 
-    public IconData Icon { get; set; }
+    public readonly IconData Icon;
+    public readonly Type WidgetType;
+    public readonly DynamicCtorArgMeta[]? CtorArgs;
+    public readonly DynamicPropertyMeta[]? Properties;
+    public readonly DynamicEventMeta[]? Events;
+    public readonly ContainerSlot[]? Slots;
 
-    public Type WidgetType { get; set; } = null!;
+    public bool ShowOnToolbox => Catelog != string.Empty;
+    public bool IsContainer => Slots is { Length: > 0 };
 
-    public ContainerType ContainerType { get; set; }
+    public bool IsReversedWrapElement => Slots is { Length: 1 } &&
+                                         Slots[0].ContainerType == ContainerType.SingleChildReversed;
 
-    public DynamicCtorArgMeta[]? CtorArgs { get; set; }
-
-    public DynamicPropertyMeta[]? Properties { get; set; }
-
-    public DynamicEventMeta[]? Events { get; set; }
-
-    public Action<Widget, Widget>? AddChildAction { get; set; }
-
-    public void AddChild(Widget parent, Widget child)
-    {
-        if (AddChildAction != null)
-        {
-            AddChildAction(parent, child);
-            return;
-        }
-
-        throw new NotImplementedException();
-    }
+    // public Action<Widget, Widget>? AddChildAction { get; set; }
+    //
+    // public void AddChild(Widget parent, Widget child)
+    // {
+    //     if (AddChildAction != null)
+    //     {
+    //         AddChildAction(parent, child);
+    //         return;
+    //     }
+    //
+    //     throw new NotImplementedException();
+    // }
 
     /// <summary>
     /// 根据名称查找属性定义，找不到报错
@@ -173,5 +188,10 @@ public sealed class DynamicPropertyMeta
 
 public sealed class DynamicEventMeta
 {
-    public string Name { get; set; }
+    public DynamicEventMeta(string name)
+    {
+        Name = name;
+    }
+
+    public readonly string Name;
 }
