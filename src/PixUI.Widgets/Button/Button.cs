@@ -4,11 +4,8 @@ namespace PixUI;
 
 public sealed class Button : Widget, IMouseRegion, IFocusable
 {
-    public Button(State<string>? text = null, State<IconData>? icon = null)
+    public Button()
     {
-        _text = text;
-        _icon = icon;
-
         Height = DefaultHeight; //TODO: 默认字体高+padding
 
         MouseRegion = new MouseRegion(() => Cursors.Hand);
@@ -20,16 +17,24 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         _hoverDecoration.AttachHoverChangedEvent(this);
     }
 
+    public Button(State<string>? text = null, State<IconData>? icon = null) : this()
+    {
+        Text = text;
+        Icon = icon;
+    }
+
     internal const float DefaultHeight = 30;
     internal const float StandardRadius = 4;
 
-    private State<string>? _text;
-    private State<IconData>? _icon;
     private State<float>? _outlineWidth;
     private State<Color>? _textColor;
     private State<float>? _fontSize;
 
     private bool _drawMask;
+
+    public State<string>? Text { get; init; } = "Button";
+
+    public State<IconData>? Icon { get; init; }
 
     public ButtonStyle Style { get; set; } = ButtonStyle.Solid;
     public ButtonShape Shape { get; set; } = ButtonShape.Standard;
@@ -145,22 +150,22 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
 
     private void TryBuildContent()
     {
-        if (_text == null && _icon == null) return;
+        if (Text == null && Icon == null) return;
 
         if (_textColor == null)
         {
             _textColor = Style == ButtonStyle.Solid ? Colors.White : Colors.Black;
         }
 
-        if (_text != null && _textWidget == null)
+        if (Text != null && _textWidget == null)
         {
-            _textWidget = new Text(_text) { TextColor = _textColor, FontSize = _fontSize };
+            _textWidget = new Text(Text) { TextColor = _textColor, FontSize = _fontSize };
             _textWidget.Parent = this;
         }
 
-        if (_icon != null && _iconWidget == null)
+        if (Icon != null && _iconWidget == null)
         {
-            _iconWidget = new Icon(_icon) { Color = _textColor, Size = _fontSize };
+            _iconWidget = new Icon(Icon) { Color = _textColor, Size = _fontSize };
             _iconWidget.Parent = this;
         }
     }
@@ -256,9 +261,9 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
 
     public override string ToString()
     {
-        if (DebugLabel != null || _text == null)
+        if (DebugLabel != null || Text == null)
             return base.ToString();
-        return $"{nameof(Button)}[\"{_text.Value}\"]";
+        return $"{nameof(Button)}[\"{Text.Value}\"]";
     }
 
     protected override void OnUnmounted()
