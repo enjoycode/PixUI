@@ -213,23 +213,24 @@ public sealed class DesignElement : Widget, IMouseRegion
                 Invalidate(InvalidAction.Relayout);
                 _controller.Select(childElement);
             }
-            return;
         }
-
-        throw new NotImplementedException();
-
-
-        // //判断是否反向包装
-        // if (Meta?.ContainerType == ContainerType.SingleChildReversed)
-        // {
-        //     var newChild = new DesignElement(_controller, meta);
-        //     Child = newChild;
-        //     _controller.Select(newChild);
-        //     return;
-        // }
-        //
-        // ChangeMeta(meta, true);
-        // _controller.OnSelectionChanged(); //强制刷新属性面板
+        else if (defaultSlot.ContainerType == ContainerType.SingleChild)
+        {
+            var newChild = new DesignElement(_controller, meta, defaultSlot.PropertyName);
+            if (defaultSlot.TrySetChild(Target!, newChild))
+            {
+                Invalidate(InvalidAction.Relayout);
+                _controller.Select(newChild);
+            }
+        }
+        else
+        {
+            //eg: drop widget to Positioned, check it, should never be here!
+            throw new NotImplementedException();
+            // var newChild = new DesignElement(_controller, meta, parentChildrenPropName);
+            // Child = newChild;
+            // _controller.Select(newChild);
+        }
     }
 
     #endregion
