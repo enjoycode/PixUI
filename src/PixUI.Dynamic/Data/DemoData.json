@@ -1,33 +1,16 @@
-[
-  {
-    "State": [
-      { "Name": "title", "Type": "System.String", "Value": "Click Me" }
-    ],
-    "View": {
-      "Type": "Center",
-      "Child": {
-        "Type": "Button",
-        "CtorArgs": [ { "State": "title" }, { "Const": null } ],
-        "Properties": { "TextColor": { "Const": "00FF0000" } },
-        "Events": {
-          "OnTap": { "Handler": "SetState", "Name": "title", "Value": "Clicked" }
-        }
-      }
-    }
+{
+  "State": {
+    "title": { "Type": "System.String", "Value": "Click Me" }
   },
-  {
-    "State": [
-      { "Name": "title", "Type": "System.String", "Value": "Click Me" }
-    ],
-    "Root": {
-      "Type": { "Id": "Center" },
-      "Child": {
-        "Type": { "Id": "Button", "Args": [ { "State": "title" }, { "Const": null } ] },
-        "TextColor": { "Const": "00FF0000" },
-        "Events": {
-          "OnTap": { "Handler": "SetState", "Name": "title", "Value": "Clicked" }
-        }
+  "Root": {
+    "Type": "Center",
+    "Child": {
+      "Type": "Button",
+      "Text": { "Const": "按钮" },
+      "TextColor": { "Const": "00FF0000" },
+      "Events": {
+        "OnTap": { "Handler": "SetState", "Name": "title", "Value": "Clicked" }
       }
     }
   }
-]
+}
