@@ -1,5 +1,5 @@
 using System;
-using System.Reflection;
+using System.Linq;
 
 namespace PixUI.Dynamic.Design;
 
@@ -32,7 +32,7 @@ public sealed class DesignElement : Widget, IMouseRegion
     private DesignElement(DesignController controller, DynamicWidgetMeta meta, string slotName) : this(controller,
         slotName)
     {
-        if (slotName == String.Empty)
+        if (slotName == string.Empty)
             throw new ArgumentNullException(nameof(slotName));
 
         ChangeMeta(meta, !meta.IsReversedWrapElement);
@@ -96,13 +96,25 @@ public sealed class DesignElement : Widget, IMouseRegion
 
     public bool IsContainer => Meta == null /*Root*/ || Meta.IsContainer;
 
-    internal void ChangeMeta(DynamicWidgetMeta? meta, bool makeDefaultTarget)
+    private void ChangeMeta(DynamicWidgetMeta? meta, bool makeDefaultTarget)
     {
         Meta = meta;
         Data.Type = Meta == null ? string.Empty : Meta.Name;
+        Data.Properties?.Clear();
         MouseRegion.Opaque = !IsContainer;
         if (makeDefaultTarget || (Meta == null && Child != null))
+        {
             Child = Meta?.CreateInstance();
+            if (Child != null && Meta!.Properties != null) //设置设计时初始化属性值
+            {
+                var initProps = Meta.Properties.Where(p => p.InitValue != null);
+                foreach (var prop in initProps)
+                {
+                    var propValue = Data.SetPropertyValue(prop.Name, prop.InitValue!.Value);
+                    SetPropertyValue(propValue);
+                }
+            }
+        }
     }
 
     /// <summary>

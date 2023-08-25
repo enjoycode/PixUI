@@ -142,12 +142,12 @@ public sealed class DynamicWidgetMeta
 
 public sealed class DynamicPropertyMeta
 {
-    public DynamicPropertyMeta(string name, Type runtimeType, bool allowNull, bool initSetter = false, DynamicValue? defaultValue = null)
+    public DynamicPropertyMeta(string name, Type runtimeType, bool allowNull, bool initSetter = false, DynamicValue? initValue = null)
     {
         Name = name;
         AllowNull = allowNull;
         IsInitSetter = initSetter;
-        DefaultValue = defaultValue;
+        InitValue = initValue;
         //判断是否状态类型
         if (typeof(State).IsAssignableFrom(runtimeType))
         {
@@ -173,7 +173,10 @@ public sealed class DynamicPropertyMeta
     public readonly bool AllowNull;
     public readonly bool IsInitSetter;
     public readonly bool IsState;
-    public readonly DynamicValue? DefaultValue;
+    /// <summary>
+    /// 仅用于设计时创建实例时的初始化值
+    /// </summary>
+    public readonly DynamicValue? InitValue;
 
     public object? GetRuntimeValue(in DynamicValue source /*, IDynamicStateProvider stateProvider*/)
     {

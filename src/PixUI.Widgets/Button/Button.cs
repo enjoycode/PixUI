@@ -32,7 +32,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
 
     private bool _drawMask;
 
-    public State<string>? Text { get; init; } = "Button";
+    public State<string>? Text { get; init; }
 
     public State<IconData>? Icon { get; init; }
 

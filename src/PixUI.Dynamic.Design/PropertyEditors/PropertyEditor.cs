@@ -41,29 +41,6 @@ public sealed class PropertyEditor : Widget
         }
     }
 
-//     /// <summary>
-//     /// 新建构造参数编辑器
-//     /// </summary>
-//     public PropertyEditor(DesignElement element, DynamicCtorArgMeta ctorArgMeta)
-//     {
-// #if DEBUG
-//         DebugLabel = ctorArgMeta.Name;
-// #endif
-//
-//         var valueType = GetValueType(ctorArgMeta.Value);
-//         _targetEditor = GetCtorArgValueEditor(valueType, element, ctorArgMeta, out var editingValue);
-//         _targetEditor.Parent = this;
-//         EditingValue = editingValue;
-//
-//         if (ctorArgMeta.Value.IsState)
-//             _bindButton = BuildBindButton();
-//         if (ctorArgMeta.AllowNull)
-//         {
-//             _deleteButton = BuildDeleteButton();
-//             _deleteButton.OnTap = _ => DeleteCtorArgValue(element, ctorArgMeta, editingValue);
-//         }
-//     }
-
     private readonly Widget _targetEditor;
     private readonly Button? _deleteButton;
     private readonly Button? _bindButton;
@@ -132,10 +109,6 @@ public sealed class PropertyEditor : Widget
         var editor = new ValueEditorInfo(
             typeof(TEditor).Name, isDefault, typeof(TValue),
             CreateEditorMaker(valueType, typeof(TEditor)),
-            // (element, ctorArgMeta, index) => new RxProxy<TValue?>(
-            //     () => (TValue?)GetCtorArgValue(element, ctorArgMeta, index),
-            //     newValue => SetCtorArgValue(element, ctorArgMeta, index, newValue)
-            // ),
             (element, propertyMeta) => new RxProxy<TValue?>(
                 () => (TValue?)GetPropertyValue(element, propertyMeta),
                 newValue => SetPropertyValue(element, propertyMeta, newValue)
@@ -152,10 +125,6 @@ public sealed class PropertyEditor : Widget
         var editor = new ValueEditorInfo(
             typeof(TEditor).Name, isDefault, typeof(TValue),
             CreateEditorMaker(typeof(TValue), typeof(TEditor)),
-            // (element, ctorArgMeta, index) => new RxProxy<TValue?>(
-            //     () => (TValue?)GetCtorArgValue(element, ctorArgMeta, index),
-            //     newValue => SetCtorArgValue(element, ctorArgMeta, index, newValue)
-            // ),
             (element, propertyMeta) => new RxProxy<TValue?>(
                 () => (TValue?)GetPropertyValue(element, propertyMeta),
                 newValue => SetPropertyValue(element, propertyMeta, newValue)
@@ -170,56 +139,6 @@ public sealed class PropertyEditor : Widget
     /// </summary>
     private static ValueEditorInfo? TryGetValueEditorByValueType(Type valueType) =>
         _valueEditors.FirstOrDefault(e => e.IsDefault && e.ValueType == valueType);
-
-    #endregion
-
-    #region ====CtorArgValue====
-
-    // private static Widget GetCtorArgValueEditor(Type valueType, DesignElement element, DynamicCtorArgMeta ctorArgMeta,
-    //     out State? editingValue)
-    // {
-    //     //TODO:先判断是否指定编辑器
-    //
-    //     //获取注册的编辑器信息
-    //     var editorInfo = TryGetValueEditorByValueType(valueType);
-    //     if (editorInfo == null)
-    //     {
-    //         //TODO:
-    //         editingValue = null;
-    //         return new TextInput("None");
-    //     }
-    //
-    //     var index = Array.IndexOf(element.Meta!.CtorArgs!, ctorArgMeta);
-    //     editingValue = editorInfo.CtorArgStateMaker(element, ctorArgMeta, index);
-    //     return editorInfo.EditorMaker(editingValue);
-    // }
-
-    // private static object? GetCtorArgValue(DesignElement element, DynamicCtorArgMeta ctorArgMeta, int index)
-    // {
-    //     var exists = element.Data.TryGetCtorArgValue(index);
-    //     if (exists != null)
-    //     {
-    //         if (exists.Value.From != ValueSource.Const) throw new NotImplementedException();
-    //         return exists.Value.Value;
-    //     }
-    //
-    //     return ctorArgMeta.Value.DefaultValue?.Value;
-    // }
-
-    // private static void SetCtorArgValue(DesignElement element, DynamicCtorArgMeta ctorArgMeta, int index,
-    //     object? newValue)
-    // {
-    //     var dynamicValue = new DynamicValue { From = ValueSource.Const, Value = newValue };
-    //     element.Data.SetCtorArgValue(dynamicValue, index, element.Meta!.CtorArgs!.Length);
-    //     element.OnCtorArgValueChanged();
-    // }
-    //
-    // private static void DeleteCtorArgValue(DesignElement element, DynamicCtorArgMeta ctorArgMeta, State? editingValue)
-    // {
-    //     SetCtorArgValue(element, ctorArgMeta, Array.IndexOf(element.Meta!.CtorArgs!, ctorArgMeta), null);
-    //     //TODO: 考虑恢复默认值
-    //     editingValue?.NotifyValueChanged();
-    // }
 
     #endregion
 
@@ -258,8 +177,10 @@ public sealed class PropertyEditor : Widget
             if (currentValue!.Value.From != ValueSource.Const) throw new NotImplementedException();
             return currentValue.Value.Value;
         }
+        
+        //TODO: none nullable get default value
 
-        return propertyMeta.DefaultValue?.Value;
+        return null;
     }
 
     /// <summary>
