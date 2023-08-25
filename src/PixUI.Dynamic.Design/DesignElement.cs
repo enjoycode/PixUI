@@ -11,16 +11,17 @@ public sealed class DesignElement : Widget, IMouseRegion
     /// <summary>
     /// Ctor for Root DesignElement or Deserialize
     /// </summary>
-    public DesignElement(DesignController controller, bool isRoot = false)
+    public DesignElement(DesignController controller, string slotName)
     {
         _controller = controller;
+        _slotName = slotName;
         MouseRegion = new MouseRegion(opaque: false);
         MouseRegion.PointerDown += OnPointerDown;
         MouseRegion.PointerMove += OnPointerMove;
 
-        if (isRoot)
+        if (_slotName == string.Empty)
         {
-            controller.RootElement = this;
+            _controller.RootElement = this;
             DebugLabel = "Root";
         }
     }
@@ -28,8 +29,12 @@ public sealed class DesignElement : Widget, IMouseRegion
     /// <summary>
     /// Ctor for designtime
     /// </summary>
-    private DesignElement(DesignController controller, DynamicWidgetMeta meta) : this(controller)
+    private DesignElement(DesignController controller, DynamicWidgetMeta meta, string slotName) : this(controller,
+        slotName)
     {
+        if (slotName == String.Empty)
+            throw new ArgumentNullException(nameof(slotName));
+
         ChangeMeta(meta, !meta.IsReversedWrapElement);
     }
 
@@ -37,6 +42,7 @@ public sealed class DesignElement : Widget, IMouseRegion
         TextPainter.BuildParagraph("Drop Here", float.PositiveInfinity, 16, Colors.Gray));
 
     private readonly DesignController _controller;
+    private readonly string _slotName;
     private bool _isSelected;
     private Widget? _child;
 
@@ -86,6 +92,8 @@ public sealed class DesignElement : Widget, IMouseRegion
         }
     }
 
+    private bool IsRoot => ReferenceEquals(this, _controller.RootElement);
+
     public bool IsContainer => Meta == null /*Root*/ || Meta.IsContainer;
 
     internal void ChangeMeta(DynamicWidgetMeta? meta, bool makeDefaultTarget)
@@ -94,30 +102,18 @@ public sealed class DesignElement : Widget, IMouseRegion
         Data.Type = Meta == null ? string.Empty : Meta.Name;
         MouseRegion.Opaque = !IsContainer;
         if (makeDefaultTarget || (Meta == null && Child != null))
-            Child = Meta?.MakeDefaultInstance();
+            Child = Meta?.CreateInstance();
     }
 
-    // /// <summary>
-    // /// 用于包装的目标添加子组件
-    // /// </summary>
-    // public void AddChild(Widget child)
-    // {
-    //     if (!IsContainer) throw new InvalidOperationException();
-    //     if (Meta == null || Child == null || Meta.ContainerType == ContainerType.SingleChildReversed)
-    //         throw new InvalidOperationException();
-    //
-    //     Meta.AddChild(Child, child);
-    // }
-
     /// <summary>
-    /// 构造参数改变后重新创建实例
+    /// 初始化属性的值改变后重新创建实例
     /// </summary>
-    public void OnCtorArgValueChanged()
+    internal void OnInitPropertyValueChanged()
     {
         if (Meta == null) throw new Exception();
 
-        var newTarget = Data.CtorArgs == null ? Meta.MakeDefaultInstance() : Meta.MakeInstance(Data.CtorArgs);
-        Child = newTarget;
+        var newTarget = Meta.CreateInstance();
+        Child = newTarget; //set Child before reset properties
 
         //重设属性值
         if (Data.Properties != null)
@@ -129,17 +125,23 @@ public sealed class DesignElement : Widget, IMouseRegion
         }
     }
 
+    /// <summary>
+    /// 设置目标组件的运行时属性值
+    /// </summary>
     public void SetPropertyValue(PropertyValue propertyValue)
     {
         if (Meta == null || Target == null) throw new Exception();
 
         //TODO: emit 优化，暂用反射
         var propMeta = Meta.GetPropertyMeta(propertyValue.Name);
-        var propValue = propMeta.Value.GetRuntimeValue(propertyValue.Value);
+        var propValue = propMeta.GetRuntimeValue(propertyValue.Value);
         var propInfo = Meta.WidgetType.GetProperty(propertyValue.Name);
         propInfo!.SetValue(Target, propValue);
     }
 
+    /// <summary>
+    /// 移除目标组件的运行时属性值（如果可以为空）
+    /// </summary>
     public void RemovePropertyValue(string name)
     {
         if (Meta == null || Target == null) throw new Exception();
@@ -167,39 +169,56 @@ public sealed class DesignElement : Widget, IMouseRegion
 
     public void OnDrop(DynamicWidgetMeta meta /*TODO: args for x, y*/)
     {
+        //是否根节点或占位的Slot, eg: HSplitter的Left slot or Right slot
+        if (Meta == null)
+        {
+            ChangeMeta(meta, true);
+            _controller.OnSelectionChanged(); //强制刷新属性面板
+            return;
+        }
+
+        //非容器退出
+        if (!Meta.IsContainer) return;
+
+        //获取默认的Slot
+        var defaultSlot = Meta.Slots![0];
+        if (defaultSlot.ContainerType == ContainerType.MultiChild)
+        {
+            Widget childToBeAdded;
+            DesignElement childElement;
+
+            //TODO:暂简单特殊处理添加非Positioned至Stack内
+            if (Meta.WidgetType == typeof(Stack) && meta.WidgetType != typeof(Positioned))
+            {
+                childElement = new DesignElement(_controller, meta, nameof(Positioned.Child));
+                var positionedMeta = DynamicWidgetManager.GetByName(nameof(Positioned));
+                var positionedElement = new DesignElement(_controller, positionedMeta, defaultSlot.PropertyName)
+                    { Child = childElement };
+                childToBeAdded = new Positioned { Child = positionedElement };
+            }
+            else if (meta.IsReversedWrapElement)
+            {
+                throw new NotImplementedException();
+                // childToBeAdded = meta.CreateInstance();
+                // childElement = new DesignElement(_controller, meta, defaultSlot.PropertyName);
+                // meta.AddChild(childToBeAdded, childElement);
+            }
+            else
+            {
+                childToBeAdded = childElement = new DesignElement(_controller, meta, defaultSlot.PropertyName);
+            }
+
+            if (defaultSlot.TryAddChild(Target!, childToBeAdded))
+            {
+                Invalidate(InvalidAction.Relayout);
+                _controller.Select(childElement);
+            }
+            return;
+        }
+
         throw new NotImplementedException();
 
-        // //先判断是否容器类型(暂特殊处理多子级的容器)
-        // if (Meta?.ContainerType == ContainerType.MultiChild)
-        // {
-        //     Widget childToBeAdded;
-        //     DesignElement childElement;
-        //
-        //     //TODO:暂简单特殊处理添加非Positioned至Stack内
-        //     if (Meta.WidgetType == typeof(Stack) && meta.WidgetType != typeof(Positioned))
-        //     {
-        //         childElement = new DesignElement(_controller, meta);
-        //         var positionedMeta = DynamicWidgetManager.GetByName(nameof(Positioned));
-        //         var positionedElement = new DesignElement(_controller, positionedMeta) { Child = childElement};
-        //         childToBeAdded = new Positioned { Child = positionedElement };
-        //     }
-        //     else if (meta.ContainerType == ContainerType.SingleChildReversed)
-        //     {
-        //         childToBeAdded = meta.MakeDefaultInstance();
-        //         childElement = new DesignElement(_controller, meta);
-        //         meta.AddChild(childToBeAdded, childElement);
-        //     }
-        //     else
-        //     {
-        //         childToBeAdded = childElement = new DesignElement(_controller, meta);
-        //     }
-        //
-        //     AddChild(childToBeAdded);
-        //     Invalidate(InvalidAction.Relayout);
-        //     _controller.Select(childElement);
-        //     return;
-        // }
-        //
+
         // //判断是否反向包装
         // if (Meta?.ContainerType == ContainerType.SingleChildReversed)
         // {

@@ -13,7 +13,7 @@ public sealed class DesignCanvas : View
                 Elevation = 10,
                 Child = new Transform(Matrix4.CreateIdentity())
                 {
-                    Child = new DesignElement(controller, true)
+                    Child = new DesignElement(controller, string.Empty)
                 }
             }
         };

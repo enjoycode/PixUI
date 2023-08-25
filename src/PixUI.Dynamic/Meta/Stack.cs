@@ -4,16 +4,18 @@ namespace PixUI.Dynamic;
 
 partial class DynamicWidgetManager
 {
-    private static DynamicWidgetMeta MakeStackMeta() => new(
-        "Layout", "Stack", typeof(Stack), MaterialIcons.Layers,
+    private static DynamicWidgetMeta MakeStackMeta() => DynamicWidgetMeta.Make<Stack>(
+        MaterialIcons.Layers,
+        catalog: "Layout",
         slots: new ContainerSlot[]
         {
             new(nameof(Stack.Children), ContainerType.MultiChild)
         }
     );
 
-    private static DynamicWidgetMeta MakePositionedMeta() => new(
-        string.Empty, "Positioned", typeof(Positioned), MaterialIcons.PictureInPicture,
+    private static DynamicWidgetMeta MakePositionedMeta() => DynamicWidgetMeta.Make<Positioned>(
+        MaterialIcons.PictureInPicture,
+        catalog: string.Empty,
         properties: new DynamicPropertyMeta[]
         {
             new(nameof(Positioned.Left), typeof(State<float>), true),

@@ -99,7 +99,7 @@ public struct DynamicValue
         writer.WriteEndObject();
     }
 
-    public static DynamicValue Read(ref Utf8JsonReader reader, DynamicValueMeta valueMeta)
+    public static DynamicValue Read(ref Utf8JsonReader reader, DynamicPropertyMeta valueMeta)
     {
         var v = new DynamicValue();
 

@@ -72,13 +72,13 @@ public sealed class PropertyPanel : SingleChildWidget
     private void BuildWidgetGroup(DesignElement element, DynamicWidgetMeta meta)
     {
         var widgetGroupItems = new List<FormItem> { new("Type:", new Text(meta.Name)) };
-        if (meta.CtorArgs is { Length: > 0 })
-        {
-            foreach (var ctorArgMeta in meta.CtorArgs)
-            {
-                widgetGroupItems.Add(new FormItem($"{ctorArgMeta.Name}:", new PropertyEditor(element, ctorArgMeta)));
-            }
-        }
+        // if (meta.CtorArgs is { Length: > 0 })
+        // {
+        //     foreach (var ctorArgMeta in meta.CtorArgs)
+        //     {
+        //         widgetGroupItems.Add(new FormItem($"{ctorArgMeta.Name}:", new PropertyEditor(element, ctorArgMeta)));
+        //     }
+        // }
 
         _widgetGroup.SetItems(widgetGroupItems);
     }

@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Linq.Expressions;
+using System.Reflection;
 using NUnit.Framework;
 
 namespace PixUI.UnitTests;
@@ -24,6 +26,36 @@ public class Tests
         Assert.True(float.IsNaN(n));
 
         Assert.Pass();
+    }
+
+    [Test]
+    public void EmitTest()
+    {
+        var parent = new Stack();
+        var child = new Positioned();
+        //parent.Children.Add(child);
+
+        var parentType = parent.GetType();
+        var childrenPropInfo = parentType.GetProperty(nameof(Stack.Children));
+        var listType = childrenPropInfo!.PropertyType;
+        var itemType = typeof(Widget);
+        if (listType.IsGenericType)
+            itemType = listType.GenericTypeArguments[0];
+        var addMethod = typeof(ICollection<>).MakeGenericType(itemType).GetMethod("Add");
+        
+        var parentArg = Expression.Parameter(typeof(Widget));
+        var childArg = Expression.Parameter(typeof(Widget));
+        var convertedParent = Expression.Convert(parentArg, parentType);
+        var convertedChild = Expression.Convert(childArg, itemType);
+        var childrenMember = Expression.MakeMemberAccess(convertedParent, childrenPropInfo);
+        // var childrenCount = Expression.Property(childrenMember, "Count");
+        var expression = Expression.Lambda<Action<Widget, Widget>>(
+            // Expression.Call(childrenMember, addMethod!,  convertedChild), parentArg, childArg
+            Expression.Call(childrenMember, "Add", null, convertedChild), parentArg, childArg
+        );
+        var action = expression.Compile();
+
+        action(parent, child);
     }
 
     [Test]
