@@ -75,6 +75,13 @@ public sealed class DynamicWidgetMeta
         return Properties.First(p => p.Name == name);
     }
 
+    public ContainerSlot GetSlot(string name)
+    {
+        if (!IsContainer) 
+            throw new Exception($"[{WidgetType.Name}] can't get slot [{name}]");
+        return Slots!.First(s => s.PropertyName == name);
+    }
+
     /// <summary>
     /// 创建目标组件的实例
     /// </summary>
@@ -142,7 +149,8 @@ public sealed class DynamicWidgetMeta
 
 public sealed class DynamicPropertyMeta
 {
-    public DynamicPropertyMeta(string name, Type runtimeType, bool allowNull, bool initSetter = false, DynamicValue? initValue = null)
+    public DynamicPropertyMeta(string name, Type runtimeType, bool allowNull, bool initSetter = false,
+        DynamicValue? initValue = null)
     {
         Name = name;
         AllowNull = allowNull;
@@ -173,6 +181,7 @@ public sealed class DynamicPropertyMeta
     public readonly bool AllowNull;
     public readonly bool IsInitSetter;
     public readonly bool IsState;
+
     /// <summary>
     /// 仅用于设计时创建实例时的初始化值
     /// </summary>

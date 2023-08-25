@@ -7,6 +7,7 @@
   &lt;TestAncestor&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.Dynamic.ContainerTest.AddChildTest&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.Dynamic.ContainerTest.SetChildTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.Dynamic.ContainerTest.AddAndRemoveChildTest&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a58cc5d0_002D5832_002D407a_002Db44b_002D89255f8aa24a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="FindTypefaceTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;

@@ -6,13 +6,16 @@ namespace PixUI.UnitTests.Dynamic;
 public class ContainerTest
 {
     [Test]
-    public void AddChildTest()
+    public void AddAndRemoveChildTest()
     {
         var parent = new Stack();
         var child = new Positioned();
         var slot = new ContainerSlot(nameof(Stack.Children), ContainerType.MultiChild);
         slot.AddChild(parent, child);
         Assert.True(ReferenceEquals(parent.Children[0], child));
+        
+        slot.RemoveChild(parent, child);
+        Assert.True(parent.Children.Count == 0);
     }
 
     [Test]

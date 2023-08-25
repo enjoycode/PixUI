@@ -14,12 +14,12 @@ public sealed class DesignElement : Widget, IMouseRegion
     public DesignElement(DesignController controller, string slotName)
     {
         _controller = controller;
-        _slotName = slotName;
+        SlotName = slotName;
         MouseRegion = new MouseRegion(opaque: false);
         MouseRegion.PointerDown += OnPointerDown;
         MouseRegion.PointerMove += OnPointerMove;
 
-        if (_slotName == string.Empty)
+        if (SlotName == string.Empty)
         {
             _controller.RootElement = this;
             DebugLabel = "Root";
@@ -29,8 +29,8 @@ public sealed class DesignElement : Widget, IMouseRegion
     /// <summary>
     /// Ctor for designtime
     /// </summary>
-    private DesignElement(DesignController controller, DynamicWidgetMeta meta, string slotName) : this(controller,
-        slotName)
+    private DesignElement(DesignController controller, DynamicWidgetMeta meta, string slotName)
+        : this(controller, slotName)
     {
         if (slotName == string.Empty)
             throw new ArgumentNullException(nameof(slotName));
@@ -42,9 +42,13 @@ public sealed class DesignElement : Widget, IMouseRegion
         TextPainter.BuildParagraph("Drop Here", float.PositiveInfinity, 16, Colors.Gray));
 
     private readonly DesignController _controller;
-    private readonly string _slotName;
     private bool _isSelected;
     private Widget? _child;
+
+    /// <summary>
+    /// 当前针对上级的Slot属性名
+    /// </summary>
+    internal string SlotName { get; }
 
     public DynamicWidgetMeta? Meta { get; private set; }
 
@@ -92,11 +96,11 @@ public sealed class DesignElement : Widget, IMouseRegion
         }
     }
 
-    private bool IsRoot => ReferenceEquals(this, _controller.RootElement);
+    internal bool IsRoot => ReferenceEquals(this, _controller.RootElement);
 
     public bool IsContainer => Meta == null /*Root*/ || Meta.IsContainer;
 
-    private void ChangeMeta(DynamicWidgetMeta? meta, bool makeDefaultTarget)
+    internal void ChangeMeta(DynamicWidgetMeta? meta, bool makeDefaultTarget)
     {
         Meta = meta;
         Data.Type = Meta == null ? string.Empty : Meta.Name;

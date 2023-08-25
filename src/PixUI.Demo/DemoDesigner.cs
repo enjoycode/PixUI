@@ -24,7 +24,8 @@ public sealed class DemoDesigner : View
                         {
                             new Button("Load") { OnTap = OnLoad },
                             new Button("Save"),
-                            new Button("Test") { OnTap = OnTest },
+                            new Button("Add") { OnTap = OnAdd },
+                            new Button("Remove") {OnTap = OnRemove},
                         }
                     }
                 },
@@ -63,7 +64,7 @@ public sealed class DemoDesigner : View
         _designController.Load(Encoding.UTF8.GetBytes(json));
     }
 
-    private void OnTest(PointerEvent e)
+    private void OnAdd(PointerEvent e)
     {
         if (_designController.FirstSelected == null) return;
 
@@ -75,5 +76,10 @@ public sealed class DemoDesigner : View
 
         //active.OnDrop(DynamicWidgetManager.GetByName("Center"));
         //active.AddChild(new DesignElement(_designController, DynamicWidgetManager.GetByName("Button")));
+    }
+
+    private void OnRemove(PointerEvent e)
+    {
+        _designController.DeleteElements();
     }
 }

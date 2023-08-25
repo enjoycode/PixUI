@@ -96,11 +96,55 @@ public sealed partial class DesignController
     public void DeleteElements()
     {
         //TODO: maybe check can be deleted
+        DesignElement? lastParentElement = null;
+
         foreach (var element in _selection)
         {
+            if (element.IsRoot)
+            {
+                element.ChangeMeta(null, false);
+                element.Invalidate(InvalidAction.Relayout);
+                OnSelectionChanged();
+                break; //ignore others
+            }
             
+            DesignElement parentElement;
+            DesignElement childElement;
+            Widget childWidget;
+            if (element.Parent is DesignElement reversed) //是反向包装的
+            {
+                childElement = reversed;
+                childWidget = reversed.Parent!;
+                parentElement = (DesignElement)childWidget.Parent!.Parent!;
+            }
+            else
+            {
+                childWidget = childElement = element;
+                parentElement = (DesignElement)element.Parent!.Parent!;
+            }
+
+            var slot = parentElement.Meta!.GetSlot(childElement.SlotName);
+            if (slot.ContainerType == ContainerType.MultiChild)
+            {
+                if (slot.TryRemoveChild(parentElement.Target!, childWidget))
+                {
+                    parentElement.Invalidate(InvalidAction.Relayout);
+                    lastParentElement = parentElement;
+                }
+            }
+            else
+            {
+                if (slot.TrySetChild(parentElement.Target!, null))
+                {
+                    parentElement.Invalidate(InvalidAction.Relayout);
+                    lastParentElement = parentElement;
+                }
+            }
         }
+
+        if (lastParentElement != null)
+            Select(lastParentElement);
     }
-    
+
     #endregion
 }
