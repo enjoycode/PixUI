@@ -77,9 +77,21 @@ public sealed class DynamicWidgetMeta
 
     public ContainerSlot GetSlot(string name)
     {
-        if (!IsContainer) 
+        if (!IsContainer)
             throw new Exception($"[{WidgetType.Name}] can't get slot [{name}]");
         return Slots!.First(s => s.PropertyName == name);
+    }
+
+    public bool IsSlot(string name, out ContainerSlot? slot)
+    {
+        if (IsContainer)
+        {
+            slot = Slots!.FirstOrDefault(s => s.PropertyName == name);
+            return slot != null;
+        }
+
+        slot = null;
+        return false;
     }
 
     /// <summary>

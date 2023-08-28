@@ -252,7 +252,8 @@ public sealed class ColorJsonConverter : JsonConverter<Color>
 
     public override void Write(Utf8JsonWriter writer, Color value, JsonSerializerOptions options)
     {
-        throw new NotImplementedException();
+        var number = (uint)value;
+        writer.WriteStringValue(number.ToString("X2"));
     }
 }
 #endif

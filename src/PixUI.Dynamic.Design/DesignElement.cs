@@ -29,7 +29,7 @@ public sealed class DesignElement : Widget, IMouseRegion
     /// <summary>
     /// Ctor for designtime
     /// </summary>
-    private DesignElement(DesignController controller, DynamicWidgetMeta meta, string slotName)
+    internal DesignElement(DesignController controller, DynamicWidgetMeta meta, string slotName)
         : this(controller, slotName)
     {
         if (slotName == string.Empty)

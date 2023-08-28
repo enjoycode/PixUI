@@ -1,4 +1,7 @@
+using System;
+using System.IO;
 using System.Text;
+using System.Text.Json;
 using PixUI.Dynamic;
 using PixUI.Dynamic.Design;
 
@@ -6,6 +9,19 @@ namespace PixUI.Demo;
 
 public sealed class DemoDesigner : View
 {
+    private static string json = """
+                                 {
+                                   "Root": {
+                                     "Type": "Center",
+                                     "Child": {
+                                       "Type": "Button",
+                                       "Text": {"Const": "Button1"},
+                                       "TextColor": {"Const": "FFFF0000"}
+                                     }
+                                   }
+                                 }
+                                 """;
+
     public DemoDesigner()
     {
         Child = new Column
@@ -23,9 +39,9 @@ public sealed class DemoDesigner : View
                         Children =
                         {
                             new Button("Load") { OnTap = OnLoad },
-                            new Button("Save"),
+                            new Button("Save") { OnTap = OnSave },
                             new Button("Add") { OnTap = OnAdd },
-                            new Button("Remove") {OnTap = OnRemove},
+                            new Button("Remove") { OnTap = OnRemove },
                         }
                     }
                 },
@@ -46,21 +62,19 @@ public sealed class DemoDesigner : View
 
     private readonly DesignController _designController = new();
 
+    private void OnSave(PointerEvent e)
+    {
+        using var ms = new MemoryStream();
+        var writer = new Utf8JsonWriter(ms, new JsonWriterOptions() { Indented = true });
+        _designController.Write(writer);
+        writer.Flush();
+
+        json = Encoding.UTF8.GetString(ms.ToArray());
+        Log.Info(json);
+    }
+
     private void OnLoad(PointerEvent e)
     {
-        const string json = """
-                            {
-                              "View": {
-                                "Type": "Center",
-                                "Child": {
-                                  "Type": "Button",
-                                  "CtorArgs": [ { "Const": "Button1" }, { "Const": null } ],
-                                  "Properties": { "TextColor": { "Const": "FFFF0000" } }
-                                }
-                              }
-                            }
-                            """;
-
         _designController.Load(Encoding.UTF8.GetBytes(json));
     }
 
