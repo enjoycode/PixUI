@@ -43,18 +43,25 @@ partial class DesignController
         // Slots
         if (element.IsContainer && element.Child != null)
         {
-            var childs = GetAllChildrenElements(element.Child);
+            var childs = GetAllChildrenElements(element);
             var slots = childs.GroupBy(c => c.SlotName);
             foreach (var group in slots)
             {
                 var slot = meta.GetSlot(group.Key);
+                writer.WritePropertyName(slot.PropertyName);
+
                 if (slot.ContainerType == ContainerType.MultiChild)
                 {
-                    throw new NotImplementedException();
+                    writer.WriteStartArray();
+                    foreach (var childElement in group)
+                    {
+                        WriteWidget(writer, childElement);
+                    }
+
+                    writer.WriteEndArray();
                 }
                 else
                 {
-                    writer.WritePropertyName(slot.PropertyName);
                     WriteWidget(writer, group.First());
                 }
             }
@@ -63,16 +70,16 @@ partial class DesignController
         writer.WriteEndObject();
     }
 
-    private static IList<DesignElement> GetAllChildrenElements(Widget parent)
+    private static IEnumerable<DesignElement> GetAllChildrenElements(DesignElement parentElement)
     {
         var list = new List<DesignElement>();
-        parent.VisitChildren(child =>
+        var start = parentElement.Meta!.IsReversedWrapElement ? parentElement : parentElement.Child;
+
+        start?.VisitChildren(child =>
         {
             var childElement = GetChildElement(child);
             if (childElement != null)
-            {
                 list.Add(childElement);
-            }
 
             return false;
         });
@@ -82,7 +89,8 @@ partial class DesignController
 
     private static DesignElement? GetChildElement(Widget child)
     {
-        if (child is DesignElement designElement) return designElement;
+        if (child is DesignElement designElement)
+            return designElement;
 
         DesignElement? next = null;
         child.VisitChildren(nextChild =>
@@ -159,33 +167,51 @@ partial class DesignController
                     element.Child = meta.CreateInstance();
                 }
             }
-            else
+            else if (propName == "Events")
             {
-                //判断是属性还是slot
-                if (meta.IsSlot(propName, out var childSlot))
+                throw new NotImplementedException();
+            }
+            else if (meta.IsSlot(propName, out var childSlot))
+            {
+                if (childSlot!.ContainerType == ContainerType.MultiChild)
                 {
-                    if (childSlot!.ContainerType == ContainerType.MultiChild)
-                    {
-                        throw new NotImplementedException();
-                    }
-                    else
-                    {
-                        var child = ReadWidget(ref reader, meta, childSlot!.PropertyName);
-                        childSlot.SetChild(element.Target!, child);
-                    }
+                    ReadWidgetArray(ref reader, meta, element.Target!, childSlot);
+                }
+                else if (childSlot.ContainerType == ContainerType.SingleChildReversed)
+                {
+                    var child = ReadWidget(ref reader, meta, childSlot!.PropertyName);
+                    element.Child = child;
                 }
                 else
                 {
-                    var prop = new PropertyValue { Name = propName };
-                    var propMeta = meta.GetPropertyMeta(prop.Name);
-                    prop.Value = DynamicValue.Read(ref reader, propMeta);
-
-                    element.Data.AddPropertyValue(prop);
-                    element.SetPropertyValue(prop);
+                    var child = ReadWidget(ref reader, meta, childSlot!.PropertyName);
+                    childSlot.SetChild(element.Target!, child);
                 }
+            }
+            else
+            {
+                var prop = new PropertyValue { Name = propName };
+                var propMeta = meta.GetPropertyMeta(prop.Name);
+                prop.Value = DynamicValue.Read(ref reader, propMeta);
+
+                element.Data.AddPropertyValue(prop);
+                element.SetPropertyValue(prop);
             }
         }
 
         return result;
+    }
+
+    private void ReadWidgetArray(ref Utf8JsonReader reader, DynamicWidgetMeta parentMeta, Widget parent,
+        ContainerSlot childrenSlot)
+    {
+        while (reader.Read())
+        {
+            if (reader.TokenType == JsonTokenType.EndArray) break;
+            if (reader.TokenType != JsonTokenType.StartObject) continue;
+
+            var child = ReadWidget(ref reader, parentMeta, childrenSlot.PropertyName);
+            childrenSlot.AddChild(parent, child);
+        }
     }
 }
