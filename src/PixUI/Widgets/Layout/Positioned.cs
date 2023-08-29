@@ -85,6 +85,8 @@ public sealed class Positioned : Widget
         var y = 0f;
         var w = Width?.Value;
         var h = Height?.Value;
+        var calcX_afterLayoutChild = false;
+        var calcY_afterLayoutChild = false;
 
         if (_left != null && _right != null)
         {
@@ -95,8 +97,13 @@ public sealed class Positioned : Widget
         {
             if (_left != null)
                 x = _left.Value;
-            else if (_right != null && w.HasValue)
-                x = availableWidth - w.Value - _right.Value;
+            else if (_right != null)
+            {
+                if (w.HasValue)
+                    x = availableWidth - w.Value - _right.Value;
+                else
+                    calcX_afterLayoutChild = true;
+            }
         }
 
         if (_top != null && _bottom != null)
@@ -108,8 +115,13 @@ public sealed class Positioned : Widget
         {
             if (_top != null)
                 y = _top.Value;
-            else if (_bottom != null && h.HasValue)
-                y = availableHeight - h.Value - _bottom.Value;
+            else if (_bottom != null)
+            {
+                if (h.HasValue)
+                    y = availableHeight - h.Value - _bottom.Value;
+                else
+                    calcY_afterLayoutChild = true;
+            }
         }
 
         if (w is <= 0 || h is <= 0) //eg: availableWidth - left - right <= 0
@@ -123,6 +135,12 @@ public sealed class Positioned : Widget
 
         w ??= _child.W;
         h ??= _child.H;
+
+        if (calcX_afterLayoutChild)
+            x = availableWidth - w.Value - _right!.Value;
+        if (calcY_afterLayoutChild)
+            y = availableHeight - h.Value - _bottom!.Value;
+
         SetPosition(x, y);
         SetSize(w.Value, h.Value);
     }
