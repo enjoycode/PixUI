@@ -61,6 +61,9 @@ namespace PixUI.Platform.Mac
             var pos = theEvent.LocationInWindow;
             if (rect.Contains(pos)) //暂排除窗体之外的事件
             {
+                if (theEvent.DeltaX == 0 && theEvent.DeltaY == 0)
+                    return;
+
                 MacWindow.OnPointerMove(PointerEvent.UseDefault(PointerButtons.None, (float)pos.X,
                     (float)(rect.Height - pos.Y), (float)theEvent.DeltaX, (float)theEvent.DeltaY));
             }
@@ -77,6 +80,9 @@ namespace PixUI.Platform.Mac
             var pos = theEvent.LocationInWindow;
             if (rect.Contains(pos)) //暂排除窗体之外的事件
             {
+                if (theEvent.DeltaX == 0 && theEvent.DeltaY == 0)
+                    return;
+
                 MacWindow.OnPointerMove(PointerEvent.UseDefault(PointerButtons.Left, (float)pos.X,
                     (float)(rect.Height - pos.Y), (float)theEvent.DeltaX, (float)theEvent.DeltaY));
             }
