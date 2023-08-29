@@ -34,9 +34,9 @@ partial class DesignController
         {
             foreach (var property in data.Properties)
             {
-                // var propMeta = meta.GetPropertyMeta(property.Name);
+                var propMeta = meta.GetPropertyMeta(property.Name);
                 writer.WritePropertyName(property.Name);
-                property.Value.Write(writer);
+                property.Value.Write(writer, propMeta);
             }
         }
 

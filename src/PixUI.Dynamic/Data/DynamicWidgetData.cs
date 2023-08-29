@@ -69,8 +69,14 @@ public struct DynamicValue
     public static implicit operator DynamicValue(string any) => new() { From = ValueSource.Const, Value = any };
     public static implicit operator DynamicValue(float value) => new() { From = ValueSource.Const, Value = value };
 
-    public void Write(Utf8JsonWriter writer)
+    public void Write(Utf8JsonWriter writer, DynamicPropertyMeta valueMeta)
     {
+        if (!valueMeta.IsState)
+        {
+            JsonSerializer.Serialize(writer, Value);
+            return;
+        }
+
         writer.WriteStartObject();
 
         var propName = From switch
@@ -87,24 +93,31 @@ public struct DynamicValue
 
     public static DynamicValue Read(ref Utf8JsonReader reader, DynamicPropertyMeta valueMeta)
     {
-        var v = new DynamicValue();
-
-        reader.Read(); // {
-        reader.Read(); // ValueSource
-        var sourceName = reader.GetString()!;
-        v.From = sourceName switch
-        {
-            nameof(ValueSource.Const) => ValueSource.Const,
-            nameof(ValueSource.State) => ValueSource.State,
-            _ => throw new JsonException($"Unknown ValueSource: [{sourceName}]")
-        };
-
         var valueType = valueMeta.ValueType;
         if (valueMeta.ValueType.IsValueType && valueMeta.IsState) //TODO:排除本身就是Nullable<>
             valueType = typeof(Nullable<>).MakeGenericType(valueType);
 
-        v.Value = JsonSerializer.Deserialize(ref reader, valueType /*TODO: options*/);
-        reader.Read(); // }
+        var v = new DynamicValue();
+
+        if (!valueMeta.IsState)
+        {
+            v.From = ValueSource.Const;
+            v.Value = JsonSerializer.Deserialize(ref reader, valueType);
+        }
+        else
+        {
+            reader.Read(); // {
+            reader.Read(); // ValueSource
+            var sourceName = reader.GetString()!;
+            v.From = sourceName switch
+            {
+                nameof(ValueSource.Const) => ValueSource.Const,
+                nameof(ValueSource.State) => ValueSource.State,
+                _ => throw new JsonException($"Unknown ValueSource: [{sourceName}]")
+            };
+            v.Value = JsonSerializer.Deserialize(ref reader, valueType /*TODO: options*/);
+            reader.Read(); // }
+        }
 
         return v;
     }
