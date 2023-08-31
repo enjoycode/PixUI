@@ -70,7 +70,7 @@ partial class DesignController
         writer.WriteEndObject();
     }
 
-    private static IEnumerable<DesignElement> GetAllChildrenElements(DesignElement parentElement)
+    public static IEnumerable<DesignElement> GetAllChildrenElements(DesignElement parentElement)
     {
         var list = new List<DesignElement>();
         var start = parentElement.Meta!.IsReversedWrapElement ? parentElement : parentElement.Child;
