@@ -5,6 +5,11 @@ namespace PixUI.Dynamic.Design;
 
 public sealed partial class DesignController
 {
+    public DesignController()
+    {
+        StatesController.DataSource = new List<DynamicState>();
+    }
+
     /// <summary>
     /// 设计画布缩放百分比
     /// </summary>
@@ -21,6 +26,11 @@ public sealed partial class DesignController
     /// 通知属性面板附加的布局属性发生了变更
     /// </summary>
     internal Action<string>? NotifyLayoutPropertyChanged;
+
+    /// <summary>
+    /// 状态列表控制器
+    /// </summary>
+    internal readonly DataGridController<DynamicState> StatesController = new();
 
     #region ====DesignElement Selection====
 
@@ -107,7 +117,7 @@ public sealed partial class DesignController
                 OnSelectionChanged();
                 break; //ignore others
             }
-            
+
             DesignElement parentElement;
             DesignElement childElement;
             Widget childWidget;

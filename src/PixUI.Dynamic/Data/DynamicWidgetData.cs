@@ -11,7 +11,7 @@ namespace PixUI.Dynamic;
 /// </summary>
 public sealed class DynamicWidgetData
 {
-    public string Type { get; set; } //TODO: remove it
+    // public string Type { get; set; }
 
     public List<PropertyValue>? Properties { get; private set; }
 

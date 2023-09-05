@@ -1,6 +1,6 @@
 {
   "State": {
-    "title": { "Type": "System.String", "Value": "Click Me" }
+    "title": { "Type": "String", "Value": "Click Me" }
   },
   "Root": {
     "Type": "Center",

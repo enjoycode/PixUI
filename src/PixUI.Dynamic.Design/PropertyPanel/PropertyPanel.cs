@@ -14,12 +14,18 @@ public sealed class PropertyPanel : SingleChildWidget
         _layoutGroup = new PropertyGroup(_layoutGroupTitle);
         _listView = ListView<Widget>.From(new Widget[]
         {
+            new StateGroup(controller.StatesController),
             _widgetGroup,
             new IfConditional(_layoutGroupVisible, () => _layoutGroup),
             new IfConditional(_propGroupVisible, () => _propGroup),
             new IfConditional(_eventGroupVisible, () => _eventGroup)
         });
-        Child = _listView;
+
+        Child = new Container
+        {
+            BgColor = new Color(0xFFF3F3F3),
+            Child = _listView
+        };
     }
 
     private readonly DesignController _controller;
@@ -81,7 +87,7 @@ public sealed class PropertyPanel : SingleChildWidget
         _layoutGroupVisible.Value = element.Parent is DesignElement;
         _layoutProperties.Clear();
         if (!_layoutGroupVisible.Value) return;
-        
+
         var parentElement = (DesignElement)element.Parent!;
         var parentMeta = parentElement.Meta!;
         _layoutGroupTitle.Value = parentMeta.Name;
@@ -102,7 +108,7 @@ public sealed class PropertyPanel : SingleChildWidget
     {
         _propGroupVisible.Value = meta.Properties is { Length: > 0 };
         if (!_propGroupVisible.Value) return;
-        
+
         var propItems = new FormItem[meta.Properties!.Length];
         for (var i = 0; i < propItems.Length; i++)
         {

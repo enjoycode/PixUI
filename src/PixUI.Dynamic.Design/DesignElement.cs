@@ -103,7 +103,7 @@ public sealed class DesignElement : Widget, IMouseRegion
     internal void ChangeMeta(DynamicWidgetMeta? meta, bool makeDefaultTarget)
     {
         Meta = meta;
-        Data.Type = Meta == null ? string.Empty : Meta.Name;
+        // Data.Type = Meta == null ? string.Empty : Meta.Name;
         Data.Properties?.Clear();
         MouseRegion.Opaque = !IsContainer;
         if (makeDefaultTarget || (Meta == null && Child != null))
