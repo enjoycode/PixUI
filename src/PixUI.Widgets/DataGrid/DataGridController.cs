@@ -66,12 +66,13 @@ public sealed class DataGridController<T> /* where T : notnull*/
     /// <summary>
     /// 数据源
     /// </summary>
-    public IList<T> DataSource
+    public IList<T>? DataSource
     {
+        get => _dataSource;
         set
         {
-            var oldEmpty = _dataSource == null ? true : _dataSource.Count == 0;
-            var newEmpty = value == null ? true : value.Count == 0;
+            var oldEmpty = _dataSource == null || _dataSource.Count == 0;
+            var newEmpty = value == null || value.Count == 0;
 
             _dataSource = value;
             ClearAllCache();
@@ -85,7 +86,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
     {
         get
         {
-            //TODO: sort and filter
+            //TODO: apply sort and filter
             return _dataSource;
         }
     }

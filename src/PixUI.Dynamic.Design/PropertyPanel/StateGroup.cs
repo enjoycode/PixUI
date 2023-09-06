@@ -37,6 +37,7 @@ internal sealed class StateGroup : View
                                     {
                                         Style = ButtonStyle.Transparent,
                                         Shape = ButtonShape.Pills,
+                                        OnTap = _ => OnEditState(s),
                                     }) { Width = ColumnWidth.Fixed(50) }
                             }
                         }
@@ -64,5 +65,14 @@ internal sealed class StateGroup : View
 
         //TODO: check usages
         _statesController.RemoveAt(_statesController.CurrentRowIndex);
+    }
+
+    private static void OnEditState(DynamicState state)
+    {
+        if (state.Type == DynamicStateType.DataSet)
+        {
+            var dlg = DesignSettings.GetDataSetEditor?.Invoke(state);
+            dlg?.Show();
+        }
     }
 }

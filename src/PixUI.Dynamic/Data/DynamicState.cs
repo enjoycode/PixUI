@@ -11,5 +11,5 @@ public sealed class DynamicState
 {
     public string Name { get; set; } = null!;
     public DynamicStateType Type { get; set; }
-    public IDynamicStateValue Value { get; set; } = null!;
+    public IDynamicStateValue? Value { get; set; }
 }

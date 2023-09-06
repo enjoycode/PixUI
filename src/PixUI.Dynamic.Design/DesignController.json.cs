@@ -12,9 +12,45 @@ partial class DesignController
     {
         writer.WriteStartObject();
 
+        //State
+        WriteStates(writer);
+
         //Root
         writer.WritePropertyName("Root");
         WriteWidget(writer, RootElement);
+
+        writer.WriteEndObject();
+    }
+
+    private void WriteStates(Utf8JsonWriter writer)
+    {
+        var states = StatesController.DataSource;
+        if (states == null || states.Count == 0)
+            return;
+
+        writer.WritePropertyName("State");
+        writer.WriteStartObject();
+
+        foreach (var state in states)
+        {
+            writer.WritePropertyName(state.Name);
+            writer.WriteStartObject();
+
+            //Type
+            writer.WriteString(nameof(DynamicState.Type), state.Type.ToString());
+            //Value
+            if (state.Value == null)
+            {
+                writer.WriteNull(nameof(DynamicState.Value));
+            }
+            else
+            {
+                writer.WritePropertyName(nameof(DynamicState.Value));
+                state.Value.WriteTo(writer);
+            }
+
+            writer.WriteEndObject();
+        }
 
         writer.WriteEndObject();
     }
@@ -118,6 +154,9 @@ partial class DesignController
             var propName = reader.GetString();
             switch (propName)
             {
+                case "State":
+                    ReadStates(ref reader);
+                    break;
                 case "Root":
                     rootElement = (DesignElement)ReadWidget(ref reader, null, string.Empty);
                     break;
@@ -136,6 +175,45 @@ partial class DesignController
 #if DEBUG
         Log.Debug($"加载耗时: {Stopwatch.GetElapsedTime(ts).TotalMilliseconds}ms");
 #endif
+    }
+
+    private void ReadStates(ref Utf8JsonReader reader)
+    {
+        var states = new List<DynamicState>();
+
+        while (reader.Read())
+        {
+            if (reader.TokenType == JsonTokenType.EndObject) break;
+            if (reader.TokenType != JsonTokenType.PropertyName) continue;
+
+            var propName = reader.GetString()!;
+            ReadState(ref reader, propName, states);
+        }
+
+        StatesController.DataSource = states;
+    }
+
+    private static void ReadState(ref Utf8JsonReader reader, string name, IList<DynamicState> states)
+    {
+        reader.Read(); //{
+        reader.Read(); //Type prop
+        reader.Read();
+        var type = Enum.Parse<DynamicStateType>(reader.GetString()!);
+        reader.Read(); //Value prop
+
+        if (type == DynamicStateType.DataSet)
+        {
+            var ds = DesignSettings.MakeDataSetSettings!();
+            ds.ReadFrom(ref reader);
+            var state = new DynamicState() { Name = name, Type = type, Value = ds };
+            states.Add(state);
+        }
+        else
+        {
+            throw new NotImplementedException();
+        }
+
+        reader.Read(); //}
     }
 
     private Widget ReadWidget(ref Utf8JsonReader reader, DynamicWidgetMeta? parentMeta, string slotName)
