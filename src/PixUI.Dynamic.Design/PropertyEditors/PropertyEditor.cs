@@ -118,12 +118,13 @@ public sealed class PropertyEditor : Widget
         _valueEditors.Add(editor);
     }
 
-    public static void RegisterClassValueEditor<TValue, TEditor>(bool isDefault)
+    public static void RegisterClassValueEditor<TValue, TEditor>(bool isDefault, string? name = null)
         where TValue : class
         where TEditor : Widget
     {
+        name ??= typeof(TEditor).Name;
         var editor = new ValueEditorInfo(
-            typeof(TEditor).Name, isDefault, typeof(TValue),
+            name, isDefault, typeof(TValue),
             CreateEditorMaker(typeof(TValue), typeof(TEditor)),
             (element, propertyMeta) => new RxProxy<TValue?>(
                 () => (TValue?)GetPropertyValue(element, propertyMeta),
@@ -177,7 +178,7 @@ public sealed class PropertyEditor : Widget
             if (currentValue!.Value.From != ValueSource.Const) throw new NotImplementedException();
             return currentValue.Value.Value;
         }
-        
+
         //TODO: none nullable get default value
 
         return null;
@@ -226,8 +227,10 @@ public sealed class PropertyEditor : Widget
         var width = CacheAndCheckAssignWidth(availableWidth);
         var height = CacheAndCheckAssignHeight(availableHeight);
 
-        var editorWidth = width - (_deleteButton == null ? 0 : _buttonSize.Value) -
-                          (_bindButton == null ? 0 : _buttonSize.Value);
+        // var editorWidth = width - (_deleteButton == null ? 0 : _buttonSize.Value) -
+        //                   (_bindButton == null ? 0 : _buttonSize.Value);
+        var editorWidth = width - _buttonSize.Value * 2; //暂不考虑有无删除或绑定按钮
+
         _targetEditor.Layout(editorWidth, height);
         _targetEditor.SetPosition(0, 0);
         SetSize(width, _targetEditor.H);
