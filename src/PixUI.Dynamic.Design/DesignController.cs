@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PixUI.Dynamic.Design;
 
@@ -31,6 +32,10 @@ public sealed partial class DesignController
     /// 状态列表控制器
     /// </summary>
     internal readonly DataGridController<DynamicState> StatesController = new();
+
+    internal DynamicState? FindState(string name) =>
+        StatesController.DataSource?.FirstOrDefault(s => s.Name == name);
+
 
     #region ====DesignElement Selection====
 

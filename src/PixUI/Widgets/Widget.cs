@@ -251,7 +251,7 @@ public abstract class Widget : IStateBindable, IDisposable
     /// <summary>
     /// 根据条件向上(包括自己)查找
     /// </summary>
-    internal Widget? FindParent(Predicate<Widget> predicate)
+    public Widget? FindParent(Predicate<Widget> predicate)
         => predicate(this) ? this : _parent?.FindParent(predicate);
 
     /// <summary>
