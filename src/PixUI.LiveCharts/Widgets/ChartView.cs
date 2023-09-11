@@ -375,7 +375,13 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
         var width = CacheAndCheckAssignWidth(availableWidth);
         var height = CacheAndCheckAssignHeight(availableHeight);
 
+        var oldWidth = W;
+        var oldHeight = H;
+
         SetSize(width, height);
+
+        if (core != null && !core.IsFirstDraw && (oldWidth != W || oldHeight != H))
+            core.Update();
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
