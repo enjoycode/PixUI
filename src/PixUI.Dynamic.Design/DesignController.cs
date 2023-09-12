@@ -33,9 +33,17 @@ public sealed partial class DesignController
     /// </summary>
     internal readonly DataGridController<DynamicState> StatesController = new();
 
-    internal DynamicState? FindState(string name) =>
+    public DynamicState? FindState(string name) =>
         StatesController.DataSource?.FirstOrDefault(s => s.Name == name);
 
+    public IEnumerable<DynamicState> GetAllDataSet()
+    {
+        if (StatesController.DataSource == null) yield break;
+        foreach (var state in StatesController.DataSource)
+        {
+            if (state.Type == DynamicStateType.DataSet) yield return state;
+        }
+    }
 
     #region ====DesignElement Selection====
 

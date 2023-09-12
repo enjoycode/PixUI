@@ -87,6 +87,8 @@ public abstract class State<T> : State
 
     public static implicit operator State<T>(T value) => new RxValue<T>(value);
 
+    public StateListener<T> Listen(Action<T> changeAction) => new StateListener<T>(this, changeAction);
+
 #if __WEB__
         //TODO:临时解决隐式转换
         public static State<T> op_Implicit_From<T>(T value) {

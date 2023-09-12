@@ -27,6 +27,7 @@ public sealed class PropertyEditor : Widget
         DebugLabel = propertyMeta.Name;
 #endif
 
+        _element = element;
         var valueType = GetValueType(propertyMeta);
         _targetEditor = GetPropertyValueEditor(valueType, element, propertyMeta, out var editingValue);
         _targetEditor.Parent = this;
@@ -41,6 +42,7 @@ public sealed class PropertyEditor : Widget
         }
     }
 
+    private readonly DesignElement _element;
     private readonly Widget _targetEditor;
     private readonly Button? _deleteButton;
     private readonly Button? _bindButton;
@@ -72,6 +74,8 @@ public sealed class PropertyEditor : Widget
         button.Parent = this;
         return button;
     }
+
+    public DesignController DesignController => _element.Controller;
 
 
     #region ====ValueEditors====

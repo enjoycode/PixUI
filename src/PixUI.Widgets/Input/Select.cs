@@ -78,11 +78,8 @@ public sealed class Select<T> : InputBase<Widget>
             _optionBuilder ??
             ((data, index, isHover, isSelected) =>
             {
-                var color = RxComputed<Color>.Make(
-                    isSelected, v => v ? Colors.White : Colors.Black);
-                return new Text(_labelGetter != null
-                        ? _labelGetter(data)
-                        : data?.ToString() ?? "")
+                var color = RxComputed<Color>.Make(isSelected, v => v ? Colors.White : Colors.Black);
+                return new Text(_labelGetter != null ? _labelGetter(data) : data?.ToString() ?? "")
                     { TextColor = color };
             });
         _listPopup = new ListPopup<T>(Overlay!, optionBuilder, W + 8, Theme.DefaultFontSize + 8);

@@ -47,7 +47,11 @@ internal sealed class ListPopupItemWidget : SingleChildWidget, IMouseRegion
         //始终为上级指定的宽高
         var fixedWidth = Width!.Value;
         var fixedHeight = Height!.Value;
-        Child?.Layout(fixedWidth, fixedHeight);
+        if (Child != null)
+        {
+            Child.Layout(fixedWidth, fixedHeight);
+            Child.SetPosition(0, (fixedHeight - Child.H) / 2f); //暂上下居中
+        }
         SetSize(fixedWidth, fixedHeight);
     }
 
@@ -124,8 +128,7 @@ public class ListPopup<T> : Popup
     {
         var states = _itemStates![index];
 
-        return new ListPopupItemWidget(index, states.HoverState, states.SelectedState,
-            OnSelectByTap)
+        return new ListPopupItemWidget(index, states.HoverState, states.SelectedState, OnSelectByTap)
         {
             Width = _child.Width, Height = _itemExtent,
             Child = _itemBuilder(data, index, states.HoverState, states.SelectedState)

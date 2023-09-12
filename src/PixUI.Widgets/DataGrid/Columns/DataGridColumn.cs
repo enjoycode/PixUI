@@ -72,6 +72,11 @@ public abstract class DataGridColumn<T>
     protected internal virtual void ClearAllCache() { }
 
     protected internal virtual void OnWidthChanged(float width, float height) => ClearAllCache();
+    
+    /// <summary>
+    /// 清除指定单元格的缓存
+    /// </summary>
+    protected internal virtual void ClearCacheAt(int rowIndex) {}
 
     /// <summary>
     /// 滚动后清除相关缓存

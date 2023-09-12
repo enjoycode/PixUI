@@ -597,5 +597,21 @@ public sealed class DataGridController<T> /* where T : notnull*/
         _owner?.Invalidate(InvalidAction.Repaint);
     }
 
+    /// <summary>
+    /// 清除当前行的缓存并重绘
+    /// </summary>
+    public void RefreshCurrentRow()
+    {
+        var curRowIndex = CurrentRowIndex;
+        if (curRowIndex < 0) return;
+
+        foreach (var column in _cachedLeafColumns)
+        {
+            column.ClearCacheAt(curRowIndex);
+        }
+
+        _owner?.Invalidate(InvalidAction.Repaint); //TODO:暂简单全部重绘
+    }
+
     #endregion
 }

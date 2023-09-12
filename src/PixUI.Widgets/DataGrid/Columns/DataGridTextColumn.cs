@@ -56,6 +56,14 @@ public sealed class DataGridTextColumn<T> : DataGridColumn<T>
         _cellParagraphs.Clear();
     }
 
+    protected internal override void ClearCacheAt(int rowIndex)
+    {
+        var pattern = new CellCache<Paragraph>(rowIndex, null);
+        var index = _cellParagraphs.BinarySearch(pattern, _cellCacheComparer);
+        if (index >= 0)
+            _cellParagraphs.RemoveAt(index);
+    }
+
     protected internal override void ClearCacheOnScroll(bool isScrollDown, int rowIndex)
     {
         if (isScrollDown)

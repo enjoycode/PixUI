@@ -13,7 +13,7 @@ public sealed class DesignElement : Widget, IMouseRegion
     /// </summary>
     public DesignElement(DesignController controller, string slotName)
     {
-        _controller = controller;
+        Controller = controller;
         SlotName = slotName;
         MouseRegion = new MouseRegion(opaque: false);
         MouseRegion.PointerDown += OnPointerDown;
@@ -21,7 +21,7 @@ public sealed class DesignElement : Widget, IMouseRegion
 
         if (SlotName == string.Empty)
         {
-            _controller.RootElement = this;
+            Controller.RootElement = this;
             DebugLabel = "Root";
         }
     }
@@ -41,7 +41,7 @@ public sealed class DesignElement : Widget, IMouseRegion
     private static readonly Lazy<Paragraph> _hint = new(() =>
         TextPainter.BuildParagraph("Drop Here", float.PositiveInfinity, 16, Colors.Gray));
 
-    private readonly DesignController _controller;
+    public readonly DesignController Controller;
     private bool _isSelected;
     private Widget? _child;
 
@@ -96,7 +96,7 @@ public sealed class DesignElement : Widget, IMouseRegion
         }
     }
 
-    internal bool IsRoot => ReferenceEquals(this, _controller.RootElement);
+    internal bool IsRoot => ReferenceEquals(this, Controller.RootElement);
 
     public bool IsContainer => Meta == null /*Root*/ || Meta.IsContainer;
 
@@ -173,13 +173,13 @@ public sealed class DesignElement : Widget, IMouseRegion
     private void OnPointerDown(PointerEvent e)
     {
         e.IsHandled = true;
-        _controller.Select(this);
+        Controller.Select(this);
     }
 
     private void OnPointerMove(PointerEvent e)
     {
         if (e.Buttons != PointerButtons.Left) return;
-        _controller.MoveElements(e.DeltaX, e.DeltaY);
+        Controller.MoveElements(e.DeltaX, e.DeltaY);
         e.IsHandled = true;
     }
 
@@ -189,7 +189,7 @@ public sealed class DesignElement : Widget, IMouseRegion
         if (Meta == null)
         {
             ChangeMeta(meta, true);
-            _controller.OnSelectionChanged(); //强制刷新属性面板
+            Controller.OnSelectionChanged(); //强制刷新属性面板
             return;
         }
 
@@ -206,9 +206,9 @@ public sealed class DesignElement : Widget, IMouseRegion
             //TODO:暂简单特殊处理添加非Positioned至Stack内
             if (Meta.WidgetType == typeof(Stack) && meta.WidgetType != typeof(Positioned))
             {
-                childElement = new DesignElement(_controller, meta, nameof(Positioned.Child));
+                childElement = new DesignElement(Controller, meta, nameof(Positioned.Child));
                 var positionedMeta = DynamicWidgetManager.GetByName(nameof(Positioned));
-                var positionedElement = new DesignElement(_controller, positionedMeta, defaultSlot.PropertyName)
+                var positionedElement = new DesignElement(Controller, positionedMeta, defaultSlot.PropertyName)
                     { Child = childElement };
                 childToBeAdded = new Positioned { Child = positionedElement };
             }
@@ -221,22 +221,22 @@ public sealed class DesignElement : Widget, IMouseRegion
             }
             else
             {
-                childToBeAdded = childElement = new DesignElement(_controller, meta, defaultSlot.PropertyName);
+                childToBeAdded = childElement = new DesignElement(Controller, meta, defaultSlot.PropertyName);
             }
 
             if (defaultSlot.TryAddChild(Target!, childToBeAdded))
             {
                 Invalidate(InvalidAction.Relayout);
-                _controller.Select(childElement);
+                Controller.Select(childElement);
             }
         }
         else if (defaultSlot.ContainerType == ContainerType.SingleChild)
         {
-            var newChild = new DesignElement(_controller, meta, defaultSlot.PropertyName);
+            var newChild = new DesignElement(Controller, meta, defaultSlot.PropertyName);
             if (defaultSlot.TrySetChild(Target!, newChild))
             {
                 Invalidate(InvalidAction.Relayout);
-                _controller.Select(newChild);
+                Controller.Select(newChild);
             }
         }
         else
@@ -314,7 +314,7 @@ public sealed class DesignElement : Widget, IMouseRegion
     {
         if (!IsSelected) return;
 
-        var scaleRatio = _controller.Zoom.Value / 100f;
+        var scaleRatio = Controller.Zoom.Value / 100f;
         var anchorSize = 10f * scaleRatio;
         var borderSize = 3f;
 
