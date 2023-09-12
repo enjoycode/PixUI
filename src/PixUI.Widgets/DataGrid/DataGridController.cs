@@ -238,7 +238,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
         //TODO:暂仅支持单选
         var oldRowIndex = CurrentRowIndex;
         //TODO: 如果移动端则需要 _cachedHitInRows = HitTestInRows(e.X, e.Y);
-        var newRowIndex = _cachedHitInRows != null ? _cachedHitInRows.Value.RowIndex : -1;
+        var newRowIndex = _cachedHitInRows?.RowIndex ?? -1;
         TrySelectRow(oldRowIndex, newRowIndex);
         //TODO: if (res == _cachedHitInRows) return;
 

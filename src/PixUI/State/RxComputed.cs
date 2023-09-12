@@ -36,6 +36,13 @@ public sealed class RxComputed<T> : State<T>, IStateBindable
         return computed;
     }
 
+    public static RxComputed<TS?> MakeNullable<TS>(State<TS> source) where TS : struct
+    {
+        var computed = new RxComputed<TS?>(() => source.Value, v => source.Value = v ?? default(TS));
+        source.AddBinding(computed, BindingOptions.None);
+        return computed;
+    }
+
     [TSRename("Make2")]
     public static RxComputed<TR> Make<T1, T2, TR>(State<T1> s1, State<T2> s2,
         Func<T1, T2, TR> getter,
