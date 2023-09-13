@@ -73,12 +73,14 @@ public sealed class PropertyPanel : SingleChildWidget
         BuildLayoutGroup(element, meta);
         BuildPropertyGroup(element, meta);
 
+        _listView.Controller.ResetScroll();
         _listView.Invalidate(InvalidAction.Relayout);
     }
 
     private void BuildWidgetGroup(DesignElement element, DynamicWidgetMeta meta)
     {
         var widgetGroupItems = new List<FormItem> { new("Type:", new Text(meta.Name)) };
+        //TODO:考虑在这里添加宽高属性
         _widgetGroup.SetItems(widgetGroupItems);
     }
 

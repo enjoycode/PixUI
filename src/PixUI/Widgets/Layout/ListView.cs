@@ -44,6 +44,19 @@ public sealed class ListViewController<T> : WidgetController<ListView<T>>
         if (!offset.IsEmpty)
             Widget.Root!.Window.AfterScrollDone(Widget, offset);
     }
+
+    /// <summary>
+    /// 重置滚动位置
+    /// </summary>
+    public void ResetScroll()
+    {
+        if (ScrollController.OffsetX == 0 && ScrollController.OffsetY == 0)
+            return;
+
+        var offset = Widget.OnScroll(-ScrollController.OffsetX, -ScrollController.OffsetY);
+        if (!offset.IsEmpty)
+            Widget.Root!.Window.AfterScrollDone(Widget, offset);
+    }
 }
 
 public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
@@ -55,23 +68,23 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
         ListViewController<T>? controller = null)
     {
         _itemBuilder = itemBuilder;
-        _controller = controller ?? new ListViewController<T>();
-        _controller.AttachWidget(this);
+        Controller = controller ?? new ListViewController<T>();
+        Controller.AttachWidget(this);
         if (dataSource != null)
-            _controller.DataSource = dataSource;
+            Controller.DataSource = dataSource;
     }
 
-    private readonly ListViewController<T> _controller;
     private readonly Func<T, int, Widget> _itemBuilder;
+    public readonly ListViewController<T> Controller;
 
     internal void OnDataSourceChanged()
     {
         _children.Clear();
-        if (_controller.DataSource != null)
+        if (Controller.DataSource != null)
         {
-            for (var i = 0; i < _controller.DataSource.Count; i++)
+            for (var i = 0; i < Controller.DataSource.Count; i++)
             {
-                _children.Add(_itemBuilder(_controller.DataSource[i], i));
+                _children.Add(_itemBuilder(Controller.DataSource[i], i));
             }
         }
 
@@ -144,8 +157,8 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
 
     #region ====IScrollable====
 
-    public float ScrollOffsetX => _controller.ScrollController.OffsetX;
-    public float ScrollOffsetY => _controller.ScrollController.OffsetY;
+    public float ScrollOffsetX => Controller.ScrollController.OffsetX;
+    public float ScrollOffsetY => Controller.ScrollController.OffsetY;
     public bool IgnoreScrollOffsetForHitTest => false;
 
     public Offset OnScroll(float dx, float dy)
@@ -158,7 +171,7 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
         var maxOffsetX = 0f;
         var maxOffsetY = lastChild.Y + lastChild.H - H;
 
-        var offset = _controller.ScrollController.OnScroll(dx, dy, maxOffsetX, maxOffsetY);
+        var offset = Controller.ScrollController.OnScroll(dx, dy, maxOffsetX, maxOffsetY);
         if (!offset.IsEmpty)
             Invalidate(InvalidAction.Repaint);
         return offset;
