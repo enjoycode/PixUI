@@ -11,21 +11,26 @@ internal sealed class StateGroup : View
         Child = new Collapse
         {
             Title = new Text("State") { FontWeight = FontWeight.Bold },
-            Body = new Card()
+            Body = new Column(HorizontalAlignment.Left)
             {
-                Child = new Column(HorizontalAlignment.Left)
+                Children =
                 {
-                    Children =
+                    new Container
                     {
-                        new ButtonGroup
+                        Padding = EdgeInsets.Only(4, 0, 0, 0),
+                        IsLayoutTight = true,
+                        Child = new ButtonGroup
                         {
                             Children =
                             {
                                 new Button(icon: MaterialIcons.Add) { OnTap = OnAddState },
                                 new Button(icon: MaterialIcons.Remove) { OnTap = OnRemoveState },
                             }
-                        },
-                        new DataGrid<DynamicState>(statesController)
+                        }
+                    },
+                    new Card
+                    {
+                        Child = new DataGrid<DynamicState>(statesController)
                         {
                             Height = 118,
                             Columns =
