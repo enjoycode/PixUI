@@ -20,9 +20,25 @@ public sealed class DynamicWidgetMeta
         Name = name;
         WidgetType = widgetType;
         Icon = icon;
-        Properties = properties;
         Events = events;
         Slots = slots;
+
+        // 暂简单根据是否反向包装来判断，可考虑添加Sizable参数来判断
+        if (IsReversedWrapElement)
+        {
+            Properties = properties;
+        }
+        else
+        {
+            var len = properties?.Length ?? 0;
+            Properties = new DynamicPropertyMeta[len + 2];
+            Properties[0] = new DynamicPropertyMeta(nameof(Widget.Width), typeof(State<float>), true);
+            Properties[1] = new DynamicPropertyMeta(nameof(Widget.Height), typeof(State<float>), true);
+            for (var i = 0; i < len; i++)
+            {
+                Properties[i + 2] = properties![i];
+            }
+        }
     }
 
     public static DynamicWidgetMeta Make<T>(IconData icon,
