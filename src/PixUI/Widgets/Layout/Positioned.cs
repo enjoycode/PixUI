@@ -130,7 +130,9 @@ public sealed class Positioned : Widget
             return;
         }
 
-        _child.Layout(w ?? availableWidth, h ?? availableHeight);
+        //注意优先顺序 (_child.Width, _child.Height) > (w,h) > (availableWidth, availableHeight)
+        _child.Layout(_child.Width?.Value ?? (w ?? availableWidth),
+            _child.Height?.Value ?? (h ?? availableHeight));
         _child.SetPosition(0, 0);
 
         w ??= _child.W;

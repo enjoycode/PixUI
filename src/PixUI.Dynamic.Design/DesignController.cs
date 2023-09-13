@@ -100,6 +100,7 @@ public sealed partial class DesignController
         foreach (var element in _selection)
         {
             var moveable = element.Target is Positioned ? element : (DesignElement)element.Parent!;
+            var target = moveable.Child as DesignElement;
             var positioned = (Positioned)moveable.Target!;
             var oldX = positioned.Left?.Value ?? 0f;
             var oldY = positioned.Top?.Value ?? 0f;
@@ -109,7 +110,24 @@ public sealed partial class DesignController
             NotifyLayoutPropertyChanged?.Invoke("Left");
             moveable.SetPropertyValue(moveable.Data.SetPropertyValue("Top", oldY + dy));
             NotifyLayoutPropertyChanged?.Invoke("Top");
-            //TODO: maybe clear Right & Bottom value
+            //clear Right & Bottom value
+            if (moveable.Data.TryGetPropertyValue("Right", out var _))
+            {
+                target?.SetPropertyValue(target.Data.SetPropertyValue("Width", moveable.W));
+                moveable.Data.RemovePropertyValue("Right");
+                moveable.RemovePropertyValue("Right");
+                NotifyLayoutPropertyChanged?.Invoke("Width");
+                NotifyLayoutPropertyChanged?.Invoke("Right");
+            }
+
+            if (moveable.Data.TryGetPropertyValue("Bottom", out var _))
+            {
+                target?.SetPropertyValue(target.Data.SetPropertyValue("Height", moveable.H));
+                moveable.Data.RemovePropertyValue("Bottom");
+                moveable.RemovePropertyValue("Bottom");
+                NotifyLayoutPropertyChanged?.Invoke("Height");
+                NotifyLayoutPropertyChanged?.Invoke("Bottom");
+            }
         }
     }
 

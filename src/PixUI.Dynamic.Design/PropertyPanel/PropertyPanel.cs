@@ -97,10 +97,11 @@ public sealed class PropertyPanel : SingleChildWidget
         var propItems = new FormItem[parentMeta.Properties!.Length];
         for (var i = 0; i < propItems.Length; i++)
         {
+            var propName = parentMeta.Properties[i].Name;
             var propEditor = new PropertyEditor(parentElement, parentMeta.Properties[i]);
             if (propEditor.EditingValue != null)
-                _layoutProperties.Add(parentMeta.Properties[i].Name, propEditor.EditingValue);
-            propItems[i] = new($"{parentMeta.Properties[i].Name}:", propEditor);
+                _layoutProperties.Add(propName, propEditor.EditingValue);
+            propItems[i] = new($"{propName}:", propEditor);
         }
 
         _layoutGroup.SetItems(propItems);
@@ -114,7 +115,11 @@ public sealed class PropertyPanel : SingleChildWidget
         var propItems = new FormItem[meta.Properties!.Length];
         for (var i = 0; i < propItems.Length; i++)
         {
-            propItems[i] = new($"{meta.Properties[i].Name}:", new PropertyEditor(element, meta.Properties[i]));
+            var propName = meta.Properties[i].Name;
+            var propEditor = new PropertyEditor(element, meta.Properties[i]);
+            propItems[i] = new($"{propName}:", propEditor);
+            if ((propName == "Width" || propName == "Height") && propEditor.EditingValue != null)
+                _layoutProperties.Add(propName, propEditor.EditingValue);
         }
 
         _propGroup.SetItems(propItems);
