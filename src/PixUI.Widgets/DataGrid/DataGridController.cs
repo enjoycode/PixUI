@@ -168,6 +168,12 @@ public sealed class DataGridController<T> /* where T : notnull*/
         SelectionChanged?.Invoke();
     }
 
+    public void TrySelectFirstRow()
+    {
+        if (DataView != null && DataView.Count > 0)
+            SelectAt(0);
+    }
+
     private void TrySelectRow(int oldRowIndex, int newRowIndex)
     {
         if (oldRowIndex == newRowIndex) return;
