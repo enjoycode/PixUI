@@ -253,7 +253,7 @@ public abstract class UIWindow
 
     private void NewHitTest(float winX, float winY)
     {
-        Log.Debug($"========NewHitTest:({winX},{winY}) ========");
+        Log.Debug($"========NewHitTest:({winX},{winY})========");
         //先检测Overlay，没有命中再从RootWidget开始
         if (Overlay.HasEntry)
             Overlay.HitTest(winX, winY, _newHitResult);

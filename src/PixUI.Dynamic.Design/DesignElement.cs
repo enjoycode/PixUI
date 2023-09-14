@@ -6,7 +6,7 @@ namespace PixUI.Dynamic.Design;
 /// <summary>
 /// 设计时包装目标Widget
 /// </summary>
-public sealed class DesignElement : Widget, IMouseRegion
+public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
 {
     /// <summary>
     /// Ctor for Root DesignElement or Deserialize
@@ -18,6 +18,7 @@ public sealed class DesignElement : Widget, IMouseRegion
         MouseRegion = new MouseRegion(opaque: false);
         MouseRegion.PointerDown += OnPointerDown;
         MouseRegion.PointerMove += OnPointerMove;
+        MouseRegion.HoverChanged += OnHoverChanged;
 
         if (SlotName == string.Empty)
         {
@@ -121,6 +122,8 @@ public sealed class DesignElement : Widget, IMouseRegion
         }
     }
 
+    #region ====Property Value====
+
     /// <summary>
     /// 初始化属性的值改变后重新创建实例
     /// </summary>
@@ -168,7 +171,23 @@ public sealed class DesignElement : Widget, IMouseRegion
         propInfo!.SetValue(Target, null);
     }
 
+    internal void ChangeLayoutPropertyValue(string propName, float value)
+    {
+        SetPropertyValue(Data.SetPropertyValue(propName, value));
+        Controller.NotifyLayoutPropertyChanged?.Invoke(propName);
+    }
+
+    #endregion
+
     #region ====Event Handler====
+
+    private AnchorPosition? _hoverAnchor;
+
+    private void OnHoverChanged(bool isHover)
+    {
+        if (!isHover && IsSelected)
+            Cursor.Current = Cursors.Arrow; //reset cursor for anchor
+    }
 
     private void OnPointerDown(PointerEvent e)
     {
@@ -178,9 +197,88 @@ public sealed class DesignElement : Widget, IMouseRegion
 
     private void OnPointerMove(PointerEvent e)
     {
-        if (e.Buttons != PointerButtons.Left) return;
-        Controller.MoveElements(e.DeltaX, e.DeltaY);
-        e.IsHandled = true;
+        if (e.Buttons == PointerButtons.None)
+        {
+            if (IsSelected)
+            {
+                Cursor.Current = Cursors.Arrow;
+                _hoverAnchor = null;
+                foreach (var pos in Enum.GetValues<AnchorPosition>())
+                {
+                    if (GetAnchorRect(pos).ContainsPoint(e.X, e.Y))
+                    {
+                        _hoverAnchor = pos;
+                        if (pos == AnchorPosition.MiddleLeft || pos == AnchorPosition.MiddleRight)
+                            Cursor.Current = Cursors.ResizeLR;
+                        else
+                            Cursor.Current = Cursors.ResizeUD;
+                        break;
+                    }
+                }
+            }
+        }
+        else if (e.Buttons == PointerButtons.Left)
+        {
+            //先判断是否移动Anchor
+            if (_hoverAnchor.HasValue)
+            {
+                Resize(_hoverAnchor.Value, e.DeltaX, e.DeltaY);
+            }
+            else
+            {
+                //再移动元素
+                Controller.MoveElements(e.DeltaX, e.DeltaY);
+            }
+
+            e.IsHandled = true;
+        }
+    }
+
+    private void Resize(AnchorPosition pos, float dx, float dy)
+    {
+        const string LEFT = "Left";
+        const string RIGHT = "Right";
+        const string WIDTH = "Width";
+        const string HEIGHT = "Height";
+
+        DesignElement? parentPositioned = null;
+        if (Parent is DesignElement parent && parent.Target is Positioned)
+            parentPositioned = parent;
+        switch (pos)
+        {
+            case AnchorPosition.MiddleLeft:
+                var oldWidth = Data.TryGetPropertyValue(WIDTH, out var width)
+                    ? (float)width!.Value.Value!
+                    : Target!.W;
+                var newWidth = oldWidth - dx;
+                if (parentPositioned == null)
+                {
+                    ChangeLayoutPropertyValue(WIDTH, newWidth); //设置自身的宽度
+                }
+                else
+                {
+                    var hasLeft = parentPositioned.Data.TryGetPropertyValue(LEFT, out var left);
+                    var hasRight = parentPositioned.Data.TryGetPropertyValue(RIGHT, out _);
+                    if (hasLeft && hasRight)
+                    {
+                        //Left与Right都有值仅调整Left
+                        parentPositioned.ChangeLayoutPropertyValue(LEFT, ((float)left!.Value.Value!) + dx);
+                    }
+                    else if (hasLeft)
+                    {
+                        //仅Left有值调整Left并修改宽度
+                        ChangeLayoutPropertyValue(WIDTH, newWidth);
+                        parentPositioned.ChangeLayoutPropertyValue(LEFT, ((float)left!.Value.Value!) + dx);
+                    }
+                    else
+                    {
+                        //仅Right有值修改宽度
+                        ChangeLayoutPropertyValue(WIDTH, newWidth);
+                    }
+                }
+
+                break;
+        }
     }
 
     public void OnDrop(DynamicWidgetMeta meta /*TODO: args for x, y*/)
@@ -310,12 +408,39 @@ public sealed class DesignElement : Widget, IMouseRegion
         canvas.DrawParagraph(paragraph, (W - paragraph.MaxIntrinsicWidth) / 2f, (H - paragraph.Height) / 2f);
     }
 
+    private Rect GetAnchorRect(AnchorPosition position)
+    {
+        //TopLeft
+        //Rect.FromLTWH(0 - anchorSize / 2, 0 - anchorSize / 2, anchorSize, anchorSize)
+        //TopRight
+        //Rect.FromLTWH(W - anchorSize / 2, 0 - anchorSize / 2, anchorSize, anchorSize)
+        //BottomLeft
+        //Rect.FromLTWH(0 - anchorSize / 2, H - anchorSize / 2, anchorSize, anchorSize)
+        //BottomRight
+        //Rect.FromLTWH(W - anchorSize / 2, H - anchorSize / 2, anchorSize, anchorSize)
+
+        var scaleRatio = Controller.Zoom.Value / 100f;
+        var anchorSize = 10f * scaleRatio;
+
+        return position switch
+        {
+            AnchorPosition.TopMiddle => Rect.FromLTWH(W / 2 - anchorSize / 2, 0 - anchorSize / 2, anchorSize,
+                anchorSize),
+            AnchorPosition.MiddleLeft => Rect.FromLTWH(0 - anchorSize / 2, H / 2 - anchorSize / 2, anchorSize,
+                anchorSize),
+            AnchorPosition.MiddleRight => Rect.FromLTWH(W - anchorSize / 2, H / 2 - anchorSize / 2, anchorSize,
+                anchorSize),
+            AnchorPosition.BottomMiddle => Rect.FromLTWH(W / 2 - anchorSize / 2, H - anchorSize / 2, anchorSize,
+                anchorSize),
+            _ => throw new ArgumentOutOfRangeException(nameof(position), position, null)
+        };
+    }
+
     private void DrawSelection(Canvas canvas)
     {
         if (!IsSelected) return;
 
         var scaleRatio = Controller.Zoom.Value / 100f;
-        var anchorSize = 10f * scaleRatio;
         var borderSize = 3f;
 
         var paint = PaintUtils.Shared(Theme.FocusedColor, PaintStyle.Stroke, borderSize * scaleRatio);
@@ -323,24 +448,10 @@ public sealed class DesignElement : Widget, IMouseRegion
 
         paint = PaintUtils.Shared(Theme.FocusedColor, PaintStyle.Fill, 1f * scaleRatio);
 
-        //TopLeft
-        DrawAnchor(canvas, paint, Rect.FromLTWH(0 - anchorSize / 2, 0 - anchorSize / 2, anchorSize, anchorSize));
-        //TopMiddle
-        DrawAnchor(canvas, paint, Rect.FromLTWH(W / 2 - anchorSize / 2, 0 - anchorSize / 2, anchorSize, anchorSize));
-        //TopRight
-        DrawAnchor(canvas, paint, Rect.FromLTWH(W - anchorSize / 2, 0 - anchorSize / 2, anchorSize, anchorSize));
-
-        //MiddleLeft
-        DrawAnchor(canvas, paint, Rect.FromLTWH(0 - anchorSize / 2, H / 2 - anchorSize / 2, anchorSize, anchorSize));
-        //MiddleRight
-        DrawAnchor(canvas, paint, Rect.FromLTWH(W - anchorSize / 2, H / 2 - anchorSize / 2, anchorSize, anchorSize));
-
-        //BottomLeft
-        DrawAnchor(canvas, paint, Rect.FromLTWH(0 - anchorSize / 2, H - anchorSize / 2, anchorSize, anchorSize));
-        //BottomMiddle
-        DrawAnchor(canvas, paint, Rect.FromLTWH(W / 2 - anchorSize / 2, H - anchorSize / 2, anchorSize, anchorSize));
-        //BottomRight
-        DrawAnchor(canvas, paint, Rect.FromLTWH(W - anchorSize / 2, H - anchorSize / 2, anchorSize, anchorSize));
+        DrawAnchor(canvas, paint, GetAnchorRect(AnchorPosition.TopMiddle));
+        DrawAnchor(canvas, paint, GetAnchorRect(AnchorPosition.MiddleLeft));
+        DrawAnchor(canvas, paint, GetAnchorRect(AnchorPosition.MiddleRight));
+        DrawAnchor(canvas, paint, GetAnchorRect(AnchorPosition.BottomMiddle));
     }
 
     private static void DrawAnchor(Canvas canvas, Paint paint, Rect rect)
@@ -349,4 +460,12 @@ public sealed class DesignElement : Widget, IMouseRegion
     }
 
     #endregion
+
+    private enum AnchorPosition
+    {
+        TopMiddle,
+        MiddleLeft,
+        MiddleRight,
+        BottomMiddle
+    }
 }
