@@ -98,8 +98,8 @@ public sealed partial class DesignController
             var moveable = element.Target is Positioned ? element : (DesignElement)element.Parent!;
             var target = moveable.Child as DesignElement;
             var positioned = (Positioned)moveable.Target!;
-            var oldX = positioned.Left?.Value ?? 0f;
-            var oldY = positioned.Top?.Value ?? 0f;
+            var oldX = positioned.Left?.Value ?? positioned.X;
+            var oldY = positioned.Top?.Value ?? positioned.Y;
 
             // Log.Debug($"old={oldX}, {oldY} delta={e.DeltaX}, {e.DeltaY}");
             moveable.SetPropertyValue(moveable.Data.SetPropertyValue("Left", oldX + dx));
