@@ -45,6 +45,8 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
     public readonly DesignController Controller;
     private bool _isSelected;
     private Widget? _child;
+    private SelectedDecorator? _selectedDecorator;
+    private AnchorPosition? _hoverAnchor;
 
     /// <summary>
     /// 当前针对上级的Slot属性名
@@ -93,13 +95,19 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
             if (_isSelected == value) return;
 
             _isSelected = value;
-            //TODO: 使用选择装饰器
+
+            if (_isSelected)
+                ShowSelectedDecorator();
+            else
+                HideSelectedDecorator();
         }
     }
 
     internal bool IsRoot => ReferenceEquals(this, Controller.RootElement);
 
     public bool IsContainer => Meta == null /*Root*/ || Meta.IsContainer;
+
+    #region ====Meta & Property Value====
 
     internal void ChangeMeta(DynamicWidgetMeta? meta, bool makeDefaultTarget)
     {
@@ -121,8 +129,6 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
             }
         }
     }
-
-    #region ====Property Value====
 
     /// <summary>
     /// 初始化属性的值改变后重新创建实例
@@ -181,7 +187,20 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
 
     #region ====Event Handler====
 
-    private AnchorPosition? _hoverAnchor;
+    private void ShowSelectedDecorator()
+    {
+        _selectedDecorator = new SelectedDecorator(this);
+        Overlay?.Show(_selectedDecorator);
+    }
+
+    private void HideSelectedDecorator()
+    {
+        if (_selectedDecorator == null) return;
+
+        (_selectedDecorator.Parent as Overlay)?.Remove(_selectedDecorator);
+        _selectedDecorator.Dispose();
+        _selectedDecorator = null;
+    }
 
     private void OnHoverChanged(bool isHover)
     {
@@ -234,50 +253,166 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         }
     }
 
+    private const string LEFT = "Left";
+    private const string TOP = "Top";
+    private const string RIGHT = "Right";
+    private const string BOTTOM = "Bottom";
+    private const string WIDTH = "Width";
+    private const string HEIGHT = "Height";
+
     private void Resize(AnchorPosition pos, float dx, float dy)
     {
-        const string LEFT = "Left";
-        const string RIGHT = "Right";
-        const string WIDTH = "Width";
-        const string HEIGHT = "Height";
-
         DesignElement? parentPositioned = null;
         if (Parent is DesignElement parent && parent.Target is Positioned)
             parentPositioned = parent;
         switch (pos)
         {
             case AnchorPosition.MiddleLeft:
-                var oldWidth = Data.TryGetPropertyValue(WIDTH, out var width)
-                    ? (float)width!.Value.Value!
-                    : Target!.W;
-                var newWidth = oldWidth - dx;
-                if (parentPositioned == null)
-                {
-                    ChangeLayoutPropertyValue(WIDTH, newWidth); //设置自身的宽度
-                }
-                else
-                {
-                    var hasLeft = parentPositioned.Data.TryGetPropertyValue(LEFT, out var left);
-                    var hasRight = parentPositioned.Data.TryGetPropertyValue(RIGHT, out _);
-                    if (hasLeft && hasRight)
-                    {
-                        //Left与Right都有值仅调整Left
-                        parentPositioned.ChangeLayoutPropertyValue(LEFT, ((float)left!.Value.Value!) + dx);
-                    }
-                    else if (hasLeft)
-                    {
-                        //仅Left有值调整Left并修改宽度
-                        ChangeLayoutPropertyValue(WIDTH, newWidth);
-                        parentPositioned.ChangeLayoutPropertyValue(LEFT, ((float)left!.Value.Value!) + dx);
-                    }
-                    else
-                    {
-                        //仅Right有值修改宽度
-                        ChangeLayoutPropertyValue(WIDTH, newWidth);
-                    }
-                }
-
+                ResizeLeft(parentPositioned, dx);
                 break;
+            case AnchorPosition.MiddleRight:
+                ResizeRight(parentPositioned, dx);
+                break;
+            case AnchorPosition.TopMiddle:
+                ResizeTop(parentPositioned, dy);
+                break;
+            case AnchorPosition.BottomMiddle:
+                ResizeBottom(parentPositioned, dy);
+                break;
+        }
+    }
+
+    private void ResizeLeft(DesignElement? parentPositioned, float dx)
+    {
+        if (dx == 0) return;
+
+        var oldWidth = Data.TryGetPropertyValue(WIDTH, out var width)
+            ? (float)width!.Value.Value!
+            : Target!.W;
+        var newWidth = oldWidth - dx;
+        if (parentPositioned == null)
+        {
+            ChangeLayoutPropertyValue(WIDTH, newWidth); //设置自身的宽度
+        }
+        else
+        {
+            var hasLeft = parentPositioned.Data.TryGetPropertyValue(LEFT, out var left);
+            var hasRight = parentPositioned.Data.TryGetPropertyValue(RIGHT, out _);
+            if (hasLeft && hasRight)
+            {
+                //Left与Right都有值仅调整Left
+                parentPositioned.ChangeLayoutPropertyValue(LEFT, ((float)left!.Value.Value!) + dx);
+            }
+            else if (hasLeft)
+            {
+                //仅Left有值调整Left并修改宽度
+                ChangeLayoutPropertyValue(WIDTH, newWidth);
+                parentPositioned.ChangeLayoutPropertyValue(LEFT, ((float)left!.Value.Value!) + dx);
+            }
+            else
+            {
+                //仅Right有值修改宽度
+                ChangeLayoutPropertyValue(WIDTH, newWidth);
+            }
+        }
+    }
+
+    private void ResizeRight(DesignElement? parentPositioned, float dx)
+    {
+        if (dx == 0) return;
+
+        var oldWidth = Data.TryGetPropertyValue(WIDTH, out var width)
+            ? (float)width!.Value.Value!
+            : Target!.W;
+        var newWidth = oldWidth + dx;
+        if (parentPositioned == null)
+        {
+            ChangeLayoutPropertyValue(WIDTH, newWidth); //设置自身的宽度
+        }
+        else
+        {
+            var hasLeft = parentPositioned.Data.TryGetPropertyValue(LEFT, out _);
+            var hasRight = parentPositioned.Data.TryGetPropertyValue(RIGHT, out var right);
+            if (hasLeft && hasRight)
+            {
+                //Left与Right都有值仅调整Right
+                parentPositioned.ChangeLayoutPropertyValue(RIGHT, ((float)right!.Value.Value!) - dx);
+            }
+            else if (hasRight)
+            {
+                //仅Right有值调整Right并修改宽度
+                ChangeLayoutPropertyValue(WIDTH, newWidth);
+                parentPositioned.ChangeLayoutPropertyValue(RIGHT, ((float)right!.Value.Value!) - dx);
+            }
+            else
+            {
+                //仅Left有值修改宽度
+                ChangeLayoutPropertyValue(WIDTH, newWidth);
+            }
+        }
+    }
+
+    private void ResizeTop(DesignElement? parentPositioned, float dy)
+    {
+        if (dy == 0) return;
+
+        var oldHeight = Data.TryGetPropertyValue(HEIGHT, out var height)
+            ? (float)height!.Value.Value!
+            : Target!.H;
+        var newHeight = oldHeight - dy;
+        if (parentPositioned == null)
+        {
+            ChangeLayoutPropertyValue(HEIGHT, newHeight); //设置自身的高度
+        }
+        else
+        {
+            var hasTop = parentPositioned.Data.TryGetPropertyValue(TOP, out var top);
+            var hasBottom = parentPositioned.Data.TryGetPropertyValue(BOTTOM, out _);
+            if (hasTop && hasBottom)
+            {
+                parentPositioned.ChangeLayoutPropertyValue(TOP, ((float)top!.Value.Value!) + dy);
+            }
+            else if (hasTop)
+            {
+                ChangeLayoutPropertyValue(HEIGHT, newHeight);
+                parentPositioned.ChangeLayoutPropertyValue(TOP, ((float)top!.Value.Value!) + dy);
+            }
+            else
+            {
+                ChangeLayoutPropertyValue(HEIGHT, newHeight);
+            }
+        }
+    }
+
+    private void ResizeBottom(DesignElement? parentPositioned, float dy)
+    {
+        if (dy == 0) return;
+
+        var oldHeight = Data.TryGetPropertyValue(HEIGHT, out var height)
+            ? (float)height!.Value.Value!
+            : Target!.H;
+        var newHeight = oldHeight + dy;
+        if (parentPositioned == null)
+        {
+            ChangeLayoutPropertyValue(HEIGHT, newHeight);
+        }
+        else
+        {
+            var hasTop = parentPositioned.Data.TryGetPropertyValue(TOP, out _);
+            var hasBottom = parentPositioned.Data.TryGetPropertyValue(BOTTOM, out var bottom);
+            if (hasTop && hasBottom)
+            {
+                parentPositioned.ChangeLayoutPropertyValue(BOTTOM, ((float)bottom!.Value.Value!) - dy);
+            }
+            else if (hasBottom)
+            {
+                ChangeLayoutPropertyValue(HEIGHT, newHeight);
+                parentPositioned.ChangeLayoutPropertyValue(BOTTOM, ((float)bottom!.Value.Value!) - dy);
+            }
+            else
+            {
+                ChangeLayoutPropertyValue(HEIGHT, newHeight);
+            }
         }
     }
 
@@ -351,6 +486,12 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
 
     #region ====Widget Overrides====
 
+    protected override void OnUnmounted()
+    {
+        HideSelectedDecorator();
+        base.OnUnmounted();
+    }
+
     public override void VisitChildren(Func<Widget, bool> action)
     {
         if (Child != null) action(Child);
@@ -386,15 +527,9 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
         if (Child != null)
-        {
-            if (IsSelected) canvas.Save();
             base.Paint(canvas, area);
-            if (IsSelected) canvas.Restore();
-        }
         else
             DrawPlaceholder(canvas);
-
-        DrawSelection(canvas);
     }
 
     private void DrawPlaceholder(Canvas canvas)
@@ -408,7 +543,7 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         canvas.DrawParagraph(paragraph, (W - paragraph.MaxIntrinsicWidth) / 2f, (H - paragraph.Height) / 2f);
     }
 
-    private Rect GetAnchorRect(AnchorPosition position)
+    internal Rect GetAnchorRect(AnchorPosition position)
     {
         //TopLeft
         //Rect.FromLTWH(0 - anchorSize / 2, 0 - anchorSize / 2, anchorSize, anchorSize)
@@ -436,32 +571,9 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         };
     }
 
-    private void DrawSelection(Canvas canvas)
-    {
-        if (!IsSelected) return;
-
-        var scaleRatio = Controller.Zoom.Value / 100f;
-        var borderSize = 3f;
-
-        var paint = PaintUtils.Shared(Theme.FocusedColor, PaintStyle.Stroke, borderSize * scaleRatio);
-        canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), paint);
-
-        paint = PaintUtils.Shared(Theme.FocusedColor, PaintStyle.Fill, 1f * scaleRatio);
-
-        DrawAnchor(canvas, paint, GetAnchorRect(AnchorPosition.TopMiddle));
-        DrawAnchor(canvas, paint, GetAnchorRect(AnchorPosition.MiddleLeft));
-        DrawAnchor(canvas, paint, GetAnchorRect(AnchorPosition.MiddleRight));
-        DrawAnchor(canvas, paint, GetAnchorRect(AnchorPosition.BottomMiddle));
-    }
-
-    private static void DrawAnchor(Canvas canvas, Paint paint, Rect rect)
-    {
-        canvas.DrawRect(rect, paint);
-    }
-
     #endregion
 
-    private enum AnchorPosition
+    internal enum AnchorPosition
     {
         TopMiddle,
         MiddleLeft,

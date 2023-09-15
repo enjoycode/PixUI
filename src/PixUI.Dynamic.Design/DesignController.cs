@@ -66,11 +66,7 @@ public sealed partial class DesignController
         OnSelectionChanged();
     }
 
-    internal void OnSelectionChanged()
-    {
-        SelectionChanged?.Invoke();
-        RootElement.Invalidate(InvalidAction.Repaint); //暂在这里全部刷新，待实现选择装饰器后移除
-    }
+    internal void OnSelectionChanged() => SelectionChanged?.Invoke();
 
     #endregion
 

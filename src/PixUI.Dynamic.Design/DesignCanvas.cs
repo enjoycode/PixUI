@@ -33,4 +33,18 @@ public sealed class DesignCanvas : View, IDynamicView
 
         return ((IDynamicDataSetStateValue)state.Value).GetRuntimeDataSet();
     }
+
+    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)
+    {
+        canvas.Save();
+        if (X != 0 || Y != 0)
+            canvas.Translate(X, Y);
+        //注意忽略onlyTransform参数始终clip
+        canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
+    }
+
+    protected internal override void AfterPaint(Canvas canvas)
+    {
+        canvas.Restore();
+    }
 }
