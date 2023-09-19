@@ -154,6 +154,24 @@ public sealed class PropertyEditor : Widget
     {
         //TODO:先判断是否指定编辑器
 
+        //判断是否枚举类型
+        if (valueType.IsEnum)
+        {
+            var propState = new RxProxy<string?>(
+                () =>
+                {
+                    var enumValue = GetPropertyValue(element, propertyMeta);
+                    return enumValue?.ToString(); //TODO: 考虑无值转换为枚举的默认值
+                },
+                v =>
+                {
+                    var enumValue = Enum.Parse(valueType, v!);
+                    SetPropertyValue(element, propertyMeta, enumValue);
+                });
+            editingValue = propState;
+            return new Select<string>(propState) { Options = Enum.GetNames(valueType) };
+        }
+
         //获取注册的编辑器信息
         var editorInfo = TryGetValueEditorByValueType(valueType);
         if (editorInfo == null)
