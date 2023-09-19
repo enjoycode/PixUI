@@ -398,6 +398,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
         }
         else
         {
+            _drawCtx.Canvas = canvas;
             _drawCtx.Width = (int)W;
             _drawCtx.Height = (int)H;
             _drawCtx.Background = BackColor.AsSKColor();

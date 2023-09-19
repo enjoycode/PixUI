@@ -242,7 +242,7 @@ public class LabelGeometry : Geometry, ILabelGeometry<SkiaDrawingContext>
         return TextSize;
     }
 
-    private string[] GetLines(string multiLineText)
+    private static string[] GetLines(string multiLineText)
     {
 #if __WEB__
         return string.IsNullOrEmpty(multiLineText)
