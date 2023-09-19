@@ -161,8 +161,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
         UIApplication.Current.BeginInvoke(action);
     }
 
-    // void IChartView.Invalidate() //TODO: rename IChartView.Invalidate()
-    //     => CoreCanvas.Invalidate();
+    //void IChartView.Invalidate() => CoreCanvas.Invalidate();
 
     public IPaint<SkiaDrawingContext>? LegendTextPaint
     {
@@ -384,15 +383,27 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
             core.Update();
     }
 
+
+    private SkiaDrawingContext? _drawCtx;
+
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
         canvas.Save();
         canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
+        
+        if (_drawCtx == null)
+        {
+            _drawCtx = new SkiaDrawingContext(CanvasCore, (int)W, (int)H, canvas)
+                { Background = BackColor.AsSKColor() };
+        }
+        else
+        {
+            _drawCtx.Width = (int)W;
+            _drawCtx.Height = (int)H;
+            _drawCtx.Background = BackColor.AsSKColor();
+        }
 
-        //TODO: cache SkiaSharpDrawingContext instance
-        var drawCtx = new SkiaDrawingContext(CanvasCore, (int)W, (int)H, canvas);
-        drawCtx.Background = BackColor.AsSKColor();
-        CanvasCore.DrawFrame(drawCtx);
+        CanvasCore.DrawFrame(_drawCtx);
 
         canvas.Restore();
     }
