@@ -77,7 +77,7 @@ public class LabelGeometry : Geometry, ILabelGeometry<SkiaDrawingContext>
     }
 
     /// <inheritdoc cref="ILabelGeometry{TDrawingContext}.Padding" />
-    public Padding Padding { get; set; } = new (0, 0, 0, 0);
+    public Padding Padding { get; set; } = new(0, 0, 0, 0);
 
     /// <inheritdoc cref="ILabelGeometry{TDrawingContext}.LineHeight" />
     public float LineHeight { get; set; } = 1.75f;
@@ -199,7 +199,7 @@ public class LabelGeometry : Geometry, ILabelGeometry<SkiaDrawingContext>
 
         //TODO: 暂简单实现
         using var para = PixUI.TextPainter.BuildParagraph(content, float.PositiveInfinity, TextSize, paint.Color);
-        context.Canvas.DrawParagraph(para, X, Y + yLine - TextSize);
+        context.Canvas.DrawParagraph(para, X, Y + yLine - para.Height + LineHeight);
     }
 
     private LvcSize MeasureLines(SKPaint paint)
@@ -215,7 +215,8 @@ public class LabelGeometry : Geometry, ILabelGeometry<SkiaDrawingContext>
             //h += lineHeight;
 
             //TODO: 暂简单实现
-            using var para = PixUI.TextPainter.BuildParagraph(line, float.PositiveInfinity, TextSize, paint.Color, null, 1, true);
+            using var para =
+                PixUI.TextPainter.BuildParagraph(line, float.PositiveInfinity, TextSize, paint.Color, null, 1, true);
             h += para.Height * LineHeight;
             if (para.LongestLine > w) w = para.LongestLine;
         }
@@ -251,6 +252,6 @@ public class LabelGeometry : Geometry, ILabelGeometry<SkiaDrawingContext>
         return string.IsNullOrEmpty(multiLineText)
             ? Array.Empty<string>()
             : multiLineText.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-#endif        
+#endif
     }
 }
