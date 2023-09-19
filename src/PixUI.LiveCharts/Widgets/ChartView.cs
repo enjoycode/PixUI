@@ -86,7 +86,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
     public IChart CoreChart => core!;
     public bool DesignerMode => false;
 
-    public LvcColor BackColor { get; set; } = new(255, 255, 255);
+    public LvcColor BackColor { get; set; } = new(255, 255, 255, 0);
 
     public LvcSize ControlSize
     {
@@ -390,7 +390,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
     {
         canvas.Save();
         canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
-        
+
         if (_drawCtx == null)
         {
             _drawCtx = new SkiaDrawingContext(CanvasCore, (int)W, (int)H, canvas)
