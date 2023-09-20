@@ -228,6 +228,15 @@ public sealed class DynamicPropertyMeta
 
         return source.Value;
     }
+
+    public void SetRuntimeValue(DynamicWidgetMeta meta, Widget target, in DynamicValue propertyValue)
+    {
+        //TODO: emit 优化，暂用反射
+
+        var runtimeValue = GetRuntimeValue(propertyValue);
+        var propInfo = meta.WidgetType.GetProperty(Name);
+        propInfo!.SetValue(target, runtimeValue);
+    }
 }
 
 public sealed class DynamicEventMeta

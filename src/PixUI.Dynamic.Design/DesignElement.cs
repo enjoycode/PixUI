@@ -157,11 +157,8 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
     {
         if (Meta == null || Target == null) throw new Exception();
 
-        //TODO: emit 优化，暂用反射
         var propMeta = Meta.GetPropertyMeta(propertyValue.Name);
-        var propValue = propMeta.GetRuntimeValue(propertyValue.Value);
-        var propInfo = Meta.WidgetType.GetProperty(propertyValue.Name);
-        propInfo!.SetValue(Target, propValue);
+        propMeta.SetRuntimeValue(Meta, Target, propertyValue.Value);
     }
 
     /// <summary>
