@@ -393,7 +393,9 @@ internal sealed class InvalidQueue
                 temp.BeforePaint(canvas, false, dirtyRect);
                 if (canvas.IsClipEmpty)
                 {
-                    Log.Debug("重绘裁剪区域为空");
+                    if (temp is IPaintEmptyClip paintEmptyClip)
+                        paintEmptyClip.ClearOrStopPaint(canvas);
+                    Log.Debug($"{temp}重绘时裁剪区域为空");
                     canvas.RestoreToCount(saveCount);
                     return;
                 }
@@ -404,7 +406,7 @@ internal sealed class InvalidQueue
             }
         }
 
-        //恢复坐标转换开始绘制
+        //恢复坐标转换从opaque开始绘制
         var factor = widget.Root!.Window.ScaleFactor;
         var matrix = Matrix4.CreateScale(factor, factor, 1);
         canvas.SetMatrix(matrix);

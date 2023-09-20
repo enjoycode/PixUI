@@ -16,7 +16,7 @@ using LCC = LiveChartsCore;
 
 namespace LiveCharts;
 
-public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingContext>
+public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingContext>, IPaintEmptyClip
 {
     protected ChartView(IChartTooltip<SkiaDrawingContext>? tooltip,
         IChartLegend<SkiaDrawingContext>? legend)
@@ -320,7 +320,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
         _isDrawingLoopRunning = true;
 
         var ts = TimeSpan.FromSeconds(1 / MaxFps);
-        while (!CanvasCore.IsValid)
+        while (!CanvasCore.IsValid && _isDrawingLoopRunning)
         {
             Invalidate(InvalidAction.Repaint);
             await Task.Delay((int)ts.TotalMilliseconds);
@@ -383,6 +383,11 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
             core.Update();
     }
 
+    void IPaintEmptyClip.ClearOrStopPaint(Canvas canvas)
+    {
+        //暂直接停止DrawingLoop
+        _isDrawingLoopRunning = false;
+    }
 
     private SkiaDrawingContext? _drawCtx;
 
