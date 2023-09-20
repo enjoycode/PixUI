@@ -17,8 +17,8 @@ public sealed class BlazorCursors : IPlatformCursors
     private static readonly BlazorCursor _arrow = new("auto");
     private static readonly BlazorCursor _hand = new("pointer");
     private static readonly BlazorCursor _ibeam = new("text");
-    private static readonly BlazorCursor _resizeLR = new("e-resize");
-    private static readonly BlazorCursor _resizeUD = new("s-resize");
+    private static readonly BlazorCursor _resizeLR = new("ew-resize");
+    private static readonly BlazorCursor _resizeUD = new("ns-resize");
 
     public Cursor Arrow => _arrow;
     public Cursor Hand => _hand;
