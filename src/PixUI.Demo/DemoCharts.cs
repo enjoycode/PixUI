@@ -1,9 +1,12 @@
 using System.Collections.Generic;
+using System.IO;
 using LiveChartsCore;
 using LiveChartsCore.Measure;
 using LiveCharts;
+using LiveCharts.Drawing;
 using LiveCharts.Painting;
 using LiveCharts.VisualElements;
+using LiveChartsCore.Geo;
 
 namespace PixUI.Demo;
 
@@ -38,30 +41,41 @@ public sealed class DemoCharts : View
 
     public DemoCharts()
     {
-        Child = new Row
+        var geoJson = ResourceLoad.LoadStream("Resources.wuxi.json");
+        var wuxiMap = Maps.GetMapFromStreamReader<SkiaDrawingContext>(new StreamReader(geoJson));
+
+        Child = new Column
         {
             Children =
             {
-                new Card
+                new Row
                 {
-                    Child = new CartesianChart
+                    Children =
                     {
-                        Series = series,
-                        //Title = title,
-                        Width = 400,
-                        Height = 300,
+                        new Card
+                        {
+                            Child = new CartesianChart
+                            {
+                                Series = series,
+                                //Title = title,
+                                Width = 400,
+                                Height = 300,
+                            }
+                        },
+                        new Card
+                        {
+                            Child = new PieChart
+                            {
+                                Series = pieSeries,
+                                LegendPosition = LegendPosition.Right,
+                                Width = 600,
+                                Height = 300,
+                            }
+                        }
                     }
                 },
-                new Card
-                {
-                    Child = new PieChart
-                    {
-                        Series = pieSeries,
-                        LegendPosition = LegendPosition.Right,
-                        Width = 600,
-                        Height = 300,
-                    }
-                }
+                
+                new GeoMap() { ActiveMap = wuxiMap }
             }
         };
     }

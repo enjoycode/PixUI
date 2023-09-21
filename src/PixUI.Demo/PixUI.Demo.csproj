@@ -16,6 +16,8 @@
 
     <ItemGroup>
       <EmbeddedResource Include="Resources\Cat.webp" />
+      <None Remove="Resources\wuxi.json" />
+      <EmbeddedResource Include="Resources\wuxi.json" />
     </ItemGroup>
 
 </Project>

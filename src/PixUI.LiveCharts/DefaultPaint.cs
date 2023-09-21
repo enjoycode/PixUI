@@ -34,7 +34,7 @@ namespace LiveCharts;
 /// Defines a default paint task.
 /// </summary>
 /// <seealso cref="IPaint{TDrawingContext}" />
-[Obsolete("This is an obsolete class to make maps work, thgey are out-dated and will behave differently in the future.")]
+[Obsolete("This is an obsolete class to make maps work, they are out-dated and will behave differently in the future.")]
 public class DefaultPaint : IPaint<SkiaDrawingContext>
 {
     /// <summary>
