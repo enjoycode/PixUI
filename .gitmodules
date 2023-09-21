@@ -1,4 +1,4 @@
 [submodule "ext/LiveCharts2"]
 	path = ext/LiveCharts2
 	url = git@github.com:enjoycode/LiveCharts2.git
-	branch = PixUI
+	branch = PixUI2
