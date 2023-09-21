@@ -24,6 +24,8 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
         if (tooltip != null) this.tooltip = tooltip;
         if (legend != null) this.legend = legend;
 
+        _motionCanvas = new MotionCanvas(this);
+
         if (!LCC.LiveCharts.IsConfigured)
             LCC.LiveCharts.Configure(config => config.UseDefaults());
 
@@ -47,6 +49,8 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
     }
 
     #region ====Fields====
+
+    private readonly MotionCanvas _motionCanvas;
 
     protected LiveChartsCore.Chart<SkiaDrawingContext>? core;
 
@@ -239,7 +243,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
     public event VisualElementHandler<SkiaDrawingContext>? VisualElementsPointerDown;
 
     public bool AutoUpdateEnabled { get; set; } = true;
-    public MotionCanvas<SkiaDrawingContext> CoreCanvas => CanvasCore;
+    public MotionCanvas<SkiaDrawingContext> CoreCanvas => _motionCanvas.CanvasCore;
 
     public IChartLegend<SkiaDrawingContext>? Legend
     {
@@ -293,57 +297,6 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
 
     #endregion
 
-    #region ====MotionCanvas====
-
-    private bool _isDrawingLoopRunning = false;
-    private List<PaintSchedule<SkiaDrawingContext>> _paintTasksSchedule = new();
-
-    public List<PaintSchedule<SkiaDrawingContext>> PaintTasks
-    {
-        get => _paintTasksSchedule;
-        set
-        {
-            _paintTasksSchedule = value;
-            OnPaintTasksChanged();
-        }
-    }
-
-    public double MaxFps { get; set; } = 65;
-
-    public MotionCanvas<SkiaDrawingContext> CanvasCore { get; } = new();
-
-    private void CanvasCore_Invalidated(MotionCanvas<SkiaDrawingContext> sender) => RunDrawingLoop();
-
-    private async void RunDrawingLoop()
-    {
-        if (_isDrawingLoopRunning) return;
-        _isDrawingLoopRunning = true;
-
-        var ts = TimeSpan.FromSeconds(1 / MaxFps);
-        while (!CanvasCore.IsValid && _isDrawingLoopRunning)
-        {
-            Invalidate(InvalidAction.Repaint);
-            await Task.Delay((int)ts.TotalMilliseconds);
-        }
-
-        _isDrawingLoopRunning = false;
-    }
-
-    private void OnPaintTasksChanged()
-    {
-        var tasks = new HashSet<IPaint<SkiaDrawingContext>>();
-
-        foreach (var item in _paintTasksSchedule)
-        {
-            item.PaintTask.SetGeometries(CanvasCore, item.Geometries);
-            _ = tasks.Add(item.PaintTask);
-        }
-
-        CanvasCore.SetPaintTasks(tasks);
-    }
-
-    #endregion
-
     #region ====Widget Overrides====
 
     public MouseRegion MouseRegion { get; }
@@ -353,15 +306,15 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
         base.OnMounted();
         core?.Load();
 
-        CanvasCore.Invalidated += CanvasCore_Invalidated;
+        CoreCanvas.Invalidated += _motionCanvas.CanvasCore_Invalidated;
     }
 
     protected override void OnUnmounted()
     {
         base.OnUnmounted();
 
-        CanvasCore.Invalidated -= CanvasCore_Invalidated;
-        CanvasCore.Dispose();
+        CoreCanvas.Invalidated -= _motionCanvas.CanvasCore_Invalidated;
+        CoreCanvas.Dispose();
 
         if (tooltip is IDisposable disposableTooltip)
             disposableTooltip.Dispose();
@@ -386,7 +339,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
     void IPaintEmptyClip.ClearOrStopPaint(Canvas canvas)
     {
         //暂直接停止DrawingLoop
-        _isDrawingLoopRunning = false;
+        _motionCanvas.StopDrawingLoop();
     }
 
     private SkiaDrawingContext? _drawCtx;
@@ -398,7 +351,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
 
         if (_drawCtx == null)
         {
-            _drawCtx = new SkiaDrawingContext(CanvasCore, (int)W, (int)H, canvas)
+            _drawCtx = new SkiaDrawingContext(CoreCanvas, (int)W, (int)H, canvas)
                 { Background = BackColor.AsSKColor() };
         }
         else
@@ -409,7 +362,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
             _drawCtx.Background = BackColor.AsSKColor();
         }
 
-        CanvasCore.DrawFrame(_drawCtx);
+        CoreCanvas.DrawFrame(_drawCtx);
 
         canvas.Restore();
     }

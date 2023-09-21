@@ -199,7 +199,7 @@ public class LabelGeometry : Geometry, ILabelGeometry<SkiaDrawingContext>
 
         //TODO: 暂简单实现
         using var para = PixUI.TextPainter.BuildParagraph(content, float.PositiveInfinity, TextSize, paint.Color);
-        context.Canvas.DrawParagraph(para, X, Y + yLine - para.Height + LineHeight);
+        context.Canvas.DrawParagraph(para, X, Y + yLine - TextSize /*para.Height + LineHeight*/);
     }
 
     private LvcSize MeasureLines(SKPaint paint)

@@ -78,11 +78,11 @@ public sealed class CartesianChart : ChartView, ICartesianChartView<SkiaDrawingC
             Color = new SKColor(33, 150, 243, 50),
             ZIndex = int.MaxValue
         };
-        zoomingSectionPaint.AddGeometryToPaintTask(CanvasCore, zoomingSection);
-        CanvasCore.AddDrawableTask(zoomingSectionPaint);
+        zoomingSectionPaint.AddGeometryToPaintTask(CoreCanvas, zoomingSection);
+        CoreCanvas.AddDrawableTask(zoomingSectionPaint);
 
         core = new CartesianChart<SkiaDrawingContext>(
-            this, config => config.UseDefaults(), CanvasCore, zoomingSection);
+            this, config => config.UseDefaults(), CoreCanvas, zoomingSection);
         if (((IChartView)this).DesignerMode) return;
         core.Update();
     }

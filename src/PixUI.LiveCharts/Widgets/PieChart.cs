@@ -46,7 +46,7 @@ public sealed class PieChart : ChartView, IPieChartView<SkiaDrawingContext>
     protected override void InitializeCore()
     {
         core = new PieChart<SkiaDrawingContext>(
-            this, config => config.UseDefaults(), CanvasCore, true);
+            this, config => config.UseDefaults(), CoreCanvas, true);
         if (DesignerMode) return;
         core.Update();
     }
