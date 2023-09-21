@@ -18,6 +18,10 @@
       <EmbeddedResource Include="Resources\Cat.webp" />
       <None Remove="Resources\wuxi.json" />
       <EmbeddedResource Include="Resources\wuxi.json" />
+      <None Remove="Resources\world.geojson" />
+      <EmbeddedResource Include="Resources\world.json" />
+      <None Remove="Resources\China.json" />
+      <EmbeddedResource Include="Resources\China.json" />
     </ItemGroup>
 
 </Project>

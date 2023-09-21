@@ -67,7 +67,7 @@ public static class ThemesExtensions
                             axis.SeparatorsPaint = cartesian.Orientation == AxisOrientation.X
                                 ? null
                                 : new SolidColorPaint {Color = new SKColor(235, 235, 235)};
-                            cartesian.Padding = Padding.All(12);
+                            cartesian.Padding = new Padding(12);
                         }
                         else
                         {
@@ -229,7 +229,7 @@ public static class ThemesExtensions
                             axis.SeparatorsPaint = cartesian.Orientation == AxisOrientation.X
                                 ? null
                                 : SolidColorPaint.MakeByColor(new SKColor(90, 90, 90));
-                            cartesian.Padding = Padding.All(12);
+                            cartesian.Padding = new Padding(12);
                         }
                         else
                         {

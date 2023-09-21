@@ -20,7 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
+using LiveCharts.Drawing;
+using LiveCharts.Drawing.Geometries;
 
 namespace LiveCharts.Drawing.Geometries;
 
@@ -38,7 +39,7 @@ public class CircleGeometry : SizedGeometry
         matchDimensions = true;
     }
 
-    /// <inheritdoc cref="Geometry.OnDraw(SkiaDrawingContext, SKPaint)" />
+    /// <inheritdoc cref="Geometry.OnDraw(SkiaSharpDrawingContext, SKPaint)" />
     public override void OnDraw(SkiaDrawingContext context, SKPaint paint)
     {
         var rx = Width / 2f;

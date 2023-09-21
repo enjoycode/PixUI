@@ -29,6 +29,7 @@ using LiveChartsCore.Kernel;
 using LiveCharts.Drawing;
 using LiveCharts.Drawing.Geometries;
 using LiveCharts.Drawing.Segments;
+using LiveChartsCore;
 
 namespace LiveCharts;
 
@@ -59,13 +60,8 @@ public class MapFactory : IMapFactory<SkiaDrawingContext>
 
         foreach (var layer in layersQuery)
         {
-#if __WEB__
-            var stroke = /*layer.Stroke == LiveChartsCore.LiveCharts.DefaultPaint ? context.View.Stroke :*/ layer.Stroke;
-            var fill = /*layer.Fill == LiveChartsCore.LiveCharts.DefaultPaint ? context.View.Fill :*/ layer.Fill;
-#else            
-            var stroke = layer.Stroke == LiveChartsCore.LiveCharts.DefaultPaint ? context.View.Stroke : layer.Stroke;
-            var fill = layer.Fill == LiveChartsCore.LiveCharts.DefaultPaint ? context.View.Fill : layer.Fill;
-#endif
+            var stroke = context.View.Stroke ?? layer.Stroke;
+            var fill = context.View.Fill ?? layer.Fill;
 
             if (fill is not null)
             {
@@ -73,6 +69,7 @@ public class MapFactory : IMapFactory<SkiaDrawingContext>
                 _ = _usedPaints.Add(fill);
                 _ = toRemovePaints.Remove(fill);
             }
+
             if (stroke is not null)
             {
                 context.View.Canvas.AddDrawableTask(stroke);
@@ -92,13 +89,7 @@ public class MapFactory : IMapFactory<SkiaDrawingContext>
                     if (landData.Shape is null)
                     {
                         landData.Shape = shape = new HeatPathShape { IsClosed = true };
-
-                        _ = shape
-                            .TransitionateProperties(nameof(HeatPathShape.FillColor))
-                            .WithAnimation(animation =>
-                                animation
-                                    .WithDuration(TimeSpan.FromMilliseconds(800))
-                                    .WithEasingFunction(LiveChartsCore.EasingFunctions.ExponentialOut));
+                        shape.Animate(EasingFunctions.ExponentialOut, TimeSpan.FromMilliseconds(800));
                     }
                     else
                     {
@@ -147,10 +138,6 @@ public class MapFactory : IMapFactory<SkiaDrawingContext>
 
         foreach (var paint in toRemovePaints)
         {
-#if !__WEB__            
-            if (paint == LiveChartsCore.LiveCharts.DefaultPaint) continue;
-#endif
-
             _ = _usedPaints.Remove(paint);
             context.View.Canvas.RemovePaintTask(paint);
         }
@@ -163,10 +150,10 @@ public class MapFactory : IMapFactory<SkiaDrawingContext>
     }
 
     /// <inheritdoc cref="IMapFactory{TDrawingContext}.ViewTo(GeoMap{TDrawingContext}, object)"/>
-    public void ViewTo(LiveChartsCore.GeoMap<SkiaDrawingContext> sender, object? command) { }
+    public void ViewTo(GeoMap<SkiaDrawingContext> sender, object? command) { }
 
     /// <inheritdoc cref="IMapFactory{TDrawingContext}.Pan(GeoMap{TDrawingContext}, LvcPoint)"/>
-    public void Pan(LiveChartsCore.GeoMap<SkiaDrawingContext> sender, LvcPoint delta) { }
+    public void Pan(GeoMap<SkiaDrawingContext> sender, LvcPoint delta) { }
 
     /// <summary>
     /// Disposes the map factory.
@@ -176,18 +163,13 @@ public class MapFactory : IMapFactory<SkiaDrawingContext>
         if (_mapView is not null)
         {
             var layersQuery = _mapView.ActiveMap.Layers.Values
-               .Where(x => x.IsVisible)
-               .OrderByDescending(x => x.ProcessIndex);
+                .Where(x => x.IsVisible)
+                .OrderByDescending(x => x.ProcessIndex);
 
             foreach (var layer in layersQuery)
             {
-#if __WEB__
-                var stroke = /*layer.Stroke == LiveChartsCore.LiveCharts.DefaultPaint ? _mapView.Stroke :*/ layer.Stroke;
-                var fill = /*layer.Fill == LiveChartsCore.LiveCharts.DefaultPaint ? _mapView.Fill :*/ layer.Fill;
-#else                
-                var stroke = layer.Stroke == LiveChartsCore.LiveCharts.DefaultPaint ? _mapView.Stroke : layer.Stroke;
-                var fill = layer.Fill == LiveChartsCore.LiveCharts.DefaultPaint ? _mapView.Fill : layer.Fill;
-#endif
+                var stroke = _mapView.Stroke ?? layer.Stroke;
+                var fill = _mapView.Fill ?? layer.Fill;
 
                 foreach (var landDefinition in layer.Lands.Values)
                 {
@@ -202,14 +184,15 @@ public class MapFactory : IMapFactory<SkiaDrawingContext>
                         landData.Shape = null;
                     }
                 }
+
                 foreach (var paint in _usedPaints)
                 {
                     _mapView.Canvas.RemovePaintTask(paint);
                     paint.ClearGeometriesFromPaintTask(_mapView.Canvas);
                 }
 
-                _mapView.Canvas.RemovePaintTask(stroke);
-                _mapView.Canvas.RemovePaintTask(fill);
+                if (stroke is not null) _mapView.Canvas.RemovePaintTask(stroke);
+                if (fill is not null) _mapView.Canvas.RemovePaintTask(fill);
             }
         }
 

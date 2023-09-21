@@ -21,17 +21,17 @@
 // SOFTWARE.
 
 using System;
+using LiveCharts.Drawing;
+using LiveCharts.Motion;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Motion;
-using LiveCharts.Motion;
-using LiveCharts.Painting;
 
 namespace LiveCharts.Drawing.Geometries;
 
 /// <inheritdoc cref="IGeometry{TDrawingContext}" />
-public abstract class Geometry : Drawable, IGeometry<SkiaDrawingContext>, IVisualChartPoint<SkiaDrawingContext>
+public abstract class Geometry : Drawable, IGeometry<SkiaDrawingContext>
 {
-    private readonly bool _hasGeometryTransform = false;
+    private readonly bool _hasGeometryTransform;
     private readonly FloatMotionProperty _opacityProperty;
     private readonly FloatMotionProperty _xProperty;
     private readonly FloatMotionProperty _yProperty;
@@ -41,11 +41,11 @@ public abstract class Geometry : Drawable, IGeometry<SkiaDrawingContext>, IVisua
     private readonly PointMotionProperty _skewProperty;
     private readonly PointMotionProperty _translateProperty;
     private readonly SKMatrixMotionProperty _transformProperty;
-    private bool _hasTransform = false;
-    private bool _hasRotation = false;
-    private bool _hasScale = false;
-    private bool _hasSkew = false;
-    private bool _hasTranslate = false;
+    private bool _hasTransform;
+    private bool _hasRotation;
+    private bool _hasScale;
+    private bool _hasSkew;
+    private bool _hasTranslate;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Geometry"/> class.
@@ -73,10 +73,22 @@ public abstract class Geometry : Drawable, IGeometry<SkiaDrawingContext>, IVisua
     private bool HasTransform => _hasGeometryTransform || _hasTranslate || _hasRotation || _hasScale || _hasSkew || _hasTransform;
 
     /// <inheritdoc cref="IGeometry{TDrawingContext}.X" />
-    public float X { get => _xProperty.GetMovement(this); set => _xProperty.SetMovement(value, this); }
+    public float X
+    {
+        get => Parent is null
+            ? _xProperty.GetMovement(this)
+            : _xProperty.GetMovement(this) + Parent.X;
+        set => _xProperty.SetMovement(value, this);
+    }
 
     /// <inheritdoc cref="IGeometry{TDrawingContext}.Y" />
-    public float Y { get => _yProperty.GetMovement(this); set => _yProperty.SetMovement(value, this); }
+    public float Y
+    {
+        get => Parent is null
+            ? _yProperty.GetMovement(this)
+            : _yProperty.GetMovement(this) + Parent.Y;
+        set => _yProperty.SetMovement(value, this);
+    }
 
     /// <inheritdoc cref="IGeometry{TDrawingContext}.TransformOrigin" />
     public LvcPoint TransformOrigin
@@ -92,7 +104,7 @@ public abstract class Geometry : Drawable, IGeometry<SkiaDrawingContext>, IVisua
         set
         {
             _translateProperty.SetMovement(value, this);
-            _hasTranslate = value.X != 0 || value.Y != 0;
+            _hasTranslate = true;
         }
     }
 
@@ -103,7 +115,7 @@ public abstract class Geometry : Drawable, IGeometry<SkiaDrawingContext>, IVisua
         set
         {
             _rotationProperty.SetMovement(value, this);
-            _hasRotation = value != 0;
+            _hasRotation = true;
         }
     }
 
@@ -114,7 +126,7 @@ public abstract class Geometry : Drawable, IGeometry<SkiaDrawingContext>, IVisua
         set
         {
             _scaleProperty.SetMovement(value, this);
-            _hasScale = value.X != 1 || value.Y != 1;
+            _hasScale = true;
         }
     }
 
@@ -125,7 +137,7 @@ public abstract class Geometry : Drawable, IGeometry<SkiaDrawingContext>, IVisua
         set
         {
             _skewProperty.SetMovement(value, this);
-            _hasSkew = value.X != 0 || value.Y != 0;
+            _hasSkew = true;
         }
     }
 
@@ -141,7 +153,7 @@ public abstract class Geometry : Drawable, IGeometry<SkiaDrawingContext>, IVisua
         set
         {
             _transformProperty.SetMovement(value, this);
-            _hasTransform = !value.IsIdentity;
+            _hasTransform = true;
         }
     }
 
@@ -154,8 +166,8 @@ public abstract class Geometry : Drawable, IGeometry<SkiaDrawingContext>, IVisua
     /// <inheritdoc cref="IPaintable{TDrawingContext}.Fill" />
     public IPaint<SkiaDrawingContext>? Fill { get; set; }
 
-    /// <inheritdoc cref="IVisualChartPoint{TDrawingContext}.MainGeometry" />
-    public IGeometry<SkiaDrawingContext> MainGeometry => GetHighlitableGeometry();
+    /// <inheritdoc cref="IGeometry{TDrawingContext}.Parent"/>
+    public IGeometry<SkiaDrawingContext>? Parent { get; set; }
 
     /// <summary>
     /// Draws the geometry in the user interface.
@@ -165,7 +177,7 @@ public abstract class Geometry : Drawable, IGeometry<SkiaDrawingContext>, IVisua
     {
         if (HasTransform)
         {
-            context.Canvas.Save();
+            _ = context.Canvas.Save();
 
             var m = OnMeasure(context.PaintTask);
             var o = TransformOrigin;
@@ -173,11 +185,6 @@ public abstract class Geometry : Drawable, IGeometry<SkiaDrawingContext>, IVisua
 
             var xo = m.Width * o.X;
             var yo = m.Height * o.Y;
-
-            if (_hasGeometryTransform)
-            {
-                ApplyCustomGeometryTransform(context);
-            }
 
             if (_hasRotation)
             {
@@ -215,34 +222,48 @@ public abstract class Geometry : Drawable, IGeometry<SkiaDrawingContext>, IVisua
             }
         }
 
-        SKPaint? originalStroke = null;
-        if (context.PaintTask.IsStroke && Stroke is not null)
-        {
-            Stroke.IsStroke = true;
-            originalStroke = context.Paint;
-            Stroke.InitializeTask(context);
-        }
-        SKPaint? originalFill = null;
-        if (!context.PaintTask.IsStroke && Fill is not null)
-        {
-            Fill.IsStroke = false;
-            originalFill = context.Paint;
-            Fill.InitializeTask(context);
-        }
+        var hasGeometryOpacity = Opacity < 1;
 
-        if (Opacity != 1) context.PaintTask.ApplyOpacityMask(context, this);
-        OnDraw(context, context.Paint);
-        if (Opacity != 1) context.PaintTask.RestoreOpacityMask(context, this);
-
-        if (context.PaintTask.IsStroke && Stroke is not null)
+        if (Fill is null && Stroke is null)
         {
-            Stroke.Dispose();
-            if (originalStroke != null) context.Paint = originalStroke;
+            if (hasGeometryOpacity) context.PaintTask.ApplyOpacityMask(context, this);
+            OnDraw(context, context.Paint);
+            if (hasGeometryOpacity) context.PaintTask.RestoreOpacityMask(context, this);
         }
-        if (!context.PaintTask.IsStroke && Fill is not null)
+        else
         {
-            Fill.Dispose();
-            if (originalFill != null) context.Paint = originalFill;
+            var originalPaint = context.Paint;
+            var originalTask = context.PaintTask;
+
+            // using fill and stroke on each geometry has a performance penalty, but allows
+            // to use different paints for each geometry.
+
+            if (Fill is not null)
+            {
+                Fill.IsStroke = false;
+                Fill.InitializeTask(context);
+
+                if (hasGeometryOpacity) Fill.ApplyOpacityMask(context, this);
+                OnDraw(context, context.Paint);
+                if (hasGeometryOpacity) Fill.RestoreOpacityMask(context, this);
+
+                Fill.Dispose();
+            }
+
+            if (Stroke is not null)
+            {
+                Stroke.IsStroke = true;
+                Stroke.InitializeTask(context);
+
+                if (hasGeometryOpacity) Stroke.ApplyOpacityMask(context, this);
+                OnDraw(context, context.Paint);
+                if (hasGeometryOpacity) Stroke.RestoreOpacityMask(context, this);
+
+                Stroke.Dispose();
+            }
+
+            context.Paint = originalPaint;
+            context.PaintTask = originalTask;
         }
 
         if (HasTransform) context.Canvas.Restore();
@@ -262,24 +283,20 @@ public abstract class Geometry : Drawable, IGeometry<SkiaDrawingContext>, IVisua
     /// <returns>the size of the geometry.</returns>
     public LvcSize Measure(IPaint<SkiaDrawingContext> drawableTask)
     {
-        var measure = OnMeasure((Paint)drawableTask);
+        var measure = OnMeasure(drawableTask);
 
         var r = RotateTransform;
         if (Math.Abs(r) > 0)
         {
-            const double toRadias = Math.PI / 180;
+            const double toRadians = Math.PI / 180;
 
             r %= 360;
             if (r < 0) r += 360;
 
             if (r > 180) r = 360 - r;
-#if __WEB__
-            if (r > 90 && r <= 180) r = 180 - r;
-#else
             if (r is > 90 and <= 180) r = 180 - r;
-#endif            
 
-            var rRadians = r * toRadias;
+            var rRadians = r * toRadians;
 
             var w = (float)(Math.Cos(rRadians) * measure.Width + Math.Sin(rRadians) * measure.Height);
             var h = (float)(Math.Sin(rRadians) * measure.Width + Math.Cos(rRadians) * measure.Height);
@@ -293,22 +310,7 @@ public abstract class Geometry : Drawable, IGeometry<SkiaDrawingContext>, IVisua
     /// <summary>
     /// Called when the geometry is measured.
     /// </summary>
-    /// <param name="paintTaks">The paint task.</param>
+    /// <param name="paintTasks">The paint task.</param>
     /// <returns>the size of the geometry</returns>
-    protected abstract LvcSize OnMeasure(Paint paintTaks);
-
-    /// <summary>
-    /// Gets the highlitable geometry.
-    /// </summary>
-    /// <returns></returns>
-    protected virtual IGeometry<SkiaDrawingContext> GetHighlitableGeometry()
-    {
-        return this;
-    }
-
-    /// <summary>
-    /// Applies the geometry transform.
-    /// </summary>
-    /// <param name="context"></param>
-    protected virtual void ApplyCustomGeometryTransform(SkiaDrawingContext context) { }
+    protected abstract LvcSize OnMeasure(IPaint<SkiaDrawingContext> paintTasks);
 }

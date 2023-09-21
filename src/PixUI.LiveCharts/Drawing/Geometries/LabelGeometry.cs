@@ -21,8 +21,12 @@
 // SOFTWARE.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Motion;
+using PixUI;
 using Paint = LiveCharts.Painting.Paint;
 
 namespace LiveCharts.Drawing.Geometries;
@@ -32,6 +36,8 @@ public class LabelGeometry : Geometry, ILabelGeometry<SkiaDrawingContext>
 {
     private readonly FloatMotionProperty _textSizeProperty;
     private readonly ColorMotionProperty _backgroundProperty;
+    internal float _maxTextHeight = 0f;
+    internal int _lines;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LabelGeometry"/> class.
@@ -80,80 +86,221 @@ public class LabelGeometry : Geometry, ILabelGeometry<SkiaDrawingContext>
     public Padding Padding { get; set; } = new(0, 0, 0, 0);
 
     /// <inheritdoc cref="ILabelGeometry{TDrawingContext}.LineHeight" />
-    public float LineHeight { get; set; } = 1.75f;
+    public float LineHeight { get; set; } = 1.45f;
+
+    /// <inheritdoc cref="ILabelGeometry{TDrawingContext}.MaxWidth" />
+    public float MaxWidth { get; set; } = float.MaxValue;
+
+#if DEBUG
+    /// <summary>
+    /// This property is only available on debug mode, it indicates if the debug lines should be shown.
+    /// </summary>
+    public static bool ShowDebugLines { get; set; }
+#endif
 
     /// <inheritdoc cref="Geometry.OnDraw(SkiaDrawingContext, SKPaint)" />
     public override void OnDraw(SkiaDrawingContext context, SKPaint paint)
     {
+        var p = Padding;
+        var bg = Background;
+
         var size = OnMeasure(context.PaintTask);
 
-        var bg = Background;
-        if (bg != LvcColor.Empty)
-        {
-            using var bgPaint = new SKPaint { Color = new SKColor(bg.R, bg.G, bg.B, (byte)(bg.A * Opacity)) };
-            var p = Padding;
-            context.Canvas.DrawRect(X - p.Left, Y - size.Height + p.Bottom, size.Width, size.Height, bgPaint);
-        }
+        var isFirstLine = true;
+        var verticalPos =
+            _lines > 1
+                ? VerticalAlign switch // respect alignment on multiline labels
+                {
+                    Align.Start => 0,
+                    Align.Middle => -_lines * _maxTextHeight * 0.5f,
+                    Align.End => -_lines * _maxTextHeight,
+                    _ => 0
+                }
+                : 0;
 
-        var lines = GetLines(Text);
-        double linesCount = lines.Length;
-        var lineNumber = 0;
-        var lhd = (GetActualLineHeight(paint) - GetRawLineHeight(paint)) * 0.5f;
+        var textBounds = new SKRect();
 
-        foreach (var line in lines)
+        foreach (var line in GetLines(context.Paint))
         {
-            var ph = (float)(++lineNumber / linesCount) * size.Height;
-            var yLine = ph - size.Height;
-            DrawLine(line, yLine - lhd, context, paint);
+            //_ = context.Paint.MeasureText(line, ref textBounds);
+            using var ph = TextPainter.BuildParagraph(line, float.MaxValue, TextSize, paint.Color, forceHeight: true);
+            textBounds.Width = ph.MaxIntrinsicWidth;
+            textBounds.Height = ph.Height;
+
+            var lhd = (textBounds.Height * LineHeight - _maxTextHeight) * 0.5f;
+            var ao = GetAlignmentOffset(textBounds);
+
+            if (isFirstLine && bg != LvcColor.Empty)
+            {
+                var c = new SKColor(bg.R, bg.G, bg.B, (byte)(bg.A * Opacity));
+                using var bgPaint = new SKPaint { Color = c };
+
+                context.Canvas.DrawRect(X + ao.X, Y + ao.Y - textBounds.Height, size.Width, size.Height, bgPaint);
+            }
+
+            // if (paint.Typeface is not null)
+            //     context.Canvas.DrawShapedText(shaper, line, X + ao.X + p.Left, Y + ao.Y + p.Top + lhd + verticalPos, paint);
+            // else
+            //     context.Canvas.DrawText(line, X + ao.X + p.Left, Y + ao.Y + p.Top + lhd + verticalPos, paint);
+            context.Canvas.DrawParagraph(ph, X + ao.X + p.Left, Y + ao.Y + p.Top + lhd + verticalPos);
+
+#if DEBUG
+            if (ShowDebugLines)
+            {
+                using var r = new SKPaint { Color = new SKColor(255, 0, 0), Style = PaintStyle.Stroke };
+                using var b = new SKPaint { Color = new SKColor(0, 0, 255), Style = PaintStyle.Stroke };
+
+                context.Canvas.DrawRect(X - 2.5f, Y - 2.5f, 5, 5, b);
+
+                context.Canvas.DrawRect(
+                    X + ao.X,
+                    Y + ao.Y - textBounds.Height + verticalPos,
+                    textBounds.Width + Padding.Left + Padding.Right,
+                    textBounds.Height * LineHeight + Padding.Top + Padding.Bottom,
+                    r);
+
+                context.Canvas.DrawRect(
+                    X + ao.X + p.Left,
+                    Y + ao.Y - textBounds.Height + p.Top + verticalPos,
+                    textBounds.Width,
+                    textBounds.Height * LineHeight,
+                    b);
+            }
+#endif
+
+            verticalPos += _maxTextHeight * LineHeight;
+            isFirstLine = false;
         }
     }
 
-    /// <inheritdoc cref="Geometry.OnMeasure(Painting.Paint)" />
-    protected override LvcSize OnMeasure(Paint drawable)
+    /// <inheritdoc cref="Geometry.OnMeasure(IPaint&lt;SkiaDrawingContext&gt;)" />
+    protected override LvcSize OnMeasure(IPaint<SkiaDrawingContext> paint)
     {
+        //TODO: cache Measure result
+
+        var skiaPaint = (Paint)paint;
         //var typeface = drawable.GetSKTypeface();
 
         using var p = new SKPaint
         {
-            Color = drawable.Color,
-            AntiAlias = drawable.IsAntialias,
-            Style = drawable.IsStroke ? SKPaintStyle.Stroke : SKPaintStyle.Fill,
-            StrokeWidth = drawable.StrokeThickness,
+            Color = skiaPaint.Color,
+            AntiAlias = skiaPaint.IsAntialias,
+            Style = skiaPaint.IsStroke ? SKPaintStyle.Stroke : SKPaintStyle.Fill,
+            StrokeWidth = skiaPaint.StrokeThickness,
             //TextSize = TextSize,
             //Typeface = typeface
         };
 
-        var bounds = MeasureLines(p);
+
+        var w = 0f;
+        _maxTextHeight = 0f;
+        _lines = 0;
+
+        foreach (var line in GetLines(p))
+        {
+            var bounds = new SKRect();
+            //_ = p.MeasureText(line, ref bounds);
+            using var ph = TextPainter.BuildParagraph(line, float.MaxValue, TextSize, skiaPaint.Color, forceHeight: true);
+            bounds.Width = ph.MaxIntrinsicWidth;
+            bounds.Height = ph.Height;
+
+            if (bounds.Width > w) w = bounds.Width;
+            if (bounds.Height > _maxTextHeight) _maxTextHeight = bounds.Height;
+            _lines++;
+        }
+
+        var h = _maxTextHeight * _lines * LineHeight;
 
         // Note #301222
-        // Disposing typefaces could cause render issues.
-        // Does this causes memory leaks?
+        // Disposing typefaces could cause render issues (Blazor) at least on SkiaSharp (2.88.3)
+        // Could this cause memory leaks?
         // Should the user dispose typefaces manually?
-        //typeface.Dispose();
+        // typeface.Dispose();
+        return new LvcSize(w + Padding.Left + Padding.Right, h + Padding.Top + Padding.Bottom);
+    }
+    
+    internal IEnumerable<string> GetLines(SKPaint paint)
+    {
+        IEnumerable<string> lines = Text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 
-        return new LvcSize(bounds.Width + Padding.Left + Padding.Right, bounds.Height + Padding.Top + Padding.Bottom);
+        if (MaxWidth != float.MaxValue)
+            lines = lines.SelectMany(x => GetLinesByMaxWidth(x, paint));
+
+        return lines;
     }
 
-    /// <inheritdoc cref="Geometry.ApplyCustomGeometryTransform(SkiaDrawingContext)" />
-    protected override void ApplyCustomGeometryTransform(SkiaDrawingContext context)
+    private IEnumerable<string> GetLinesByMaxWidth(string source, SKPaint paint)
     {
-        //context.Paint.TextSize = TextSize;
-        var size = MeasureLines(context.Paint);
+        // DISCLAIM ====================================================================
+        // WE ARE USING A DOUBLE STRING BUILDER, AND MEASURE THE REAL STRING EVERY TIME
+        // BECAUSE IT SEEMS THAT THE SKIA MEASURE TEXT IS INCONSISTENT, FOR EXAMPLE:
 
-        const double toRadians = Math.PI / 180d;
+        //using var p = new SKPaint() { Color = SKColors.Black, TextSize = 15 };
+        //var b = new SKRect();
+        //_ = p.MeasureText("nullam. Ut tellus", ref b);
+
+        //var w1 = b.Width;
+
+        //var w2 = 0f;
+        //_ = p.MeasureText("nullam.", ref b);
+        //w2 += b.Width;
+        //_ = p.MeasureText(" Ut", ref b);
+        //w2 += b.Width;
+        //_ = p.MeasureText(" tellus", ref b);
+        //w2 += b.Width;
+
+        //Assert.IsTrue(w1 == w2); THIS IS FALSE!!!!
+
+        var sb = new StringBuilder();
+        var sb2 = new StringBuilder();
+        var words = source.Split(new[] { " ", Environment.NewLine }, StringSplitOptions.None);
+        var bounds = new SKRect();
+        var mw = MaxWidth - Padding.Left - Padding.Right;
+
+        foreach (var word in words)
+        {
+            _ = sb2.Clear();
+            _ = sb2.Append(sb);
+            _ = sb2.Append(' ');
+            _ = sb2.Append(word);
+            //_ = paint.MeasureText(sb2.ToString(), ref bounds);
+            using var ph = TextPainter.BuildParagraph(sb2.ToString(), float.MaxValue, TextSize, Colors.Black,
+                forceHeight: true);
+            bounds.Width = ph.MaxIntrinsicWidth;
+            bounds.Height = ph.Height;
+
+            if (bounds.Width > mw)
+            {
+                yield return sb.ToString();
+                _ = sb.Clear();
+            }
+
+            if (sb.Length > 0) _ = sb.Append(' ');
+            _ = sb.Append(word);
+        }
+
+        if (sb.Length > 0) yield return sb.ToString();
+    }
+
+    private LvcPoint GetAlignmentOffset(SKRect bounds)
+    {
         var p = Padding;
-        float w = 0.5f, h = 0.5f;
+
+        var w = bounds.Width + p.Left + p.Right;
+        var h = bounds.Height * LineHeight + p.Top + p.Bottom;
+
+        float l = -bounds.Left, t = -bounds.Top;
 
         switch (VerticalAlign)
         {
             case Align.Start:
-                h = 1f * size.Height + p.Top;
+                t += 0;
                 break;
             case Align.Middle:
-                h = 0.5f * (size.Height + p.Top - p.Bottom);
+                t -= h * 0.5f;
                 break;
             case Align.End:
-                h = 0f * size.Height - p.Bottom;
+                t -= h + 0;
                 break;
             default:
                 break;
@@ -162,96 +309,18 @@ public class LabelGeometry : Geometry, ILabelGeometry<SkiaDrawingContext>
         switch (HorizontalAlign)
         {
             case Align.Start:
-                w = 0f * size.Width - p.Left;
+                l += 0;
                 break;
             case Align.Middle:
-                w = 0.5f * (size.Width - p.Left + p.Right);
+                l -= w * 0.5f;
                 break;
             case Align.End:
-                w = 1 * size.Width + p.Right;
+                l -= w + 0;
                 break;
             default:
                 break;
         }
 
-        var rotation = RotateTransform;
-        rotation = (float)(rotation * toRadians);
-
-        var xp = -Math.Cos(rotation) * w + -Math.Sin(rotation) * h;
-        var yp = -Math.Sin(rotation) * w + Math.Cos(rotation) * h;
-
-        // translate the label to the upper-left corner
-        // just for consistency with the rest of the shapes in the library (and Skia??),
-        // and also translate according to the vertical an horizontal alignment properties
-        context.Canvas.Translate((float)xp, (float)yp);
-    }
-
-    private void DrawLine(string content, float yLine, SkiaDrawingContext context, SKPaint paint)
-    {
-        // if (paint.Typeface is not null)
-        // {
-        //     using var eventTextShaper = new SKShaper(paint.Typeface);
-        //     context.Canvas.DrawShapedText(content, new SKPoint(X, Y + yLine), paint);
-        //     return;
-        // }
-        //
-        // context.Canvas.DrawText(content, new SKPoint(X, Y + yLine), paint);
-
-        //TODO: 暂简单实现
-        using var para = PixUI.TextPainter.BuildParagraph(content, float.PositiveInfinity, TextSize, paint.Color);
-        context.Canvas.DrawParagraph(para, X, Y + yLine - TextSize /*para.Height + LineHeight*/);
-    }
-
-    private LvcSize MeasureLines(SKPaint paint)
-    {
-        float w = 0f, h = 0f;
-        //var lineHeight = GetActualLineHeight(paint);
-
-        foreach (var line in GetLines(Text))
-        {
-            //var bounds = new SKRect();
-            //_ = paint.MeasureText(line, ref bounds);
-            //if (bounds.Width > w) w = bounds.Width;
-            //h += lineHeight;
-
-            //TODO: 暂简单实现
-            using var para =
-                PixUI.TextPainter.BuildParagraph(line, float.PositiveInfinity, TextSize, paint.Color, null, 1, true);
-            h += para.Height * LineHeight;
-            if (para.LongestLine > w) w = para.LongestLine;
-        }
-
-        return new LvcSize(w, h);
-    }
-
-    private float GetActualLineHeight(SKPaint paint)
-    {
-        // var boundsH = new SKRect();
-        // _ = paint.MeasureText("█", ref boundsH);
-        // return LineHeight * boundsH.Height;
-        //TODO: 暂简单实现
-        return TextSize * LineHeight;
-    }
-
-    private float GetRawLineHeight(SKPaint paint)
-    {
-        // var boundsH = new SKRect();
-        // _ = paint.MeasureText("█", ref boundsH);
-        // return boundsH.Height;
-        //TODO: 暂简单实现
-        return TextSize;
-    }
-
-    private static string[] GetLines(string multiLineText)
-    {
-#if __WEB__
-        return string.IsNullOrEmpty(multiLineText)
-            ? Array.Empty<string>()
-            : multiLineText.Split('\n');
-#else
-        return string.IsNullOrEmpty(multiLineText)
-            ? Array.Empty<string>()
-            : multiLineText.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-#endif
+        return new(l, t);
     }
 }

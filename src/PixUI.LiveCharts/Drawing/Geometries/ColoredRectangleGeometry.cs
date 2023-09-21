@@ -20,9 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using LiveCharts.Drawing;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Motion;
-
+using PixUI;
 
 namespace LiveCharts.Drawing.Geometries;
 
@@ -30,7 +31,7 @@ namespace LiveCharts.Drawing.Geometries;
 /// Defines a rectangle geometry with a specified color.
 /// </summary>
 /// <seealso cref="SizedGeometry" />
-public class ColoredRectangleGeometry : SizedGeometry, ISolidColorChartPoint<SkiaDrawingContext>
+public class ColoredRectangleGeometry : SizedGeometry, IColoredGeometry<SkiaDrawingContext>
 {
     private readonly ColorMotionProperty _colorProperty;
 
@@ -49,12 +50,13 @@ public class ColoredRectangleGeometry : SizedGeometry, ISolidColorChartPoint<Ski
         set => _colorProperty.SetMovement(value, this);
     }
 
-    /// <inheritdoc cref="Geometry.OnDraw(SkiaDrawingContext, SKPaint)" />
+    /// <inheritdoc cref="Geometry.OnDraw(SkiaSharpDrawingContext, SKPaint)" />
     public override void OnDraw(SkiaDrawingContext context, SKPaint paint)
     {
         var c = Color;
         paint.Color = new SKColor(c.R, c.G, c.B, c.A);
 
-        context.Canvas.DrawRect(X, Y, Width, Height, paint);
+        context.Canvas.DrawRect(
+            new SKRect { Top = Y, Left = X, Size = new Size { Height = Height, Width = Width } }, paint);
     }
 }

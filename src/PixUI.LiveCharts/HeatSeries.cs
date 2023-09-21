@@ -24,6 +24,7 @@ using LiveChartsCore.Drawing;
 using LiveChartsCore.Kernel;
 using LiveCharts.Drawing;
 using LiveCharts.Drawing.Geometries;
+using LiveChartsCore;
 
 namespace LiveCharts;
 
@@ -35,57 +36,51 @@ namespace LiveCharts;
 /// to use a custom type, you must register the type globally 
 /// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
 /// or at the series level 
+/// (<see cref="Series{TModel,TVisual,TLabel,TDrawingContext}.Mapping"/>).
+/// </typeparam>
+public class HeatSeries<TModel> : HeatSeries<TModel, ColoredRectangleGeometry, LabelGeometry> { }
+
+/// <summary>
+/// Defines a heat series in the user interface.
+/// </summary>
+/// <typeparam name="TModel">
+/// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
+/// to use a custom type, you must register the type globally 
+/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
+/// or at the series level 
 /// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
 /// </typeparam>
-public sealed class HeatSeries<TModel> 
-    : LiveChartsCore.HeatSeries<TModel, ColoredRectangleGeometry, LabelGeometry, SkiaDrawingContext>
-{
-    public HeatSeries(): base(() => new ColoredRectangleGeometry(), () => new LabelGeometry()) {}
-}
+/// <typeparam name="TVisual">
+/// The type of the geometry of every point of the series.
+/// </typeparam>
+public class HeatSeries<TModel, TVisual> : HeatSeries<TModel, TVisual, LabelGeometry>
+    where TVisual : class, ISizedGeometry<SkiaDrawingContext>, IColoredGeometry<SkiaDrawingContext>, new() { }
 
-// /// <summary>
-// /// Defines a heat series in the user interface.
-// /// </summary>
-// /// <typeparam name="TModel">
-// /// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
-// /// to use a custom type, you must register the type globally 
-// /// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
-// /// or at the series level 
-// /// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
-// /// </typeparam>
-// /// <typeparam name="TVisual">
-// /// The type of the geometry of every point of the series.
-// /// </typeparam>
-// public class HeatSeries<TModel, TVisual> : HeatSeries<TModel, TVisual, LabelGeometry>
-//     where TVisual : class, ISolidColorChartPoint<SkiaSharpDrawingContext>, new()
-// { }
-//
-// /// <summary>
-// /// Defines a heat series in the user interface.
-// /// </summary>
-// /// <typeparam name="TModel">
-// /// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
-// /// to use a custom type, you must register the type globally 
-// /// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
-// /// or at the series level 
-// /// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
-// /// </typeparam>
-// /// <typeparam name="TVisual">
-// /// The type of the geometry of every point of the series.
-// /// </typeparam>
-// /// <typeparam name="TLabel">
-// /// The type of the data label of every point.
-// /// </typeparam>
-// public class HeatSeries<TModel, TVisual, TLabel> : HeatSeries<TModel, TVisual, TLabel, SkiaSharpDrawingContext>
-//     where TVisual : class, ISolidColorChartPoint<SkiaSharpDrawingContext>, new()
-//     where TLabel : class, ILabelGeometry<SkiaSharpDrawingContext>, new()
-// {
-//     /// <summary>
-//     /// Initializes a new instance of the <see cref="HeatSeries{TModel, TVisual, TLabel}"/> class.
-//     /// </summary>
-//     public HeatSeries()
-//     {
-//         // This is required for now...
-//         if (!LiveCharts.IsConfigured) LiveCharts.Configure(config => config.UseDefaults());
-//     }
-// }
+/// <summary>
+/// Defines a heat series in the user interface.
+/// </summary>
+/// <typeparam name="TModel">
+/// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
+/// to use a custom type, you must register the type globally 
+/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
+/// or at the series level 
+/// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
+/// </typeparam>
+/// <typeparam name="TVisual">
+/// The type of the geometry of every point of the series.
+/// </typeparam>
+/// <typeparam name="TLabel">
+/// The type of the data label of every point.
+/// </typeparam>
+public class HeatSeries<TModel, TVisual, TLabel> : HeatSeries<TModel, TVisual, TLabel, SkiaDrawingContext>
+    where TVisual : class, ISizedGeometry<SkiaDrawingContext>, IColoredGeometry<SkiaDrawingContext>, new()
+    where TLabel : class, ILabelGeometry<SkiaDrawingContext>, new()
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HeatSeries{TModel, TVisual, TLabel}"/> class.
+    /// </summary>
+    public HeatSeries()
+    {
+        LiveChartsCore.LiveCharts.Configure(config => config.UseDefaults());
+    }
+}

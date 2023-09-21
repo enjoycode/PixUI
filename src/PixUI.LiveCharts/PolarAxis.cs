@@ -23,15 +23,9 @@
 using LiveChartsCore.Kernel.Sketches;
 using LiveCharts.Drawing;
 using LiveCharts.Drawing.Geometries;
+using LiveChartsCore;
 
 namespace LiveCharts;
 
 /// <inheritdoc cref="ICartesianAxis" />
-public sealed class PolarAxis 
-    : LiveChartsCore.PolarAxis<SkiaDrawingContext, LabelGeometry, LineGeometry, CircleGeometry>
-{
-    public PolarAxis() : 
-        base(() => new LabelGeometry(), 
-            () => new LineGeometry(), 
-            () => new CircleGeometry()) { }
-}
+public class PolarAxis : PolarAxis<SkiaDrawingContext, LabelGeometry, LineGeometry, CircleGeometry> { }

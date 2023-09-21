@@ -21,15 +21,15 @@
 // SOFTWARE.
 
 using System;
+using LiveCharts.Drawing;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Motion;
-using LiveCharts.Painting;
-
+using PixUI;
 
 namespace LiveCharts.Drawing.Geometries;
 
 /// <inheritdoc cref="IDoughnutGeometry{TDrawingContext}" />
-public class DoughnutGeometry : Geometry, IDoughnutGeometry<SkiaDrawingContext>, IDoughnutVisualChartPoint<SkiaDrawingContext>
+public class DoughnutGeometry : Geometry, IDoughnutGeometry<SkiaDrawingContext>
 {
     private readonly FloatMotionProperty _cxProperty;
     private readonly FloatMotionProperty _cyProperty;
@@ -58,19 +58,39 @@ public class DoughnutGeometry : Geometry, IDoughnutGeometry<SkiaDrawingContext>,
     }
 
     /// <inheritdoc cref="IDoughnutGeometry{TDrawingContext}.CenterX" />
-    public float CenterX { get => _cxProperty.GetMovement(this); set => _cxProperty.SetMovement(value, this); }
+    public float CenterX
+    {
+        get => _cxProperty.GetMovement(this);
+        set => _cxProperty.SetMovement(value, this);
+    }
 
     /// <inheritdoc cref="IDoughnutGeometry{TDrawingContext}.CenterY" />
-    public float CenterY { get => _cyProperty.GetMovement(this); set => _cyProperty.SetMovement(value, this); }
+    public float CenterY
+    {
+        get => _cyProperty.GetMovement(this);
+        set => _cyProperty.SetMovement(value, this);
+    }
 
     /// <inheritdoc cref="IDoughnutGeometry{TDrawingContext}.Width" />
-    public float Width { get => _wProperty.GetMovement(this); set => _wProperty.SetMovement(value, this); }
+    public float Width
+    {
+        get => _wProperty.GetMovement(this);
+        set => _wProperty.SetMovement(value, this);
+    }
 
     /// <inheritdoc cref="IDoughnutGeometry{TDrawingContext}.Height" />
-    public float Height { get => _hProperty.GetMovement(this); set => _hProperty.SetMovement(value, this); }
+    public float Height
+    {
+        get => _hProperty.GetMovement(this);
+        set => _hProperty.SetMovement(value, this);
+    }
 
     /// <inheritdoc cref="IDoughnutGeometry{TDrawingContext}.StartAngle" />
-    public float StartAngle { get => _startProperty.GetMovement(this); set => _startProperty.SetMovement(value, this); }
+    public float StartAngle
+    {
+        get => _startProperty.GetMovement(this);
+        set => _startProperty.SetMovement(value, this);
+    }
 
     /// <inheritdoc cref="IDoughnutGeometry{TDrawingContext}.SweepAngle" />
     public float SweepAngle
@@ -80,26 +100,38 @@ public class DoughnutGeometry : Geometry, IDoughnutGeometry<SkiaDrawingContext>,
     }
 
     /// <inheritdoc cref="IDoughnutGeometry{TDrawingContext}.PushOut" />
-    public float PushOut { get => _pushoutProperty.GetMovement(this); set => _pushoutProperty.SetMovement(value, this); }
+    public float PushOut
+    {
+        get => _pushoutProperty.GetMovement(this);
+        set => _pushoutProperty.SetMovement(value, this);
+    }
 
     /// <inheritdoc cref="IDoughnutGeometry{TDrawingContext}.InnerRadius" />
-    public float InnerRadius { get => _innerRadiusProperty.GetMovement(this); set => _innerRadiusProperty.SetMovement(value, this); }
+    public float InnerRadius
+    {
+        get => _innerRadiusProperty.GetMovement(this);
+        set => _innerRadiusProperty.SetMovement(value, this);
+    }
 
     /// <inheritdoc cref="IDoughnutGeometry{TDrawingContext}.CornerRadius" />
-    public float CornerRadius { get => _cornerRadiusProperty.GetMovement(this); set => _cornerRadiusProperty.SetMovement(value, this); }
+    public float CornerRadius
+    {
+        get => _cornerRadiusProperty.GetMovement(this);
+        set => _cornerRadiusProperty.SetMovement(value, this);
+    }
 
     /// <inheritdoc cref="IDoughnutGeometry{TDrawingContext}.InvertedCornerRadius" />
     public bool InvertedCornerRadius { get; set; }
 
     internal static Action<DoughnutGeometry, SkiaDrawingContext, SKPaint>? AlternativeDraw { get; set; }
 
-    /// <inheritdoc cref="Geometry.OnMeasure(Paint)" />
-    protected override LvcSize OnMeasure(Paint paint)
+    /// <inheritdoc cref="Geometry.OnMeasure(IPaint{SkiaSharpDrawingContext})" />
+    protected override LvcSize OnMeasure(IPaint<SkiaDrawingContext> paint)
     {
         return new LvcSize(Width, Height);
     }
 
-    /// <inheritdoc cref="Geometry.OnDraw(SkiaDrawingContext, SKPaint)" />
+    /// <inheritdoc cref="Geometry.OnDraw(SkiaSharpDrawingContext, SKPaint)" />
     public override void OnDraw(SkiaDrawingContext context, SKPaint paint)
     {
         if (AlternativeDraw is not null)
@@ -127,19 +159,29 @@ public class DoughnutGeometry : Geometry, IDoughnutGeometry<SkiaDrawingContext>,
             (float)(cx + Math.Cos(startAngle * toRadians) * r),
             (float)(cy + Math.Sin(startAngle * toRadians) * r));
         path.ArcTo(
-            SKRect.FromLTWH(X, Y, Width, Height),
+            new SKRect { Left = X, Top = Y, Size = new Size { Width = Width, Height = Height } },
             startAngle,
             sweepAngle,
             false);
         path.LineTo(
             (float)(cx + Math.Cos((sweepAngle + startAngle) * toRadians) * wedge),
             (float)(cy + Math.Sin((sweepAngle + startAngle) * toRadians) * wedge));
-        path.ArcTo( wedge, wedge, 0,
-            sweepAngle > 180 ? false : true,
+        path.ArcTo(
+            //new SKPoint { X = wedge, Y = wedge },
+            wedge, wedge,
+            0,
+            //sweepAngle > 180 ? SKPathArcSize.Large : SKPathArcSize.Small,
+            !(sweepAngle > 180),
+            //SKPathDirection.CounterClockwise,
             true,
+            // new SKPoint
+            // {
+            //     X = (float)(cx + Math.Cos(startAngle * toRadians) * wedge),
+            //     Y = (float)(cy + Math.Sin(startAngle * toRadians) * wedge)
+            // }
             (float)(cx + Math.Cos(startAngle * toRadians) * wedge),
             (float)(cy + Math.Sin(startAngle * toRadians) * wedge)
-            );
+        );
 
         path.Close();
 
@@ -149,7 +191,7 @@ public class DoughnutGeometry : Geometry, IDoughnutGeometry<SkiaDrawingContext>,
             var x = pushout * (float)Math.Cos(pushoutAngle * toRadians);
             var y = pushout * (float)Math.Sin(pushoutAngle * toRadians);
 
-            context.Canvas.Save();
+            _ = context.Canvas.Save();
             context.Canvas.Translate(x, y);
         }
 

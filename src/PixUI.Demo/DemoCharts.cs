@@ -35,14 +35,13 @@ public sealed class DemoCharts : View
     {
         Text = "My Chart Title",
         TextSize = 25,
-        Padding = LiveChartsCore.Drawing.Padding.All(15),
+        Padding = new LiveChartsCore.Drawing.Padding(15),
         Paint = new SolidColorPaint { Color = Colors.Gray }
     };
 
     public DemoCharts()
     {
-        var geoJson = ResourceLoad.LoadStream("Resources.wuxi.json");
-        var wuxiMap = Maps.GetMapFromStreamReader<SkiaDrawingContext>(new StreamReader(geoJson));
+        var geoJson = ResourceLoad.LoadStream("Resources.China.json");
 
         Child = new Column
         {
@@ -74,8 +73,14 @@ public sealed class DemoCharts : View
                         }
                     }
                 },
-                
-                new GeoMap() { ActiveMap = wuxiMap }
+
+                new GeoMap()
+                {
+                    Width = 500,
+                    Height = 300,
+                    MapProjection = MapProjection.Mercator,
+                    ActiveMap = Maps.GetMapFromStreamReader<SkiaDrawingContext>(new StreamReader(geoJson))
+                }
             }
         };
     }

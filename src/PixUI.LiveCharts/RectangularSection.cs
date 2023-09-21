@@ -22,13 +22,11 @@
 
 using LiveCharts.Drawing;
 using LiveCharts.Drawing.Geometries;
+using LiveChartsCore;
 
 namespace LiveCharts;
 
 /// <summary>
 /// Defines a rectangular section in a Cartesian chart.
 /// </summary>
-public sealed class RectangularSection : LiveChartsCore.Section<RectangleGeometry, SkiaDrawingContext>
-{
-    public RectangularSection(): base(() => new RectangleGeometry()) {}
-}
+public class RectangularSection : Section<RectangleGeometry, LabelGeometry, SkiaDrawingContext> { }

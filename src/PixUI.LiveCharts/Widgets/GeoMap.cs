@@ -19,8 +19,7 @@ public sealed class GeoMap : Widget, IMouseRegion, IGeoMapView<SkiaDrawingContex
     {
         _motionCanvas = new MotionCanvas(this);
 
-        if (!LCC.LiveCharts.IsConfigured)
-            LCC.LiveCharts.Configure(config => config.UseDefaults());
+        LCC.LiveCharts.Configure(config => config.UseDefaults());
 
         _core = new GeoMap<SkiaDrawingContext>(this);
 
@@ -59,6 +58,8 @@ public sealed class GeoMap : Widget, IMouseRegion, IGeoMapView<SkiaDrawingContex
     #region ====IGeoMapView====
 
     public bool DesignerMode => false;
+
+    public object SyncContext { get; set; } = new();
 
     public MotionCanvas<SkiaDrawingContext> Canvas => _motionCanvas.CanvasCore;
 
@@ -176,6 +177,31 @@ public sealed class GeoMap : Widget, IMouseRegion, IGeoMapView<SkiaDrawingContex
 
         if (HasLayout && (oldWidth != W || oldHeight != H))
             _core.Update();
+    }
+
+    private SkiaDrawingContext? _drawCtx;
+
+    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    {
+        canvas.Save();
+        canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
+
+        if (_drawCtx == null)
+        {
+            _drawCtx = new SkiaDrawingContext(_motionCanvas.CanvasCore, (int)W, (int)H, canvas);
+            //{ Background = BackColor.AsSKColor() };
+        }
+        else
+        {
+            _drawCtx.Canvas = canvas;
+            _drawCtx.Width = (int)W;
+            _drawCtx.Height = (int)H;
+            //_drawCtx.Background = BackColor.AsSKColor();
+        }
+
+        _motionCanvas.CanvasCore.DrawFrame(_drawCtx);
+
+        canvas.Restore();
     }
 
     void IPaintEmptyClip.ClearOrStopPaint(Canvas canvas)

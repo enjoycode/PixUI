@@ -25,6 +25,7 @@ using LiveChartsCore.Drawing;
 using LiveChartsCore.Kernel;
 using LiveCharts.Drawing;
 using LiveCharts.Drawing.Geometries;
+using LiveChartsCore;
 
 namespace LiveCharts;
 
@@ -36,18 +37,9 @@ namespace LiveCharts;
 /// to use a custom type, you must register the type globally 
 /// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
 /// or at the series level 
-/// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
+/// (<see cref="Series{TModel,TVisual,TLabel,TDrawingContext}.Mapping"/>).
 /// </typeparam>
-public sealed class LineSeries<TModel> 
-    : LiveChartsCore.LineSeries<TModel, CircleGeometry, LabelGeometry, SkiaDrawingContext,
-    CubicBezierAreaGeometry, BezierPoint<CircleGeometry>>
-{
-    public LineSeries(bool isStacked = false) 
-        : base(() => new CircleGeometry(), () => new LabelGeometry(), 
-            () => new CubicBezierAreaGeometry(), 
-            () => new BezierPoint<CircleGeometry>(new CircleGeometry()), 
-            isStacked) { }
-}
+public class LineSeries<TModel> : LineSeries<TModel, CircleGeometry, LabelGeometry> { }
 
 /// <summary>
 /// Defines a line series in the user interface.
@@ -62,9 +54,8 @@ public sealed class LineSeries<TModel>
 /// <typeparam name="TVisual">
 /// The type of the geometry of every point of the series.
 /// </typeparam>
-// public class LineSeries<TModel, TVisual> : LineSeries<TModel, TVisual, LabelGeometry>
-//     where TVisual : class, ISizedVisualChartPoint<SkiaSharpDrawingContext>, new()
-// { }
+public class LineSeries<TModel, TVisual> : LineSeries<TModel, TVisual, LabelGeometry>
+    where TVisual : class, ISizedGeometry<SkiaDrawingContext>, new() { }
 
 /// <summary>
 /// Defines a line series in the user interface.
@@ -82,8 +73,7 @@ public sealed class LineSeries<TModel>
 /// <typeparam name="TLabel">
 /// The type of the data label of every point.
 /// </typeparam>
-// public class LineSeries<TModel, TVisual, TLabel>
-//     : LineSeries<TModel, TVisual, TLabel, SkiaSharpDrawingContext, CubicBezierAreaGeometry, BezierPoint<TVisual>>
-//     where TVisual : class, ISizedVisualChartPoint<SkiaSharpDrawingContext>, new()
-//     where TLabel : class, ILabelGeometry<SkiaSharpDrawingContext>, new()
-// { }
+public class LineSeries<TModel, TVisual, TLabel>
+    : LineSeries<TModel, TVisual, TLabel, SkiaDrawingContext, CubicBezierAreaGeometry, LineGeometry>
+    where TVisual : class, ISizedGeometry<SkiaDrawingContext>, new()
+    where TLabel : class, ILabelGeometry<SkiaDrawingContext>, new() { }

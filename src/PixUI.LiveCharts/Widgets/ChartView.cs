@@ -24,8 +24,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
 
         _motionCanvas = new MotionCanvas(this);
 
-        if (!LCC.LiveCharts.IsConfigured)
-            LCC.LiveCharts.Configure(config => config.UseDefaults());
+        LCC.LiveCharts.Configure(config => config.UseDefaults());
 
         InitializeCore();
 
@@ -238,7 +237,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
     public event ChartEventHandler<SkiaDrawingContext>? Measuring;
     public event ChartEventHandler<SkiaDrawingContext>? UpdateStarted;
     public event ChartEventHandler<SkiaDrawingContext>? UpdateFinished;
-    public event VisualElementHandler<SkiaDrawingContext>? VisualElementsPointerDown;
+    public event VisualElementsHandler<SkiaDrawingContext>? VisualElementsPointerDown;
 
     public bool AutoUpdateEnabled { get; set; } = true;
     public MotionCanvas<SkiaDrawingContext> CoreCanvas => _motionCanvas.CanvasCore;
@@ -267,21 +266,6 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
         }
     }
 
-    public void ShowTooltip(IEnumerable<ChartPoint> points)
-    {
-        if (tooltip is null || core is null) return;
-
-        tooltip.Show(points, core);
-    }
-
-    public void HideTooltip()
-    {
-        if (tooltip is null || core is null) return;
-
-        core.ClearTooltipData();
-        tooltip.Hide();
-    }
-
     public void OnVisualElementPointerDown(IEnumerable<VisualElement<SkiaDrawingContext>> visualElements,
         LvcPoint pointer)
     {
@@ -292,6 +276,18 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
         TooltipFindingStrategy strategy = TooltipFindingStrategy.Automatic);
 
     public abstract IEnumerable<VisualElement<SkiaDrawingContext>> GetVisualsAt(LvcPoint point);
+
+    void IChartView.Invalidate() => CoreCanvas.Invalidate();
+
+    public object SyncContext
+    {
+        get => CoreCanvas.Sync;
+        set
+        {
+            CoreCanvas.Sync = value;
+            OnPropertyChanged();
+        }
+    }
 
     #endregion
 
@@ -330,7 +326,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
 
         SetSize(width, height);
 
-        if (core != null && !core.IsFirstDraw && (oldWidth != W || oldHeight != H))
+        if (core != null && HasLayout && (oldWidth != W || oldHeight != H))
             core.Update();
     }
 

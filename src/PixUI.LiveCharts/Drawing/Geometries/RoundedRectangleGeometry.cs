@@ -20,9 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using LiveCharts.Drawing;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Motion;
-
 
 namespace LiveCharts.Drawing.Geometries;
 
@@ -30,42 +30,30 @@ namespace LiveCharts.Drawing.Geometries;
 /// Defines a rounded rectangle geometry.
 /// </summary>
 /// <seealso cref="SizedGeometry" />
-public class RoundedRectangleGeometry : SizedGeometry, IRoundedRectangleChartPoint<SkiaDrawingContext>
+public class RoundedRectangleGeometry : SizedGeometry, IRoundedGeometry<SkiaDrawingContext>
 {
-    private readonly FloatMotionProperty _rx;
-    private readonly FloatMotionProperty _ry;
+    private readonly PointMotionProperty _borderRadius;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RoundedRectangleGeometry"/> class.
     /// </summary>
     public RoundedRectangleGeometry()
     {
-        _rx = RegisterMotionProperty(new FloatMotionProperty(nameof(Rx), 8f));
-        _ry = RegisterMotionProperty(new FloatMotionProperty(nameof(Ry), 8f));
+        _borderRadius = RegisterMotionProperty(new PointMotionProperty(nameof(BorderRadius), new LvcPoint(8f, 8f)));
     }
 
-    /// <summary>
-    /// Gets or sets the rx, the rounding in the x axis.
-    /// </summary>
-    /// <value>
-    /// The rx.
-    /// </value>
-    public float Rx { get => _rx.GetMovement(this); set => _rx.SetMovement(value, this); }
+    /// <inheritdoc cref="IRoundedGeometry{TDrawingContext}.BorderRadius"/>
+    public LvcPoint BorderRadius
+    {
+        get => _borderRadius.GetMovement(this);
+        set => _borderRadius.SetMovement(value, this);
+    }
 
-    /// <summary>
-    /// Gets or sets the ry, the rounding in the axis.
-    /// </summary>
-    /// <value>
-    /// The ry.
-    /// </value>
-    public float Ry { get => _ry.GetMovement(this); set => _ry.SetMovement(value, this); }
-
-    /// <inheritdoc cref="Geometry.OnDraw(SkiaDrawingContext, SKPaint)" />
+    /// <inheritdoc cref="Geometry.OnDraw(SkiaSharpDrawingContext, SKPaint)" />
     public override void OnDraw(SkiaDrawingContext context, SKPaint paint)
     {
-        // context.Canvas.DrawRoundRect(
-        //     new SKRect { Top = Y, Left = X, Size = new SKSize { Height = Height, Width = Width } }, Rx, Ry, paint);
-        using var rrect = PixUI.RRect.FromRectAndRadius(SKRect.FromLTWH(X, Y, Width, Height), Rx, Ry);
+        using var rrect =
+            PixUI.RRect.FromRectAndRadius(SKRect.FromLTWH(X, Y, Width, Height), BorderRadius.X, BorderRadius.Y);
         context.Canvas.DrawRRect(rrect, paint);
     }
 }

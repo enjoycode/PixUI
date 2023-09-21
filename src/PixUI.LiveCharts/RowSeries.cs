@@ -24,6 +24,7 @@ using LiveChartsCore.Drawing;
 using LiveChartsCore.Kernel;
 using LiveCharts.Drawing;
 using LiveCharts.Drawing.Geometries;
+using LiveChartsCore;
 
 namespace LiveCharts;
 
@@ -35,48 +36,43 @@ namespace LiveCharts;
 /// to use a custom type, you must register the type globally 
 /// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
 /// or at the series level 
-/// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
+/// (<see cref="Series{TModel,TVisual,TLabel,TDrawingContext}.Mapping"/>).
 /// </typeparam> data label of every point.
-public sealed class RowSeries<TModel> 
-    : LiveChartsCore.RowSeries<TModel, RoundedRectangleGeometry, LabelGeometry, SkiaDrawingContext>
-{
-    public RowSeries(): base(() => new RoundedRectangleGeometry(), () => new LabelGeometry()) {}
-}
+public class RowSeries<TModel> : RowSeries<TModel, RoundedRectangleGeometry, LabelGeometry> { }
 
-// /// <summary>
-// /// Defines a row series in the user interface.
-// /// </summary>
-// /// <typeparam name="TModel">
-// /// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
-// /// to use a custom type, you must register the type globally 
-// /// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
-// /// or at the series level 
-// /// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
-// /// </typeparam>
-// /// <typeparam name="TVisual">
-// /// The type of the geometry of every point of the series.
-// /// </typeparam>
-// public class RowSeries<TModel, TVisual> : RowSeries<TModel, TVisual, LabelGeometry>
-//     where TVisual : class, IRoundedRectangleChartPoint<SkiaSharpDrawingContext>, new()
-// { }
-//
-// /// <summary>
-// /// Defines a row series in the user interface.
-// /// </summary>
-// /// <typeparam name="TModel">
-// /// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
-// /// to use a custom type, you must register the type globally 
-// /// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
-// /// or at the series level 
-// /// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
-// /// </typeparam>
-// /// <typeparam name="TVisual">
-// /// The type of the geometry of every point of the series.
-// /// </typeparam>
-// /// <typeparam name="TLabel">
-// /// The type of the data label of every point.
-// /// </typeparam>
-// public class RowSeries<TModel, TVisual, TLabel> : RowSeries<TModel, TVisual, TLabel, SkiaSharpDrawingContext>
-//     where TVisual : class, IRoundedRectangleChartPoint<SkiaSharpDrawingContext>, new()
-//     where TLabel : class, ILabelGeometry<SkiaSharpDrawingContext>, new()
-// { }
+/// <summary>
+/// Defines a row series in the user interface.
+/// </summary>
+/// <typeparam name="TModel">
+/// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
+/// to use a custom type, you must register the type globally 
+/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
+/// or at the series level 
+/// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
+/// </typeparam>
+/// <typeparam name="TVisual">
+/// The type of the geometry of every point of the series.
+/// </typeparam>
+public class RowSeries<TModel, TVisual> : RowSeries<TModel, TVisual, LabelGeometry>
+    where TVisual : class, ISizedGeometry<SkiaDrawingContext>, new() { }
+
+/// <summary>
+/// Defines a row series in the user interface.
+/// </summary>
+/// <typeparam name="TModel">
+/// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
+/// to use a custom type, you must register the type globally 
+/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
+/// or at the series level 
+/// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
+/// </typeparam>
+/// <typeparam name="TVisual">
+/// The type of the geometry of every point of the series.
+/// </typeparam>
+/// <typeparam name="TLabel">
+/// The type of the data label of every point.
+/// </typeparam>
+public class RowSeries<TModel, TVisual, TLabel>
+    : RowSeries<TModel, TVisual, TLabel, SkiaDrawingContext, LineGeometry>
+    where TVisual : class, ISizedGeometry<SkiaDrawingContext>, new()
+    where TLabel : class, ILabelGeometry<SkiaDrawingContext>, new() { }

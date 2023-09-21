@@ -33,21 +33,21 @@ public class HeatLand : IWeigthedMapLand
 {
     private double _value;
 
-    // /// <summary>
-    // /// Initializes a new instance of the <see cref="HeatLand"/> class.
-    // /// </summary>
-    // public HeatLand() { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HeatLand"/> class.
+    /// </summary>
+    public HeatLand() { }
 
-    // /// <summary>
-    // /// Initializes a new instance of the <see cref="HeatLand"/> class.
-    // /// </summary>
-    // /// <param name="name">The name/</param>
-    // /// <param name="value">The value.</param>
-    // public HeatLand(string name, double value)
-    // {
-    //     Name = name;
-    //     Value = value;
-    // }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HeatLand"/> class.
+    /// </summary>
+    /// <param name="name">The name/</param>
+    /// <param name="value">The value.</param>
+    public HeatLand(string name, double value)
+    {
+        Name = name;
+        Value = value;
+    }
 
     /// <summary>
     /// Called when a property changes.

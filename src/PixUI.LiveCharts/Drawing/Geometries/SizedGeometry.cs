@@ -20,14 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using LiveCharts.Drawing;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Motion;
-using LiveCharts.Painting;
 
 namespace LiveCharts.Drawing.Geometries;
 
 /// <inheritdoc cref="ISizedGeometry{TDrawingContext}" />
-public abstract class SizedGeometry : Geometry, ISizedVisualChartPoint<SkiaDrawingContext>
+public abstract class SizedGeometry : Geometry, ISizedGeometry<SkiaDrawingContext>
 {
     /// <summary>
     /// The width
@@ -71,8 +71,8 @@ public abstract class SizedGeometry : Geometry, ISizedVisualChartPoint<SkiaDrawi
         }
     }
 
-    /// <inheritdoc cref="Geometry.OnMeasure(Paint)" />
-    protected override LvcSize OnMeasure(Paint paint)
+    /// <inheritdoc cref="Geometry.OnMeasure(IPaint{SkiaSharpDrawingContext})" />
+    protected override LvcSize OnMeasure(IPaint<SkiaDrawingContext> paint)
     {
         return new LvcSize(Width, Height);
     }

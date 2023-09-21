@@ -39,34 +39,10 @@ namespace LiveCharts;
 /// </summary>
 public static class LiveChartsSkiaSharp
 {
-#if !__WEB__    
-    /// <summary>
-    /// Gets the default paint task.
-    /// </summary>
-    /// <value>
-    /// The default paint.
-    /// </value>
-    public static DefaultPaint DefaultPaint { get; } = new();
-#endif
-
     /// <summary>
     /// Gets or sets an SKTypeface instance to use globally on any paint that does not specify any.
     /// </summary>
     public static SKTypeface? DefaultSKTypeface { get; set; }
-
-    /// <summary>
-    /// Gets the default platform builder.
-    /// </summary>
-    /// <value>
-    /// The default platform builder.
-    /// </value>
-    public static Action<LiveChartsSettings> DefaultPlatformBuilder =>
-        (LiveChartsSettings settings) => settings
-#if !__WEB__                
-            .AddDefaultMappers()
-#endif
-            .AddSkiaSharp()
-            .AddLightTheme();
 
     /// <summary>
     /// Configures LiveCharts using the default settings for SkiaSharp.
@@ -75,12 +51,11 @@ public static class LiveChartsSkiaSharp
     /// <returns>The settings.</returns>
     public static LiveChartsSettings UseDefaults(this LiveChartsSettings settings)
     {
-        return settings
-#if !__WEB__                
-            .AddDefaultMappers()
-#endif
-            .AddSkiaSharp()
-            .AddLightTheme();
+        if (!LiveChartsCore.LiveCharts.HasBackend) _ = settings.AddSkiaSharp();
+        if (!LiveChartsCore.LiveCharts.HasTheme) _ = settings.AddLightTheme();
+        if (!LiveChartsCore.LiveCharts.HasDefaultMappers) _ = settings.AddDefaultMappers();
+
+        return settings;
     }
 
     /// <summary>
@@ -90,17 +65,8 @@ public static class LiveChartsSkiaSharp
     /// <returns></returns>
     public static LiveChartsSettings AddSkiaSharp(this LiveChartsSettings settings)
     {
-        // this is obsolete, currently only used in the GeoMap control and will be removed a future version.
-        //LiveChartsCore.LiveCharts.DefaultPaint = DefaultPaint;
-
+        LiveChartsCore.LiveCharts.HasBackend = true;
         return settings.HasProvider(new SkiaSharpProvider());
-    }
-
-    public static LiveChartsSettings WithGlobalSKTypeface(this LiveChartsSettings settings, SKTypeface typeface)
-    {
-        if (!LiveChartsCore.LiveCharts.IsConfigured) LiveChartsCore.LiveCharts.Configure(DefaultPlatformBuilder);
-        DefaultSKTypeface = typeface;
-        return settings;
     }
 
     /// <summary>
@@ -135,7 +101,7 @@ public static class LiveChartsSkiaSharp
         return new LvcColor(color.Red, color.Green, color.Blue, color.Alpha);
     }
 
-#if !__WEB__    
+#if !__WEB__
     /// <summary>
     /// Gets the <see cref="SkiaFontMatchChar"/> key.
     /// </summary>
@@ -152,7 +118,7 @@ public static class LiveChartsSkiaSharp
     {
         return $"{SkiaFontMatchChar}|{@char}";
     }
-#endif    
+#endif
 
     /// <summary>
     /// Converts an IEnumerable to an ObservableCollection of pie series.
@@ -182,34 +148,31 @@ public static class LiveChartsSkiaSharp
     /// <param name="target">The target.</param>
     /// <param name="location">The location.</param>
     /// <returns>The distance in pixels.</returns>
-    public static double GetDistanceTo<TDrawingContext>(this ChartPoint target, LvcPoint location)
-        where TDrawingContext: DrawingContext
+    public static double GetDistanceTo(this ChartPoint target, LvcPoint location)
     {
         LvcPointD dataCoordinates;
         double x, y;
 
-        if (target.Context is ICartesianChartView<TDrawingContext> cartesianChart)
+        if (target.Context is ICartesianChartView<SkiaDrawingContext> cartesianChart)
         {
-            dataCoordinates = cartesianChart.ScalePixelsToData(new LvcPointD(location.X, location.Y));
+            dataCoordinates = cartesianChart.ScalePixelsToData(new LvcPointD(location));
 
             var cartesianSeries = (ICartesianSeries<SkiaDrawingContext>)target.Context.Series;
 
-#if __WEB__
-            if ((target.Context.Series.SeriesProperties & SeriesProperties.PrimaryAxisHorizontalOrientation) == SeriesProperties.PrimaryAxisHorizontalOrientation)
-#else
             if (target.Context.Series.SeriesProperties.HasFlag(SeriesProperties.PrimaryAxisHorizontalOrientation))
-#endif                
             {
                 var primaryAxis = cartesianChart.Core.YAxes[cartesianSeries.ScalesYAt];
                 var secondaryAxis = cartesianChart.Core.XAxes[cartesianSeries.ScalesXAt];
 
                 var drawLocation = cartesianChart.Core.DrawMarginLocation;
                 var drawMarginSize = cartesianChart.Core.DrawMarginSize;
-                var secondaryScale = Scaler.Make(drawLocation, drawMarginSize, primaryAxis);
-                var primaryScale = Scaler.Make(drawLocation, drawMarginSize, secondaryAxis);
+                var secondaryScale = new Scaler(drawLocation, drawMarginSize, primaryAxis);
+                var primaryScale = new Scaler(drawLocation, drawMarginSize, secondaryAxis);
 
-                x = secondaryScale.ToPixels(target.SecondaryValue);
-                y = primaryScale.ToPixels(target.PrimaryValue);
+                var coordinate = target.Coordinate;
+
+                x = secondaryScale.ToPixels(coordinate.SecondaryValue);
+                y = primaryScale.ToPixels(coordinate.PrimaryValue);
             }
             else
             {
@@ -219,16 +182,18 @@ public static class LiveChartsSkiaSharp
                 var drawLocation = cartesianChart.Core.DrawMarginLocation;
                 var drawMarginSize = cartesianChart.Core.DrawMarginSize;
 
-                var secondaryScale = Scaler.Make(drawLocation, drawMarginSize, secondaryAxis);
-                var primaryScale = Scaler.Make(drawLocation, drawMarginSize, primaryAxis);
+                var secondaryScale = new Scaler(drawLocation, drawMarginSize, secondaryAxis);
+                var primaryScale = new Scaler(drawLocation, drawMarginSize, primaryAxis);
 
-                x = secondaryScale.ToPixels(target.SecondaryValue);
-                y = primaryScale.ToPixels(target.PrimaryValue);
+                var coordinate = target.Coordinate;
+
+                x = secondaryScale.ToPixels(coordinate.SecondaryValue);
+                y = primaryScale.ToPixels(coordinate.PrimaryValue);
             }
         }
-        else if (target.Context is IPolarChartView<TDrawingContext> polarChart)
+        else if (target.Context is IPolarChartView<SkiaDrawingContext> polarChart)
         {
-            dataCoordinates = polarChart.ScalePixelsToData(new LvcPointD(location.X, location.Y));
+            dataCoordinates = polarChart.ScalePixelsToData(new LvcPointD(location));
 
             var polarSeries = (IPolarSeries<SkiaDrawingContext>)target.Context.Series;
 

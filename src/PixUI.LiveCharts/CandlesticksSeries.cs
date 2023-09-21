@@ -24,6 +24,7 @@ using LiveChartsCore.Drawing;
 using LiveChartsCore.Kernel;
 using LiveCharts.Drawing;
 using LiveCharts.Drawing.Geometries;
+using LiveChartsCore;
 
 namespace LiveCharts;
 
@@ -35,52 +36,44 @@ namespace LiveCharts;
 /// to use a custom type, you must register the type globally 
 /// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
 /// or at the series level 
+/// (<see cref="Series{TModel,TVisual,TLabel,TDrawingContext}.Mapping"/>).
+/// </typeparam>
+public class CandlesticksSeries<TModel> : CandlesticksSeries<TModel, CandlestickGeometry, LabelGeometry> { }
+
+/// <summary>
+/// Defines a candlesticks series in the user interface.
+/// </summary>
+/// <typeparam name="TModel">
+/// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
+/// to use a custom type, you must register the type globally 
+/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
+/// or at the series level 
 /// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
 /// </typeparam>
-public sealed class CandlesticksSeries<TModel> : LiveChartsCore.FinancialSeries<TModel, CandlestickGeometry, LabelGeometry,
-    CircleGeometry,
-    SkiaDrawingContext>
-{
-    public CandlesticksSeries()
-        : base(() => new CandlestickGeometry(),
-            () => new LabelGeometry(),
-            () => new CircleGeometry()) { }
-}
+/// <typeparam name="TVisual">
+/// The type of the geometry of every point of the series.
+/// </typeparam>
+public class CandlesticksSeries<TModel, TVisual> : CandlesticksSeries<TModel, TVisual, LabelGeometry>
+    where TVisual : class, IFinancialGeometry<SkiaDrawingContext>, new() { }
 
-// /// <summary>
-// /// Defines a candlesticks series in the user interface.
-// /// </summary>
-// /// <typeparam name="TModel">
-// /// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
-// /// to use a custom type, you must register the type globally 
-// /// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
-// /// or at the series level 
-// /// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
-// /// </typeparam>
-// /// <typeparam name="TVisual">
-// /// The type of the geometry of every point of the series.
-// /// </typeparam>
-// public class CandlesticksSeries<TModel, TVisual> : CandlesticksSeries<TModel, TVisual, LabelGeometry>
-//     where TVisual : class, IFinancialVisualChartPoint<SkiaSharpDrawingContext>, new()
-// { }
-//
-// /// <summary>
-// /// Defines a candlesticks series in the user interface.
-// /// </summary>
-// /// <typeparam name="TModel">
-// /// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
-// /// to use a custom type, you must register the type globally 
-// /// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
-// /// or at the series level 
-// /// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
-// /// </typeparam>
-// /// <typeparam name="TVisual">
-// /// The type of the geometry of every point of the series.
-// /// </typeparam>
-// /// <typeparam name="TLabel">
-// /// The type of the data label of every point.
-// /// </typeparam>
-// public class CandlesticksSeries<TModel, TVisual, TLabel> : FinancialSeries<TModel, TVisual, TLabel, CircleGeometry, SkiaSharpDrawingContext>
-//     where TVisual : class, IFinancialVisualChartPoint<SkiaSharpDrawingContext>, new()
-//     where TLabel : class, ILabelGeometry<SkiaSharpDrawingContext>, new()
-// { }
+/// <summary>
+/// Defines a candlesticks series in the user interface.
+/// </summary>
+/// <typeparam name="TModel">
+/// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
+/// to use a custom type, you must register the type globally 
+/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
+/// or at the series level 
+/// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
+/// </typeparam>
+/// <typeparam name="TVisual">
+/// The type of the geometry of every point of the series.
+/// </typeparam>
+/// <typeparam name="TLabel">
+/// The type of the data label of every point.
+/// </typeparam>
+public class
+    CandlesticksSeries<TModel, TVisual, TLabel> : FinancialSeries<TModel, TVisual, TLabel, CircleGeometry,
+        SkiaDrawingContext>
+    where TVisual : class, IFinancialGeometry<SkiaDrawingContext>, new()
+    where TLabel : class, ILabelGeometry<SkiaDrawingContext>, new() { }

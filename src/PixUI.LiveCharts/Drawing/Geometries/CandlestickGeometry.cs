@@ -21,16 +21,17 @@
 // SOFTWARE.
 
 using System;
+using LiveCharts.Drawing;
+using LiveCharts.Drawing.Geometries;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Motion;
-using LiveCharts.Painting;
 
 namespace LiveCharts.Drawing.Geometries;
 
 /// <summary>
 /// Defines a candlestick geometry.
 /// </summary>
-public class CandlestickGeometry : Geometry, IFinancialVisualChartPoint<SkiaDrawingContext>
+public class CandlestickGeometry : Geometry, IFinancialGeometry<SkiaDrawingContext>
 {
     private readonly FloatMotionProperty _wProperty;
     private readonly FloatMotionProperty _oProperty;
@@ -60,7 +61,7 @@ public class CandlestickGeometry : Geometry, IFinancialVisualChartPoint<SkiaDraw
     /// <inheritdoc cref="IFinancialGeometry{TDrawingContext}.Low" />
     public float Low { get => _lProperty.GetMovement(this); set => _lProperty.SetMovement(value, this); }
 
-    /// <inheritdoc cref="Geometry.OnDraw(SkiaDrawingContext, SKPaint)" />
+    /// <inheritdoc cref="Geometry.OnDraw(SkiaSharpDrawingContext, SKPaint)" />
     public override void OnDraw(SkiaDrawingContext context, SKPaint paint)
     {
         var w = Width;
@@ -88,8 +89,8 @@ public class CandlestickGeometry : Geometry, IFinancialVisualChartPoint<SkiaDraw
         context.Canvas.DrawLine(cx, yj, cx, l, paint);
     }
 
-    /// <inheritdoc cref="Geometry.OnMeasure(Paint)" />
-    protected override LvcSize OnMeasure(Paint paintTaks)
+    /// <inheritdoc cref="Geometry.OnMeasure(IPaint{SkiaSharpDrawingContext})" />
+    protected override LvcSize OnMeasure(IPaint<SkiaDrawingContext> paintTasks)
     {
         return new LvcSize(Width, Math.Abs(Low - Y));
     }

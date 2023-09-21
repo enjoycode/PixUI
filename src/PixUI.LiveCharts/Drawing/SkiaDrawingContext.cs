@@ -65,7 +65,7 @@ public sealed class SkiaDrawingContext : DrawingContext
     public MotionCanvas<SkiaDrawingContext> MotionCanvas { get; set; }
 
     public int Width { get; set; }
-    
+
     public int Height { get; set; }
 
     // /// <summary>
@@ -106,25 +106,12 @@ public sealed class SkiaDrawingContext : DrawingContext
     public SKColor Background { get; set; } = SKColor.Empty;
 
     /// <inheritdoc cref="DrawingContext.OnBegingDraw"/>
-    public override void OnBegingDraw()
+    public override void OnBeginDraw()
     {
         //if (_clearOnBegingDraw) Canvas.Clear();
         if (Background != SKColor.Empty)
         {
-            Canvas.DrawRect(SKRect.FromLTWH(0,0, Width, Height), PixUI.PaintUtils.Shared(Background));
+            Canvas.DrawRect(SKRect.FromLTWH(0, 0, Width, Height), PixUI.PaintUtils.Shared(Background));
         }
-
-        if (MotionCanvas.StartPoint == null ||
-            (MotionCanvas.StartPoint.Value.X == 0 &&
-            MotionCanvas.StartPoint.Value.Y == 0)) return;
-
-        Canvas.Translate(MotionCanvas.StartPoint.Value.X, MotionCanvas.StartPoint.Value.Y);
-    }
-
-    /// <inheritdoc cref="DrawingContext.OnEndDraw"/>
-    public override void OnEndDraw()
-    {
-        //if (MotionCanvas.StartPoint == null) return;
-        //Canvas.Restore();
     }
 }

@@ -23,13 +23,11 @@
 using System;
 using LiveCharts.Drawing;
 using LiveCharts.Drawing.Geometries;
+using LiveChartsCore;
 
 namespace LiveCharts;
 
 /// <summary>
 /// Defines a visual frame in the draw margin of the chart.
 /// </summary>
-public class DrawMarginFrame : LiveChartsCore.DrawMarginFrame<RectangleGeometry, SkiaDrawingContext>
-{
-    public DrawMarginFrame() : base(() => new RectangleGeometry()) { }
-}
+public class DrawMarginFrame : DrawMarginFrame<RectangleGeometry, SkiaDrawingContext> { }

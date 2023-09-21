@@ -21,10 +21,9 @@
 // SOFTWARE.
 
 using System;
+using LiveCharts.Drawing;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Motion;
-using LiveCharts.Painting;
-
 
 namespace LiveCharts.Drawing.Geometries;
 
@@ -55,8 +54,8 @@ public class LineGeometry : Geometry, ILineGeometry<SkiaDrawingContext>
         context.Canvas.DrawLine(X, Y, X1, Y1, paint);
     }
 
-    /// <inheritdoc cref="Geometry.OnMeasure(Paint)" />
-    protected override LvcSize OnMeasure(Paint drawable)
+    /// <inheritdoc cref="Geometry.OnMeasure(IPaint{SkiaDrawingContext})" />
+    protected override LvcSize OnMeasure(IPaint<SkiaDrawingContext> drawable)
     {
         return new LvcSize(Math.Abs(X1 - X), Math.Abs(Y1 - Y));
     }

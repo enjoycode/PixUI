@@ -37,7 +37,8 @@ public sealed class PieChart : ChartView, IPieChartView<SkiaDrawingContext>
     private bool _isClockwise = true;
     private double _initialRotation;
     private double _maxAngle = 360;
-    private double? _total;
+    private double? _maxValue;
+    private double _minValue;
 
     #endregion
 
@@ -85,6 +86,12 @@ public sealed class PieChart : ChartView, IPieChartView<SkiaDrawingContext>
     #region ====IPieChartView====
 
     public PieChart<SkiaDrawingContext> Core => (PieChart<SkiaDrawingContext>)core!;
+    
+    /// <inheritdoc cref="IPieChartView{TDrawingContext}.MaxValue" />
+    public double? MaxValue { get => _maxValue; set { _maxValue = value; OnPropertyChanged(); } }
+
+    /// <inheritdoc cref="IPieChartView{TDrawingContext}.MinValue" />
+    public double MinValue { get => _minValue; set { _minValue = value; OnPropertyChanged(); } }
 
     public IEnumerable<ISeries> Series
     {
@@ -120,10 +127,10 @@ public sealed class PieChart : ChartView, IPieChartView<SkiaDrawingContext>
 
     public double? Total
     {
-        get => _total;
+        get => _maxValue;
         set
         {
-            _total = value;
+            _maxValue = value;
             OnPropertyChanged();
         }
     }

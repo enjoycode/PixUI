@@ -48,7 +48,7 @@ public abstract class VectorGeometry<TSegment> : Drawable, IVectorGeometry<TSegm
     /// <summary>
     /// Gets the commands in the vector.
     /// </summary>
-    protected LinkedList<TSegment> Commands { get; } = new();
+    public LinkedList<TSegment> Commands { get; } = new();
 
     /// <inheritdoc cref="IVectorGeometry{TSegment, TDrawingContext}.FirstCommand" />
     public LinkedListNode<TSegment>? FirstCommand => Commands.First;

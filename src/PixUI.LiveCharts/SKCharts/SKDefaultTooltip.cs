@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Kernel;
@@ -29,35 +30,33 @@ using LiveCharts.Drawing.Geometries;
 using LiveCharts.Painting;
 using LiveCharts.Painting.ImageFilters;
 using LiveCharts.VisualElements;
+using LiveChartsCore;
 using LiveChartsCore.VisualElements;
 
 
 namespace LiveCharts.SKCharts;
 
-/// <inheritdoc cref="IChartTooltip{TDrawingContext}" />
-public class SKDefaultTooltip : IChartTooltip<SkiaDrawingContext>, IImageControl
+/// <summary>
+/// Defines the default tooltip.
+/// </summary>
+public class SKDefaultTooltip : IChartTooltip<SkiaDrawingContext>
 {
-    private static readonly int s_zIndex = 10050;
-    private LiveChartsCore.Chart<SkiaDrawingContext>? _chart;
+    internal StackPanel<PopUpGeometry, SkiaDrawingContext>? _panel;
+    private static readonly int s_zIndex = 10100;
     private IPaint<SkiaDrawingContext>? _backgroundPaint;
-    private StackPanel<RoundedRectangleGeometry, SkiaDrawingContext>? _stackPanel;
-    private readonly Dictionary<LiveChartsCore.ISeries, SeriesVisual> _seriesVisualsMap = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SKDefaultTooltip"/> class.
     /// </summary>
     public SKDefaultTooltip()
     {
-        FontPaint = new SolidColorPaint { Color = new SKColor(28, 49, 58) };
-        BackgroundPaint = new SolidColorPaint
+        FontPaint = SolidColorPaint.MakeByColor(new SKColor(28, 49, 58));
+        BackgroundPaint = new SolidColorPaint()
         {
-            Color = new SKColor(240, 240, 240),
-            ImageFilter = new DropShadow(2, 2, 2, 2, new SKColor(30, 30, 30, 60))
+            Color = new SKColor(235, 235, 235, 230),
+            ImageFilter = new DropShadow(2, 2, 6, 6, new SKColor(50, 0, 0, 100))
         };
     }
-
-    /// <inheritdoc cref="IImageControl.Size"/>
-    public LvcSize Size { get; private set; }
 
     /// <summary>
     /// Gets or sets the legend font paint.
@@ -85,130 +84,157 @@ public class SKDefaultTooltip : IChartTooltip<SkiaDrawingContext>, IImageControl
     /// </summary>
     public double TextSize { get; set; } = 16;
 
-    /// <inheritdoc cref="IChartTooltip{TDrawingContext}.Show(IEnumerable{ChartPoint}, Chart{TDrawingContext})"/>
-    public void Show(IEnumerable<ChartPoint> foundPoints, LiveChartsCore.Chart<SkiaDrawingContext> chart)
+    /// <inheritdoc cref="IChartTooltip{TDrawingContext}.Show(IEnumerable{ChartPoint}, Chart{TDrawingContext})" />
+    public void Show(IEnumerable<ChartPoint> foundPoints, Chart<SkiaDrawingContext> chart)
     {
-        _chart = chart;
+        const int wedge = 10;
 
+        if (chart.View.TooltipTextSize is not null) TextSize = chart.View.TooltipTextSize.Value;
         if (chart.View.TooltipBackgroundPaint is not null) BackgroundPaint = chart.View.TooltipBackgroundPaint;
         if (chart.View.TooltipTextPaint is not null) FontPaint = chart.View.TooltipTextPaint;
-        if (chart.View.TooltipTextSize is not null) TextSize = chart.View.TooltipTextSize.Value;
 
-        if (BackgroundPaint is not null) BackgroundPaint.ZIndex = s_zIndex;
-        if (FontPaint is not null) FontPaint.ZIndex = s_zIndex + 1;
-
-        var sp = _stackPanel ??=
-            new StackPanel<RoundedRectangleGeometry, SkiaDrawingContext>(() => new RoundedRectangleGeometry())
+        if (_panel is null)
+        {
+            _panel = new StackPanel<PopUpGeometry, SkiaDrawingContext>
             {
-                Padding = new Padding(12, 8, 12, 8),
                 Orientation = ContainerOrientation.Vertical,
-                HorizontalAlignment = Align.Start,
+                HorizontalAlignment = Align.Middle,
                 VerticalAlignment = Align.Middle,
                 BackgroundPaint = BackgroundPaint
             };
 
-        var toRemoveSeries = new List<SeriesVisual>(_seriesVisualsMap.Values);
+            _panel.BackgroundGeometry.Wedge = wedge;
+            _panel.BackgroundGeometry.WedgeThickness = 3;
+
+            _panel
+                .Animate(
+                    new Animation(EasingFunctions.EaseOut, TimeSpan.FromMilliseconds(150)),
+                    nameof(RoundedRectangleGeometry.X),
+                    nameof(RoundedRectangleGeometry.Y));
+        }
+
+        if (BackgroundPaint is not null) BackgroundPaint.ZIndex = s_zIndex;
+        if (FontPaint is not null) FontPaint.ZIndex = s_zIndex + 1;
+
+        foreach (var child in _panel.Children.ToArray())
+        {
+            _ = _panel.Children.Remove(child);
+            chart.RemoveVisual(child);
+        }
+
+        var tableLayout = new TableLayout<RoundedRectangleGeometry, SkiaDrawingContext>
+        {
+            HorizontalAlignment = Align.Middle,
+            VerticalAlignment = Align.Middle
+        };
+
+        var lw = (float)LiveChartsCore.LiveCharts.DefaultSettings.MaxTooltipsAndLegendsLabelsWidth;
+
+        var i = 0;
         foreach (var point in foundPoints)
         {
-            var seriesMiniatureVisual = GetSeriesVisual(point);
-            _ = toRemoveSeries.Remove(seriesMiniatureVisual);
+            var series = (IChartSeries<SkiaDrawingContext>)point.Context.Series;
+
+            if (i == 0)
+            {
+                var title = point.Context.Series.GetSecondaryToolTipText(point) ?? string.Empty;
+
+                if (title != LiveChartsCore.LiveCharts.IgnoreToolTipLabel)
+                {
+                    _panel.Children.Add(
+                        new LabelVisual
+                        {
+                            Text = point.Context.Series.GetSecondaryToolTipText(point) ?? string.Empty,
+                            Paint = FontPaint,
+                            TextSize = TextSize,
+                            Padding = new Padding(0, 0, 0, 0),
+                            MaxWidth = lw,
+                            VerticalAlignment = Align.Start,
+                            HorizontalAlignment = Align.Start,
+                            ClippingMode = LiveChartsCore.Measure.ClipMode.None
+                        });
+
+                    _panel.Children.Add(
+                        new StackPanel<RectangleGeometry, SkiaDrawingContext> { Padding = new(0, 8) });
+                }
+            }
+
+            var content = point.Context.Series.GetPrimaryToolTipText(point) ?? string.Empty;
+
+            var ltr = LiveChartsCore.LiveCharts.DefaultSettings.IsRightToLeft;
+
+            if (content != LiveChartsCore.LiveCharts.IgnoreToolTipLabel)
+            {
+                tableLayout.AddChild(series.GetMiniaturesSketch().AsDrawnControl(s_zIndex), i, ltr ? 3 : 0);
+
+                if (point.Context.Series.Name != LiveChartsCore.LiveCharts.IgnoreSeriesName)
+                    tableLayout.AddChild(
+                        new LabelVisual
+                        {
+                            Text = point.Context.Series.Name ?? string.Empty,
+                            Paint = FontPaint,
+                            TextSize = TextSize,
+                            Padding = new Padding(10, 0, 0, 0),
+                            MaxWidth = lw,
+                            VerticalAlignment = Align.Start,
+                            HorizontalAlignment = Align.Start,
+                            ClippingMode = LiveChartsCore.Measure.ClipMode.None
+                        }, i, 1, horizontalAlign: Align.Start);
+
+                tableLayout.AddChild(
+                    new LabelVisual
+                    {
+                        Text = content,
+                        Paint = FontPaint,
+                        TextSize = TextSize,
+                        Padding = new Padding(10, 0, 0, 0),
+                        MaxWidth = lw,
+                        VerticalAlignment = Align.Start,
+                        HorizontalAlignment = Align.Start,
+                        ClippingMode = LiveChartsCore.Measure.ClipMode.None
+                    }, i, ltr ? 0 : 2, horizontalAlign: Align.End);
+
+                i++;
+            }
         }
 
-        Measure(chart);
+        _panel.Children.Add(tableLayout);
 
-        var location = foundPoints.GetTooltipLocation(Size, chart);
+        var size = _panel.Measure(chart);
+        _ = foundPoints.GetTooltipLocation(size, chart);
+        _panel.BackgroundGeometry.Placement = chart.AutoToolTipsInfo.ToolTipPlacement;
 
-        _stackPanel.X = location.X;
-        _stackPanel.Y = location.Y;
-
-        foreach (var seriesVisual in toRemoveSeries)
+        switch (chart.AutoToolTipsInfo.ToolTipPlacement)
         {
-            _ = _stackPanel.Children.Remove(seriesVisual.Visual);
-            chart.RemoveVisual(seriesVisual.Visual);
-            _ = _seriesVisualsMap.Remove(seriesVisual.Series);
+            case LiveChartsCore.Measure.PopUpPlacement.Top:
+                _panel.Padding = new Padding(12, 8, 12, 8 + wedge);
+                break;
+            case LiveChartsCore.Measure.PopUpPlacement.Bottom:
+                _panel.Padding = new Padding(12, 8 + wedge, 12, 8);
+                break;
+            case LiveChartsCore.Measure.PopUpPlacement.Left:
+                _panel.Padding = new Padding(12, 8, 12 + wedge, 8);
+                break;
+            case LiveChartsCore.Measure.PopUpPlacement.Right:
+                _panel.Padding = new Padding(12 + wedge, 8, 12, 8);
+                break;
+            default: break;
         }
 
-        chart.AddVisual(sp);
+        // the size changed... we need to do the math again
+        size = _panel.Measure(chart);
+        var location = foundPoints.GetTooltipLocation(size, chart);
+
+        _panel.X = location.X;
+        _panel.Y = location.Y;
+
+        chart.AddVisual(_panel);
     }
 
     /// <inheritdoc cref="IChartTooltip{TDrawingContext}.Hide"/>
-    public void Hide()
+    public void Hide(Chart<SkiaDrawingContext> chart)
     {
-        if (_chart is null || _stackPanel is null) return;
-        _chart.RemoveVisual(_stackPanel);
+        if (chart is null || _panel is null) return;
+        chart.RemoveVisual(_panel);
     }
-
-    /// <inheritdoc cref="IImageControl.Measure(IChart)"/>
-    public void Measure(IChart chart)
-    {
-        if (_stackPanel is null) return;
-        Size = _stackPanel.Measure((LiveChartsCore.Chart<SkiaDrawingContext>)chart, null, null);
-    }
-
-    private SeriesVisual GetSeriesVisual(ChartPoint point)
-    {
-        if (_seriesVisualsMap.TryGetValue(point.Context.Series, out var visual))
-        {
-            if (_chart is null) return visual;
-            visual.LabelVisual.Text = point.AsTooltipString;
-            visual.LabelVisual.Invalidate(_chart);
-            return visual;
-        }
-
-        var sketch = ((IChartSeries<SkiaDrawingContext>)point.Context.Series).GetMiniatresSketch();
-        var relativePanel = sketch.AsDrawnControl();
-
-        var label = new LabelVisual
-        {
-            Text = point.AsTooltipString,
-            Paint = FontPaint,
-            TextSize = TextSize,
-            Padding = new Padding(8, 0, 0, 0),
-            VerticalAlignment = Align.Start,
-            HorizontalAlignment = Align.Start
-        };
-
-        var sp = new StackPanel<RoundedRectangleGeometry, SkiaDrawingContext>(() => new RoundedRectangleGeometry())
-        {
-            Padding = new Padding(0, 4, 0, 4),
-            VerticalAlignment = Align.Middle,
-            HorizontalAlignment = Align.Middle,
-#if !__WEB__
-            Children =
-            {
-                relativePanel,
-                label
-            }
-#endif
-        };
-#if __WEB__
-        sp.Children.Add(relativePanel);
-        sp.Children.Add(label);
-#endif
-
-        _ = _stackPanel?.Children.Add(sp);
-        var seriesVisual = new SeriesVisual(point.Context.Series, sp, label);
-        _seriesVisualsMap.Add(point.Context.Series, seriesVisual);
-
-        return seriesVisual;
-    }
-}
-
-internal sealed class SeriesVisual
-{
-    public SeriesVisual(
-        LiveChartsCore.ISeries series,
-        StackPanel<RoundedRectangleGeometry, SkiaDrawingContext> stackPanel,
-        LabelVisual label)
-    {
-        Series = series;
-        Visual = stackPanel;
-        LabelVisual = label;
-    }
-
-    public LiveChartsCore.ISeries Series { get; }
-
-    public StackPanel<RoundedRectangleGeometry, SkiaDrawingContext> Visual { get; }
-
-    public LabelVisual LabelVisual { get; set; }
 }

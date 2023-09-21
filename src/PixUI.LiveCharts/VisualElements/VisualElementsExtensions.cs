@@ -20,9 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Kernel.Drawing;
 using LiveCharts.Drawing;
+using LiveCharts.Drawing.Geometries;
 using LiveChartsCore.VisualElements;
 
 namespace LiveCharts.VisualElements;
@@ -35,10 +37,10 @@ public static class VisualElementsExtensions
     /// <summary>
     /// Creates a relative panel control from a given sketch.
     /// </summary>
-    public static RelativePanel<SkiaDrawingContext> AsDrawnControl(
+    public static RelativePanel<RectangleGeometry, SkiaDrawingContext> AsDrawnControl(
         this Sketch<SkiaDrawingContext> sketch, int baseZIndex = 10050)
     {
-        var relativePanel = new RelativePanel<SkiaDrawingContext>
+        var relativePanel = new RelativePanel<RectangleGeometry, SkiaDrawingContext>
         {
             Size = new LvcSize((float)sketch.Width, (float)sketch.Height)
         };
@@ -52,7 +54,14 @@ public static class VisualElementsExtensions
                 {
                     Width = sizedGeometry.Width,
                     Height = sizedGeometry.Height,
+                    ClippingMode = LiveChartsCore.Measure.ClipMode.None
                 };
+
+                if (g is ISvgPath<SkiaDrawingContext> svgGeometry)
+                {
+                    svgGeometry.SVGPath =
+                        sketch.Svg ?? throw new NullReferenceException("sketch.Svg can not be null at this point.");
+                }
 
                 schedule.PaintTask.ZIndex = schedule.PaintTask.ZIndex + 1 + baseZIndex;
 

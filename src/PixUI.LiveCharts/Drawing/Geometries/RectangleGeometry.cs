@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
+using LiveCharts.Drawing;
 
 namespace LiveCharts.Drawing.Geometries;
 
@@ -33,12 +33,11 @@ public class RectangleGeometry : SizedGeometry
     /// <summary>
     /// Initializes a new instance of the <see cref="RectangleGeometry"/> class.
     /// </summary>
-    public RectangleGeometry() : base()
-    { }
+    public RectangleGeometry() : base() { }
 
-    /// <inheritdoc cref="Geometry.OnDraw(SkiaDrawingContext, SKPaint)" />
+    /// <inheritdoc cref="Geometry.OnDraw(SkiaSharpDrawingContext, SKPaint)" />
     public override void OnDraw(SkiaDrawingContext context, SKPaint paint)
     {
-        context.Canvas.DrawRect( SKRect.FromLTWH(X, Y, Width, Height), paint);
+        context.Canvas.DrawRect(SKRect.FromLTWH(X, Y, Height, Width), paint);
     }
 }
