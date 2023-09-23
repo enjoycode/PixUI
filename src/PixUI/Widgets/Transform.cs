@@ -107,15 +107,15 @@ public class Transform : SingleChildWidget
     {
         if (Child == null) return;
         base.BeforePaint(canvas, onlyTransform, dirtyRect);
-        canvas.Save(); //TODO: save old Matrix
+        canvas.Save(); //TODO: 考虑保存Matrix不用保存
         canvas.Concat(EffectiveTransform); //canvas.Transform(EffectiveTransform);
     }
 
     protected internal override void AfterPaint(Canvas canvas)
     {
         if (Child == null) return;
-        base.AfterPaint(canvas);
-        canvas.Restore(); //TODO: reset old Matrix
+        canvas.Restore(); //TODO: 考虑恢复之前保存的Matrix
+        base.AfterPaint(canvas); //Must call after restore canvas matrix now.
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
