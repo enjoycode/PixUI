@@ -495,7 +495,7 @@ public abstract class Widget : IStateBindable, IDisposable
         if (dirtyRect.HasValue)
         {
             Debug.Assert(onlyTransform == false);
-            canvas.ClipRect(dirtyRect.Value, ClipOp.Intersect, false); //TODO: check need save
+            canvas.ClipRect(dirtyRect.Value, ClipOp.Intersect, false); //不需要保存画布状态,InvalidQueue会恢复
         }
     }
 
@@ -510,6 +510,9 @@ public abstract class Widget : IStateBindable, IDisposable
 
     public virtual void Paint(Canvas canvas, IDirtyArea? area = null)
     {
+        if (W == 0 || H == 0 || canvas.IsClipEmpty)
+            return;
+
         PaintChildren(canvas, area);
     }
 

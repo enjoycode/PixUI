@@ -95,18 +95,19 @@ internal sealed class InvalidQueue
 #endif
 
         //根据Widget所在的画布加入相应的队列
+        var root = widget.Root;
 #if DEBUG
-        if (widget.Root == null)
+        if (root == null)
             throw new Exception("Widget without root");
 #else
-        if (widget.Root == null)
+        if (root == null)
         {
             Log.Warn("Widget without root");
             return false;
         }
 #endif
 
-        var win = widget.Root.Window;
+        var win = root.Window;
         if (widget.Root is Overlay)
         {
             if (win.OverlayInvalidQueue.IsSuspended)
@@ -402,13 +403,14 @@ internal sealed class InvalidQueue
             }
             else
             {
-                temp.BeforePaint(canvas);
+                //注意这里暂需要传入脏区域强制Clip，否则后续遇到缩放过的Transform会造成裁剪区域不正确，待确认是否skia的Bug
+                temp.BeforePaint(canvas, false, Rect.FromLTWH(0, 0, temp.W, temp.H));
             }
         }
 
         //恢复坐标转换从opaque开始绘制
-        var factor = widget.Root!.Window.ScaleFactor;
-        var matrix = Matrix4.CreateScale(factor, factor, 1);
+        var factor = ctx.Window.ScaleFactor;
+        var matrix = Matrix4.CreateScale(factor, factor);
         canvas.SetMatrix(matrix);
 
         for (var i = widgetToRoot.Count - 1; i >= 0; i--)

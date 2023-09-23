@@ -181,11 +181,17 @@ public sealed class GeoMap : Widget, IMouseRegion, IGeoMapView<SkiaDrawingContex
 
     private SkiaDrawingContext? _drawCtx;
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    protected override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)
     {
         canvas.Save();
-        canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
+        if (X != 0 || Y != 0)
+            canvas.Translate(X, Y);
+        if (!onlyTransform)
+            canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
+    }
 
+    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    {
         if (_drawCtx == null)
         {
             _drawCtx = new SkiaDrawingContext(_motionCanvas.CanvasCore, (int)W, (int)H, canvas);
@@ -200,7 +206,10 @@ public sealed class GeoMap : Widget, IMouseRegion, IGeoMapView<SkiaDrawingContex
         }
 
         _motionCanvas.CanvasCore.DrawFrame(_drawCtx);
+    }
 
+    protected override void AfterPaint(Canvas canvas)
+    {
         canvas.Restore();
     }
 
