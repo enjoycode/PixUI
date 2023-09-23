@@ -105,10 +105,10 @@ public sealed class SkiaDrawingContext : DrawingContext
     /// </summary>
     public SKColor Background { get; set; } = SKColor.Empty;
 
-    /// <inheritdoc cref="DrawingContext.OnBegingDraw"/>
+    /// <inheritdoc cref="DrawingContext.OnBeginDraw"/>
     public override void OnBeginDraw()
     {
-        //if (_clearOnBegingDraw) Canvas.Clear();
+        //if (_clearOnBeginDraw) Canvas.Clear();
         if (Background != SKColor.Empty)
         {
             Canvas.DrawRect(SKRect.FromLTWH(0, 0, Width, Height), PixUI.PaintUtils.Shared(Background));

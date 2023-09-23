@@ -6,6 +6,7 @@ using LiveCharts;
 using LiveCharts.Drawing;
 using LiveCharts.Painting;
 using LiveCharts.VisualElements;
+using LiveChartsCore.Drawing;
 using LiveChartsCore.Geo;
 
 namespace PixUI.Demo;
@@ -42,6 +43,33 @@ public sealed class DemoCharts : View
     public DemoCharts()
     {
         var geoJson = ResourceLoad.LoadStream("Resources.China.json");
+        //var gcp1 = new LvcPointD(116.3683244, 39.915085);
+        //var gcp2 = new LvcPointD(104.113164, 37.570667);
+        //max 135.09567000000001, 53.563268999999998
+        //min 73.502354999999994, 3.3971618700000001
+        var maxBounds = new LvcPointD(135.09567000000001, 53.563268999999998);
+        var minBounds = new LvcPointD(73.502354999999994, 3.3971618700000001);
+
+        var scale = 5f;
+        var mapWidth = 400f;
+        var mapHeight = 300f;
+        var projection = MapProjection.Mercator;
+        var projector = Maps.BuildProjector(projection, new[] { mapWidth, mapHeight });
+
+        //var center = projector.ToMap(gcp2);
+        // var ox = mapWidth / 2f - center.X;
+        // var oy = mapHeight / 2f - center.Y;
+        var min = projector.ToMap(minBounds);
+        var max = projector.ToMap(maxBounds);
+        var cx = (max.X - min.X) / 2f + min.X;
+        var cy = (max.Y - min.Y) / 2f + min.Y;
+        var ox = mapWidth / 2f - cx;
+        var oy = mapHeight / 2f - cy;
+
+        var matrix = Matrix4.CreateTranslation(mapWidth / 2f, mapHeight / 2f);
+        matrix.Scale(scale, scale);
+        matrix.Translate(-(mapWidth / 2f), -(mapHeight / 2f));
+        matrix.Translate(ox, oy);
 
         Child = new Column
         {
@@ -74,12 +102,24 @@ public sealed class DemoCharts : View
                     }
                 },
 
-                new GeoMap()
+                new Card
                 {
-                    Width = 500,
-                    Height = 300,
-                    MapProjection = MapProjection.Mercator,
-                    ActiveMap = Maps.GetMapFromStreamReader<SkiaDrawingContext>(new StreamReader(geoJson))
+                    Child = new Center
+                    {
+                        DebugLabel = "ChartCenter",
+                        Child = new Transform(matrix)
+                        {
+                            Child = new GeoMap()
+                            {
+                                Width = mapWidth,
+                                Height = mapHeight,
+                                MapProjection = projection,
+                                Stroke = new SolidColorPaint { Color = Colors.Green },
+                                Fill = new SolidColorPaint { Color = Colors.Red },
+                                ActiveMap = Maps.GetMapFromStreamReader<SkiaDrawingContext>(new StreamReader(geoJson))
+                            }
+                        }
+                    }
                 }
             }
         };

@@ -108,10 +108,10 @@ public class MapFactory : IMapFactory<SkiaDrawingContext>
 
                     foreach (var point in landData.Coordinates)
                     {
-                        var p = projector.ToMap(new double[] { point.X, point.Y });
+                        var p = projector.ToMap(point);
 
-                        var x = p[0];
-                        var y = p[1];
+                        var x = p.X;
+                        var y = p.Y;
 
                         if (isFirst)
                         {

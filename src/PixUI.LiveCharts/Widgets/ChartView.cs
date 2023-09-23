@@ -87,7 +87,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
     public IChart CoreChart => core!;
     public bool DesignerMode => false;
 
-    public LvcColor BackColor { get; set; } = new(255, 255, 255, 0);
+    public LvcColor BackColor { get; set; } = new(0, 0, 0, 0);
 
     public LvcSize ControlSize
     {
