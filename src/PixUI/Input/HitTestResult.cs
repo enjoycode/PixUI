@@ -14,6 +14,12 @@ public sealed class HitTestResult
     private Matrix4 _transform = Matrix4.CreateIdentity();
 
     /// <summary>
+    /// 仅用于缓存路径中上级如IScrollable\Transform的限制HitTest的区域,用于判断是否子组件已滚出或转换出该区域
+    /// 注意坐标为窗体坐标
+    /// </summary>
+    private Rect? _restrictedBounds;
+
+    /// <summary>
     /// 仅用于缓存最后命中的Widget,不一定是MouseRegion
     /// </summary>
     internal Widget? LastHitWidget { get; private set; }
@@ -40,6 +46,7 @@ public sealed class HitTestResult
         _transform.Translate(-widget.X, -widget.Y);
         if (widget.Parent is IScrollable { IgnoreScrollOffsetForHitTest: false } scrollable)
         {
+            ConcatRestrictedBounds(widget.Parent);
             _transform.Translate(scrollable.ScrollOffsetX, scrollable.ScrollOffsetY);
         }
 
@@ -65,6 +72,17 @@ public sealed class HitTestResult
         {
             _path[_path.Count - 1] = new HitTestEntry(LastEntry!.Value.Widget, _transform);
         }
+    }
+
+    internal void ConcatRestrictedBounds(Widget parent)
+    {
+        Debug.Assert(parent is IScrollable or Transform);
+
+        var winPt = parent.LocalToWindow(0, 0); //TODO: use current _transform
+        var bounds = Rect.FromLTWH(winPt.X, winPt.Y, parent.W, parent.H);
+        _restrictedBounds = _restrictedBounds.HasValue
+            ? Rect.Intersect(_restrictedBounds.Value, bounds)
+            : bounds;
     }
 
     /// <summary>
@@ -107,18 +125,15 @@ public sealed class HitTestResult
     /// </summary>
     internal bool StillInLastRegion(float winX, float winY)
     {
-        if (LastHitWidget == null) return false;
+        if (LastHitWidget == null || IsInvalidated) return false;
 
+        //先判断是否在限制区域内
+        if (_restrictedBounds.HasValue && !_restrictedBounds.Value.ContainsPoint(winX, winY))
+            return false;
+
+        //再判断是否还在旧区域内
         var transformed = MatrixUtils.TransformPoint(_transform, winX, winY);
-        var contains = LastHitWidget.ContainsPoint(transformed.Dx, transformed.Dy);
-        if (!contains) return false;
-
-        //如果上级是IScrollable，还需要判断是否已滚出上级区域
-        var scrollableParent = LastHitWidget.Parent?.FindParent(w => w is IScrollable);
-        if (scrollableParent == null) return true;
-
-        var scrollableToWin = scrollableParent.LocalToWindow(0, 0);
-        return scrollableParent.ContainsPoint(winX - scrollableToWin.X, winY - scrollableToWin.Y);
+        return LastHitWidget.ContainsPoint(transformed.Dx, transformed.Dy);
     }
 
     /// <summary>
@@ -218,6 +233,7 @@ public sealed class HitTestResult
         LastHitWidget = null;
         IsInvalidated = false;
         _transform = Matrix4.CreateIdentity();
+        _restrictedBounds = null;
     }
 
     internal void CopyFrom(HitTestResult other)
@@ -226,6 +242,7 @@ public sealed class HitTestResult
         _path.AddRange(other._path);
         LastHitWidget = other.LastHitWidget;
         _transform = other._transform;
+        _restrictedBounds = other._restrictedBounds;
     }
 }
 

@@ -9,11 +9,13 @@ public class Transform : SingleChildWidget
 {
     private Matrix4 _transform;
     private Offset? _origin;
+    private bool _restrictedHitTest; //只能在本组件范围内HitTest
 
-    public Transform(Matrix4 transform, Offset? origin = null)
+    public Transform(Matrix4 transform, Offset? origin = null, bool restrictedHitTest = true)
     {
         SetTransform(transform);
         Origin = origin;
+        _restrictedHitTest = restrictedHitTest;
     }
 
     /// <summary>
@@ -79,8 +81,10 @@ public class Transform : SingleChildWidget
 
     protected internal override bool HitTest(float x, float y, HitTestResult result)
     {
-        //不要检查ContainsPoint,可能变换出范围
         if (Child == null) return false;
+
+        if (_restrictedHitTest && !ContainsPoint(x, y))
+            return false;
 
         var effectiveTransform = EffectiveTransform;
         //TODO: short path for effectiveTransform is Identity
@@ -98,7 +102,11 @@ public class Transform : SingleChildWidget
         //不要加入 result.Add(this, effectiveTransform);
         var hitChild = Child.HitTest(transformed.Dx, transformed.Dy, result);
         if (hitChild)
+        {
             result.ConcatLastTransform(transform.Value, X, Y);
+            if (_restrictedHitTest)
+                result.ConcatRestrictedBounds(this);
+        }
 
         return hitChild;
     }
