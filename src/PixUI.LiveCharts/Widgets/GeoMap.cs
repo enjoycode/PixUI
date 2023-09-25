@@ -177,6 +177,8 @@ public sealed class GeoMap : Widget, IMouseRegion, IGeoMapView<SkiaDrawingContex
 
         if (HasLayout && (oldWidth != W || oldHeight != H))
             _core.Update();
+
+        HasLayout = true;
     }
 
     private SkiaDrawingContext? _drawCtx;

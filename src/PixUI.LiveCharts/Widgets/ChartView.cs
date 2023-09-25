@@ -326,7 +326,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
 
         SetSize(width, height);
 
-        if (core != null && HasLayout && (oldWidth != W || oldHeight != H))
+        if (core != null && !core._isFirstDraw && (oldWidth != W || oldHeight != H))
             core.Update();
     }
 
