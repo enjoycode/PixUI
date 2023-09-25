@@ -403,8 +403,7 @@ internal sealed class InvalidQueue
                 }
                 else
                 {
-                    //注意这里暂需要传入脏区域强制Clip，否则后续遇到缩放过的Transform会造成裁剪区域不正确，待确认是否skia的Bug
-                    temp.BeforePaint(canvas, false, Rect.FromLTWH(0, 0, temp.W, temp.H));
+                    temp.BeforePaint(canvas, false);
                 }
             }
 

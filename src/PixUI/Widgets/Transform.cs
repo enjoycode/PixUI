@@ -9,13 +9,13 @@ public class Transform : SingleChildWidget
 {
     private Matrix4 _transform;
     private Offset? _origin;
-    private bool _restrictedHitTest; //只能在本组件范围内HitTest
+    private bool _clipBounds; //裁剪范围,并只能在本组件范围内HitTest
 
-    public Transform(Matrix4 transform, Offset? origin = null, bool restrictedHitTest = true)
+    public Transform(Matrix4 transform, Offset? origin = null, bool clipBounds = true)
     {
         SetTransform(transform);
         Origin = origin;
-        _restrictedHitTest = restrictedHitTest;
+        _clipBounds = clipBounds;
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ public class Transform : SingleChildWidget
     {
         if (Child == null) return false;
 
-        if (_restrictedHitTest && !ContainsPoint(x, y))
+        if (_clipBounds && !ContainsPoint(x, y))
             return false;
 
         var effectiveTransform = EffectiveTransform;
@@ -104,7 +104,7 @@ public class Transform : SingleChildWidget
         if (hitChild)
         {
             result.ConcatLastTransform(transform.Value, X, Y);
-            if (_restrictedHitTest)
+            if (_clipBounds)
                 result.ConcatRestrictedBounds(this);
         }
 
@@ -114,16 +114,20 @@ public class Transform : SingleChildWidget
     protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)
     {
         if (Child == null) return;
-        base.BeforePaint(canvas, onlyTransform, dirtyRect);
-        canvas.Save(); //TODO: 考虑保存Matrix不用保存
+
+        canvas.Save();
+        if (X != 0 || Y != 0)
+            canvas.Translate(X, Y);
+        if (_clipBounds)
+            canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
+
         canvas.Concat(EffectiveTransform); //canvas.Transform(EffectiveTransform);
     }
 
     protected internal override void AfterPaint(Canvas canvas)
     {
         if (Child == null) return;
-        canvas.Restore(); //TODO: 考虑恢复之前保存的Matrix
-        base.AfterPaint(canvas); //Must call after restore canvas matrix now.
+        canvas.Restore();
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
