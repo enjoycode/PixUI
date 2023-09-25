@@ -33,6 +33,6 @@ public static class Log
 
     private static void Write(char level, string msg, string file, string method, int line)
     {
-        Console.WriteLine($"[{level}{DateTime.Now:hh:mm:ss} {IOPath.GetFileNameWithoutExtension(file)}.{method}:{line}]: {msg}");
+        Console.WriteLine($"[{level}{DateTime.Now:hh:mm:ss.fff} {IOPath.GetFileNameWithoutExtension(file)}.{method}:{line}]: {msg}");
     }
 }
