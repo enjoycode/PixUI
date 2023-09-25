@@ -5,6 +5,7 @@ using LiveChartsCore.Measure;
 using LiveCharts;
 using LiveCharts.Drawing;
 using LiveCharts.Painting;
+using LiveCharts.Painting.ImageFilters;
 using LiveCharts.VisualElements;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Geo;
@@ -117,7 +118,14 @@ public sealed class DemoCharts : View
                                 Height = mapHeight,
                                 MapProjection = projection,
                                 Stroke = new SolidColorPaint { Color = Colors.Green },
-                                Fill = new SolidColorPaint { Color = Colors.Red },
+                                Fill = new SolidColorPaint
+                                {
+                                    Color = Colors.Red,
+                                    ImageFilter = new DropShadow(
+                                        2 / scale, 2 / scale, 6 / scale, 6 / scale,
+                                        Colors.Black /*new Color(50, 0, 0, 100)*/
+                                    )
+                                },
                                 ActiveMap = Maps.GetMapFromStreamReader<SkiaDrawingContext>(new StreamReader(geoJson))
                             }
                         }
