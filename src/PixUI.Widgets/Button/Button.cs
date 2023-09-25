@@ -86,7 +86,8 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
 
     private void OnPointerUp(PointerEvent e)
     {
-        if (e.Buttons != PointerButtons.Left) return;
+        //Web平台左键按下然后释放，此时的Buttons = None
+        if (e.Buttons != PointerButtons.Left && !UIApplication.Current.IsWasm) return;
 
         _drawMask = false;
         Invalidate(InvalidAction.Repaint);
