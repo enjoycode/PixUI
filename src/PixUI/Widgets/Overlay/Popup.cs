@@ -219,7 +219,7 @@ internal sealed class PopupProxy : Widget
 internal sealed class ScaleYTransition : Transform //TODO: 整合
 {
     public ScaleYTransition(Animation<double> animation, Offset? origin = null)
-        : base(Matrix4.CreateScale(1, (float)animation.Value, 1), origin)
+        : base(Matrix4.CreateScale(1, (float)animation.Value, 1), origin, false)
     {
         _animation = animation;
         _animation.ValueChanged += OnAnimationValueChanged;
