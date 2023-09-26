@@ -18,7 +18,7 @@ public sealed class SlideTransition : Transform
     private float _offsetY = 0;
 
     public SlideTransition(Animation<Offset> position)
-        : base(Matrix4.CreateIdentity())
+        : base(Matrix4.CreateIdentity(), null, false)
     {
         _position = position;
         _position.ValueChanged += OnPositionChanged;
