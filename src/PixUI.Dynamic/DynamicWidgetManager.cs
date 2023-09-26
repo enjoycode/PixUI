@@ -27,6 +27,17 @@ public static partial class DynamicWidgetManager
         _dynamicWidgets[dynamicWidgetMeta.Name] = dynamicWidgetMeta;
     }
 
+    public static void Register<T>(IconData icon,
+        string? catalog = null,
+        string? name = null,
+        DynamicPropertyMeta[]? properties = null,
+        DynamicEventMeta[]? events = null,
+        ContainerSlot[]? slots = null, bool replaceExists = false)
+        where T : Widget, new()
+    {
+        Register(DynamicWidgetMeta.Make<T>(icon, catalog, name, properties, events, slots), replaceExists);
+    }
+
     public static IList<DynamicWidgetMeta> GetAll() => _dynamicWidgets.Values.ToList();
 
     public static DynamicWidgetMeta GetByName(string name) => _dynamicWidgets[name]!;
