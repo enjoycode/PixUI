@@ -7,9 +7,7 @@ namespace PixUI.Demo.Mac
     {
         private static void Main(string[] args)
         {
-            //MacApplication.Run(new DemoRoute());
-            // PaintDebugger.Switch();
-            MacApplication.Run(new WuxiMap());
+            MacApplication.Run(new DemoRoute());
         }
     }
 }
