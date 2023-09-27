@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace PixUI;
@@ -39,13 +40,25 @@ public abstract class FlowDecorator<T> : Widget where T : Widget
         }
 
         var saveCount = canvas.Save();
-        for (var i = widgetToRoot.Count - 1; i >= 0; i--)
+        try
         {
-            widgetToRoot[i].BeforePaint(canvas, _onlyTransform);
-        }
+            for (var i = widgetToRoot.Count - 1; i >= 0; i--)
+            {
+                widgetToRoot[i].BeforePaint(canvas, _onlyTransform);
+            }
 
-        PaintCore(canvas);
-        canvas.RestoreToCount(saveCount);
+            PaintCore(canvas);
+        }
+#if !DEBUG
+        catch (Exception e)
+        {
+            Log.Error(e.Message);
+        }
+#endif
+        finally
+        {
+            canvas.RestoreToCount(saveCount);
+        }
     }
 
     protected abstract void PaintCore(Canvas canvas);
