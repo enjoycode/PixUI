@@ -86,6 +86,8 @@ public abstract class Widget : IStateBindable, IDisposable
         get => (_flag & MountedMask) == MountedMask;
         protected set
         {
+            if (IsMounted == value) return;
+
             if (value)
             {
                 _flag |= MountedMask;

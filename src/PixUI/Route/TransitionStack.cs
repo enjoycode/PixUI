@@ -20,7 +20,7 @@ internal sealed class TransitionStack : Widget
 
     public override void VisitChildren(Func<Widget, bool> action)
     {
-        // if (!IsMounted) return; //Do not do this
+        // if (!IsMounted) return; //Do not do this, Unmount children when animation done need this.
         if (action(_from)) return;
         action(_to);
     }
@@ -44,6 +44,8 @@ internal sealed class TransitionStack : Widget
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
+        if (!IsMounted) return; //maybe has remove from widget tree when animation done.
+        
         _from.BeforePaint(canvas);
         _from.Paint(canvas, null /*Paint all, area?.ToChild(_from)*/);
         _from.AfterPaint(canvas);
