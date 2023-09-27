@@ -74,6 +74,6 @@ public sealed class TabBody<T> : DynamicView
         Offset fromOffset, Offset toOffset)
     {
         var offsetAnimation = new OffsetTween(fromOffset, toOffset).Animate(animation);
-        return new SlideTransition(offsetAnimation) { Child = child };
+        return new SlideTransition(offsetAnimation, true) { Child = child };
     }
 }
