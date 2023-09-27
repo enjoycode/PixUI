@@ -483,6 +483,13 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
 
     #region ====Widget Overrides====
 
+    protected override void OnMounted()
+    {
+        base.OnMounted();
+        if (_isSelected)
+            ShowSelectedDecorator();
+    }
+
     protected override void OnUnmounted()
     {
         HideSelectedDecorator();
