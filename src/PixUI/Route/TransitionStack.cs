@@ -20,7 +20,7 @@ internal sealed class TransitionStack : Widget
 
     public override void VisitChildren(Func<Widget, bool> action)
     {
-        if (!IsMounted) return;
+        // if (!IsMounted) return; //Do not do this
         if (action(_from)) return;
         action(_to);
     }
