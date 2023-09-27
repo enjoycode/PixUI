@@ -192,7 +192,7 @@ public sealed class GeoMap : Widget, IMouseRegion, IGeoMapView<SkiaDrawingContex
             canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    private void EnsureDrawingContext(Canvas canvas)
     {
         if (_drawCtx == null)
         {
@@ -206,8 +206,12 @@ public sealed class GeoMap : Widget, IMouseRegion, IGeoMapView<SkiaDrawingContex
             _drawCtx.Height = (int)H;
             //_drawCtx.Background = BackColor.AsSKColor();
         }
-
-        _motionCanvas.CanvasCore.DrawFrame(_drawCtx);
+    }
+    
+    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    {
+        EnsureDrawingContext(canvas);
+        _motionCanvas.CanvasCore.DrawFrame(_drawCtx!);
     }
 
     protected override void AfterPaint(Canvas canvas)
@@ -217,8 +221,8 @@ public sealed class GeoMap : Widget, IMouseRegion, IGeoMapView<SkiaDrawingContex
 
     void IPaintEmptyClip.ClearOrStopPaint(Canvas canvas)
     {
-        //暂直接停止DrawingLoop
-        _motionCanvas.StopDrawingLoop();
+        EnsureDrawingContext(canvas);
+        _motionCanvas.CanvasCore.DrawFrame(_drawCtx!);
     }
 
     #endregion

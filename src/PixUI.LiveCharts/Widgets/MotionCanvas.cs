@@ -42,7 +42,7 @@ internal sealed class MotionCanvas
         _isDrawingLoopRunning = true;
 
         var ts = TimeSpan.FromSeconds(1 / MaxFps);
-        while (!CanvasCore.IsValid && _isDrawingLoopRunning)
+        while (!CanvasCore.IsValid)
         {
             _chartView.Invalidate(InvalidAction.Repaint);
             await Task.Delay((int)ts.TotalMilliseconds);
@@ -50,8 +50,6 @@ internal sealed class MotionCanvas
 
         _isDrawingLoopRunning = false;
     }
-
-    internal void StopDrawingLoop() => _isDrawingLoopRunning = false;
 
     private void OnPaintTasksChanged()
     {

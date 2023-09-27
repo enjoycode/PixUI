@@ -332,17 +332,16 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
 
     void IPaintEmptyClip.ClearOrStopPaint(Canvas canvas)
     {
-        //暂直接停止DrawingLoop
-        _motionCanvas.StopDrawingLoop();
+        //不能简单停止MotionCanvas.DrawingLoop，因为可能动画进入前clip区域为空
+        //所以应该继续绘制至有效状态
+        EnsureDrawingContext(canvas);
+        CoreCanvas.DrawFrame(_drawCtx!);
     }
 
     private SkiaDrawingContext? _drawCtx;
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    private void EnsureDrawingContext(Canvas canvas)
     {
-        canvas.Save();
-        canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
-
         if (_drawCtx == null)
         {
             _drawCtx = new SkiaDrawingContext(CoreCanvas, (int)W, (int)H, canvas)
@@ -355,9 +354,16 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
             _drawCtx.Height = (int)H;
             _drawCtx.Background = BackColor.AsSKColor();
         }
+    }
 
-        CoreCanvas.DrawFrame(_drawCtx);
+    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    {
+        canvas.Save();
+        canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
 
+        EnsureDrawingContext(canvas);
+        CoreCanvas.DrawFrame(_drawCtx!);
+        
         canvas.Restore();
     }
 
