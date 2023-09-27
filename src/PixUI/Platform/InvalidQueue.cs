@@ -384,46 +384,49 @@ internal sealed class InvalidQueue
 
         //转换坐标并裁剪绘制区域
         var saveCount = canvas.Save();
+#if !DEBUG
         try
         {
-            for (var i = widgetToRoot.Count - 1; i >= 0; i--)
+#endif
+        for (var i = widgetToRoot.Count - 1; i >= 0; i--)
+        {
+            temp = widgetToRoot[i];
+            if (i == 0)
             {
-                temp = widgetToRoot[i];
-                if (i == 0)
+                var dirtyRect = dirtyArea?.GetRect() ?? Rect.FromLTWH(0, 0, temp.W, temp.H);
+                temp.BeforePaint(canvas, false, dirtyRect);
+                if (canvas.IsClipEmpty)
                 {
-                    var dirtyRect = dirtyArea?.GetRect() ?? Rect.FromLTWH(0, 0, temp.W, temp.H);
-                    temp.BeforePaint(canvas, false, dirtyRect);
-                    if (canvas.IsClipEmpty)
-                    {
-                        if (temp is IPaintEmptyClip paintEmptyClip)
-                            paintEmptyClip.ClearOrStopPaint(canvas);
-                        Log.Debug($"{temp}重绘时裁剪区域为空");
-                        return;
-                    }
-                }
-                else
-                {
-                    temp.BeforePaint(canvas, false);
+                    if (temp is IPaintEmptyClip paintEmptyClip)
+                        paintEmptyClip.ClearOrStopPaint(canvas);
+                    Log.Debug($"{temp}重绘时裁剪区域为空");
+                    return;
                 }
             }
-
-            //恢复坐标转换从opaque开始绘制
-            var factor = ctx.Window.ScaleFactor;
-            var matrix = Matrix4.CreateScale(factor, factor);
-            canvas.SetMatrix(matrix);
-
-            for (var i = widgetToRoot.Count - 1; i >= 0; i--)
+            else
             {
-                temp = widgetToRoot[i];
-                temp.BeforePaint(canvas, true);
-                if (ReferenceEquals(temp, opaque))
-                {
-                    opaque.Paint(canvas, ReferenceEquals(opaque, widget)
-                        ? dirtyArea
-                        : new RepaintChild(opaque, widget, dirtyArea));
-                    break;
-                }
+                temp.BeforePaint(canvas, false);
             }
+        }
+
+        //恢复坐标转换从opaque开始绘制
+        var factor = ctx.Window.ScaleFactor;
+        var matrix = Matrix4.CreateScale(factor, factor);
+        canvas.SetMatrix(matrix);
+
+        for (var i = widgetToRoot.Count - 1; i >= 0; i--)
+        {
+            temp = widgetToRoot[i];
+            temp.BeforePaint(canvas, true);
+            if (ReferenceEquals(temp, opaque))
+            {
+                opaque.Paint(canvas, ReferenceEquals(opaque, widget)
+                    ? dirtyArea
+                    : new RepaintChild(opaque, widget, dirtyArea));
+                break;
+            }
+        }
+#if !DEBUG
         }
         catch (Exception ex)
         {
@@ -431,7 +434,10 @@ internal sealed class InvalidQueue
         }
         finally
         {
-            canvas.RestoreToCount(saveCount);
+#endif
+        canvas.RestoreToCount(saveCount);
+#if !DEBUG
         }
+#endif
     }
 }
