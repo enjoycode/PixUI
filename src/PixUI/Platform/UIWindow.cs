@@ -156,6 +156,7 @@ public abstract class UIWindow
     {
         LastMouseX = LastMouseY = -1;
         CompareAndSwapHitTestResult();
+        EventHookManager.HookEvent(EventType.MoveOutWindow, null);
     }
 
     public void OnPointerDown(PointerEvent pointerEvent)

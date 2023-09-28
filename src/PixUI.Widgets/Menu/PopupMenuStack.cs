@@ -155,6 +155,11 @@ internal sealed class PopupMenuStack : Popup
                 return EventPreviewResult.Processed;
             }
         }
+        else if (type == EventType.MoveOutWindow)
+        {
+            _closeAll();
+            return EventPreviewResult.NotProcessed;
+        }
 
         return base.PreviewEvent(type, e);
     }
