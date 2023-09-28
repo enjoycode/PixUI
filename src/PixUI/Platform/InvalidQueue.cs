@@ -98,7 +98,7 @@ internal sealed class InvalidQueue
         var root = widget.Root;
 #if DEBUG
         if (root == null)
-            throw new Exception("Widget without root");
+            throw new Exception($"[{widget}] without root");
 #else
         if (root == null)
         {

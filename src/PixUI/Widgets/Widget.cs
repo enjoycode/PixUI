@@ -188,7 +188,6 @@ public abstract class Widget : IStateBindable, IDisposable
                 throw new InvalidOperationException("Widget already has parent");
             if (SuspendingMount && value == null) return; //忽略移动过程中设上级为空
 
-            // Don't do this: _parent?.Children.Remove(this);
             _parent = value;
 
             // 自动挂载或取消挂载至WidgetTree

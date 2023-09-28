@@ -157,29 +157,31 @@ public sealed class RouteHistoryManager
         //TODO: 再处理各命名路由的路径
     }
 
-    private bool ComparePath(Navigator? navigator, string[] pss, int index, RouteChangeAction action)
+    private static bool ComparePath(Navigator? navigator, string[] pss, int index, RouteChangeAction action)
     {
-        if (navigator == null) return false;
-
-        var name = pss[index];
-        if (name == "")
-            name = navigator.GetDefaultRoute().Name;
-        string? arg = null;
-        if (navigator.IsDynamic(name))
+        while (true)
         {
-            arg = pss[index + 1];
-            index++;
-        }
+            if (navigator == null) return false;
+            
+            var name = pss[index];
+            if (name == "") name = navigator.GetDefaultRoute().Name;
+            string? arg = null;
+            if (navigator.IsDynamic(name))
+            {
+                arg = pss[index + 1];
+                index++;
+            }
 
-        if (name != navigator.ActiveRoute.Name || arg != navigator.ActiveArgument)
-        {
-            navigator.Goto(name, arg, action);
-            return true;
-        }
+            if (name != navigator.ActiveRoute.Name || arg != navigator.ActiveArgument)
+            {
+                navigator.Goto(name, arg, action);
+                return true;
+            }
 
-        if (index == pss.Length - 1)
-            return false;
-        return ComparePath(GetDefaultNavigator(navigator), pss, index + 1, action);
+            if (index == pss.Length - 1) return false;
+            navigator = GetDefaultNavigator(navigator);
+            index = index + 1;
+        }
     }
 
     /// <summary>
