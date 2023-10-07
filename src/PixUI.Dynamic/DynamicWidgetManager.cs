@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace PixUI.Dynamic;
 
@@ -36,6 +37,46 @@ public static partial class DynamicWidgetManager
         where T : Widget, new()
     {
         Register(DynamicWidgetMeta.Make<T>(icon, catalog, name, properties, events, slots), replaceExists);
+    }
+
+    /// <summary>
+    /// 注册标了DynamicWidgetAttribute的组件
+    /// </summary>
+    public static bool Register(Type widgetType, bool replaceExists = false)
+    {
+        var baseType = typeof(Widget);
+        if (!widgetType.IsAssignableTo(baseType))
+            return false;
+
+        //TODO:判断是否具备无参构造
+
+        var attr = widgetType.GetCustomAttribute<DynamicWidgetAttribute>();
+        if (attr == null)
+            return false;
+
+        var catalog = string.IsNullOrEmpty(attr.Catalog) ? "Other" : attr.Catalog;
+        var name = string.IsNullOrEmpty(attr.Name) ? widgetType.Name : attr.Name;
+        var icon = string.IsNullOrEmpty(attr.Icon) ? MaterialIcons.Widgets : GetIconByName(attr.Icon);
+
+        //TODO: properties
+
+        var meta = new DynamicWidgetMeta(catalog, name, widgetType, icon,
+            () => (Widget)Activator.CreateInstance(widgetType)!);
+        try
+        {
+            Register(meta, replaceExists);
+            return true;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
+
+    private static IconData GetIconByName(string iconName)
+    {
+        var propInfo = typeof(MaterialIcons).GetProperty(iconName, BindingFlags.Static | BindingFlags.Public);
+        return propInfo == null ? MaterialIcons.Widgets : (IconData)propInfo.GetValue(null)!;
     }
 
     public static IList<DynamicWidgetMeta> GetAll() => _dynamicWidgets.Values.ToList();

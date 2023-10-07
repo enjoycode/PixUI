@@ -9,7 +9,7 @@ namespace PixUI.Dynamic;
 /// </summary>
 public sealed class DynamicWidgetMeta
 {
-    private DynamicWidgetMeta(string catalog, string name, Type widgetType, IconData icon,
+    internal DynamicWidgetMeta(string catalog, string name, Type widgetType, IconData icon,
         Func<Widget> instanceMaker,
         DynamicPropertyMeta[]? properties = null,
         DynamicEventMeta[]? events = null,
@@ -116,65 +116,9 @@ public sealed class DynamicWidgetMeta
     public Widget CreateInstance() => _instanceMaker();
 }
 
-// public sealed class DynamicValueMeta
-// {
-//     public DynamicValueMeta(Type runtimeType, DynamicValue? defautValue = null)
-//     {
-//         //先判断是否状态类型
-//         if (typeof(State).IsAssignableFrom(runtimeType))
-//         {
-//             if (runtimeType.IsGenericType && runtimeType.GetGenericTypeDefinition() == typeof(State<>))
-//             {
-//                 ValueType = runtimeType.GenericTypeArguments[0];
-//                 IsState = true;
-//             }
-//             else
-//             {
-//                 throw new NotSupportedException("Only State<> supported");
-//             }
-//         }
-//         else
-//         {
-//             ValueType = runtimeType;
-//             IsState = false;
-//         }
-//
-//         DefaultValue = defautValue;
-//     }
-//
-//     public readonly Type ValueType;
-//     public readonly bool IsState;
-//     public readonly DynamicValue? DefaultValue;
-//
-//     public object? GetRuntimeValue(in DynamicValue source /*, IDynamicStateProvider stateProvider*/)
-//     {
-//         if (source.From != ValueSource.Const) throw new NotImplementedException();
-//
-//         //from const value, 已经在读取时转换类型为ValueType
-//         if (IsState && source.Value != null) //TODO: check Nullable of value
-//         {
-//             var rxType = typeof(RxValue<>).MakeGenericType(ValueType);
-//             return Activator.CreateInstance(rxType, source.Value);
-//         }
-//
-//         return source.Value;
-//     }
-// }
-
-// public sealed class DynamicCtorArgMeta
-// {
-//     public DynamicCtorArgMeta(string name, Type runtimeType, bool allowNull, DynamicValue? defaultValue = null)
-//     {
-//         Name = name;
-//         AllowNull = allowNull;
-//         Value = new DynamicValueMeta(runtimeType, defaultValue);
-//     }
-//
-//     public readonly string Name;
-//     public readonly DynamicValueMeta Value;
-//     public readonly bool AllowNull;
-// }
-
+/// <summary>
+/// 动态组件的属性定义
+/// </summary>
 public sealed class DynamicPropertyMeta
 {
     public DynamicPropertyMeta(string name, Type runtimeType, bool allowNull, bool initSetter = false,
@@ -239,6 +183,9 @@ public sealed class DynamicPropertyMeta
     }
 }
 
+/// <summary>
+/// 动态组件的事件定义
+/// </summary>
 public sealed class DynamicEventMeta
 {
     public DynamicEventMeta(string name)
