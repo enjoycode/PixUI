@@ -62,6 +62,8 @@ public sealed class Toolbox : View
         _treeController.DataSource = treeList;
     }
 
+    public void Rebuild() => BuildTreeDataSource();
+
     private void OnSelectionChanged()
     {
         _designController.CurrentToolboxItem = _treeController.FirstSelectedNode?.Data.DynamicWidgetMeta;

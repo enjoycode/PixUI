@@ -97,11 +97,12 @@ public sealed class TreeController<T> //: IStateBindable
             _dataSource = value;
             // if (DataSource is RxList<T> rxList)
             //     rxList.AddBinding(this, BindingOptions.None);
-            if (TreeView != null && TreeView.IsMounted)
+            if (TreeView != null)
             {
                 Nodes.Clear();
                 InitNodes(TreeView);
-                TreeView.Invalidate(InvalidAction.Relayout);
+                if (TreeView.IsMounted)
+                    TreeView.Invalidate(InvalidAction.Relayout);
             }
         }
     }
