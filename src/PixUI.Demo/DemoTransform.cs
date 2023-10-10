@@ -18,7 +18,7 @@ namespace PixUI.Demo.Mac
                 Width = 300,
                 Height = 300,
                 BgColor = Colors.Green,
-                Child = new Transform(m2, new Offset(0, 0))
+                Child = new Transform(m2, new Offset(0, 0), false)
                 {
                     // Child = new HitTestWidget()
                     // {

@@ -113,6 +113,7 @@ namespace PixUI.Demo
                             new DatePicker(new DateTime(1977, 3, 16)) { Width = 200 },
                             new Text(_numValue.ToStateOfString()),
                             new NumberInput<float>(_numValue) { Width = 250 },
+                            new DropFileInput() { OnDrop = data => { Notification.Info($"Drop File: {data}"); } }
                         }
                     }
                 }

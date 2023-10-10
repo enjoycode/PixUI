@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace PixUI;
 
@@ -215,6 +216,22 @@ public abstract class UIWindow
         var offset = ((IScrollable)scrollable).OnScroll(scrollEvent.Dx, scrollEvent.Dy);
         if (!offset.IsEmpty)
             AfterScrollDoneInternal(scrollable, offset.Dx, offset.Dy);
+    }
+
+    public void OnDropFile(int x, int y, string name, int size, string type, Stream stream)
+    {
+        //HitTest for drop area, TODO: maybe use temp HitTestResult
+        NewHitTest(x, y);
+        var lastMouseRegion = _newHitResult.LastWidgetWithMouseRegion as IMouseRegion;
+        //TODO: maybe map point to local coordinate and pass to event args
+        _newHitResult.Reset();
+        if (lastMouseRegion == null) return;
+
+        //暂在这里判断一下是否允许Drop
+        var arg = new FileDataTransferItem(name, size, type, stream);
+        if (!lastMouseRegion.MouseRegion.AllowDrop(arg)) return;
+        
+        lastMouseRegion.MouseRegion.RaiseDrop(arg);
     }
 
     public void OnKeyDown(KeyEvent keyEvent)

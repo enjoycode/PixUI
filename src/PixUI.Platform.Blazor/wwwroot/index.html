@@ -148,6 +148,15 @@
             ev.preventDefault();
             ev.stopPropagation();
         }
+        window.ondragover = ev => {
+            ev.preventDefault();
+        }
+        window.ondrop = async (ev) => {
+            ev.preventDefault();
+            for (const file of ev.dataTransfer.files) {
+                await DotNet.invokeMethodAsync(_asmName, "OnDropFile", ev.x, ev.y, file.name, file.size, file.type, DotNet.createJSStreamReference(file))
+            }
+        }
         window.onkeydown = ev => {
             DotNet.invokeMethod(_asmName, "OnKeyDown", ev.key, ev.code, ev.altKey, ev.ctrlKey, ev.shiftKey)
             if (ev.code === 'Tab') {
@@ -214,11 +223,11 @@
             DotNet.invokeMethod(_asmName, "OnInvalidate")
         });
     }
-    
+
     async function ClipboardWriteText(text) {
         await navigator.clipboard.writeText(text)
     }
-    
+
     async function ClipboardReadText() {
         return await navigator.clipboard.readText()
     }

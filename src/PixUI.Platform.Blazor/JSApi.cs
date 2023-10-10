@@ -36,6 +36,22 @@ public static class JSApi
     }
 
     [JSInvokable]
+    public static async Task OnDropFile(int x, int y, string name, int size, string type,
+        IJSStreamReference jsStreamReference)
+    {
+        try
+        {
+            await using var stream =
+                await jsStreamReference.OpenReadStreamAsync(maxAllowedSize: 1024 * 1024 /*TODO: 全局配置*/);
+            BlazorApplication.Window.OnDropFile(x, y, name, size, type, stream);
+        }
+        finally
+        {
+            await jsStreamReference.DisposeAsync();
+        }
+    }
+
+    [JSInvokable]
     public static void OnScroll(int x, int y, int dx, int dy)
     {
         var args = ScrollEvent.Make(x, y, dx, dy);
