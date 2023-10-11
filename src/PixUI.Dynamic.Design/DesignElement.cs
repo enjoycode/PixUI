@@ -530,10 +530,22 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
+        DrawBackground(canvas);
+
         if (Child != null)
             base.Paint(canvas, area);
         else
             DrawPlaceholder(canvas);
+    }
+
+    private void DrawBackground(Canvas canvas)
+    {
+        if (!IsRoot) return;
+
+        if (Controller.BackgroundImage != null)
+        {
+            canvas.DrawImage(Controller.BackgroundImage, Rect.FromLTWH(0, 0, W, H)); //暂填满
+        }
     }
 
     private void DrawPlaceholder(Canvas canvas)

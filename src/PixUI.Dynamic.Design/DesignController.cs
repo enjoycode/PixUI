@@ -18,6 +18,28 @@ public sealed partial class DesignController
 
     public DesignElement RootElement { get; internal set; } = null!;
 
+    private DynamicBackground? _background;
+    private Image? _cachedBgImage;
+
+    public DynamicBackground? Background
+    {
+        get => _background;
+        set
+        {
+            _background = value;
+            _cachedBgImage?.Dispose();
+            _cachedBgImage = null;
+            if (_background is { ImageData: not null })
+            {
+                _cachedBgImage = Image.FromEncodedData(_background.ImageData);
+            }
+
+            RootElement.Invalidate(InvalidAction.Repaint);
+        }
+    }
+
+    internal Image? BackgroundImage => _cachedBgImage;
+
     /// <summary>
     /// 当前工具箱选择的项
     /// </summary>

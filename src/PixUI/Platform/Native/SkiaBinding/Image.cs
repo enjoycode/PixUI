@@ -60,6 +60,11 @@ namespace PixUI
             var p = paint?.Handle ?? IntPtr.Zero;
             return GetObject(SkiaApi.sk_image_new_from_picture(picture.Handle, &dimensions, matrix, p))!;
         }
+        
+        public SKData Encode (EncodedImageFormat format, int quality)
+        {
+            return SKData.GetObject (SkiaApi.sk_image_encode_specific (Handle, format, quality));
+        }
     }
 }
 #endif

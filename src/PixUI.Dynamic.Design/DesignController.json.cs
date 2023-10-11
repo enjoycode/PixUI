@@ -12,6 +12,9 @@ partial class DesignController
     {
         writer.WriteStartObject();
 
+        //Background
+        WriteBackground(writer);
+
         //State
         WriteStates(writer);
 
@@ -20,6 +23,14 @@ partial class DesignController
         WriteWidget(writer, RootElement);
 
         writer.WriteEndObject();
+    }
+
+    private void WriteBackground(Utf8JsonWriter writer)
+    {
+        if (Background == null) return;
+
+        writer.WritePropertyName(nameof(Background));
+        JsonSerializer.Serialize(writer, Background);
     }
 
     private void WriteStates(Utf8JsonWriter writer)
@@ -154,6 +165,9 @@ partial class DesignController
             var propName = reader.GetString();
             switch (propName)
             {
+                case "Background":
+                    ReadBackgournd(ref reader);
+                    break;
                 case "State":
                     ReadStates(ref reader);
                     break;
@@ -175,6 +189,11 @@ partial class DesignController
 #if DEBUG
         Log.Debug($"加载耗时: {Stopwatch.GetElapsedTime(ts).TotalMilliseconds}ms");
 #endif
+    }
+
+    private void ReadBackgournd(ref Utf8JsonReader reader)
+    {
+        Background = JsonSerializer.Deserialize<DynamicBackground>(ref reader);
     }
 
     private void ReadStates(ref Utf8JsonReader reader)
