@@ -87,7 +87,12 @@ public abstract class State<T> : State
 
     public static implicit operator State<T>(T value) => new RxValue<T>(value);
 
-    public StateListener<T> Listen(Action<T> changeAction) => new StateListener<T>(this, changeAction);
+    /// <summary>
+    /// 监听状态变更后执行相应的操作
+    /// </summary>
+    /// <param name="changeAction">状态变更后执行的操作</param>
+    /// <returns>注意必须保持StateListener的引用，否则可能被垃圾回收掉</returns>
+    public StateListener<T> Listen(Action<T> changeAction) => new(this, changeAction);
 
 #if __WEB__
         //TODO:临时解决隐式转换
