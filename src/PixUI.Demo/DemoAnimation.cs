@@ -16,8 +16,7 @@ namespace PixUI.Demo.Mac
             _controller = new AnimationController(1000);
             _controller.ValueChanged += OnAnimationValueChanged;
             _colorAnimation = new ColorTween(Colors.Black, Colors.Red).Animate(_controller);
-            _offsetAnimation =
-                new OffsetTween(new Offset(-1, 0), new Offset(1, 0)).Animate(_controller);
+            _offsetAnimation = new OffsetTween(new Offset(-1, 0), new Offset(1, 0)).Animate(_controller);
 
             Child = BuildChild();
         }
@@ -30,13 +29,22 @@ namespace PixUI.Demo.Mac
                 {
                     new Button("Play") { OnTap = _ => Play() },
                     new Text(_title) { FontSize = _fontSize, TextColor = _color },
-                    new SlideTransition(_offsetAnimation)
+                    new Container
                     {
-                        Child = new Container
+                        BgColor = Colors.Gray,
+                        Width = 150,
+                        Height = 50,
+                        Child = new Center
                         {
-                            Width = 50,
-                            Height = 50,
-                            BgColor = Colors.Red
+                            Child = new SlideTransition(_offsetAnimation, false)
+                            {
+                                Child = new Container
+                                {
+                                    Width = 50,
+                                    Height = 50,
+                                    BgColor = Colors.Red
+                                }
+                            }
                         }
                     }
                 }

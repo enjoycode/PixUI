@@ -29,7 +29,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
     public State<bool>? Readonly
     {
         get => _readonly;
-        set => _readonly = Rebind(_readonly, value, BindingOptions.None);
+        set => _readonly = Bind(_readonly, value, OnReadonlyChanged);
     }
 
     internal bool IsReadonly => _readonly != null && _readonly.Value;
@@ -197,24 +197,18 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
     private void TryBuildParagraph()
     {
         if (CachedParagraph != null) return;
-        if (Text.Value == null || Text.Value.Length == 0) return;
+        if (string.IsNullOrEmpty(Text.Value) || Text.Value.Length == 0) return;
 
         var text = IsObscure ? new string('●', Text.Value.Length) : Text.Value;
         BuildParagraph(text, float.PositiveInfinity);
     }
 
-    public override void OnStateChanged(State state, BindingOptions options)
+    private void OnReadonlyChanged(State state)
     {
-        if (ReferenceEquals(state, _readonly))
-        {
-            if (IsReadonly)
-                Root?.Window.StopTextInput();
-            else
-                Root?.Window.StartTextInput();
-            return;
-        }
-
-        base.OnStateChanged(state, options);
+        if (IsReadonly)
+            Root?.Window.StopTextInput();
+        else
+            Root?.Window.StartTextInput();
     }
 
     public override void Layout(float availableWidth, float availableHeight)
@@ -228,7 +222,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
-        if (Text.Value == null || Text.Value.Length == 0)
+        if (string.IsNullOrEmpty(Text.Value) || Text.Value.Length == 0)
         {
             if (string.IsNullOrEmpty(HintText)) return;
 

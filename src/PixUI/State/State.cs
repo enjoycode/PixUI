@@ -1,69 +1,56 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace PixUI;
-
-/// <summary>
-/// 允许绑定状态的对象
-/// </summary>
-public interface IStateBindable
-{
-    /// <summary>
-    /// 绑定的状态发生变更
-    /// </summary>
-    void OnStateChanged(State state, BindingOptions options);
-}
 
 [TSRename("StateBase")]
 public abstract class State
 {
-    private List<Binding>? _bindings;
+    private List<Action<State>>? _bindings;
+    private static readonly EmptyState _emptyState = new EmptyState();
+
+    public static State Empty => _emptyState;
 
     public abstract bool Readonly { get; }
 
-    public void AddBinding(IStateBindable target, BindingOptions options)
+    public void AddListener(Action<State> action)
     {
-        if (_bindings == null)
-        {
-            _bindings = new List<Binding> { new Binding(target, options) };
-        }
-        else
-        {
-            if (!_bindings.Any(b => ReferenceEquals(b.Target.Target, target)))
-            {
-                _bindings.Add(new Binding(target, options));
-            }
-        }
+        _bindings ??= new List<Action<State>>();
+        _bindings.Add(action);
     }
 
-    public void RemoveBinding(IStateBindable target)
+    public void RemoveListener(Action<State> action)
     {
-        _bindings?.RemoveAll(b => ReferenceEquals(b.Target.Target, target));
+        _bindings?.RemoveAll(b => ReferenceEquals(b, action));
+    }
+
+    public void RemoveByTarget(object target)
+    {
+        Debug.Assert(target != null);
+        _bindings?.RemoveAll(b => ReferenceEquals(b.Target, target));
     }
 
     public void NotifyValueChanged()
     {
-        if (_bindings == null) return;
+        if (_bindings == null || _bindings.Count == 0) return;
 
         for (var i = 0; i < _bindings.Count; i++)
         {
-            var target = _bindings[i].Target.Target;
-            if (target == null) /*DoNot use binding.Target.IsAlive*/
-            {
-                _bindings.RemoveAt(i); //remove none alive binding
-                i--;
-            }
-            else
-            {
-                ((IStateBindable)target).OnStateChanged(this, _bindings[i].Options);
-            }
+            _bindings[i](this);
         }
     }
 }
 
+internal sealed class EmptyState : State
+{
+    public override bool Readonly => true;
+}
+
 public abstract class State<T> : State
 {
+    public static State<T?> Default() => new RxValue<T?>(default);
+
     public abstract T Value { get; set; }
 
     public override string ToString() => Value?.ToString() ?? string.Empty;
@@ -86,13 +73,6 @@ public abstract class State<T> : State
         RxComputed<TR>.Make(this, other, getter, setter);
 
     public static implicit operator State<T>(T value) => new RxValue<T>(value);
-
-    /// <summary>
-    /// 监听状态变更后执行相应的操作
-    /// </summary>
-    /// <param name="changeAction">状态变更后执行的操作</param>
-    /// <returns>注意必须保持StateListener的引用，否则可能被垃圾回收掉</returns>
-    public StateListener<T> Listen(Action<T> changeAction) => new(this, changeAction);
 
 #if __WEB__
         //TODO:临时解决隐式转换
@@ -125,41 +105,3 @@ public static class StateExtensions
     public static State<string> ToNoneNullable(this State<string?> s) =>
         RxComputed<string>.Make(s, v => v ?? string.Empty, v => s.Value = v);
 }
-
-// public sealed class StateProxy<T> : State<T>, IStateBindable
-// {
-//     private State<T>? _source;
-//     private readonly T _defaultValue;
-//
-//     public StateProxy(State<T>? source, T defaultValue)
-//     {
-//         _source = source;
-//         _source?.AddBinding(this, BindingOptions.None);
-//         _defaultValue = defaultValue;
-//     }
-//
-//     public State<T>? Source
-//     {
-//         set
-//         {
-//             _source?.RemoveBinding(this);
-//             _source = value;
-//             _source?.AddBinding(this, BindingOptions.None);
-//         }
-//     }
-//
-//     public override bool Readonly => _source?.Readonly ?? false;
-//
-//     public override T Value
-//     {
-//         get => _source == null ? _defaultValue : _source.Value;
-//         set
-//         {
-//             if (_source == null)
-//                 throw new InvalidOperationException();
-//             _source.Value = value;
-//         }
-//     }
-//
-//     public void OnStateChanged(StateBase state, BindingOptions options) => NotifyValueChanged();
-// }

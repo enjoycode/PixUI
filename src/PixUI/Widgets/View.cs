@@ -7,7 +7,7 @@ public abstract class View : SingleChildWidget
     public State<Color>? BgColor
     {
         get => _bgBgColor;
-        set => _bgBgColor = Rebind(_bgBgColor, value, BindingOptions.AffectsVisual);
+        set => _bgBgColor = Bind(_bgBgColor, value, RepaintOnStateChanged);
     }
 
     public override bool IsOpaque => _bgBgColor != null && _bgBgColor.Value.IsOpaque;

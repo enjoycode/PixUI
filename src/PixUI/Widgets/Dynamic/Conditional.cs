@@ -31,11 +31,11 @@ public class Conditional<T> : DynamicView //where T: IEquatable<T>
     public Conditional(State<T> state)
     {
         IsLayoutTight = true;
-        _state = Bind(state, BindingOptions.AffectsLayout);
+        _state = Bind(state, OnStateChanged);
     }
 
     private readonly State<T> _state;
-    private readonly List<WhenBuilder<T>> _whens = new List<WhenBuilder<T>>();
+    private readonly List<WhenBuilder<T>> _whens = new();
 
     //TODO: add AutoDispose property to dispose not used widget
 
@@ -60,15 +60,9 @@ public class Conditional<T> : DynamicView //where T: IEquatable<T>
         return this;
     }
 
-    public override void OnStateChanged(State state, BindingOptions options)
+    private void OnStateChanged(State state)
     {
-        if (ReferenceEquals(state, _state))
-        {
-            var newChild = MakeChildByCondition();
-            ReplaceTo(newChild);
-            return;
-        }
-
-        base.OnStateChanged(state, options);
+        var newChild = MakeChildByCondition();
+        ReplaceTo(newChild);
     }
 }

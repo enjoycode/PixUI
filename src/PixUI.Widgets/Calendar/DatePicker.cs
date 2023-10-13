@@ -7,8 +7,8 @@ public sealed class DatePicker : InputBase<EditableText>
 {
     public DatePicker(State<DateTime?> value) : base(new EditableText(string.Empty))
     {
-        _value = Bind(value, BindingOptions.None);
-        _textValue = Bind(_editor.Text, BindingOptions.None);
+        _value = Bind(value, OnValueChanged);
+        _textValue = Bind(_editor.Text, OnTextChanged);
         if (value.Value != null) _textValue.Value = value.Value.Value.ToString(format);
 
         Padding = new RxValue<EdgeInsets>(EdgeInsets.Only(4, 4, 0, 4));
@@ -68,17 +68,15 @@ public sealed class DatePicker : InputBase<EditableText>
         }
     }
 
-    public override void OnStateChanged(State state, BindingOptions options)
+    private void OnValueChanged(State state)
     {
-        if (ReferenceEquals(state, _value))
-            _textValue.Value = _value.Value == null ? string.Empty : _value.Value.Value.ToString(format);
-        if (ReferenceEquals(state, _textValue))
-        {
-            if (DateTime.TryParseExact(_textValue.Value, format,
-                    CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTime))
-                _value.Value = dateTime;
-        }
+        _textValue.Value = _value.Value == null ? string.Empty : _value.Value.Value.ToString(format);
+    }
 
-        base.OnStateChanged(state, options);
+    private void OnTextChanged(State state)
+    {
+        if (DateTime.TryParseExact(_textValue.Value, format,
+                CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTime))
+            _value.Value = dateTime;
     }
 }

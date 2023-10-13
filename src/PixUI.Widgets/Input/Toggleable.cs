@@ -20,9 +20,8 @@ public abstract class Toggleable : Widget, IMouseRegion
     protected void InitState(State<bool?> value, bool tristate)
     {
         _triState = tristate;
-        _value = Bind(value, BindingOptions.AffectsVisual);
-        _positionController =
-            new AnimationController(100, value.Value != null && value.Value.Value ? 1 : 0);
+        _value = Bind(value, OnValueChanged);
+        _positionController = new AnimationController(100, value.Value != null && value.Value.Value ? 1 : 0);
         _positionController.ValueChanged += OnPositionValueChanged;
     }
 
@@ -63,15 +62,9 @@ public abstract class Toggleable : Widget, IMouseRegion
         Invalidate(InvalidAction.Repaint);
     }
 
-    public override void OnStateChanged(State state, BindingOptions options)
+    private void OnValueChanged(State state)
     {
-        if (ReferenceEquals(state, _value))
-        {
-            ValueChanged?.Invoke(_value.Value);
-            AnimateToValue();
-            return;
-        }
-
-        base.OnStateChanged(state, options);
+        ValueChanged?.Invoke(_value.Value);
+        AnimateToValue();
     }
 }

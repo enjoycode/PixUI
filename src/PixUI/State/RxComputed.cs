@@ -5,7 +5,7 @@ namespace PixUI;
 /// <summary>
 /// 通过源状态计算/转换而来的状态
 /// </summary>
-public sealed class RxComputed<T> : State<T>, IStateBindable
+public sealed class RxComputed<T> : State<T>
 {
     private readonly Func<T> _getter;
     private readonly Action<T>? _setter;
@@ -23,7 +23,7 @@ public sealed class RxComputed<T> : State<T>, IStateBindable
             formatter == null ? s.ToString : () => formatter(s.Value),
             parser == null ? null : v => s.Value = parser(v)
         );
-        s.AddBinding(computed, BindingOptions.None);
+        s.AddListener(computed.OnStateChanged);
         return computed;
     }
 
@@ -32,14 +32,14 @@ public sealed class RxComputed<T> : State<T>, IStateBindable
         Action<TR>? setter = null)
     {
         var computed = new RxComputed<TR>(() => getter(source.Value), setter);
-        source.AddBinding(computed, BindingOptions.None);
+        source.AddListener(computed.OnStateChanged);
         return computed;
     }
 
     public static RxComputed<TS?> MakeNullable<TS>(State<TS> source) where TS : struct
     {
         var computed = new RxComputed<TS?>(() => source.Value, v => source.Value = v ?? default(TS));
-        source.AddBinding(computed, BindingOptions.None);
+        source.AddListener(computed.OnStateChanged);
         return computed;
     }
 
@@ -49,8 +49,8 @@ public sealed class RxComputed<T> : State<T>, IStateBindable
         Action<TR>? setter = null)
     {
         var computed = new RxComputed<TR>(() => getter(s1.Value, s2.Value), setter);
-        s1.AddBinding(computed, BindingOptions.None);
-        s2.AddBinding(computed, BindingOptions.None);
+        s1.AddListener(computed.OnStateChanged);
+        s2.AddListener(computed.OnStateChanged);
         return computed;
     }
 
@@ -72,5 +72,5 @@ public sealed class RxComputed<T> : State<T>, IStateBindable
         }
     }
 
-    public void OnStateChanged(State state, BindingOptions options) => NotifyValueChanged();
+    private void OnStateChanged(State state) => NotifyValueChanged();
 }

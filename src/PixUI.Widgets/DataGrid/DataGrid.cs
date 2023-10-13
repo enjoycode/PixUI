@@ -86,7 +86,8 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
             hitRow.Value.Column is DataGridHostColumn<T> hostColumn)
         {
             var cellWidget = hostColumn.GetCellWidget(hitRow.Value.RowIndex);
-            HitTestChild(cellWidget, x, y, result);
+            if (cellWidget != null) //TODO:临时解决快速滚动后尚未创建承载的Widget实例
+                HitTestChild(cellWidget, x, y, result);
         }
 
         return true;

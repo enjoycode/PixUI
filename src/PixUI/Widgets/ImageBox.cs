@@ -8,7 +8,7 @@ public sealed class ImageBox : Widget
 
     public ImageBox(State<ImageSource> imgSrc /*TODO: LoadingBuilder, ErrorBuilder*/)
     {
-        _imgSrc = Bind(imgSrc, BindingOptions.AffectsLayout);
+        _imgSrc = Bind(imgSrc, RelayoutOnStateChanged);
     }
 
     public override bool IsOpaque

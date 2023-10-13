@@ -102,11 +102,13 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
         return hostedWidget;
     }
 
-    internal Widget GetCellWidget(int rowIndex)
+    internal Widget? GetCellWidget(int rowIndex)
     {
         var pattern = new CellCache<Widget>(rowIndex, null);
         var index = _cellWidgets.BinarySearch(pattern, _cellCacheComparer);
-        Debug.Assert(index >= 0);
+        //TODO:临时修复由于快速滚动后开始新的HitTest,但当前rowIndex承载的Widget还未创建
+        if (index < 0) return null;
+        //Debug.Assert(index >= 0);
         return _cellWidgets[index].CachedItem!;
     }
 

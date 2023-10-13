@@ -409,6 +409,7 @@ internal sealed class InvalidQueue
             }
 
             //恢复坐标转换从opaque开始绘制
+            //暂不考虑dirtyArea == null时设为叶子节点的整个大小
             var factor = ctx.Window.ScaleFactor;
             var matrix = Matrix4.CreateScale(factor, factor);
             canvas.SetMatrix(matrix);

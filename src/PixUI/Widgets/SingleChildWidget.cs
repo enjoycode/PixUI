@@ -19,7 +19,7 @@ public abstract class SingleChildWidget : Widget
     public State<EdgeInsets>? Padding
     {
         get => _padding;
-        set => _padding = Rebind(_padding, value, BindingOptions.AffectsLayout);
+        set => _padding = Bind(_padding, value, RelayoutOnStateChanged);
     }
 
     public Widget? Child

@@ -7,7 +7,7 @@ public sealed class Icon : Widget
     public Icon(State<IconData> data)
     {
         _painter = new IconPainter(OnIconFontLoaded);
-        _data = Bind(data, BindingOptions.AffectsVisual);
+        _data = Bind(data, OnDataChanged);
     }
 
     private readonly State<IconData> _data;
@@ -19,13 +19,13 @@ public sealed class Icon : Widget
     public State<float>? Size
     {
         get => _size;
-        set => _size = Rebind(_size, value, BindingOptions.AffectsLayout);
+        set => _size = Bind(_size, value, OnSizeChanged);
     }
 
     public State<Color>? Color
     {
         get => _color;
-        set => _color = Rebind(_color, value, BindingOptions.AffectsVisual);
+        set => _color = Bind(_color, value, RepaintOnStateChanged);
     }
 
     private void OnIconFontLoaded()
@@ -37,14 +37,16 @@ public sealed class Icon : Widget
             Invalidate(InvalidAction.Repaint);
     }
 
-    public override void OnStateChanged(State state, BindingOptions options)
+    private void OnDataChanged(State state)
     {
-        if (ReferenceEquals(state, _data) || ReferenceEquals(state, _size))
-        {
-            _painter.Reset();
-        }
+        _painter.Reset();
+        Invalidate(InvalidAction.Repaint);
+    }
 
-        base.OnStateChanged(state, options);
+    private void OnSizeChanged(State state)
+    {
+        _painter.Reset();
+        Invalidate(InvalidAction.Relayout);
     }
 
     public override void Layout(float availableWidth, float availableHeight)

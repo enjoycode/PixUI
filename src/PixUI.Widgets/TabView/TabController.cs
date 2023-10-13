@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace PixUI;
 
-public sealed class TabController<T> : IStateBindable
+public sealed class TabController<T>
 {
     public TabController(IList<T> dataSource)
     {
@@ -24,8 +24,6 @@ public sealed class TabController<T> : IStateBindable
 
     internal void BindTabBar(TabBar<T> tabBar) => _tabBar = tabBar;
     internal void BindTabBody(TabBody<T> tabBody) => _tabBody = tabBody;
-
-    public void OnStateChanged(State state, BindingOptions options) { }
 
     #region ====Events====
 
@@ -101,7 +99,7 @@ public sealed class TabController<T> : IStateBindable
                 TabSelectChanged?.Invoke(-1);
             }
         }
-            
+
         //最后激发TabClosed事件
         TabClosed?.Invoke(dataItem);
     }

@@ -1,14 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace PixUI;
 
-public abstract class Widget : IStateBindable, IDisposable
+public abstract class Widget : IDisposable
 {
-    // 绑定的状态列表,目前仅用于dispose时解除绑定关系
-    private List<State>? _states; //TODO: ?remove this, 改为在绑定时监听Widget.Disposing事件后移除绑定关系
-
     /// <summary>
     /// 是否不透明的
     /// </summary>
@@ -141,7 +137,7 @@ public abstract class Widget : IStateBindable, IDisposable
     public State<float>? Width
     {
         get => _width;
-        set => _width = Rebind(_width, value, BindingOptions.AffectsLayout);
+        set => _width = Bind(_width, value, RelayoutOnStateChanged);
     }
 
     /// <summary>
@@ -150,7 +146,7 @@ public abstract class Widget : IStateBindable, IDisposable
     public State<float>? Height
     {
         get => _height;
-        set => _height = Rebind(_height, value, BindingOptions.AffectsLayout);
+        set => _height = Bind(_height, value, RelayoutOnStateChanged);
     }
 
     /// <summary>
@@ -305,42 +301,28 @@ public abstract class Widget : IStateBindable, IDisposable
     #region ====Bind====
 
     /// <summary>
-    /// 绑定状态至Widget
+    /// 绑定状态至Widget,用于首次绑定
     /// </summary>
-    protected T Bind<T>(T newState, BindingOptions options = BindingOptions.AffectsVisual)
+    protected T Bind<T>(T newState, Action<State> action)
         where T : State
     {
-        return Rebind(null, newState, options)!;
+        newState.AddListener(action);
+        return newState;
     }
 
     /// <summary>
-    /// 重新绑定状态
+    /// 绑定状态至Widget,用于重新绑定
     /// </summary>
-    protected T? Rebind<T>(T? oldState, T? newState, BindingOptions options = BindingOptions.AffectsVisual)
+    protected T? Bind<T>(T? oldState, T? newState, Action<State> action)
         where T : State
     {
         if (ReferenceEquals(oldState, newState)) return newState;
 
-        if (oldState != null)
-        {
-            oldState.RemoveBinding(this);
-            _states!.Remove(oldState);
-        }
+        oldState?.RemoveListener(action);
+        newState?.AddListener(action);
 
-        if (newState != null)
-        {
-            newState.AddBinding(this, options);
-            if (_states == null)
-                _states = new List<State> { newState };
-            else if (!_states.Contains(newState))
-                _states.Add(newState);
-        }
-
-        //暂强制重新布局或重绘
-        if (options == BindingOptions.AffectsLayout)
-            Invalidate(InvalidAction.Relayout);
-        else if (options == BindingOptions.AffectsVisual)
-            Invalidate(InvalidAction.Repaint);
+        //暂强制调用一次变更
+        action(newState ?? State.Empty);
 
         return newState;
     }
@@ -487,9 +469,11 @@ public abstract class Widget : IStateBindable, IDisposable
     /// <summary>
     /// 开始绘制前转换画布坐标为本地坐标，并且根所需要转换矩阵或裁剪绘制区域
     /// </summary>
+    /// <param name="canvas"></param>
     /// <param name="onlyTransform">用于脏区域绘制时仅转换坐标矩阵，不需要重复裁剪</param>
     /// <param name="dirtyRect">用于脏区域绘制时裁剪区域</param>
-    protected internal virtual void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)
+    protected internal virtual void BeforePaint(Canvas canvas, bool onlyTransform = false,
+        Rect? dirtyRect = null /*TODO: use IDirtyArea*/)
     {
         if (X != 0 || Y != 0)
             canvas.Translate(X, Y);
@@ -553,16 +537,14 @@ public abstract class Widget : IStateBindable, IDisposable
         InvalidQueue.Add(this, action, area);
     }
 
-    public virtual void OnStateChanged(State state, BindingOptions options)
+    protected virtual void RepaintOnStateChanged(State state)
     {
-        if (options == BindingOptions.AffectsLayout)
-        {
-            InvalidQueue.Add(this, InvalidAction.Relayout, null);
-        }
-        else if (options == BindingOptions.AffectsVisual)
-        {
-            InvalidQueue.Add(this, InvalidAction.Repaint, null);
-        }
+        InvalidQueue.Add(this, InvalidAction.Repaint, null);
+    }
+
+    protected virtual void RelayoutOnStateChanged(State state)
+    {
+        InvalidQueue.Add(this, InvalidAction.Relayout, null);
     }
 
     #endregion
@@ -575,21 +557,8 @@ public abstract class Widget : IStateBindable, IDisposable
 
     #region ====IDisposable====
 
-    private void ClearBindings()
-    {
-        if (_states == null) return;
-        foreach (var state in _states)
-        {
-            state.RemoveBinding(this);
-        }
-
-        _states = null;
-    }
-
     public virtual void Dispose()
     {
-        ClearBindings();
-
         Parent = null;
     }
 

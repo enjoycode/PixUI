@@ -14,7 +14,7 @@ public sealed class Container : SingleChildWidget
     public State<Color>? BgColor
     {
         get => _bgColor;
-        set => _bgColor = Rebind(_bgColor, value, BindingOptions.AffectsVisual);
+        set => _bgColor = Bind(_bgColor, value, RepaintOnStateChanged);
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)

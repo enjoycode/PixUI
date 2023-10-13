@@ -11,7 +11,7 @@ public sealed class NumberInput<T> : InputBase<EditableText> where T : struct, I
 
     public NumberInput(State<T?> number) : base(new EditableText(number.ToString()))
     {
-        _nullable = Bind(number, BindingOptions.None);
+        _nullable = Bind(number, OnNullableChanged);
         _editor.PreviewInput = OnPreviewInput;
         _editor.CommitChanges = OnCommitChanges;
     }
@@ -50,10 +50,8 @@ public sealed class NumberInput<T> : InputBase<EditableText> where T : struct, I
         _nullable.Value = result;
     }
 
-    public override void OnStateChanged(State state, BindingOptions options)
+    private void OnNullableChanged(State state)
     {
-        if (ReferenceEquals(state, _nullable))
-            _editor.Text.Value = state.ToString() ?? string.Empty;
-        base.OnStateChanged(state, options);
+        _editor.Text.Value = state.ToString() ?? string.Empty;
     }
 }

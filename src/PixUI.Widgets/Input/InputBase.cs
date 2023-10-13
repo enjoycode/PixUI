@@ -28,7 +28,7 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
     public State<EdgeInsets>? Padding
     {
         get => _padding;
-        set => _padding = Rebind(_padding, value, BindingOptions.AffectsLayout);
+        set => _padding = Bind(_padding, value, RelayoutOnStateChanged);
     }
 
     public abstract State<bool>? Readonly { get; set; }

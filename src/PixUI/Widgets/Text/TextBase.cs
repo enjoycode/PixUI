@@ -6,7 +6,7 @@ public abstract class TextBase : Widget
 {
     protected TextBase(State<string> text)
     {
-        Text = Bind(text, this is EditableText ? BindingOptions.AffectsVisual : BindingOptions.AffectsLayout);
+        Text = Bind(text, this is EditableText ? RepaintOnStateChanged : RelayoutOnStateChanged);
     }
 
     public State<string> Text { get; }
@@ -24,19 +24,19 @@ public abstract class TextBase : Widget
     public State<float>? FontSize
     {
         get => _fontSize;
-        set => _fontSize = Rebind(_fontSize, value, BindingOptions.AffectsLayout);
+        set => _fontSize = Bind(_fontSize, value, RelayoutOnStateChanged);
     }
 
     public State<FontWeight>? FontWeight
     {
         get => _fontWeight;
-        set => _fontWeight = Rebind(_fontWeight, value, BindingOptions.AffectsLayout);
+        set => _fontWeight = Bind(_fontWeight, value, RepaintOnStateChanged);
     }
 
     public State<Color>? TextColor
     {
         get => _textColor;
-        set => _textColor = Rebind(_textColor, value, BindingOptions.AffectsLayout);
+        set => _textColor = Bind(_textColor, value, RepaintOnStateChanged);
     }
 
     public int MaxLines
@@ -58,13 +58,23 @@ public abstract class TextBase : Widget
         }
     }
 
-    public override void OnStateChanged(State state, BindingOptions options)
+    private void ClearCachedParagraph()
     {
         //TODO: fast update font size or color use skia paragraph
         _cachedParagraph?.Dispose();
         _cachedParagraph = null;
+    }
 
-        base.OnStateChanged(state, options);
+    protected override void RepaintOnStateChanged(State state)
+    {
+        ClearCachedParagraph();
+        base.RepaintOnStateChanged(state);
+    }
+
+    protected override void RelayoutOnStateChanged(State state)
+    {
+        ClearCachedParagraph();
+        base.RelayoutOnStateChanged(state);
     }
 
     protected void BuildParagraph(string text, float width)
@@ -82,8 +92,7 @@ public abstract class TextBase : Widget
         FontStyle? fontStyle = _fontWeight == null
             ? null
             : new FontStyle(_fontWeight.Value, FontSlant.Upright);
-        return TextPainter.BuildParagraph(text, width, fontSize, color, fontStyle, _maxLines,
-            ForceHeight);
+        return TextPainter.BuildParagraph(text, width, fontSize, color, fontStyle, _maxLines, ForceHeight);
     }
 
     public override void Layout(float availableWidth, float availableHeight)
@@ -91,7 +100,7 @@ public abstract class TextBase : Widget
         var width = CacheAndCheckAssignWidth(availableWidth);
         var height = CacheAndCheckAssignHeight(availableHeight);
 
-        if (Text.Value == null || Text.Value.Length == 0)
+        if (string.IsNullOrEmpty(Text.Value) || Text.Value.Length == 0)
         {
             SetSize(0, 0);
             return;
@@ -110,7 +119,7 @@ public abstract class TextBase : Widget
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
-        if (Text.Value == null || Text.Value.Length == 0) return;
+        if (string.IsNullOrEmpty(Text.Value) || Text.Value.Length == 0) return;
 
         if (_cachedParagraph == null) //可能颜色改变后导致的缓存丢失，可以简单重建
         {
@@ -122,5 +131,11 @@ public abstract class TextBase : Widget
 
         canvas.DrawParagraph(_cachedParagraph!, 0, 0);
         //Console.WriteLine($"Paint Text Widget: {_value} at {Left},{Top},{Width},{Height}");
+    }
+
+    public override void Dispose()
+    {
+        ClearCachedParagraph();
+        base.Dispose();
     }
 }

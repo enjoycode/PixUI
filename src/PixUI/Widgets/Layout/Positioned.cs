@@ -30,7 +30,7 @@ public sealed class Positioned : Widget
         get => _left;
         set
         {
-            _left = Rebind(_left, value, BindingOptions.AffectsLayout);
+            _left = Bind(_left, value, RelayoutOnStateChanged);
             Parent?.Invalidate(InvalidAction.Repaint); //TODO: remove when impl OnChildBoundsChanged
         }
     }
@@ -40,7 +40,7 @@ public sealed class Positioned : Widget
         get => _right;
         set
         {
-            _right = Rebind(_right, value, BindingOptions.AffectsLayout);
+            _right = Bind(_right, value, RelayoutOnStateChanged);
             Parent?.Invalidate(InvalidAction.Repaint); //TODO:
         }
     }
@@ -50,7 +50,7 @@ public sealed class Positioned : Widget
         get => _top;
         set
         {
-            _top = Rebind(_top, value, BindingOptions.AffectsLayout);
+            _top = Bind(_top, value, RelayoutOnStateChanged);
             Parent?.Invalidate(InvalidAction.Repaint); //TODO:
         }
     }
@@ -60,7 +60,7 @@ public sealed class Positioned : Widget
         get => _bottom;
         set
         {
-            _bottom = Rebind(_bottom, value, BindingOptions.AffectsLayout);
+            _bottom = Bind(_bottom, value, RelayoutOnStateChanged);
             Parent?.Invalidate(InvalidAction.Repaint); //TODO:
         }
     }

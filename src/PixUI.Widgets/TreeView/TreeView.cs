@@ -23,7 +23,7 @@ public sealed class TreeView<T> : Widget, IScrollable
     public State<Color>? Color
     {
         get => _color;
-        set => _color = Rebind(_color, value, BindingOptions.AffectsVisual);
+        set => _color = Bind(_color, value, RepaintOnStateChanged);
     }
 
     public Action<TreeNode<T>> OnCheckChanged
