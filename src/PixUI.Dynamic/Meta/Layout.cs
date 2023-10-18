@@ -5,6 +5,11 @@ partial class DynamicWidgetManager
     private static DynamicWidgetMeta MakeRow() => DynamicWidgetMeta.Make<Row>(
         MaterialIcons.ViewArray,
         catalog: "Layout",
+        properties: new DynamicPropertyMeta[]
+        {
+            new(nameof(Row.Alignment), typeof(VerticalAlignment), false),
+            new(nameof(Row.Spacing), typeof(float), false)
+        },
         slots: new ContainerSlot[]
         {
             new(nameof(Row.Children), ContainerType.MultiChild)
@@ -14,6 +19,11 @@ partial class DynamicWidgetManager
     private static DynamicWidgetMeta MakeColumn() => DynamicWidgetMeta.Make<Column>(
         MaterialIcons.ViewDay,
         catalog: "Layout",
+        properties: new DynamicPropertyMeta[]
+        {
+            new(nameof(Column.Alignment), typeof(HorizontalAlignment), false),
+            new(nameof(Column.Spacing), typeof(float), false)
+        },
         slots: new ContainerSlot[]
         {
             new(nameof(Column.Children), ContainerType.MultiChild)
