@@ -33,6 +33,10 @@ partial class DynamicWidgetManager
     private static DynamicWidgetMeta MakeExpanded() => DynamicWidgetMeta.Make<Expanded>(
         MaterialIcons.AspectRatio,
         catalog: "Layout",
+        properties: new DynamicPropertyMeta[]
+        {
+            new(nameof(Expanded.Flex), typeof(int), false)
+        },
         slots: new ContainerSlot[]
         {
             new(nameof(Expanded.Child), ContainerType.SingleChildReversed)

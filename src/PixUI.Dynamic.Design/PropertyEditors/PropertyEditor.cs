@@ -14,6 +14,7 @@ public sealed class PropertyEditor : Widget
     static PropertyEditor()
     {
         RegisterClassValueEditor<string, TextEditor>(true);
+        RegisterStructValueEditor<int, NumberEditor<int>>(true);
         RegisterStructValueEditor<float, NumberEditor<float>>(true);
         RegisterStructValueEditor<Color, ColorEditor>(true);
     }

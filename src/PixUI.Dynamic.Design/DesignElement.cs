@@ -441,28 +441,7 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         //是否根节点或用于占位的Slot
         if (Meta == null)
         {
-            if (meta.IsReversedWrapElement) //eg: drop Expanded to Row's placeholder
-            {
-                var parentElement = Parent?.Parent as DesignElement;
-                if (parentElement == null || !parentElement.Meta!.IsContainer) return;
-                var parentDefaultSlot = parentElement.Meta.Slots![0];
-                if (parentDefaultSlot.ContainerType != ContainerType.MultiChild) return;
-
-                var childWidget = meta.CreateInstance();
-                var childElement = new DesignElement(Controller, meta, parentDefaultSlot.PropertyName);
-                var childDefaultSlot = meta.Slots![0];
-                childDefaultSlot.TrySetChild(childWidget, childElement);
-
-                parentDefaultSlot.TryReplaceChild(parentElement.Target!, this, childWidget);
-                parentElement.Invalidate(InvalidAction.Relayout);
-                Controller.Select(childElement);
-            }
-            else
-            {
-                ChangeMeta(meta, !meta.IsReversedWrapElement);
-                Controller.OnSelectionChanged(); //强制刷新属性面板
-            }
-
+            DropToPlaceholder(meta);
             return;
         }
 
@@ -471,55 +450,94 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
 
         //获取默认的Slot
         var defaultSlot = Meta.Slots![0];
-        if (defaultSlot.ContainerType == ContainerType.MultiChild)
+        switch (defaultSlot.ContainerType)
         {
-            Widget childToBeAdded;
-            DesignElement childElement;
-
-            //TODO:暂简单特殊处理添加非Positioned至Stack内
-            if (Meta.WidgetType == typeof(Stack) && meta.WidgetType != typeof(Positioned))
-            {
-                childElement = new DesignElement(Controller, meta, nameof(Positioned.Child));
-                var positionedMeta = DynamicWidgetManager.GetByName(nameof(Positioned));
-                var positionedElement = new DesignElement(Controller, positionedMeta, defaultSlot.PropertyName)
-                    { Child = childElement };
-                childToBeAdded = new Positioned { Child = positionedElement };
-            }
-            else if (meta.IsReversedWrapElement)
-            {
-                throw new NotImplementedException();
-                // childToBeAdded = meta.CreateInstance();
-                // childElement = new DesignElement(_controller, meta, defaultSlot.PropertyName);
-                // meta.AddChild(childToBeAdded, childElement);
-            }
-            else
-            {
-                childToBeAdded = childElement = new DesignElement(Controller, meta, defaultSlot.PropertyName);
-            }
-
-            if (defaultSlot.TryAddChild(Target!, childToBeAdded))
-            {
-                Invalidate(InvalidAction.Relayout);
-                Controller.Select(childElement);
-            }
+            case ContainerType.MultiChild:
+                DropToMultiSlot(defaultSlot, meta);
+                break;
+            case ContainerType.SingleChild:
+                DropToSingleSlot(defaultSlot, meta);
+                break;
+            default:
+                DropToReversedSlot(defaultSlot, meta);
+                break;
         }
-        else if (defaultSlot.ContainerType == ContainerType.SingleChild)
+    }
+
+    private void DropToPlaceholder(DynamicWidgetMeta meta)
+    {
+        if (meta.IsReversedWrapElement) //eg: drop Expanded to Row's placeholder
         {
-            var newChild = new DesignElement(Controller, meta, defaultSlot.PropertyName);
-            if (defaultSlot.TrySetChild(Target!, newChild))
-            {
-                Invalidate(InvalidAction.Relayout);
-                Controller.Select(newChild);
-            }
+            var parentElement = Parent?.Parent as DesignElement;
+            if (parentElement == null || !parentElement.Meta!.IsContainer) return;
+            var parentDefaultSlot = parentElement.Meta.Slots![0];
+            if (parentDefaultSlot.ContainerType != ContainerType.MultiChild) return;
+
+            var childWidget = meta.CreateInstance();
+            var childElement = new DesignElement(Controller, meta, parentDefaultSlot.PropertyName);
+            var childDefaultSlot = meta.Slots![0];
+            childDefaultSlot.TrySetChild(childWidget, childElement);
+
+            parentDefaultSlot.TryReplaceChild(parentElement.Target!, this, childWidget);
+            parentElement.Invalidate(InvalidAction.Relayout);
+            Controller.Select(childElement);
         }
         else
         {
-            //eg: drop widget to Positioned, check it, should never be here!
-            throw new NotImplementedException();
-            // var newChild = new DesignElement(_controller, meta, parentChildrenPropName);
-            // Child = newChild;
-            // _controller.Select(newChild);
+            ChangeMeta(meta, !meta.IsReversedWrapElement);
+            Controller.OnSelectionChanged(); //强制刷新属性面板
         }
+    }
+
+    private void DropToMultiSlot(ContainerSlot defaultSlot, DynamicWidgetMeta meta)
+    {
+        Widget childToBeAdded;
+        DesignElement childElement;
+
+        //TODO:暂简单特殊处理添加非Positioned至Stack内
+        if (Meta!.WidgetType == typeof(Stack) && meta.WidgetType != typeof(Positioned))
+        {
+            childElement = new DesignElement(Controller, meta, nameof(Positioned.Child));
+            var positionedMeta = DynamicWidgetManager.GetByName(nameof(Positioned));
+            var positionedElement = new DesignElement(Controller, positionedMeta, defaultSlot.PropertyName)
+                { Child = childElement };
+            childToBeAdded = new Positioned { Child = positionedElement };
+        }
+        else if (meta.IsReversedWrapElement)
+        {
+            throw new NotImplementedException();
+            // childToBeAdded = meta.CreateInstance();
+            // childElement = new DesignElement(_controller, meta, defaultSlot.PropertyName);
+            // meta.AddChild(childToBeAdded, childElement);
+        }
+        else
+        {
+            childToBeAdded = childElement = new DesignElement(Controller, meta, defaultSlot.PropertyName);
+        }
+
+        if (defaultSlot.TryAddChild(Target!, childToBeAdded))
+        {
+            Invalidate(InvalidAction.Relayout);
+            Controller.Select(childElement);
+        }
+    }
+
+    private void DropToSingleSlot(ContainerSlot defaultSlot, DynamicWidgetMeta meta)
+    {
+        var newChild = new DesignElement(Controller, meta, defaultSlot.PropertyName);
+        if (defaultSlot.TrySetChild(Target!, newChild))
+        {
+            Invalidate(InvalidAction.Relayout);
+            Controller.Select(newChild);
+        }
+    }
+
+    private void DropToReversedSlot(ContainerSlot defaultSlot, DynamicWidgetMeta meta)
+    {
+        //eg: drop widget to Expanded
+        var newChild = new DesignElement(Controller, meta, defaultSlot.PropertyName);
+        Child = newChild;
+        Controller.Select(newChild);
     }
 
     #endregion
