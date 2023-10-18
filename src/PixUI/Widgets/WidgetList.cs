@@ -17,7 +17,6 @@ public sealed class WidgetList<T> : Collection<T> where T : Widget
     {
         foreach (var child in this)
         {
-            // child.ClearBindings();
             child.Parent = null;
         }
 
@@ -36,7 +35,6 @@ public sealed class WidgetList<T> : Collection<T> where T : Widget
     protected override void RemoveItem(int index)
     {
         var item = this[index];
-        // item.ClearBindings();
         item.Parent = null;
         base.RemoveItem(index);
     }
@@ -48,6 +46,7 @@ public sealed class WidgetList<T> : Collection<T> where T : Widget
 
         var old = this[index];
         old.Parent = null;
+        item.Parent = _parent;
         base.SetItem(index, item);
     }
 }

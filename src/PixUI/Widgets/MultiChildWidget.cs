@@ -29,7 +29,7 @@ public abstract class MultiChildWidget<T> : Widget where T : Widget
         }
     }
 
-    internal Widget GetChildAt(int index) => _children[index];
+    internal T GetChildAt(int index) => _children[index];
 
     public override void VisitChildren(Func<Widget, bool> action)
     {

@@ -27,6 +27,7 @@ public sealed class ContainerSlot
     public readonly ContainerType ContainerType;
     private Action<Widget, Widget>? _addChildAction;
     private Action<Widget, Widget>? _removeChildAction;
+    private Action<Widget, Widget, Widget>? _replaceChildAction;
     private Action<Widget, Widget?>? _setChildAction;
 
     public void AddChild(Widget parent, Widget child)
@@ -65,6 +66,59 @@ public sealed class ContainerSlot
         try
         {
             AddChild(parent, child);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Notification.Error(ex.Message);
+            return false;
+        }
+    }
+
+    public void ReplaceChild(Widget parent, Widget oldChild, Widget newChild)
+    {
+        if (ContainerType != ContainerType.MultiChild)
+            throw new NotSupportedException();
+
+        if (_replaceChildAction == null)
+        {
+            var parentType = parent.GetType();
+            var childrenPropInfo = parentType.GetProperty(PropertyName);
+            if (childrenPropInfo == null)
+                throw new Exception($"Can't find property[{PropertyName}] for [{parentType.Name}]");
+            var listType = childrenPropInfo.PropertyType;
+            var childType = typeof(Widget);
+            if (listType.IsGenericType)
+                childType = listType.GenericTypeArguments[0];
+
+            var indexerPropInfo = listType.GetProperty("Item")!;
+            var indexOfMethodInfo = typeof(IList<>).MakeGenericType(childType).GetMethod("IndexOf")!;
+
+            var parentArg = Expression.Parameter(typeof(Widget));
+            var oldChildArg = Expression.Parameter(typeof(Widget));
+            var newChildArg = Expression.Parameter(typeof(Widget));
+            var convertedParent = Expression.Convert(parentArg, parentType);
+            var convertedOldChild = Expression.Convert(oldChildArg, childType);
+            var convertedNewChild = Expression.Convert(newChildArg, childType);
+            var childrenMember = Expression.MakeMemberAccess(convertedParent, childrenPropInfo);
+            _replaceChildAction = Expression.Lambda<Action<Widget, Widget, Widget>>(
+                Expression.Assign(
+                    Expression.MakeIndex(childrenMember, indexerPropInfo,
+                        new[] { Expression.Call(childrenMember, indexOfMethodInfo, convertedOldChild) }),
+                    convertedNewChild
+                ),
+                parentArg, oldChildArg, newChildArg
+            ).Compile();
+        }
+
+        _replaceChildAction(parent, oldChild, newChild);
+    }
+
+    public bool TryReplaceChild(Widget parent, Widget oldChild, Widget newChild)
+    {
+        try
+        {
+            ReplaceChild(parent, oldChild, newChild);
             return true;
         }
         catch (Exception ex)

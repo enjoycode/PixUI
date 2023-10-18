@@ -161,7 +161,7 @@ public sealed partial class DesignController
         {
             if (element.IsRoot)
             {
-                element.ChangeMeta(null, false);
+                element.ClearMeta();
                 element.Invalidate(InvalidAction.Relayout);
                 OnSelectionChanged();
                 break; //ignore others
@@ -170,7 +170,13 @@ public sealed partial class DesignController
             DesignElement parentElement;
             DesignElement childElement;
             Widget childWidget;
-            if (element.Parent is DesignElement reversed) //是反向包装的
+            if (element.Meta is { IsReversedWrapElement: true }) //本身是反向包装的
+            {
+                childElement = element;
+                childWidget = element.Parent!;
+                parentElement = (DesignElement)childWidget.Parent!.Parent!;
+            }
+            else if (element.Parent is DesignElement reversed) //上级是反向包装的
             {
                 childElement = reversed;
                 childWidget = reversed.Parent!;

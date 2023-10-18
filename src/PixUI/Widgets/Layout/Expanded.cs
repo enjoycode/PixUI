@@ -1,16 +1,30 @@
+using System;
+
 namespace PixUI;
 
 public sealed class Expanded : SingleChildWidget
 {
-    /// <summary>
-    /// Must > 0
-    /// </summary>
-    public int Flex { get; private set; } = 1;
+    public Expanded() { }
 
     public Expanded(Widget? child = null, int flex = 1)
     {
         Child = child;
         Flex = flex;
+    }
+
+    private int _flex = 1;
+
+    public int Flex
+    {
+        get => _flex;
+        set
+        {
+            if (value <= 0)
+                throw new ArgumentOutOfRangeException();
+            _flex = value;
+            if (IsMounted)
+                Parent?.Invalidate(InvalidAction.Relayout);
+        }
     }
 
     public override void Layout(float availableWidth, float availableHeight)

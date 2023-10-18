@@ -109,22 +109,45 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
 
     #region ====Meta & Property Value====
 
-    internal void ChangeMeta(DynamicWidgetMeta? meta, bool makeDefaultTarget)
+    /// <summary>
+    /// 用于删除时清除
+    /// </summary>
+    internal void ClearMeta()
     {
-        Meta = meta;
-        // Data.Type = Meta == null ? string.Empty : Meta.Name;
+        Meta = null;
+        Child = null;
         Data.Properties?.Clear();
         MouseRegion.Opaque = !IsContainer;
-        if (makeDefaultTarget || (Meta == null && Child != null))
+    }
+
+    internal void ChangeMeta(DynamicWidgetMeta meta, bool makeDefaultTarget)
+    {
+        Meta = meta;
+        Data.Properties?.Clear();
+        MouseRegion.Opaque = !IsContainer;
+        if (makeDefaultTarget)
         {
-            Child = Meta?.CreateInstance();
-            if (Child != null && Meta!.Properties != null) //设置设计时初始化属性值
+            Child = Meta.CreateInstance();
+            if (Meta.Properties != null) //设置设计时初始化属性值
             {
                 var initProps = Meta.Properties.Where(p => p.InitValue != null);
                 foreach (var prop in initProps)
                 {
                     var propValue = Data.SetPropertyValue(prop.Name, prop.InitValue!.Value);
                     SetPropertyValue(propValue);
+                }
+            }
+
+            //暂在这里特殊处理Row, Column等IsLayoutTight的容器实例，默认添加占位的子组件
+            if (Child is Row || Child is Column) //TODO: 应判断childMeta是否需要创建占位子组件
+            {
+                var defaultSlot = Meta!.Slots![0];
+                for (var i = 0; i < 3; i++)
+                {
+                    defaultSlot.TryAddChild(Child, new DesignElement(Controller, "Children")
+                    {
+                        Width = 100, Height = 50,
+                    });
                 }
             }
         }
@@ -415,11 +438,31 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
 
     public void OnDrop(DynamicWidgetMeta meta /*TODO: args for x, y*/)
     {
-        //是否根节点或占位的Slot, eg: HSplitter的Left slot or Right slot
+        //是否根节点或用于占位的Slot
         if (Meta == null)
         {
-            ChangeMeta(meta, true);
-            Controller.OnSelectionChanged(); //强制刷新属性面板
+            if (meta.IsReversedWrapElement) //eg: drop Expanded to Row's placeholder
+            {
+                var parentElement = Parent?.Parent as DesignElement;
+                if (parentElement == null || !parentElement.Meta!.IsContainer) return;
+                var parentDefaultSlot = parentElement.Meta.Slots![0];
+                if (parentDefaultSlot.ContainerType != ContainerType.MultiChild) return;
+
+                var childWidget = meta.CreateInstance();
+                var childElement = new DesignElement(Controller, meta, parentDefaultSlot.PropertyName);
+                var childDefaultSlot = meta.Slots![0];
+                childDefaultSlot.TrySetChild(childWidget, childElement);
+
+                parentDefaultSlot.TryReplaceChild(parentElement.Target!, this, childWidget);
+                parentElement.Invalidate(InvalidAction.Relayout);
+                Controller.Select(childElement);
+            }
+            else
+            {
+                ChangeMeta(meta, !meta.IsReversedWrapElement);
+                Controller.OnSelectionChanged(); //强制刷新属性面板
+            }
+
             return;
         }
 
@@ -515,16 +558,16 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CachedAvailableWidth = availableWidth;
-        var height = CachedAvailableHeight = availableHeight;
+        var width = CacheAndCheckAssignWidth(availableWidth);
+        var height = CacheAndCheckAssignHeight(availableHeight);
 
         if (Child == null)
         {
-            SetSize(width, height);
+            SetSize(width, height); //仅设置占位宽高
             return;
         }
 
-        Child.Layout(width, height);
+        Child.Layout(CachedAvailableWidth, CachedAvailableHeight); //始终为允许的宽高
         SetSize(Child.W, Child.H);
     }
 
@@ -550,8 +593,11 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
 
     private void DrawPlaceholder(Canvas canvas)
     {
+        using var dash = PathEffect.CreateDash(new[] { 5f, 5f }, 10);
         var paint = PaintUtils.Shared(Colors.Gray, PaintStyle.Stroke, 2f);
         paint.AntiAlias = true;
+        paint.PathEffect = dash;
+        canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), paint);
         canvas.DrawLine(0, 0, W, H, paint);
         canvas.DrawLine(W, 0, 0, H, paint);
 

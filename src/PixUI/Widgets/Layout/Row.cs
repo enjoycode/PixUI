@@ -4,14 +4,39 @@ namespace PixUI;
 
 public sealed class Row : MultiChildWidget<Widget>
 {
-    private readonly VerticalAlignment _alignment;
-    private readonly float _spacing;
+    public Row() { }
 
     public Row(VerticalAlignment alignment = VerticalAlignment.Middle, float spacing = 0)
     {
         if (spacing < 0) throw new ArgumentOutOfRangeException(nameof(spacing));
         _alignment = alignment;
         _spacing = spacing;
+    }
+
+    private VerticalAlignment _alignment = VerticalAlignment.Middle;
+    private float _spacing;
+
+    public VerticalAlignment Alignment
+    {
+        get => _alignment;
+        set
+        {
+            _alignment = value;
+            if (IsMounted)
+                Invalidate(InvalidAction.Relayout);
+        }
+    }
+
+    public float Spacing
+    {
+        get => _spacing;
+        set
+        {
+            if (value < 0) throw new ArgumentOutOfRangeException();
+            _spacing = value;
+            if (IsMounted)
+                Invalidate(InvalidAction.Relayout);
+        }
     }
 
     public override void Layout(float availableWidth, float availableHeight)

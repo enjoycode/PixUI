@@ -5,9 +5,7 @@ namespace PixUI;
 
 public sealed class Column : MultiChildWidget<Widget>
 {
-    private readonly HorizontalAlignment _alignment;
-    private readonly float _spacing;
-    private float _totalFlex = 0;
+    public Column() { }
 
     public Column(HorizontalAlignment alignment = HorizontalAlignment.Center, float spacing = 0,
         string? debugLabel = null)
@@ -16,6 +14,33 @@ public sealed class Column : MultiChildWidget<Widget>
         _alignment = alignment;
         _spacing = spacing;
         DebugLabel = debugLabel;
+    }
+
+    private HorizontalAlignment _alignment = HorizontalAlignment.Center;
+    private float _spacing;
+    private float _totalFlex = 0;
+
+    public HorizontalAlignment Alignment
+    {
+        get => _alignment;
+        set
+        {
+            _alignment = value;
+            if (IsMounted)
+                Invalidate(InvalidAction.Relayout);
+        }
+    }
+
+    public float Spacing
+    {
+        get => _spacing;
+        set
+        {
+            if (value < 0) throw new ArgumentOutOfRangeException();
+            _spacing = value;
+            if (IsMounted)
+                Invalidate(InvalidAction.Relayout);
+        }
     }
 
     public override void Layout(float availableWidth, float availableHeight)
