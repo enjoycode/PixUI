@@ -17,10 +17,10 @@ internal sealed class SelectedDecorator : FlowDecorator<DesignElement>
 
         paint = PaintUtils.Shared(Theme.FocusedColor, PaintStyle.Fill, 1f * scaleRatio);
 
-        DrawAnchor(canvas, paint, Target.GetAnchorRect(DesignElement.AnchorPosition.TopMiddle));
-        DrawAnchor(canvas, paint, Target.GetAnchorRect(DesignElement.AnchorPosition.MiddleLeft));
-        DrawAnchor(canvas, paint, Target.GetAnchorRect(DesignElement.AnchorPosition.MiddleRight));
-        DrawAnchor(canvas, paint, Target.GetAnchorRect(DesignElement.AnchorPosition.BottomMiddle));
+        DrawAnchor(canvas, paint, Target.GetAnchorRect(AnchorPosition.TopMiddle));
+        DrawAnchor(canvas, paint, Target.GetAnchorRect(AnchorPosition.MiddleLeft));
+        DrawAnchor(canvas, paint, Target.GetAnchorRect(AnchorPosition.MiddleRight));
+        DrawAnchor(canvas, paint, Target.GetAnchorRect(AnchorPosition.BottomMiddle));
     }
 
     private static void DrawAnchor(Canvas canvas, Paint paint, Rect rect)

@@ -290,9 +290,13 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
 
     private void Resize(AnchorPosition pos, float dx, float dy)
     {
+        if (Meta is { IsReversedWrapElement: true }) return; //暂不允许
+        if (Target == null) return; //不允许Resize占位用的组件
+
         DesignElement? parentPositioned = null;
-        if (Parent is DesignElement parent && parent.Target is Positioned)
+        if (Parent is DesignElement { Target: Positioned } parent)
             parentPositioned = parent;
+
         switch (pos)
         {
             case AnchorPosition.MiddleLeft:
@@ -660,12 +664,4 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
     }
 
     #endregion
-
-    internal enum AnchorPosition
-    {
-        TopMiddle,
-        MiddleLeft,
-        MiddleRight,
-        BottomMiddle
-    }
 }
