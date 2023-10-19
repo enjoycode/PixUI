@@ -94,6 +94,7 @@ public sealed class DemoDesigner : View
 
     private void OnRemove(PointerEvent e)
     {
-        _designController.DeleteElements();
+        var cmd = new DeleteElementsCommand();
+        cmd.Run(_designController);
     }
 }

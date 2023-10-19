@@ -67,149 +67,39 @@ public sealed partial class DesignController
         }
     }
 
+    #region ====ContextMenu====
+
+    internal void ShowContextMenu()
+    {
+        var list = new List<MenuItem>();
+        list.Add(MenuItem.Item("Select Parent", MaterialIcons.SwipeUp, () => new SelectParentCommand().Run(this)));
+        ContextMenu.Show(list.ToArray());
+    }
+
+    #endregion
+
     #region ====DesignElement Selection====
 
-    private readonly List<DesignElement> _selection = new();
+    internal readonly List<DesignElement> Selection = new();
 
     public event Action? SelectionChanged;
 
-    public DesignElement? FirstSelected => _selection.Count > 0 ? _selection[0] : null;
+    public DesignElement? FirstSelected => Selection.Count > 0 ? Selection[0] : null;
 
     internal void Select(DesignElement element)
     {
-        if (_selection.Count == 1 && ReferenceEquals(_selection[0], element)) return;
+        if (Selection.Count == 1 && ReferenceEquals(Selection[0], element)) return;
 
-        _selection.ForEach(o => o.IsSelected = false);
-        _selection.Clear();
+        Selection.ForEach(o => o.IsSelected = false);
+        Selection.Clear();
 
-        _selection.Add(element);
+        Selection.Add(element);
         element.IsSelected = true;
 
         OnSelectionChanged();
     }
 
     internal void OnSelectionChanged() => SelectionChanged?.Invoke();
-
-    #endregion
-
-    #region ====DesignElement Actions====
-
-    /// <summary>
-    /// 移动选择的位置，目前仅适用于Positioned组件
-    /// </summary>
-    internal void MoveElements(float dx, float dy)
-    {
-        //判断选择的是否可以移动，目前仅针对Stack下的Positioned组件,
-        //另需要注意如果位置属性绑定了状态不可手工移动
-
-        var canMove = true;
-        foreach (var element in _selection)
-        {
-            if (element.Target is Positioned ||
-                element.Parent is DesignElement { Target: Positioned })
-                continue;
-            canMove = false;
-            break;
-        }
-
-        if (!canMove) return;
-
-
-        foreach (var element in _selection)
-        {
-            var moveable = element.Target is Positioned ? element : (DesignElement)element.Parent!;
-            var target = moveable.Child as DesignElement;
-            var positioned = (Positioned)moveable.Target!;
-            var oldX = positioned.Left?.Value ?? positioned.X;
-            var oldY = positioned.Top?.Value ?? positioned.Y;
-
-            // Log.Debug($"old={oldX}, {oldY} delta={e.DeltaX}, {e.DeltaY}");
-            moveable.SetPropertyValue(moveable.Data.SetPropertyValue("Left", oldX + dx));
-            NotifyLayoutPropertyChanged?.Invoke("Left");
-            moveable.SetPropertyValue(moveable.Data.SetPropertyValue("Top", oldY + dy));
-            NotifyLayoutPropertyChanged?.Invoke("Top");
-            //clear Right & Bottom value
-            if (moveable.Data.TryGetPropertyValue("Right", out var _))
-            {
-                target?.SetPropertyValue(target.Data.SetPropertyValue("Width", moveable.W));
-                moveable.Data.RemovePropertyValue("Right");
-                moveable.RemovePropertyValue("Right");
-                NotifyLayoutPropertyChanged?.Invoke("Width");
-                NotifyLayoutPropertyChanged?.Invoke("Right");
-            }
-
-            if (moveable.Data.TryGetPropertyValue("Bottom", out var _))
-            {
-                target?.SetPropertyValue(target.Data.SetPropertyValue("Height", moveable.H));
-                moveable.Data.RemovePropertyValue("Bottom");
-                moveable.RemovePropertyValue("Bottom");
-                NotifyLayoutPropertyChanged?.Invoke("Height");
-                NotifyLayoutPropertyChanged?.Invoke("Bottom");
-            }
-        }
-    }
-
-    /// <summary>
-    /// 删除选择的元素
-    /// </summary>
-    public void DeleteElements()
-    {
-        //TODO: maybe check can be deleted
-        DesignElement? lastParentElement = null;
-
-        foreach (var element in _selection)
-        {
-            if (element.IsRoot)
-            {
-                element.ClearMeta();
-                element.Invalidate(InvalidAction.Relayout);
-                OnSelectionChanged();
-                break; //ignore others
-            }
-
-            DesignElement parentElement;
-            DesignElement childElement;
-            Widget childWidget;
-            if (element.Meta is { IsReversedWrapElement: true }) //本身是反向包装的
-            {
-                childElement = element;
-                childWidget = element.Parent!;
-                parentElement = (DesignElement)childWidget.Parent!.Parent!;
-            }
-            else if (element.Parent is DesignElement reversed) //上级是反向包装的
-            {
-                childElement = reversed;
-                childWidget = reversed.Parent!;
-                parentElement = (DesignElement)childWidget.Parent!.Parent!;
-            }
-            else
-            {
-                childWidget = childElement = element;
-                parentElement = (DesignElement)element.Parent!.Parent!;
-            }
-
-            var slot = parentElement.Meta!.GetSlot(childElement.SlotName);
-            if (slot.ContainerType == ContainerType.MultiChild)
-            {
-                if (slot.TryRemoveChild(parentElement.Target!, childWidget))
-                {
-                    parentElement.Invalidate(InvalidAction.Relayout);
-                    lastParentElement = parentElement;
-                }
-            }
-            else
-            {
-                if (slot.TrySetChild(parentElement.Target!, null))
-                {
-                    parentElement.Invalidate(InvalidAction.Relayout);
-                    lastParentElement = parentElement;
-                }
-            }
-        }
-
-        if (lastParentElement != null)
-            Select(lastParentElement);
-    }
 
     #endregion
 }

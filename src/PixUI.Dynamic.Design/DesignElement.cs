@@ -231,7 +231,14 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
     private void OnPointerDown(PointerEvent e)
     {
         e.IsHandled = true;
-        Controller.Select(this);
+        if (e.Buttons == PointerButtons.Left)
+        {
+            Controller.Select(this);
+        }
+        else if (e.Buttons == PointerButtons.Right)
+        {
+            Controller.ShowContextMenu();
+        }
     }
 
     private void OnPointerMove(PointerEvent e)
@@ -266,7 +273,8 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
             else
             {
                 //再移动元素
-                Controller.MoveElements(e.DeltaX, e.DeltaY);
+                var cmd = new MoveElementsCommand(e.DeltaX, e.DeltaY);
+                cmd.Run(Controller);
             }
 
             e.IsHandled = true;
