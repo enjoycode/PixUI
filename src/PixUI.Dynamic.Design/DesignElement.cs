@@ -39,8 +39,8 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         ChangeMeta(meta, !meta.IsReversedWrapElement);
     }
 
-    private static readonly Lazy<Paragraph> _hint = new(() =>
-        TextPainter.BuildParagraph("Drop Here", float.PositiveInfinity, 16, Colors.Gray));
+    // private static readonly Lazy<Paragraph> _hint = new(() =>
+    //     TextPainter.BuildParagraph("Drop Here", float.PositiveInfinity, 16, Colors.Gray));
 
     public readonly DesignController Controller;
     private bool _isSelected;
@@ -620,15 +620,15 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
     private void DrawPlaceholder(Canvas canvas)
     {
         using var dash = PathEffect.CreateDash(new[] { 5f, 5f }, 10);
-        var paint = PaintUtils.Shared(Colors.Gray, PaintStyle.Stroke, 2f);
+        var paint = PaintUtils.Shared(Colors.Gray, PaintStyle.Stroke, 1f);
         paint.AntiAlias = true;
         paint.PathEffect = dash;
-        canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), paint);
+        canvas.DrawRect(Rect.FromLTWH(0.5f, 0.5f, W - 1, H - 1), paint);
         canvas.DrawLine(0, 0, W, H, paint);
         canvas.DrawLine(W, 0, 0, H, paint);
 
-        var paragraph = _hint.Value;
-        canvas.DrawParagraph(paragraph, (W - paragraph.MaxIntrinsicWidth) / 2f, (H - paragraph.Height) / 2f);
+        // var paragraph = _hint.Value;
+        // canvas.DrawParagraph(paragraph, (W - paragraph.MaxIntrinsicWidth) / 2f, (H - paragraph.Height) / 2f);
     }
 
     internal Rect GetAnchorRect(AnchorPosition position)
