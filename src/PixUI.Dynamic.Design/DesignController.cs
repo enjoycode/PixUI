@@ -74,8 +74,10 @@ public sealed partial class DesignController
         var list = new List<MenuItem>();
         list.Add(MenuItem.Item("Select Parent", MaterialIcons.SwipeUp, () => new SelectParentCommand().Run(this)));
         list.Add(MenuItem.Divider());
-        list.Add(MenuItem.Item("Move Forward", MaterialIcons.MoveUp));
-        list.Add(MenuItem.Item("Move Backward", MaterialIcons.MoveDown));
+        list.Add(MenuItem.Item("Move Forward", MaterialIcons.MoveUp,
+            () => new MoveChildCommand(MoveChildAction.Forward).Run(this)));
+        list.Add(MenuItem.Item("Move Backward", MaterialIcons.MoveDown,
+            () => new MoveChildCommand(MoveChildAction.Backward).Run(this)));
         ContextMenu.Show(list.ToArray());
     }
 

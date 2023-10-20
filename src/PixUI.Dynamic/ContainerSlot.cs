@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace PixUI.Dynamic;
 
@@ -28,6 +29,7 @@ public sealed class ContainerSlot
     private Action<Widget, Widget>? _addChildAction;
     private Action<Widget, Widget>? _removeChildAction;
     private Action<Widget, Widget, Widget>? _replaceChildAction;
+    private Func<Widget, Widget, MoveChildAction, bool>? _moveChildAction;
     private Action<Widget, Widget?>? _setChildAction;
 
     public void AddChild(Widget parent, Widget child)
@@ -71,6 +73,53 @@ public sealed class ContainerSlot
         catch (Exception ex)
         {
             Notification.Error(ex.Message);
+            return false;
+        }
+    }
+
+    public bool MoveChild(Widget parent, Widget child, MoveChildAction action)
+    {
+        if (ContainerType != ContainerType.MultiChild)
+            throw new NotSupportedException();
+
+        if (_moveChildAction == null)
+        {
+            var parentType = parent.GetType();
+            var childrenPropInfo = parentType.GetProperty(PropertyName);
+            if (childrenPropInfo == null)
+                throw new Exception($"Can't find property[{PropertyName}] for [{parentType.Name}]");
+            var listType = childrenPropInfo.PropertyType;
+            var childType = typeof(Widget);
+            if (listType.IsGenericType)
+                childType = listType.GenericTypeArguments[0];
+            var widgetListType = typeof(WidgetList<>).MakeGenericType(childType);
+            var moveMethodInfo = widgetListType.GetMethod("MoveItem", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            var parentArg = Expression.Parameter(typeof(Widget));
+            var childArg = Expression.Parameter(typeof(Widget));
+            var actionArg = Expression.Parameter(typeof(MoveChildAction));
+            var convertedParent = Expression.Convert(parentArg, parentType);
+            var convertedChild = Expression.Convert(childArg, childType);
+            var childrenMember = Expression.MakeMemberAccess(convertedParent, childrenPropInfo);
+            var convertedChildren = Expression.Convert(childrenMember, widgetListType);
+            _moveChildAction = Expression.Lambda<Func<Widget, Widget, MoveChildAction, bool>>(
+                Expression.Call(convertedChildren, moveMethodInfo!, convertedChild, actionArg),
+                parentArg, childArg, actionArg
+            ).Compile();
+        }
+
+        return _moveChildAction(parent, child, action);
+    }
+
+    public bool TryMoveChild(Widget parent, Widget child, MoveChildAction action)
+    {
+        try
+        {
+            return MoveChild(parent, child, action);
+        }
+        catch (Exception e)
+        {
+            Notification.Error(e.Message);
             return false;
         }
     }

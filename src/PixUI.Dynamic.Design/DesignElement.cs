@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace PixUI.Dynamic.Design;
@@ -496,6 +497,9 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         }
         else
         {
+            //需要清除占位大小
+            Width = null;
+            Height = null;
             ChangeMeta(meta, !meta.IsReversedWrapElement);
             Controller.OnSelectionChanged(); //强制刷新属性面板
         }
@@ -599,6 +603,17 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
 
         Child.Layout(CachedAvailableWidth, CachedAvailableHeight); //始终为允许的宽高
         SetSize(Child.W, Child.H);
+    }
+
+    protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
+    {
+        Debug.Assert(AutoSize);
+
+        var oldWidth = W;
+        var oldHeight = H;
+        SetSize(child.W, child.H); //直接更新自己的大小
+
+        TryNotifyParentIfSizeChanged(oldWidth, oldHeight, affects);
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
