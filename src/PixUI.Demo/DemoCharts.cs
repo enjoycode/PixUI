@@ -121,10 +121,10 @@ public sealed class DemoCharts : View
                                 Fill = new SolidColorPaint
                                 {
                                     Color = Colors.Red,
-                                    ImageFilter = new DropShadow(
-                                        2 / scale, 2 / scale, 6 / scale, 6 / scale,
-                                        Colors.Black /*new Color(50, 0, 0, 100)*/
-                                    )
+                                    // ImageFilter = new DropShadow(
+                                    //     2 / scale, 2 / scale, 6 / scale, 6 / scale,
+                                    //     Colors.Black /*new Color(50, 0, 0, 100)*/
+                                    // )
                                 },
                                 ActiveMap = Maps.GetMapFromStreamReader<SkiaDrawingContext>(new StreamReader(geoJson))
                             }
