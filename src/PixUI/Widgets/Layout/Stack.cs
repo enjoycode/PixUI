@@ -23,4 +23,12 @@ public sealed class Stack : MultiChildWidget<Positioned>
         affects.OldH = H;
         //不需要再通知上级了
     }
+
+    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    {
+        if (area is RepaintChild)
+            base.Paint(canvas, null); //TODO:***暂强制重画全部,应该重绘所有相交的子组件
+        else
+            base.Paint(canvas, area);
+    }
 }
