@@ -20,7 +20,7 @@ public sealed class Expanded : SingleChildWidget
         set
         {
             if (value <= 0)
-                throw new ArgumentOutOfRangeException();
+                value = 1;
             _flex = value;
             if (IsMounted)
                 Parent?.Invalidate(InvalidAction.Relayout);
