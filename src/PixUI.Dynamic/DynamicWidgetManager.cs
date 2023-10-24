@@ -13,6 +13,7 @@ public static partial class DynamicWidgetManager
     static DynamicWidgetManager()
     {
         Register(MakeButtonMeta());
+        Register(MakeTextMeta());
         Register(MakeRow());
         Register(MakeColumn());
         Register(MakeExpanded());

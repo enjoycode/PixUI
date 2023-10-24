@@ -4,12 +4,14 @@ namespace PixUI;
 
 public abstract class TextBase : Widget
 {
+    protected TextBase() { }
+
     protected TextBase(State<string> text)
     {
-        Text = Bind(text, this is EditableText ? RepaintOnStateChanged : RelayoutOnStateChanged);
+        Text = text;
     }
 
-    public State<string> Text { get; }
+    private State<string> _text = string.Empty;
     private State<float>? _fontSize;
     private State<FontWeight>? _fontWeight;
     private State<Color>? _textColor;
@@ -18,6 +20,12 @@ public abstract class TextBase : Widget
     private Paragraph? _cachedParagraph;
 
     protected Paragraph? CachedParagraph => _cachedParagraph;
+
+    public State<string> Text
+    {
+        get => _text;
+        init => _text = Bind(value, this is EditableText ? RepaintOnStateChanged : RelayoutOnStateChanged);
+    }
 
     protected virtual bool ForceHeight { get; } = false;
 
