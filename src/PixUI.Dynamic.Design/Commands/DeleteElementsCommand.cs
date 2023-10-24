@@ -14,6 +14,7 @@ public sealed class DeleteElementsCommand : DesignCommand
                 element.ClearMeta();
                 element.Invalidate(InvalidAction.Relayout);
                 controller.OnSelectionChanged();
+                controller.RaiseOutlineChanged();
                 break; //ignore others
             }
 
@@ -45,6 +46,7 @@ public sealed class DeleteElementsCommand : DesignCommand
                 {
                     parentElement.Invalidate(InvalidAction.Relayout);
                     lastParentElement = parentElement;
+                    controller.RaiseOutlineChanged();
                 }
             }
             else
@@ -53,6 +55,7 @@ public sealed class DeleteElementsCommand : DesignCommand
                 {
                     parentElement.Invalidate(InvalidAction.Relayout);
                     lastParentElement = parentElement;
+                    controller.RaiseOutlineChanged();
                 }
             }
         }

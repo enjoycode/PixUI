@@ -49,6 +49,7 @@ public sealed class MoveChildCommand : DesignCommand
 
         var res = slot.TryMoveChild(parentContainer.Target!, child!, _action);
         parentContainer.Invalidate(InvalidAction.Relayout);
+        controller.RaiseOutlineChanged();
         return res;
     }
 

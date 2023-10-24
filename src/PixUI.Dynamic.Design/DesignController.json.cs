@@ -119,8 +119,11 @@ partial class DesignController
 
     public static IEnumerable<DesignElement> GetAllChildrenElements(DesignElement parentElement)
     {
+        if (parentElement.Meta == null)
+            return Array.Empty<DesignElement>();
+        
         var list = new List<DesignElement>();
-        var start = parentElement.Meta!.IsReversedWrapElement ? parentElement : parentElement.Child;
+        var start = parentElement.Meta.IsReversedWrapElement ? parentElement : parentElement.Child;
 
         start?.VisitChildren(child =>
         {

@@ -51,6 +51,13 @@ public sealed partial class DesignController
     internal Action<string>? NotifyLayoutPropertyChanged;
 
     /// <summary>
+    /// 需要刷新大纲视图的事件
+    /// </summary>
+    public event Action? OutlineChanged;
+
+    internal void RaiseOutlineChanged() => OutlineChanged?.Invoke();
+
+    /// <summary>
     /// 状态列表控制器
     /// </summary>
     internal readonly DataGridController<DynamicState> StatesController = new();

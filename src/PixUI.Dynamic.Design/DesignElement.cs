@@ -503,6 +503,8 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
             ChangeMeta(meta, !meta.IsReversedWrapElement);
             Controller.OnSelectionChanged(); //强制刷新属性面板
         }
+        
+        Controller.RaiseOutlineChanged();
     }
 
     private void DropToMultiSlot(ContainerSlot defaultSlot, DynamicWidgetMeta meta)
@@ -535,6 +537,7 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         {
             Invalidate(InvalidAction.Relayout);
             Controller.Select(childElement);
+            Controller.RaiseOutlineChanged();
         }
     }
 
@@ -545,6 +548,7 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         {
             Invalidate(InvalidAction.Relayout);
             Controller.Select(newChild);
+            Controller.RaiseOutlineChanged();
         }
     }
 
@@ -554,6 +558,7 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         var newChild = new DesignElement(Controller, meta, defaultSlot.PropertyName);
         Child = newChild;
         Controller.Select(newChild);
+        Controller.OnSelectionChanged();
     }
 
     #endregion
