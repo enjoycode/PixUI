@@ -503,7 +503,7 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
             ChangeMeta(meta, !meta.IsReversedWrapElement);
             Controller.OnSelectionChanged(); //强制刷新属性面板
         }
-        
+
         Controller.RaiseOutlineChanged();
     }
 
@@ -613,6 +613,8 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
     protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
     {
         Debug.Assert(AutoSize);
+
+        if (IsRoot) return;
 
         var oldWidth = W;
         var oldHeight = H;
