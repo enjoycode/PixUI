@@ -164,18 +164,66 @@ public sealed class Column : MultiChildWidget<Widget>
         {
             if (_totalFlex > 0)
             {
-                //TODO: recalc expanded and layout 
-                throw new NotImplementedException();
+                //重新计算所有Expanded布局，这里只有可能是非Expanded改变高度
+                var remainHeight = H;
+                for (var i = 0; i < _children.Count; i++)
+                {
+                    if (i != 0 && remainHeight >= _spacing)
+                        remainHeight = Math.Max(0, remainHeight - _spacing);
+                    if (remainHeight < _children[i].H) //eg: 子组件改变后高度超出原总高
+                    {
+                        _children[i].Layout(width, remainHeight);
+                        remainHeight -= _children[i].H;
+                        break;
+                    }
+
+                    remainHeight -= _children[i].H;
+                }
+
+                var totalHeight = 0f;
+                for (var i = 0; i < _children.Count; i++)
+                {
+                    if (i != 0) totalHeight += _spacing;
+
+                    var c = _children[i];
+                    if (totalHeight >= H)
+                        c.Layout(0, 0);
+                    if (c is Expanded expanded)
+                    {
+                        if (remainHeight <= 0)
+                            c.Layout(0, 0);
+                        else
+                            c.Layout(width, remainHeight * (expanded.Flex / _totalFlex));
+                    }
+
+                    c.SetPosition(c.X, totalHeight);
+                    totalHeight += c.H;
+                }
+
+                //不需要SetSize，不会超出原大小
             }
             else
             {
-                var indexOfChild = _children.IndexOf(child);
-                for (var i = indexOfChild + 1; i < _children.Count; i++)
+                var totalHeight = 0f;
+                for (var i = 0; i < _children.Count; i++)
                 {
-                    _children[i].SetPosition(_children[i].X, _children[i].Y + dy);
+                    if (i != 0) totalHeight += _spacing;
+                    var remainHeight = height - totalHeight;
+                    var c = _children[i];
+                    if (remainHeight >= c.H)
+                    {
+                        c.SetPosition(c.X, totalHeight);
+                        totalHeight += c.H;
+                    }
+                    else
+                    {
+                        c.Layout(width, Math.Min(0, remainHeight));
+                        c.SetPosition(c.X, totalHeight);
+                        totalHeight += c.H;
+                    }
                 }
 
-                SetSize(W, H + dy);
+                SetSize(W, Math.Min(height, H + dx));
             }
         }
 
