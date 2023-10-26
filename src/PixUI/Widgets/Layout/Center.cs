@@ -1,7 +1,14 @@
+using System.Diagnostics;
+
 namespace PixUI;
 
 public sealed class Center : SingleChildWidget
 {
+    public Center()
+    {
+        IsLayoutTight = false;
+    }
+
     /// <summary>
     /// 布局充满可用空间
     /// </summary>
@@ -17,5 +24,11 @@ public sealed class Center : SingleChildWidget
         }
 
         SetSize(width, height);
+    }
+
+    protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
+    {
+        Debug.Assert(ReferenceEquals(child, Child));
+        Child!.SetPosition((W - Child.W) / 2, (H - Child.H) / 2);
     }
 }
