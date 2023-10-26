@@ -227,13 +227,21 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
             if (string.IsNullOrEmpty(HintText)) return;
 
             _hintParagraph ??= BuildParagraphInternal(HintText, float.PositiveInfinity, Colors.Gray);
+
+            canvas.Save();
+            canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
             canvas.DrawParagraph(_hintParagraph, 0, 2 /*offset*/);
+            canvas.Restore();
         }
         else
         {
             TryBuildParagraph();
             if (CachedParagraph == null) return;
+
+            canvas.Save();
+            canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
             canvas.DrawParagraph(CachedParagraph, 0, 2 /*offset*/);
+            canvas.Restore();
         }
     }
 
