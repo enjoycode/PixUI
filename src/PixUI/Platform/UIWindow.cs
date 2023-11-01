@@ -187,7 +187,7 @@ public abstract class UIWindow
             return;
 
         //先尝试激发PointerTap事件
-        if (_hitResultOnPointDown != null)
+        if (pointerEvent.Buttons == PointerButtons.Left && _hitResultOnPointDown != null)
         {
             var winX = pointerEvent.X;
             var winY = pointerEvent.Y;
@@ -230,7 +230,7 @@ public abstract class UIWindow
         //暂在这里判断一下是否允许Drop
         var arg = new FileDataTransferItem(name, size, type, stream);
         if (!lastMouseRegion.MouseRegion.AllowDrop(arg)) return;
-        
+
         lastMouseRegion.MouseRegion.RaiseDrop(arg);
     }
 
