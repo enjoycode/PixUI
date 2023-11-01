@@ -30,5 +30,7 @@ namespace PixUI.Platform.Mac
         {
             return true;
         }
+
+        public override bool SupportsSecureRestorableState(NSApplication application) => true;
     }
 }
