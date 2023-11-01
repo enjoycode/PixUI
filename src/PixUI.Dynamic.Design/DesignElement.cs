@@ -17,6 +17,7 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         Controller = controller;
         SlotName = slotName;
         MouseRegion = new MouseRegion(opaque: false);
+        MouseRegion.PointerTap += OnPointerTap;
         MouseRegion.PointerDown += OnPointerDown;
         MouseRegion.PointerMove += OnPointerMove;
         MouseRegion.HoverChanged += OnHoverChanged;
@@ -229,17 +230,17 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
             Cursor.Current = Cursors.Arrow; //reset cursor for anchor
     }
 
+    private void OnPointerTap(PointerEvent e)
+    {
+        e.IsHandled = true;
+        Controller.Select(this);
+    }
+
     private void OnPointerDown(PointerEvent e)
     {
         e.IsHandled = true;
-        if (e.Buttons == PointerButtons.Left)
-        {
-            Controller.Select(this);
-        }
-        else if (e.Buttons == PointerButtons.Right)
-        {
+        if (e.Buttons == PointerButtons.Right)
             Controller.ShowContextMenu();
-        }
     }
 
     private void OnPointerMove(PointerEvent e)
