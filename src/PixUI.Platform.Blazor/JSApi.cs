@@ -22,16 +22,16 @@ public static class JSApi
     }
 
     [JSInvokable]
-    public static void OnMouseDown(int buttons, int x, int y, int dx, int dy)
+    public static void OnMouseDown(int button, int x, int y, int dx, int dy)
     {
-        var args = PointerEvent.UseDefault(ConvertButtons(buttons), x, y, dx, dy);
+        var args = PointerEvent.UseDefault(ConvertButton(button), x, y, dx, dy);
         BlazorApplication.Window.OnPointerDown(args);
     }
 
     [JSInvokable]
-    public static void OnMouseUp(int buttons, int x, int y, int dx, int dy)
+    public static void OnMouseUp(int button, int x, int y, int dx, int dy)
     {
-        var args = PointerEvent.UseDefault(ConvertButtons(buttons), x, y, dx, dy);
+        var args = PointerEvent.UseDefault(ConvertButton(button), x, y, dx, dy);
         BlazorApplication.Window.OnPointerUp(args);
     }
 

@@ -2,8 +2,26 @@ namespace PixUI.Platform.Blazor;
 
 public static class InputUtils
 {
+    /// <summary>
+    /// 转换mousedown & mouseup时的button属性值
+    /// </summary>
+    internal static PointerButtons ConvertButton(int button)
+    {
+        return button switch
+        {
+            0 => PointerButtons.Left,
+            1 => PointerButtons.Middle,
+            2 => PointerButtons.Right,
+            _ => PointerButtons.None
+        };
+    }
+
+    /// <summary>
+    /// 转换mousemove时的buttons属性值
+    /// </summary>
     internal static PointerButtons ConvertButtons(int buttons)
     {
+        //TODO: | 合并
         return buttons switch
         {
             1 => PointerButtons.Left,

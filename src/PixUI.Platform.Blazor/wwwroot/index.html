@@ -137,12 +137,12 @@
         window.onmousedown = ev => {
             ev.preventDefault();
             ev.stopPropagation();
-            DotNet.invokeMethod(_asmName, "OnMouseDown", ev.buttons, ev.x, ev.y, ev.movementX, ev.movementY)
+            DotNet.invokeMethod(_asmName, "OnMouseDown", ev.button, ev.x, ev.y, ev.movementX, ev.movementY)
         }
         window.onmouseup = ev => {
             ev.preventDefault();
             ev.stopPropagation();
-            DotNet.invokeMethod(_asmName, "OnMouseUp", ev.buttons, ev.x, ev.y, ev.movementX, ev.movementY)
+            DotNet.invokeMethod(_asmName, "OnMouseUp", ev.button, ev.x, ev.y, ev.movementX, ev.movementY)
         }
         window.oncontextmenu = ev => {
             ev.preventDefault();
