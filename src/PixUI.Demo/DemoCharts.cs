@@ -33,6 +33,34 @@ public sealed class DemoCharts : View
         s.DataLabelsFormatter = p => $"{p.StackedValue.Share:P2}";
     });
 
+    private ISeries[] polarSeries =
+    {
+        new PolarLineSeries<int>
+        {
+            Values = new[] { 7, 5, 7, 5, 6 },
+            LineSmoothness = 0,
+            GeometrySize = 0,
+            Fill = new SolidColorPaint { Color = Colors.Blue.WithAlpha(90) }
+        },
+        new PolarLineSeries<int>
+        {
+            Values = new[] { 2, 7, 5, 9, 7 },
+            LineSmoothness = 1,
+            GeometrySize = 0,
+            Fill = new SolidColorPaint { Color = Colors.Red.WithAlpha(90) }
+        }
+    };
+
+    private PolarAxis[] polarAngleAxes =
+    {
+        new PolarAxis
+        {
+            // LabelsRotation = LiveChartsCore.LiveCharts.TangentAngle,
+            LabelsBackground = LvcColor.Empty,
+            Labels = new[] { "first", "second", "third", "forth", "fifth" }
+        }
+    };
+
     private LabelVisual title = new LabelVisual()
     {
         Text = "My Chart Title",
@@ -84,53 +112,75 @@ public sealed class DemoCharts : View
                     {
                         new Card
                         {
+                            Width = 400,
+                            Height = 300,
                             Child = new CartesianChart
                             {
                                 Series = series,
                                 //Title = title,
-                                Width = 400,
-                                Height = 300,
                             }
                         },
                         new Card
                         {
+                            Width = 600,
+                            Height = 300,
                             Child = new PieChart
                             {
                                 Series = pieSeries,
                                 LegendPosition = LegendPosition.Right,
-                                Width = 600,
-                                Height = 300,
                             }
                         }
                     }
                 },
 
-                new Card
+                new Row
                 {
-                    Child = new Center
+                    Children =
                     {
-                        DebugLabel = "ChartCenter",
-                        Child = new Transform(matrix)
+                        new Expanded
                         {
-                            Child = new GeoMap()
+                            Child = new Card
                             {
-                                Width = mapWidth,
-                                Height = mapHeight,
-                                MapProjection = projection,
-                                Stroke = new SolidColorPaint { Color = Colors.Green },
-                                Fill = new SolidColorPaint
+                                Child = new Center
                                 {
-                                    Color = Colors.Red,
-                                    // ImageFilter = new DropShadow(
-                                    //     2 / scale, 2 / scale, 6 / scale, 6 / scale,
-                                    //     Colors.Black /*new Color(50, 0, 0, 100)*/
-                                    // )
-                                },
-                                ActiveMap = Maps.GetMapFromStreamReader<SkiaDrawingContext>(new StreamReader(geoJson))
+                                    DebugLabel = "ChartCenter",
+                                    Child = new Transform(matrix)
+                                    {
+                                        Child = new GeoMap()
+                                        {
+                                            Width = mapWidth,
+                                            Height = mapHeight,
+                                            MapProjection = projection,
+                                            Stroke = new SolidColorPaint { Color = Colors.Green },
+                                            Fill = new SolidColorPaint
+                                            {
+                                                Color = Colors.Red,
+                                                // ImageFilter = new DropShadow(
+                                                //     2 / scale, 2 / scale, 6 / scale, 6 / scale,
+                                                //     Colors.Black /*new Color(50, 0, 0, 100)*/
+                                                // )
+                                            },
+                                            ActiveMap = Maps.GetMapFromStreamReader<SkiaDrawingContext>(
+                                                new StreamReader(geoJson))
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        new Expanded
+                        {
+                            Child = new Card
+                            {
+                                Child = new PolarChart()
+                                {
+                                    Series = polarSeries,
+                                    AngleAxes = polarAngleAxes,
+                                    InitialRotation = -45,
+                                }
                             }
                         }
                     }
-                }
+                },
             }
         };
     }

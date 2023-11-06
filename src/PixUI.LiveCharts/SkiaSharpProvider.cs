@@ -48,7 +48,7 @@ public class SkiaSharpProvider : ChartEngine<SkiaDrawingContext>
     /// <inheritdoc cref="ChartEngine{TDrawingContext}.GetDefaultPolarAxis"/>
     public override IPolarAxis GetDefaultPolarAxis()
     {
-        return new PolarAxis();
+        return new PolarAxis() { LabelsBackground = LvcColor.Empty };
     }
 
     /// <inheritdoc cref="ChartEngine{TDrawingContext}.GetSolidColorPaint(LvcColor)"/>
