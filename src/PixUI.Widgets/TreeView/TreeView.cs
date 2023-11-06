@@ -112,6 +112,22 @@ public sealed class TreeView<T> : Widget, IScrollable
         _controller.TotalHeight += dy;
     }
 
+    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)
+    {
+        if (!onlyTransform)
+        {
+            canvas.Save();
+            canvas.ClipRect(Rect.FromLTWH(X, Y, W, H), ClipOp.Intersect, false);
+        }
+
+        canvas.Translate(X - ScrollOffsetX, Y - ScrollOffsetY);
+    }
+
+    protected internal override void AfterPaint(Canvas canvas)
+    {
+        canvas.Restore();
+    }
+
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
         if (_controller.IsLoading)
@@ -121,9 +137,6 @@ public sealed class TreeView<T> : Widget, IScrollable
             _controller.LoadingPainter!.PaintToWidget(this, canvas);
             return;
         }
-
-        canvas.Save();
-        canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
 
         // draw background color if has
         if (_color != null)
@@ -139,12 +152,10 @@ public sealed class TreeView<T> : Widget, IScrollable
             var vb = vy + node.H;
             if (vb <= dirtyRect.Top) continue;
 
-            canvas.Translate(vx, vy);
+            canvas.Translate(node.X, node.Y);
             node.Paint(canvas, null /*area?.ToChild(vx, vy)*/);
-            canvas.Translate(-vx, -vy);
+            canvas.Translate(-node.X, -node.Y);
         }
-
-        canvas.Restore();
     }
 
     #endregion

@@ -475,8 +475,7 @@ public abstract class Widget : IDisposable
     protected internal virtual void BeforePaint(Canvas canvas, bool onlyTransform = false,
         Rect? dirtyRect = null /*TODO: use IDirtyArea*/)
     {
-        if (X != 0 || Y != 0)
-            canvas.Translate(X, Y);
+        canvas.Translate(X, Y);
         if (dirtyRect.HasValue)
         {
             Debug.Assert(onlyTransform == false);
@@ -489,7 +488,6 @@ public abstract class Widget : IDisposable
     /// </summary>
     protected internal virtual void AfterPaint(Canvas canvas)
     {
-        if (X == 0 && Y == 0) return;
         canvas.Translate(-X, -Y);
     }
 
