@@ -117,10 +117,18 @@ public sealed class TreeView<T> : Widget, IScrollable
         if (!onlyTransform)
         {
             canvas.Save();
-            canvas.ClipRect(Rect.FromLTWH(X, Y, W, H), ClipOp.Intersect, false);
-        }
+            canvas.Translate(X, Y);
+            canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
 
-        canvas.Translate(X - ScrollOffsetX, Y - ScrollOffsetY);
+            if (dirtyRect.HasValue)
+                canvas.ClipRect(dirtyRect.Value, ClipOp.Intersect, false);
+
+            canvas.Translate(-ScrollOffsetX, -ScrollOffsetY);
+        }
+        else
+        {
+            canvas.Translate(X - ScrollOffsetX, Y - ScrollOffsetY);
+        }
     }
 
     protected internal override void AfterPaint(Canvas canvas)
