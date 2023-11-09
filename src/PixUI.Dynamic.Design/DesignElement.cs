@@ -524,10 +524,10 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         }
         else if (meta.IsReversedWrapElement)
         {
-            throw new NotImplementedException();
-            // childToBeAdded = meta.CreateInstance();
-            // childElement = new DesignElement(_controller, meta, defaultSlot.PropertyName);
-            // meta.AddChild(childToBeAdded, childElement);
+            // eg: add Expanded to Row
+            childToBeAdded = meta.CreateInstance();
+            childElement = new DesignElement(Controller, meta, defaultSlot.PropertyName);
+            meta.Slots![0].SetChild(childToBeAdded, childElement);
         }
         else
         {
@@ -558,6 +558,7 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         //eg: drop widget to Expanded
         var newChild = new DesignElement(Controller, meta, defaultSlot.PropertyName);
         Child = newChild;
+        Parent?.Parent?.Invalidate(InvalidAction.Relayout); //暂强制重布局上级的上级
         Controller.Select(newChild);
         Controller.OnSelectionChanged();
     }

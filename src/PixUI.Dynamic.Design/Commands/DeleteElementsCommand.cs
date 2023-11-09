@@ -29,9 +29,17 @@ public sealed class DeleteElementsCommand : DesignCommand
             }
             else if (element.Parent is DesignElement reversed) //上级是反向包装的
             {
-                childElement = reversed;
-                childWidget = reversed.Parent!;
-                parentElement = (DesignElement)childWidget.Parent!.Parent!;
+                if (reversed.Target is Positioned) //同时删除Positioned
+                {
+                    childElement = reversed;
+                    childWidget = reversed.Parent!;
+                    parentElement = (DesignElement)childWidget.Parent!.Parent!;
+                }
+                else
+                {
+                    childWidget = childElement = element;
+                    parentElement = reversed;
+                }
             }
             else
             {
@@ -51,11 +59,22 @@ public sealed class DeleteElementsCommand : DesignCommand
             }
             else
             {
-                if (slot.TrySetChild(parentElement.Target!, null))
+                var isReversed = slot.ContainerType == ContainerType.SingleChildReversed;
+                if (isReversed)
                 {
-                    parentElement.Invalidate(InvalidAction.Relayout);
+                    parentElement.Child = null;
+                    parentElement.Parent?.Parent?.Invalidate(InvalidAction.Relayout); //暂重布局上级的上级
                     lastParentElement = parentElement;
                     controller.RaiseOutlineChanged();
+                }
+                else
+                {
+                    if (slot.TrySetChild(parentElement.Target!, null))
+                    {
+                        parentElement.Invalidate(InvalidAction.Relayout);
+                        lastParentElement = parentElement;
+                        controller.RaiseOutlineChanged();
+                    }
                 }
             }
         }
