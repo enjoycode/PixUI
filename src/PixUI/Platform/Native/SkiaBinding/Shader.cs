@@ -44,6 +44,16 @@ namespace PixUI
                     mode, null));
             }
         }
+
+        public static Shader? CreateImage(Image src) => CreateImage(src, TileMode.Clamp, TileMode.Clamp);
+
+        public static Shader? CreateImage(Image src, TileMode tmx, TileMode tmy)
+        {
+            if (src == null)
+                throw new ArgumentNullException(nameof(src));
+
+            return src.ToShader(tmx, tmy);
+        }
     }
 }
 #endif

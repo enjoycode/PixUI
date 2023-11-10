@@ -60,11 +60,20 @@ namespace PixUI
             var p = paint?.Handle ?? IntPtr.Zero;
             return GetObject(SkiaApi.sk_image_new_from_picture(picture.Handle, &dimensions, matrix, p))!;
         }
-        
-        public SKData Encode (EncodedImageFormat format, int quality)
+
+        public SKData Encode(EncodedImageFormat format, int quality)
         {
-            return SKData.GetObject (SkiaApi.sk_image_encode_specific (Handle, format, quality));
+            return SKData.GetObject(SkiaApi.sk_image_encode_specific(Handle, format, quality));
         }
+
+        #region ====ToShader====
+
+        public Shader? ToShader() => ToShader(TileMode.Clamp, TileMode.Clamp);
+
+        public unsafe Shader? ToShader(TileMode tileX, TileMode tileY) =>
+            Shader.GetObject(SkiaApi.sk_image_make_shader(Handle, tileX, tileY, null));
+
+        #endregion
     }
 }
 #endif
