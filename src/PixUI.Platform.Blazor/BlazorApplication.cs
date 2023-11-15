@@ -10,6 +10,12 @@ public sealed class BlazorApplication : UIApplication
 
     public override bool IsWasm => true;
 
+    protected override void PushWebHistory(string fullPath, int index)
+        => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("PushWebHistory", fullPath, index);
+
+    protected override void ReplaceWebHistory(string fullPath, int index)
+        => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("ReplaceWebHistory", fullPath, index);
+
     public static void Run(Func<Widget> rootBuilder, int glHandle, int width, int height, float ratio,
         string? routePath)
     {
@@ -27,7 +33,8 @@ public sealed class BlazorApplication : UIApplication
         Window.FirstShow();
     }
 
-    public override void PostInvalidateEvent() => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("PostInvalidateEvent");
+    public override void PostInvalidateEvent()
+        => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("PostInvalidateEvent");
 
     internal void RunInvaldateRequest() => OnInvalidateRequest();
 

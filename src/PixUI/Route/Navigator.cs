@@ -169,7 +169,7 @@ public sealed class Navigator
                         thisName = pss[0];
                         thisArg = pss[1];
                     }
-                    
+
                     var matchRoute = _routes.Find(r => r.Name == thisName);
                     if (matchRoute == null) //TODO: 404
                         throw new Exception("Can't find route: " + thisName);
@@ -204,9 +204,10 @@ public sealed class Navigator
         HistoryManager.AssignedPath = fullPath;
         var entry = new RouteHistoryEntry(fullPath);
         HistoryManager!.PushEntry(entry);
+        //同步浏览器历史记录
+        UIApplication.Current.PushWebHistory(fullPath, HistoryManager.Count - 1);
 #if __WEB__
-            //同步浏览器历史记录
-            PushWebHistory(fullPath, HistoryManager.Count - 1);
+        PushWebHistory(fullPath, HistoryManager.Count - 1);
 #endif
 
         //通知变更

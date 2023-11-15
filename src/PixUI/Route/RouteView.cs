@@ -26,6 +26,7 @@ public class RouteView : DynamicView //Don't sealed this class
             var path = historyManager.AssignedPath ?? "/";
             var entry = new RouteHistoryEntry(path);
             historyManager.PushEntry(entry);
+            UIApplication.Current.ReplaceWebHistory(path, 0);
 #if __WEB__
                 Navigator.ReplaceWebHistory(path, 0);
 #endif

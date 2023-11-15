@@ -217,6 +217,18 @@
         _htmlInput.value = '';
     }
 
+    function PushWebHistory(path, index) {
+        let url = document.location.origin + '/#' + path;
+        history.pushState(index, '', url);
+    }
+
+    function ReplaceWebHistory(path, index) {
+        let url = document.location.origin;
+        if (path !== '/')
+            url += '/#' + path;
+        history.replaceState(index, '', url);
+    }
+
     function PostInvalidateEvent() {
         requestAnimationFrame(() => {
             //console.log(GL);

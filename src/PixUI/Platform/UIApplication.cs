@@ -14,6 +14,16 @@ public abstract class UIApplication
     public virtual bool IsWasm => false; //TODO: remove use OperatingSystem.IsBrowser()
 
     /// <summary>
+    /// 仅Blazor应用
+    /// </summary>
+    protected internal virtual void PushWebHistory(string fullPath, int index) {}
+    
+    /// <summary>
+    /// 仅Blazor应用
+    /// </summary>
+    protected internal virtual void ReplaceWebHistory(string fullPath, int index) {}
+
+    /// <summary>
     /// Post invalidate event to main loop, maybe called by none UI thread
     /// </summary>
     public abstract void PostInvalidateEvent();
