@@ -89,27 +89,27 @@ public class LinearGradientPaint : Paint
     // public LinearGradientPaint(SKColor[] gradientStops)
     //     : this(gradientStops, s_defaultStartPoint, s_defaultEndPoint) { }
 
-    // /// <summary>
-    // /// Initializes a new instance of the <see cref="LinearGradientPaint"/> class.
-    // /// </summary>
-    // /// <param name="startColor">The start color.</param>
-    // /// <param name="endColor">The end color.</param>
-    // /// <param name="startPoint">
-    // /// The start point, both X and Y in the range of 0 to 1, where 0 is the start of the axis and 1 the end.
-    // /// </param>
-    // /// <param name="endPoint">
-    // /// The end point, both X and Y in the range of 0 to 1, where 0 is the start of the axis and 1 the end.
-    // /// </param>
-    // public LinearGradientPaint(SKColor startColor, SKColor endColor, SKPoint startPoint, SKPoint endPoint)
-    //     : this(new[] { startColor, endColor }, startPoint, endPoint) { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LinearGradientPaint"/> class.
+    /// </summary>
+    /// <param name="startColor">The start color.</param>
+    /// <param name="endColor">The end color.</param>
+    /// <param name="startPoint">
+    /// The start point, both X and Y in the range of 0 to 1, where 0 is the start of the axis and 1 the end.
+    /// </param>
+    /// <param name="endPoint">
+    /// The end point, both X and Y in the range of 0 to 1, where 0 is the start of the axis and 1 the end.
+    /// </param>
+    public LinearGradientPaint(SKColor startColor, SKColor endColor, SKPoint startPoint, SKPoint endPoint)
+        : this(new[] { startColor, endColor }, startPoint, endPoint) { }
 
-    // /// <summary>
-    // /// Initializes a new instance of the <see cref="LinearGradientPaint"/> class.
-    // /// </summary>
-    // /// <param name="start">The start.</param>
-    // /// <param name="end">The end.</param>
-    // public LinearGradientPaint(SKColor start, SKColor end)
-    //     : this(start, end, s_defaultStartPoint, s_defaultEndPoint) { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LinearGradientPaint"/> class.
+    /// </summary>
+    /// <param name="start">The start.</param>
+    /// <param name="end">The end.</param>
+    public LinearGradientPaint(SKColor start, SKColor end)
+        : this(start, end, s_defaultStartPoint, s_defaultEndPoint) { }
 
     /// <inheritdoc cref="IPaint{TDrawingContext}.CloneTask" />
     public override IPaint<SkiaDrawingContext> CloneTask()

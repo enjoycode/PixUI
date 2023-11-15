@@ -107,10 +107,12 @@ namespace RoslynUtils
         /// </summary>
         internal static bool IsAppBoxView(this ISymbol symbol, Func<string, bool> findModel)
         {
-            if (symbol is INamedTypeSymbol typeSymbol &&
-                typeSymbol.ContainingNamespace.Name == "Views")
+            if (symbol is INamedTypeSymbol typeSymbol && typeSymbol.ContainingNamespace.Name == "Views")
             {
-                return findModel(symbol.ToString());
+                var fullName = symbol.ToString();
+                if (fullName.Count(c => c == '.') != 2) //maybe eg: sys.Views.Menu.MenuItem
+                    return false;
+                return findModel(fullName);
             }
 
             return false;

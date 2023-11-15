@@ -73,6 +73,9 @@ namespace PixUI
         public unsafe Shader? ToShader(TileMode tileX, TileMode tileY) =>
             Shader.GetObject(SkiaApi.sk_image_make_shader(Handle, tileX, tileY, null));
 
+        public unsafe Shader? ToShader(TileMode tileX, TileMode tileY, Matrix3 localMatrix) =>
+            Shader.GetObject(SkiaApi.sk_image_make_shader(Handle, tileX, tileY, &localMatrix));
+
         #endregion
     }
 }

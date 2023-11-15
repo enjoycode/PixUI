@@ -51,8 +51,14 @@ namespace PixUI
         {
             if (src == null)
                 throw new ArgumentNullException(nameof(src));
-
             return src.ToShader(tmx, tmy);
+        }
+
+        public static Shader? CreateImage(Image src, TileMode tmx, TileMode tmy, Matrix3 localMatrix)
+        {
+            if (src == null)
+                throw new ArgumentNullException(nameof(src));
+            return src.ToShader(tmx, tmy, localMatrix);
         }
     }
 }

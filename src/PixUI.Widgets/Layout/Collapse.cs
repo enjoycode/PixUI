@@ -33,7 +33,7 @@ public sealed class Collapse : Widget
         }
     }
 
-    private AnimationController? _expandController; //TODO:考虑提升至TreeController共用实例
+    private AnimationController? _expandController;
     private Animation<double>? _expandCurve;
     private Animation<float>? _expandArrowAnimation;
 
