@@ -84,8 +84,7 @@ public abstract class Popup : Widget, IEventHook
         if (transitionBuilder != null)
         {
             _proxy ??= new PopupProxy(this);
-            _transition =
-                new PopupTransitionWrap(Owner, IsDialog, _proxy, origin, transitionBuilder);
+            _transition = new PopupTransitionWrap(Owner, IsDialog, _proxy, origin, transitionBuilder);
             _transition.Forward();
             target = _transition;
         }

@@ -142,8 +142,8 @@ namespace PixUI.Demo
         private async void OnButton2Tap(PointerEvent e)
         {
             var dlg = new DemoDialog();
-            var canceled = await dlg.ShowAndWaitClose();
-            Console.WriteLine($"Dialog closed: {canceled}");
+            var dlgResult = await dlg.ShowAsync();
+            Console.WriteLine($"Dialog closed: {dlgResult}");
         }
 
         private void OnButton3Tap(PointerEvent e)

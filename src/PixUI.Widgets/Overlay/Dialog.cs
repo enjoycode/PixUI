@@ -12,7 +12,7 @@ public abstract class Dialog : Popup
 
     private Card? _child;
     protected readonly State<string> Title = "";
-    private TaskCompletionSource<bool>? _closeDone;
+    private TaskCompletionSource<string>? _closeDone;
 
     protected sealed override bool IsDialog => true;
 
@@ -45,15 +45,15 @@ public abstract class Dialog : Popup
             Height = 25,
             Children =
             {
-                new Container() { Width = 35 }, //TODO: SizeBox
-                new Expanded()
+                new Container { Width = 35 }, //TODO: SizeBox
+                new Expanded
                 {
-                    Child = new Center() { Child = new Text(Title) }
+                    Child = new Center { Child = new Text(Title) }
                 },
                 new Button(null, MaterialIcons.Close)
                 {
                     Style = ButtonStyle.Transparent,
-                    OnTap = _ => Close(true),
+                    OnTap = _ => Close(DialogResult.None),
                 },
             }
         };
@@ -66,7 +66,7 @@ public abstract class Dialog : Popup
     /// </summary>
     protected virtual Widget BuildFooter()
     {
-        return new Container()
+        return new Container
         {
             Height = Button.DefaultHeight + 20 + 20,
             Padding = EdgeInsets.All(20),
@@ -75,8 +75,8 @@ public abstract class Dialog : Popup
                 Children =
                 {
                     new Expanded(),
-                    new Button("Cancel") { Width = 80, OnTap = _ => Close(true) },
-                    new Button("OK") { Width = 80, OnTap = _ => Close(false) }
+                    new Button(DialogResult.Cancel) { Width = 80, OnTap = _ => Close(DialogResult.Cancel) },
+                    new Button(DialogResult.OK) { Width = 80, OnTap = _ => Close(DialogResult.OK) }
                 }
             }
         };
@@ -85,18 +85,26 @@ public abstract class Dialog : Popup
     #endregion
 
     #region ====Show & Close====
+    
+    public static void Show(string title, Widget body)
+    {
+        var dlg = new WrapDialog(title, body);
+        dlg.Show();
+    }
 
+    /// <summary>
+    /// 显示不等待关闭
+    /// </summary>
     public void Show()
         => base.Show(null, null, DialogTransitionBuilder);
 
     /// <summary>
     /// 显示并等待关闭
     /// </summary>
-    /// <returns>true=canceled</returns>
-    public Task<bool> ShowAndWaitClose()
+    public Task<string> ShowAsync()
     {
         Show();
-        _closeDone = new TaskCompletionSource<bool>();
+        _closeDone = new TaskCompletionSource<string>();
         // @ts-ignore
         return _closeDone.Task;
     }
@@ -105,14 +113,14 @@ public abstract class Dialog : Popup
     /// 关闭前处理
     /// </summary>
     /// <returns>true=abort close</returns>
-    protected virtual bool OnClosing(bool canceled) => false;
+    protected virtual bool OnClosing(string result) => false;
 
-    protected void Close(bool canceled)
+    protected void Close(string result)
     {
-        if (OnClosing(canceled)) return; //aborted
-            
+        if (OnClosing(result)) return; //aborted
+
         Hide();
-        _closeDone?.SetResult(canceled);
+        _closeDone?.SetResult(result);
     }
 
     #endregion

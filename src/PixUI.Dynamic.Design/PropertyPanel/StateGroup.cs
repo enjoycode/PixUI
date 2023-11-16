@@ -57,8 +57,8 @@ internal sealed class StateGroup : View
     private async void OnAddState(PointerEvent e)
     {
         var dlg = new NewStateDialog();
-        var canceled = await dlg.ShowAndWaitClose();
-        if (canceled) return;
+        var dlgResult = await dlg.ShowAsync();
+        if (dlgResult != DialogResult.OK) return;
 
         var item = new DynamicState() { Name = dlg.Name, Type = dlg.Type };
         _statesController.Add(item);

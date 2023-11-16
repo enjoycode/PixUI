@@ -280,6 +280,15 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
                 var paint = PaintUtils.Shared(Theme.StripeBgColor);
                 canvas.DrawRect(cellRect, paint);
             }
+            else
+            {
+                if (Theme.DefaultRowCellStyle.BackgroundColor.HasValue && 
+                    col.CellStyle == null && col.CellStyleGetter == null)
+                {
+                    var paint = PaintUtils.Shared(Theme.DefaultRowCellStyle.BackgroundColor.Value);
+                    canvas.DrawRect(cellRect, paint);
+                }
+            }
 
             col.PaintCell(canvas, _controller, j, cellRect);
 
