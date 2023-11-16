@@ -6,12 +6,10 @@ namespace PixUI;
 
 public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
 {
-    public DataGrid(DataGridController<T> controller, DataGridTheme? theme = null)
+    public DataGrid(DataGridController<T> controller)
     {
         _controller = controller;
         _controller.Attach(this);
-
-        Theme = theme ?? DataGridTheme.Default;
 
         MouseRegion = new MouseRegion(null, false);
         MouseRegion.PointerMove += _controller.OnPointerMove;
@@ -19,7 +17,17 @@ public sealed class DataGrid<T> : Widget, IScrollable, IMouseRegion
     }
 
     private readonly DataGridController<T> _controller;
-    internal readonly DataGridTheme Theme;
+    private DataGridTheme _theme = DataGridTheme.Default;
+
+    public DataGridTheme Theme
+    {
+        get => _theme;
+        set
+        {
+            _theme = value;
+            _controller.Refresh();
+        }
+    }
 
     public DataGridColumns<T> Columns => _controller.Columns;
 

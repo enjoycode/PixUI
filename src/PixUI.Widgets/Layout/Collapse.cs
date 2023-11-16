@@ -9,11 +9,11 @@ public sealed class Collapse : Widget
         _expandIcon = BuildExpandIcon();
     }
 
-    private const float _titleHeight = 25; //暂固定标题高度
-
     private Widget? _title;
     private Widget? _body;
     private readonly ExpandIcon _expandIcon;
+
+    public float TitleHeight { get; init; } = 25;
 
     public Widget Title
     {
@@ -103,17 +103,17 @@ public sealed class Collapse : Widget
             if (IsCollapsing && _animationValue == 0) //已收缩需要恢复本身的宽度
             {
                 _animationFlag = 0;
-                SetSize(W, _titleHeight);
+                SetSize(W, TitleHeight);
             }
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             else if (IsExpanding && _animationValue == 1)
             {
                 _animationFlag = 0;
-                SetSize(W, _titleHeight + bodyHeight); //宽度之前已预设
+                SetSize(W, TitleHeight + bodyHeight); //宽度之前已预设
             }
             else
             {
-                SetSize(W, _titleHeight + expandedHeight); //宽度之前已预设
+                SetSize(W, TitleHeight + expandedHeight); //宽度之前已预设
             }
 
             return;
@@ -123,22 +123,22 @@ public sealed class Collapse : Widget
         var height = CacheAndCheckAssignHeight(availableHeight);
 
         const float padding = 5f;
-        _expandIcon.Layout(_titleHeight, _titleHeight);
-        _expandIcon.SetPosition(width - padding - _expandIcon.W, (_titleHeight - _expandIcon.H) / 2f);
+        _expandIcon.Layout(TitleHeight, TitleHeight);
+        _expandIcon.SetPosition(width - padding - _expandIcon.W, (TitleHeight - _expandIcon.H) / 2f);
 
         if (_title != null)
         {
-            _title.Layout(width - _expandIcon.W - padding, _titleHeight);
-            _title.SetPosition(padding, (_titleHeight - _title.H) / 2f);
+            _title.Layout(width - _expandIcon.W - padding, TitleHeight);
+            _title.SetPosition(padding, (TitleHeight - _title.H) / 2f);
         }
 
         if (_body != null)
         {
             _body.Layout(width, height /*maybe infinity*/);
-            _body.SetPosition(0, _titleHeight);
+            _body.SetPosition(0, TitleHeight);
         }
 
-        SetSize(width, IsExpanded ? _titleHeight + _body?.H ?? 0 : _titleHeight);
+        SetSize(width, IsExpanded ? TitleHeight + _body?.H ?? 0 : TitleHeight);
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
