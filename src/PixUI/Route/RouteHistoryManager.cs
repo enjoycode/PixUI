@@ -127,41 +127,48 @@ public sealed class RouteHistoryManager
         var action = index < _historyIndex ? RouteChangeAction.GotoBack : RouteChangeAction.GotoForward;
         _historyIndex = index;
         var newEntry = _history[_historyIndex];
+        var oldPath = AssignedPath;
         AssignedPath = newEntry.Path;
 
-        NavigateTo(newEntry.Path, action);
+        NavigateTo(oldPath, newEntry.Path, action);
     }
 
     public int Push(string fullPath)
     {
         //TODO: 验证fullPath start with '/' and convert to lowercase
+        var oldPath = AssignedPath;
         AssignedPath = fullPath;
         var newEntry = new RouteHistoryEntry(fullPath); //TODO:考虑已存在则改为Goto
         var index = PushEntry(newEntry);
 
-        NavigateTo(fullPath, RouteChangeAction.Push);
+        NavigateTo(oldPath, fullPath, RouteChangeAction.Push);
         return index;
     }
 
-    private void NavigateTo(string fullPath, RouteChangeAction action)
+    private void NavigateTo(string? oldPath, string newPath, RouteChangeAction action)
     {
         //从根开始比较
-        var psa = fullPath.Split('?');
+        var psa = newPath.Split('?');
         var defaultPath = psa[0];
         var defaultPss = defaultPath.Split('/');
 
+        //TODO:考虑在这里处理/biz/orders跳转至/biz下级默认路由，以下暂简单判断
+        //获取当前的Leaf导航器路径的默认路径与oldPath比较是否一致
+        var maybeChildToDefaut = oldPath != null && oldPath.Length > newPath.Length;
+
         //先比较处理默认路径
         var navigator = GetDefaultNavigator(RootNavigator);
-        ComparePath(navigator, defaultPss, 1, action);
+        ComparePath(navigator, defaultPss, 1, maybeChildToDefaut, action);
         //TODO: 再处理各命名路由的路径
     }
 
-    private static bool ComparePath(Navigator? navigator, string[] pss, int index, RouteChangeAction action)
+    private static bool ComparePath(Navigator? navigator, string[] pss, int index, bool maybeChildToDefault,
+        RouteChangeAction action)
     {
         while (true)
         {
             if (navigator == null) return false;
-            
+
             var name = pss[index];
             if (name == "") name = navigator.GetDefaultRoute().Name;
             string? arg = null;
@@ -177,7 +184,19 @@ public sealed class RouteHistoryManager
                 return true;
             }
 
-            if (index == pss.Length - 1) return false;
+            if (index == pss.Length - 1)
+            {
+                //可能从/biz/orders跳转至/biz下的默认下级路由
+                if (maybeChildToDefault)
+                {
+                    //TODO:这里尚未考虑keepalive的情况，以下跳转会失效。另如果上面先处理该情况移除这里的实现
+                    navigator.Goto(name, arg, action);
+                    return true;
+                }
+
+                return false;
+            }
+
             navigator = GetDefaultNavigator(navigator);
             index = index + 1;
         }
