@@ -21,7 +21,7 @@ public class RouteView : DynamicView //Don't sealed this class
 
         var historyManager = Root!.Window.RouteHistoryManager;
         //尝试向HistoryManager添加第一条记录
-        if (historyManager.Count == 0)
+        if (historyManager.IsEmpty)
         {
             var path = historyManager.AssignedPath ?? "/";
             var entry = new RouteHistoryEntry(path);

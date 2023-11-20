@@ -19,13 +19,8 @@ internal sealed class RouteHistoryEntry
 
 internal sealed class BuildPathContext
 {
-    public BuildPathContext()
-    {
-        LeafNamed = new Dictionary<string, Navigator>();
-    }
-
     internal Navigator LeafDefault = null!;
-    internal readonly Dictionary<string, Navigator> LeafNamed;
+    internal readonly Dictionary<string, Navigator> LeafNamed = new();
 
     internal string GetFullPath()
     {
@@ -59,7 +54,9 @@ public sealed class RouteHistoryManager
 
     internal string? AssignedPath { get; set; }
 
-    public int Count => _history.Count;
+    internal bool IsEmpty => _history.Count == 0;
+
+    public int NewIdForPush() => _historyIndex + 1;
 
     /// <summary>
     /// 获取当前路由的全路径
@@ -99,7 +96,7 @@ public sealed class RouteHistoryManager
         }
     }
 
-    internal void PushEntry(RouteHistoryEntry entry)
+    internal int PushEntry(RouteHistoryEntry entry)
     {
         //先清空之后的记录
         if (_historyIndex != _history.Count - 1)
@@ -110,6 +107,7 @@ public sealed class RouteHistoryManager
 
         _history.Add(entry);
         _historyIndex++;
+        return _historyIndex;
     }
 
     internal RouteHistoryEntry? Pop()
@@ -123,7 +121,7 @@ public sealed class RouteHistoryManager
 
     public void Goto(int index)
     {
-        if (index < 0 || index >= this._history.Count)
+        if (index < 0 || index >= _history.Count)
             throw new Exception("index out of range");
 
         var action = index < _historyIndex ? RouteChangeAction.GotoBack : RouteChangeAction.GotoForward;
@@ -134,14 +132,15 @@ public sealed class RouteHistoryManager
         NavigateTo(newEntry.Path, action);
     }
 
-    public void Push(string fullPath)
+    public int Push(string fullPath)
     {
         //TODO: 验证fullPath start with '/' and convert to lowercase
         AssignedPath = fullPath;
         var newEntry = new RouteHistoryEntry(fullPath); //TODO:考虑已存在则改为Goto
-        PushEntry(newEntry);
+        var index = PushEntry(newEntry);
 
         NavigateTo(fullPath, RouteChangeAction.Push);
+        return index;
     }
 
     private void NavigateTo(string fullPath, RouteChangeAction action)

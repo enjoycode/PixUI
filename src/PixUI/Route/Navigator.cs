@@ -199,15 +199,15 @@ public sealed class Navigator
         ActiveRoute = matchRoute;
         ActiveArgument = arg;
 
-        //添加至历史记录
+        //添加至历史记录(考虑以下移至OnRouteChanged之后，eg: 当前页面在二级路由内，跳转至一级路由会出问题)
         var fullPath = HistoryManager!.GetFullPath();
         HistoryManager.AssignedPath = fullPath;
         var entry = new RouteHistoryEntry(fullPath);
-        HistoryManager!.PushEntry(entry);
+        var index = HistoryManager!.PushEntry(entry);
         //同步浏览器历史记录
-        UIApplication.Current.PushWebHistory(fullPath, HistoryManager.Count - 1);
+        UIApplication.Current.PushWebHistory(fullPath, index);
 #if __WEB__
-        PushWebHistory(fullPath, HistoryManager.Count - 1);
+        PushWebHistory(fullPath, index);
 #endif
 
         //通知变更

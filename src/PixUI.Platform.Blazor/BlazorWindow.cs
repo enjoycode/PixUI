@@ -95,5 +95,5 @@ public sealed class BlazorWindow : UIWindow
 
     internal void RoutePush(string path) => RouteHistoryManager.Push(path);
 
-    internal int NewRouteId() => RouteHistoryManager.Count;
+    internal int NewRouteId() => RouteHistoryManager.NewIdForPush();
 }

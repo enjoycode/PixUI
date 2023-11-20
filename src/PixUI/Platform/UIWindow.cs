@@ -30,17 +30,6 @@ public abstract class UIWindow
     public readonly Root RootWidget;
     public readonly Overlay Overlay;
 
-    private RouteHistoryManager? _routeHistoryManager;
-
-    protected internal RouteHistoryManager RouteHistoryManager
-    {
-        get
-        {
-            _routeHistoryManager ??= new RouteHistoryManager();
-            return _routeHistoryManager;
-        }
-    }
-
     internal readonly FocusManagerStack FocusManagerStack = new();
     public readonly EventHookManager EventHookManager = new();
 
@@ -69,6 +58,32 @@ public abstract class UIWindow
     private HitTestEntry? _hitResultOnPointDown;
 
     #endregion
+
+    #endregion
+
+    #region ====Route====
+
+    private RouteHistoryManager? _routeHistoryManager;
+
+    protected internal RouteHistoryManager RouteHistoryManager
+    {
+        get
+        {
+            _routeHistoryManager ??= new RouteHistoryManager();
+            return _routeHistoryManager;
+        }
+    }
+
+    /// <summary>
+    /// 导航至指定路由
+    /// </summary>
+    /// <param name="fullPath">eg: /一级路由/二级路由</param>
+    public void NavigateTo(string fullPath)
+    {
+        var index = RouteHistoryManager.Push(fullPath);
+        //同步浏览器历史
+        UIApplication.Current.PushWebHistory(fullPath, index);
+    }
 
     #endregion
 
