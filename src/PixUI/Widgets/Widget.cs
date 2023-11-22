@@ -175,7 +175,7 @@ public abstract class Widget : IDisposable
     public Widget? Parent
     {
         get => _parent;
-        internal set
+        set
         {
             if (value == null && _parent == null) return;
             if (this is IRootWidget && value != null)
