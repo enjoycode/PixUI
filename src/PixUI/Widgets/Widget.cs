@@ -154,7 +154,7 @@ public abstract class Widget : IDisposable
     /// </summary>
     protected bool AutoSize => _width == null || _height == null;
 
-    internal void SetPosition(float x, float y)
+    protected internal void SetPosition(float x, float y)
     {
         X = x;
         Y = y;
