@@ -32,6 +32,9 @@ public sealed class ButtonGroup : MultiChildWidget<Button>
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
+        if (W == 0 || H == 0 || canvas.IsClipEmpty)
+            return;
+        
         //clip to round rectangle
         using var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, W, H),
             Button.StandardRadius, Button.StandardRadius);
@@ -40,8 +43,32 @@ public sealed class ButtonGroup : MultiChildWidget<Button>
         canvas.Save();
         canvas.ClipPath(path, ClipOp.Intersect, true);
 
-        base.Paint(canvas, area);
+        //注意不要调用PaintChildren，因RepaintChild转换了坐标但没有恢复
+        if (area is RepaintChild repaintChild)
+        {
+            var child = repaintChild.Child;
+            child.BeforePaint(canvas, true);
+            child.Paint(canvas, repaintChild.ToChild(child));
+            child.AfterPaint(canvas); //这里转换回原来的坐标
+        }
+        else
+        {
+            VisitChildren(child =>
+            {
+                if (child.W <= 0 || child.H <= 0)
+                    return false;
+                if (area != null && !area.IntersectsWith(child))
+                    return false; //脏区域与子组件没有相交部分，不用绘制
 
+                child.BeforePaint(canvas);
+                child.Paint(canvas, area?.ToChild(child));
+                child.AfterPaint(canvas);
+
+                PaintDebugger.PaintWidgetBorder(child, canvas);
+                return false;
+            });
+        }
+        
         //画分隔条
         var paint = PaintUtils.Shared(Colors.White, PaintStyle.Stroke, 1);
         for (var i = 1; i < _children.Count; i++)
