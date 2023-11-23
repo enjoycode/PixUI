@@ -120,6 +120,11 @@ public sealed class DataGridController<T> /* where T : notnull*/
     public int CurrentRowIndex => _selectedRows.Count > 0 ? _selectedRows[0] : -1;
 
     /// <summary>
+    /// 当前选中的第一行数据
+    /// </summary>
+    public T? CurrentRow => CurrentRowIndex < 0 || DataView == null ? default : DataView[CurrentRowIndex];
+
+    /// <summary>
     /// 返回监测当前选择的行的状态
     /// </summary>
     public State<T?> ObserveCurrentRow()

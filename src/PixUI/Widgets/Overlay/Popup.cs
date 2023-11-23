@@ -46,6 +46,17 @@ public abstract class Popup : Widget, IEventHook
         Invalidate(InvalidAction.Repaint);
     }
 
+    /// <summary>
+    /// 简化方法显示Popup
+    /// </summary>
+    public static Popup Show(Widget child, Widget? relativeTo = null,
+        Offset? relativeOffset = null, PopupTransitionBuilder? transitionBuilder = null)
+    {
+        var popup = new SingleChildPopup(child);
+        popup.Show(relativeTo, relativeOffset, transitionBuilder);
+        return popup;
+    }
+
     public void Show(Widget? relativeTo = null,
         Offset? relativeOffset = null, PopupTransitionBuilder? transitionBuilder = null)
     {

@@ -22,10 +22,10 @@ public abstract class Dialog : Popup
     {
         if (_child != null) return;
 
-        _child = new Card()
+        _child = new Card
         {
             Elevation = 20,
-            Child = new Column()
+            Child = new Column
             {
                 Children =
                 {
@@ -85,11 +85,20 @@ public abstract class Dialog : Popup
     #endregion
 
     #region ====Show & Close====
-    
-    public static void Show(string title, Widget body)
+
+    public static Dialog Show(string title, Func<Dialog, Widget> bodyBuilder,
+        Func<Dialog, Widget>? footerBuilder = null, Size? size = null)
     {
-        var dlg = new WrapDialog(title, body);
+        var dlg = new WrapDialog(title, bodyBuilder, footerBuilder, size);
         dlg.Show();
+        return dlg;
+    }
+
+    public static Task<string> ShowAsync(string title, Func<Dialog, Widget> bodyBuilder,
+        Func<Dialog, Widget>? footerBuilder = null, Size? size = null)
+    {
+        var dlg = new WrapDialog(title, bodyBuilder, footerBuilder, size);
+        return dlg.ShowAsync();
     }
 
     /// <summary>
@@ -115,7 +124,7 @@ public abstract class Dialog : Popup
     /// <returns>true=abort close</returns>
     protected virtual bool OnClosing(string result) => false;
 
-    protected void Close(string result)
+    public void Close(string result)
     {
         if (OnClosing(result)) return; //aborted
 
