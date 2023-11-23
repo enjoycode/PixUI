@@ -120,8 +120,6 @@ public sealed class Row : MultiChildWidget<Widget>
 
     protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
     {
-        base.OnChildSizeChanged(child, dx, dy, affects);
-        
         //TODO:暂全部重新布局并设脏区域为全部重绘，可优化
         var oldWidth = W;
         var oldHeight = H;
