@@ -352,10 +352,13 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
     #region ====Layout Methods====
 
-    internal void RelayoutIfMounted()
+    internal void OnColumnsChanged()
     {
         if (_owner is { IsMounted: true })
-            _owner.Invalidate(InvalidAction.Relayout);
+        {
+            CalcColumnsWidth(_cachedWidgetSize, true);
+            Invalidate();
+        }
     }
 
     /// <summary>

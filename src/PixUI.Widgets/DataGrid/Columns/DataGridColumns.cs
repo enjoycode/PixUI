@@ -17,7 +17,7 @@ public sealed class DataGridColumns<T> : Collection<DataGridColumn<T>>
         
         _controller.ClearLeafColumns();
         _controller.CheckHasFrozen();
-        _controller.RelayoutIfMounted();
+        _controller.OnColumnsChanged();
     }
 
     protected override void InsertItem(int index, DataGridColumn<T> item)
@@ -26,7 +26,7 @@ public sealed class DataGridColumns<T> : Collection<DataGridColumn<T>>
         
         _controller.GetLeafColumns(item, null);
         _controller.CheckHasFrozen();
-        _controller.RelayoutIfMounted();
+        _controller.OnColumnsChanged();
     }
 
     protected override void RemoveItem(int index)
@@ -36,7 +36,7 @@ public sealed class DataGridColumns<T> : Collection<DataGridColumn<T>>
         
         _controller.RemoveLeafColumns(item);
         _controller.CheckHasFrozen();
-        _controller.RelayoutIfMounted();
+        _controller.OnColumnsChanged();
     }
 
     protected override void SetItem(int index, DataGridColumn<T> item)
@@ -47,6 +47,6 @@ public sealed class DataGridColumns<T> : Collection<DataGridColumn<T>>
         _controller.RemoveLeafColumns(oldItem);
         _controller.GetLeafColumns(item, null);
         _controller.CheckHasFrozen();
-        _controller.RelayoutIfMounted();
+        _controller.OnColumnsChanged();
     }
 }
