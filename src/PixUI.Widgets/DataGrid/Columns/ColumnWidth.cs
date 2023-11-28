@@ -52,6 +52,14 @@ public sealed class ColumnWidth
         return new ColumnWidth(ColumnWidthType.Fixed, width, 0);
     }
 
+    public static ColumnWidth Parse(string value)
+    {
+        if (string.IsNullOrEmpty(value)) return Auto();
+        if (value.EndsWith('%'))
+            return float.TryParse(value.AsSpan(0, value.Length - 1), out var p) ? Percent(p) : Percent(0);
+        return float.TryParse(value, out var v) ? Fixed(v) : Fixed(20);
+    }
+
     internal void ChangeValue(float newValue)
     {
         Value = newValue;
