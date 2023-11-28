@@ -303,8 +303,7 @@ public abstract class Widget : IDisposable
     /// <summary>
     /// 绑定状态至Widget,用于首次绑定
     /// </summary>
-    protected T Bind<T>(T newState, Action<State> action)
-        where T : State
+    protected T Bind<T>(T newState, Action<State> action) where T : State
     {
         newState.AddListener(action);
         return newState;
@@ -313,8 +312,7 @@ public abstract class Widget : IDisposable
     /// <summary>
     /// 绑定状态至Widget,用于重新绑定
     /// </summary>
-    protected T? Bind<T>(T? oldState, T? newState, Action<State> action)
-        where T : State
+    protected T? Bind<T>(T? oldState, T? newState, Action<State> action) where T : State
     {
         if (ReferenceEquals(oldState, newState)) return newState;
 

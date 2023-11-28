@@ -14,12 +14,12 @@ internal interface IDataGridHostColumn
 /// </summary>
 internal sealed class HostedCellWidget : Widget
 {
-    public HostedCellWidget(IScrollable dataGrid, IDataGridHostColumn column, Widget child, float offsetYToDataGrid)
+    public HostedCellWidget(IScrollable dataGridBody, IDataGridHostColumn column, Widget child, float offsetYToDataGrid)
     {
         IsLayoutTight = false; //充满单元格
         child.Parent = this;
         _hostedWidget = child;
-        _dataGrid = dataGrid;
+        _dataGridBody = dataGridBody;
         _column = column;
         _offsetYToDataGrid = offsetYToDataGrid;
     }
@@ -31,12 +31,12 @@ internal sealed class HostedCellWidget : Widget
     /// </summary>
     private readonly float _offsetYToDataGrid;
 
-    private readonly IScrollable _dataGrid;
+    private readonly IScrollable _dataGridBody;
     private readonly IDataGridHostColumn _column;
 
     protected internal override float X => _column.LeftToDataGrid;
 
-    protected internal override float Y => _offsetYToDataGrid - _dataGrid.ScrollOffsetY;
+    protected internal override float Y => _offsetYToDataGrid - _dataGridBody.ScrollOffsetY;
 
     public override void VisitChildren(Func<Widget, bool> action) => action(_hostedWidget);
 
@@ -92,9 +92,9 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
         //没找到开始新建
         var row = controller.DataView![rowIndex];
         var cellWidget = _cellBuilder(row, rowIndex);
-        var hostedWidget = new HostedCellWidget(controller.DataGrid, this, cellWidget,
+        var hostedWidget = new HostedCellWidget(controller.DataGrid.Body, this, cellWidget,
             cellRect.Top + controller.ScrollController.OffsetY);
-        hostedWidget.Parent = controller.DataGrid;
+        hostedWidget.Parent = controller.DataGrid.Body;
         hostedWidget.Layout(cellRect.Width, cellRect.Height);
         //不需要设置hostedWidget的位置(动态计算)
         var cellCachedWidget = new CellCache<Widget>(rowIndex, hostedWidget);

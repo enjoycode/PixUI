@@ -48,14 +48,12 @@ public sealed class DataGridController<T> /* where T : notnull*/
     /// <summary>
     /// 第一行可见行索引号
     /// </summary>
-    internal int VisibleStartRowIndex =>
-        (int)Math.Truncate(ScrollController.OffsetY / Theme.RowHeight);
+    internal int VisibleStartRowIndex => (int)Math.Truncate(ScrollController.OffsetY / Theme.RowHeight);
 
     /// <summary>
     /// 可见行总数
     /// </summary>
-    internal int VisibleRows =>
-        (int)Math.Ceiling(Math.Max(0, DataGrid.H - TotalHeaderHeight) / Theme.RowHeight);
+    internal int VisibleRows => (int)Math.Ceiling(Math.Max(0, DataGrid.H - TotalHeaderHeight) / Theme.RowHeight);
 
     #endregion
 
@@ -98,7 +96,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
     // 所有非分组的列集合
     private readonly IList<DataGridColumn<T>> _cachedLeafColumns = new List<DataGridColumn<T>>();
 
-    private readonly IList<DataGridColumn<T>> _cachedVisibleColumns = new List<DataGridColumn<T>>();
+    internal readonly IList<DataGridColumn<T>> CachedVisibleColumns = new List<DataGridColumn<T>>();
 
     // 缓存的组件尺寸
     private Size _cachedWidgetSize = new Size(0, 0);
@@ -271,7 +269,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
     {
         if (y <= TotalHeaderHeight)
         {
-            foreach (var col in _cachedVisibleColumns)
+            foreach (var col in CachedVisibleColumns)
             {
                 if (col.CachedVisibleLeft <= x && x <= col.CachedVisibleRight)
                 {
@@ -314,7 +312,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
         var scrollX = 0f;
         var scrollY = 0f;
 
-        var rowIndex = (int)Math.Truncate((y - TotalHeaderHeight + ScrollController.OffsetY) / Theme.RowHeight);
+        var rowIndex = (int)Math.Truncate((y + ScrollController.OffsetY) / Theme.RowHeight);
         //判断是否超出范围
         if (rowIndex >= DataView.Count)
             return _cachedHitInRows;
@@ -328,7 +326,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
             } //TODO: rowIndex == visibleEndRowIndex
         }
 
-        foreach (var col in _cachedVisibleColumns)
+        foreach (var col in CachedVisibleColumns)
         {
             if (col.CachedVisibleLeft <= x && x <= col.CachedVisibleRight)
             {
@@ -409,7 +407,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
     /// </summary>
     internal IList<DataGridColumn<T>> LayoutVisibleColumns(Size size)
     {
-        _cachedVisibleColumns.Clear();
+        CachedVisibleColumns.Clear();
 
         var colStartIndex = 0;
         var colEndIndex = _cachedLeafColumns.Count - 1;
@@ -432,13 +430,13 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
                 col.CachedLeft = col.CachedVisibleLeft = offsetX;
                 col.CachedVisibleRight = col.CachedLeft + col.LayoutWidth;
-                _cachedVisibleColumns.Insert(insertIndex++, col);
+                CachedVisibleColumns.Insert(insertIndex++, col);
 
                 offsetX += col.LayoutWidth;
             }
 
             remainWidth -= offsetX;
-            if (remainWidth <= 0) return _cachedVisibleColumns;
+            if (remainWidth <= 0) return CachedVisibleColumns;
 
             //再计算右侧冻结列
             var rightOffsetX = 0.0f;
@@ -454,14 +452,14 @@ public sealed class DataGridController<T> /* where T : notnull*/
                 col.CachedLeft = size.Width - rightOffsetX - col.LayoutWidth;
                 col.CachedVisibleLeft = col.CachedLeft;
                 col.CachedVisibleRight = col.CachedLeft + col.LayoutWidth;
-                _cachedVisibleColumns.Add(col);
+                CachedVisibleColumns.Add(col);
 
                 rightOffsetX += col.LayoutWidth;
-                if (remainWidth - rightOffsetX <= 0) return _cachedVisibleColumns;
+                if (remainWidth - rightOffsetX <= 0) return CachedVisibleColumns;
             }
 
             remainWidth -= rightOffsetX;
-            if (remainWidth <= 0) return _cachedVisibleColumns;
+            if (remainWidth <= 0) return CachedVisibleColumns;
         }
 
         _cachedScrollLeft = offsetX;
@@ -488,7 +486,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
             col.CachedLeft = offsetX;
             col.CachedVisibleLeft = Math.Max(_cachedScrollLeft, col.CachedLeft);
             col.CachedVisibleRight = Math.Min(_cachedScrollRight, col.CachedLeft + col.LayoutWidth);
-            _cachedVisibleColumns.Insert(insertIndex++, col);
+            CachedVisibleColumns.Insert(insertIndex++, col);
 
             // print("${col.label} offsetX=$offsetX VL=${col.cachedVisibleLeft} VR=${col.cachedVisibleRight}");
 
@@ -496,17 +494,20 @@ public sealed class DataGridController<T> /* where T : notnull*/
             if (offsetX >= _cachedScrollRight) break;
         }
 
-        return _cachedVisibleColumns;
+        return CachedVisibleColumns;
     }
 
     internal Rect GetScrollClipRect(float top, float height) =>
         Rect.FromLTWH(_cachedScrollLeft, top, _cachedScrollRight - _cachedScrollLeft, height);
 
+    /// <summary>
+    /// 获取当前选择的行的边框
+    /// </summary>
     internal Rect? GetCurrentRowRect()
     {
         if (_selectedRows.Count == 0) return null;
 
-        var top = TotalHeaderHeight + (_selectedRows[0] - VisibleStartRowIndex) * Theme.RowHeight - ScrollDeltaY;
+        var top = (_selectedRows[0] - VisibleStartRowIndex) * Theme.RowHeight - ScrollDeltaY;
         return new Rect(1, top + 1, _owner!.W - 2, top + Theme.RowHeight - 1);
     }
 
@@ -519,8 +520,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
             return null;
 
         var hitColumn = _cachedHitInRows.Value.Column;
-        var top = TotalHeaderHeight +
-            (_cachedHitInRows.Value.RowIndex - VisibleStartRowIndex) * Theme.RowHeight - ScrollDeltaY;
+        var top = (_cachedHitInRows.Value.RowIndex - VisibleStartRowIndex) * Theme.RowHeight - ScrollDeltaY;
         return new Rect(hitColumn.CachedVisibleLeft + 1, top + 1,
             hitColumn.CachedVisibleRight - 2, top + Theme.RowHeight - 1);
     }
@@ -567,6 +567,16 @@ public sealed class DataGridController<T> /* where T : notnull*/
     {
         //TODO:纠正一些错误的冻结列设置,如全部冻结，中间有冻结等
         HasFrozen = _cachedLeafColumns.Any(c => c.Frozen);
+    }
+
+    #endregion
+
+    #region ====Paint Utils====
+
+    internal void PaintCellBorder(Canvas canvas, in Rect cellRect)
+    {
+        var paint = PaintUtils.Shared(Theme.BorderColor, PaintStyle.Stroke, 1);
+        canvas.DrawRect(cellRect, paint);
     }
 
     #endregion
