@@ -7,7 +7,7 @@ namespace PixUI.Demo.Mac
         public DemoDataGrid()
         {
             _controller = new DataGridController<Person>();
-            _controller.DataSource = Person.GeneratePersons(1000);
+            _controller.DataSource = Person.GeneratePersons(100);
 
             var redCellStyle = new CellStyle { Color = Colors.Red };
             var greenCellStyle = new CellStyle { Color = Colors.Green };
@@ -20,7 +20,12 @@ namespace PixUI.Demo.Mac
                     Columns =
                     {
                         new DataGridRowNumColumn<Person>("行号") { Width = 60, Frozen = true },
-                        new DataGridTextColumn<Person>("Name", p => p.Name) { Width = 500 },
+                        new DataGridTextColumn<Person>("City", p => p.City)
+                        {
+                            Width = 100, AutoMergeCells = true,
+                            CellStyle = new() { HorizontalAlignment = HorizontalAlignment.Center }
+                        },
+                        new DataGridTextColumn<Person>("Name", p => p.Name) { Width = 400 },
                         new DataGridGroupColumn<Person>("Gender")
                         {
                             new DataGridIconColumn<Person>("Icon",

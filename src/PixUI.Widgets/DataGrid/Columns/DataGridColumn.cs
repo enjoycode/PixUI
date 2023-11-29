@@ -20,6 +20,11 @@ public abstract class DataGridColumn<T>
     public Func<T, int, CellStyle>? CellStyleGetter { get; set; }
 
     /// <summary>
+    /// 是否支持合并同一列内相同内容的单元格
+    /// </summary>
+    public bool AutoMergeCells { get; set; }
+
+    /// <summary>
     /// 是否冻结列
     /// </summary>
     public bool Frozen { get; set; }
@@ -38,7 +43,7 @@ public abstract class DataGridColumn<T>
     // |->Col1.CacheLeft
     //    |->Col1.CachedVisibleLeft
     //                   |->Col1.CachedVisibleRight
-    
+
     internal float CachedLeft = 0f;
     internal float CachedVisibleLeft = 0f;
     internal float CachedVisibleRight = 0f;
@@ -78,11 +83,11 @@ public abstract class DataGridColumn<T>
     protected internal virtual void ClearAllCache() { }
 
     protected internal virtual void OnWidthChanged(float width, float height) => ClearAllCache();
-    
+
     /// <summary>
     /// 清除指定单元格的缓存
     /// </summary>
-    protected internal virtual void ClearCacheAt(int rowIndex) {}
+    protected internal virtual void ClearCacheAt(int rowIndex) { }
 
     /// <summary>
     /// 滚动后清除相关缓存
@@ -108,7 +113,8 @@ public abstract class DataGridColumn<T>
         PaintCellParagraph(canvas, cellRect, cellStyle, ph);
     }
 
-    protected internal virtual void PaintCell(Canvas canvas, DataGridController<T> controller, int rowIndex, Rect cellRect) { }
+    protected internal virtual void PaintCell(Canvas canvas, DataGridController<T> controller, int rowIndex,
+        Rect cellRect) { }
 
     internal static Paragraph BuildCellParagraph(Rect rect, CellStyle style, string text, int maxLines)
     {
@@ -164,4 +170,14 @@ public abstract class DataGridColumn<T>
             canvas.DrawParagraph(paragraph, rect.Left + CellStyle.CellPadding, rect.Top + CellStyle.CellPadding);
         }
     }
+
+    /// <summary>
+    /// 尝试向上合并单元格
+    /// </summary>
+    protected internal virtual int TryMergeUp(DataGridController<T> controller, int currentRow) => 0;
+
+    /// <summary>
+    /// 尝试向下合并单元格
+    /// </summary>
+    protected internal virtual int TryMergeDown(DataGridController<T> controller, int currentRow) => 0;
 }

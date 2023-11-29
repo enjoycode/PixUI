@@ -10,7 +10,7 @@ public abstract class DataGridTextColumnBase<T> : DataGridColumn<T>
         _cellValueGetter = cellValueGetter;
     }
 
-    private readonly Func<T, int, string> _cellValueGetter;
+    protected readonly Func<T, int, string> _cellValueGetter;
 
     private readonly List<CellCache<Paragraph>> _cellParagraphs = new();
 

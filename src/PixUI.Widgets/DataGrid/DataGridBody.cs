@@ -158,12 +158,39 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
     {
         var rowHeight = Theme.RowHeight;
         var offsetY = 0f;
+        var lastMergeBeginRow = -1;
+        var lastMergeEndRow = -1;
+
         for (var j = startRow; j < _controller.DataView!.Count; j++)
         {
             var cellRect = Rect.FromLTWH(col.CachedLeft, offsetY - deltaY, col.LayoutWidth, rowHeight);
 
+            //尝试合并单元格
+            if (col.AutoMergeCells)
+            {
+                //先判断是否已经合并
+                if (j >= lastMergeBeginRow && j <= lastMergeEndRow)
+                {
+                    offsetY += rowHeight;
+                    if (offsetY >= maxHeight) break;
+                    continue; //继续下一个循环
+                }
+
+                lastMergeBeginRow = lastMergeEndRow = j;
+                if (j == startRow)
+                {
+                    var mergeUpCount = col.TryMergeUp(_controller, j);
+                    lastMergeBeginRow = j - mergeUpCount;
+                    cellRect.Top -= mergeUpCount * rowHeight;
+                }
+
+                var mergeDownCount = col.TryMergeDown(_controller, j);
+                lastMergeEndRow = j + mergeDownCount;
+                cellRect.Bottom += mergeDownCount * rowHeight;
+            }
+
             //TODO:暂在这里画stripe背景
-            if (Theme.StripeRows && j % 2 != 0)
+            if (!col.AutoMergeCells /*合并单元格时不支持*/ && Theme.StripeRows && j % 2 != 0)
             {
                 var paint = PaintUtils.Shared(Theme.StripeBgColor);
                 canvas.DrawRect(cellRect, paint);
@@ -181,7 +208,7 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
             col.PaintCell(canvas, _controller, j, cellRect);
 
             var borderRect = new Rect(col.CachedVisibleLeft, cellRect.Top,
-                col.CachedVisibleRight, cellRect.Top + rowHeight);
+                col.CachedVisibleRight, cellRect.Bottom);
             _controller.PaintCellBorder(canvas, borderRect);
 
             offsetY += rowHeight;
