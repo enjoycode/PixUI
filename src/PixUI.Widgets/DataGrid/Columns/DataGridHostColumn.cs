@@ -6,50 +6,10 @@ namespace PixUI;
 
 internal interface IDataGridHostColumn
 {
-    float LeftToDataGrid { get; }
-}
-
-/// <summary>
-/// 用于DataGridHostColumn承载单元格组件
-/// </summary>
-internal sealed class HostedCellWidget : Widget
-{
-    public HostedCellWidget(IScrollable dataGridBody, IDataGridHostColumn column, Widget child, float offsetYToDataGrid)
-    {
-        IsLayoutTight = false; //充满单元格
-        child.Parent = this;
-        _hostedWidget = child;
-        _dataGridBody = dataGridBody;
-        _column = column;
-        _offsetYToDataGrid = offsetYToDataGrid;
-    }
-
-    private readonly Widget _hostedWidget;
-
     /// <summary>
-    /// 不包含滚动偏移量的相对于DataGrid的Y位置
+    /// 已减横向滚动偏移量的X坐标
     /// </summary>
-    private readonly float _offsetYToDataGrid;
-
-    private readonly IScrollable _dataGridBody;
-    private readonly IDataGridHostColumn _column;
-
-    protected internal override float X => _column.LeftToDataGrid;
-
-    protected internal override float Y => _offsetYToDataGrid - _dataGridBody.ScrollOffsetY;
-
-    public override void VisitChildren(Func<Widget, bool> action) => action(_hostedWidget);
-
-    public override void Layout(float availableWidth, float availableHeight)
-    {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
-
-        SetSize(width, height);
-        _hostedWidget.Layout(width, height);
-        //TODO:根据对齐方式设置位置，暂简单居中
-        _hostedWidget.SetPosition((width - _hostedWidget.W) / 2, 0);
-    }
+    float LeftToDataGrid { get; }
 }
 
 /// <summary>
@@ -74,7 +34,9 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
     {
         var cellWidget = GetOrMakeCellWidget(rowIndex, controller, cellRect);
         canvas.Translate(cellRect.Left, cellRect.Top);
+        // cellWidget.BeforePaint(canvas);
         cellWidget.Paint(canvas, null);
+        // cellWidget.AfterPaint(canvas);
         canvas.Translate(-cellRect.Left, -cellRect.Top);
     }
 
@@ -93,7 +55,7 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
         var row = controller.DataView![rowIndex];
         var cellWidget = _cellBuilder(row, rowIndex);
         var hostedWidget = new HostedCellWidget(controller.DataGrid.Body, this, cellWidget,
-            cellRect.Top + controller.ScrollController.OffsetY);
+            rowIndex * controller.Theme.RowHeight);
         hostedWidget.Parent = controller.DataGrid.Body;
         hostedWidget.Layout(cellRect.Width, cellRect.Height);
         //不需要设置hostedWidget的位置(动态计算)

@@ -16,18 +16,20 @@ namespace PixUI.Demo.Mac
                 {
                     Columns =
                     {
-                        new DataGridTextColumn<Person>("Name", p => p.Name),
+                        new DataGridTextColumn<Person>("Name", p => p.Name) { Width = 560 },
                         new DataGridGroupColumn<Person>("Gender")
                         {
                             new DataGridIconColumn<Person>("Icon", p =>
-                                p.Female ? MaterialIcons.Woman : MaterialIcons.Man, ColumnWidth.Fixed(60)),
-                            new DataGridCheckboxColumn<Person>("IsMan", p => !p.Female),
+                                p.Female ? MaterialIcons.Woman : MaterialIcons.Man, 60),
+                            new DataGridCheckboxColumn<Person>("IsMan", p => !p.Female) { Width = 100 },
                         },
-                        new DataGridTextColumn<Person>("Score", p => p.Score.ToString()),
+                        new DataGridTextColumn<Person>("Score", p => p.Score.ToString()) { Width = 100 },
                         new DataGridButtonColumn<Person>("Action",
-                            (person, index) => new Button(icon: MaterialIcons.ShoppingCart)
-                                { OnTap = _ => Notification.Info(person.Name) },
-                            ColumnWidth.Fixed(80)),
+                            (person, _) => new Button(icon: MaterialIcons.ShoppingCart)
+                            {
+                                OnTap = _ => Notification.Info(person.Name)
+                            },
+                            80) { Frozen = true },
                     }
                 }
             };

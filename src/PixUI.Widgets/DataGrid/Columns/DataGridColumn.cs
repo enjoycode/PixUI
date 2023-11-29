@@ -32,7 +32,13 @@ public abstract class DataGridColumn<T>
     //缓存的计算后的列宽度(像素)
     private float _cachedWidth = 0f;
 
-    //缓存布局后的位置信息
+    //缓存布局后的位置信息,相对于DataGrid.X
+    //    |-----DataGrid Width=100, ScrollOffsetX=10-----|
+    // |--Col1 Width=30--|--ColOthers----------------|
+    // |->Col1.CacheLeft
+    //    |->Col1.CachedVisibleLeft
+    //                   |->Col1.CachedVisibleRight
+    
     internal float CachedLeft = 0f;
     internal float CachedVisibleLeft = 0f;
     internal float CachedVisibleRight = 0f;

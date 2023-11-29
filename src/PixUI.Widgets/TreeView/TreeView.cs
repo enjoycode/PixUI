@@ -35,7 +35,6 @@ public sealed class TreeView<T> : Widget, IScrollable
 
     public float ScrollOffsetX => _controller.ScrollController.OffsetX;
     public float ScrollOffsetY => _controller.ScrollController.OffsetY;
-    public bool IgnoreScrollOffsetForHitTest => false;
 
     public Offset OnScroll(float dx, float dy)
     {

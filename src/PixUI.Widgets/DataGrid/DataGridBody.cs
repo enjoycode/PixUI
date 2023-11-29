@@ -18,7 +18,6 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
 
     public float ScrollOffsetX => _controller.ScrollController.OffsetX;
     public float ScrollOffsetY => _controller.ScrollController.OffsetY;
-    public bool IgnoreScrollOffsetForHitTest => true;
 
     public Offset OnScroll(float dx, float dy)
     {
@@ -71,7 +70,7 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
         {
             var cellWidget = hostColumn.GetCellWidget(hitRow.Value.RowIndex);
             if (cellWidget != null) //TODO:临时解决快速滚动后尚未创建承载的Widget实例
-                HitTestChild(cellWidget, x, y, result);
+                HitTestChild(cellWidget, x, y, result); //不用考虑列是否冻结，HostedCellWidget.X已抵消
         }
 
         return true;
@@ -133,9 +132,9 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
             }
 
             //clip scroll region
-            // var clipRect = _controller.GetScrollClipRect(headerHeight, size.Height - headerHeight);
-            // canvas.Save();
-            // canvas.ClipRect(clipRect, ClipOp.Intersect, false);
+            var clipRect = _controller.GetScrollClipRect(0, bodyHeight);
+            canvas.Save();
+            canvas.ClipRect(clipRect, ClipOp.Intersect, false);
 
             //再画其他列
             var noneFrozenColumns = visibleColumns.Where(c => c.Frozen == false);
@@ -144,7 +143,7 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
                 PaintColumnCells(canvas, col, startRowIndex, deltaY, bodyHeight);
             }
 
-            // canvas.Restore();
+            canvas.Restore();
         }
         else
         {

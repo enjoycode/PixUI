@@ -44,7 +44,7 @@ public sealed class HitTestResult
 
         LastHitWidget = widget;
         _transform.Translate(-widget.X, -widget.Y);
-        if (widget.Parent is IScrollable { IgnoreScrollOffsetForHitTest: false } scrollable)
+        if (widget.Parent is IScrollable scrollable)
         {
             ConcatRestrictedBounds(widget.Parent);
             _transform.Translate(scrollable.ScrollOffsetX, scrollable.ScrollOffsetY);

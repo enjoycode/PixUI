@@ -405,7 +405,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
     /// <summary>
     /// 计算可视列及其位置
     /// </summary>
-    internal IList<DataGridColumn<T>> LayoutVisibleColumns(Size size)
+    internal void LayoutVisibleColumns(Size size)
     {
         CachedVisibleColumns.Clear();
 
@@ -436,7 +436,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
             }
 
             remainWidth -= offsetX;
-            if (remainWidth <= 0) return CachedVisibleColumns;
+            if (remainWidth <= 0) return;
 
             //再计算右侧冻结列
             var rightOffsetX = 0.0f;
@@ -455,11 +455,11 @@ public sealed class DataGridController<T> /* where T : notnull*/
                 CachedVisibleColumns.Add(col);
 
                 rightOffsetX += col.LayoutWidth;
-                if (remainWidth - rightOffsetX <= 0) return CachedVisibleColumns;
+                if (remainWidth - rightOffsetX <= 0) return;
             }
 
             remainWidth -= rightOffsetX;
-            if (remainWidth <= 0) return CachedVisibleColumns;
+            if (remainWidth <= 0) return;
         }
 
         _cachedScrollLeft = offsetX;
@@ -493,8 +493,6 @@ public sealed class DataGridController<T> /* where T : notnull*/
             offsetX += col.LayoutWidth;
             if (offsetX >= _cachedScrollRight) break;
         }
-
-        return CachedVisibleColumns;
     }
 
     internal Rect GetScrollClipRect(float top, float height) =>

@@ -123,7 +123,7 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
 
     protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)
     {
-        base.BeforePaint(canvas, onlyTransform, null);
+        canvas.Translate(X, Y);
         if (!onlyTransform)
         {
             canvas.Save();
@@ -137,7 +137,7 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
 
     protected internal override void AfterPaint(Canvas canvas)
     {
-        base.AfterPaint(canvas);
+        canvas.Translate(-X, -Y);
         canvas.Restore();
         canvas.Translate(0, ScrollOffsetY);
     }
@@ -159,7 +159,6 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
 
     public float ScrollOffsetX => Controller.ScrollController.OffsetX;
     public float ScrollOffsetY => Controller.ScrollController.OffsetY;
-    public bool IgnoreScrollOffsetForHitTest => false;
 
     public Offset OnScroll(float dx, float dy)
     {

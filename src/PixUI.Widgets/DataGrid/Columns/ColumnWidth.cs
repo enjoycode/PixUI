@@ -60,6 +60,9 @@ public sealed class ColumnWidth
         return float.TryParse(value, out var v) ? Fixed(v) : Fixed(20);
     }
 
+    public static implicit operator ColumnWidth(float v) => Fixed(v);
+    public static implicit operator ColumnWidth(string v) => Parse(v);
+
     internal void ChangeValue(float newValue)
     {
         Value = newValue;

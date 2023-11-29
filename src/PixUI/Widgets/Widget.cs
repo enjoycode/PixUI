@@ -287,7 +287,7 @@ public abstract class Widget : IDisposable
     {
         var scrollOffsetX = 0f;
         var scrollOffsetY = 0f;
-        if (this is IScrollable scrollable && !scrollable.IgnoreScrollOffsetForHitTest)
+        if (this is IScrollable scrollable)
         {
             scrollOffsetX = scrollable.ScrollOffsetX;
             scrollOffsetY = scrollable.ScrollOffsetY;
