@@ -21,8 +21,9 @@ public sealed class DataGrid<T> : Widget, IMouseRegion
 
     private readonly DataGridController<T> _controller;
     internal readonly DataGridBody<T> Body;
-    private DataGridHeader<T>? _header;
-    private DataGridFooter<T>? _footer;
+    internal DataGridHeader<T>? Header { get; private set; }
+    internal DataGridFooter<T>? Footer { get; private set; }
+
     private DataGridTheme _theme = DataGridTheme.Default;
 
     public bool ShowHeader { get; init; } = true;
@@ -46,9 +47,9 @@ public sealed class DataGrid<T> : Widget, IMouseRegion
 
     public override void VisitChildren(Func<Widget, bool> action)
     {
-        if (_header != null && action(_header)) return;
+        if (Header != null && action(Header)) return;
         if (action(Body)) return;
-        if (_footer != null) action(_footer);
+        if (Footer != null) action(Footer);
     }
 
     public override void Layout(float availableWidth, float availableHeight)
@@ -62,32 +63,32 @@ public sealed class DataGrid<T> : Widget, IMouseRegion
 
         if (ShowHeader)
         {
-            if (_header == null)
+            if (Header == null)
             {
-                _header = new DataGridHeader<T>(_controller);
-                _header.Parent = this;
+                Header = new DataGridHeader<T>(_controller);
+                Header.Parent = this;
             }
 
-            _header.Layout(width, height);
-            _header.SetPosition(0, 0);
-            bodyHeight -= _header.H;
+            Header.Layout(width, height);
+            Header.SetPosition(0, 0);
+            bodyHeight -= Header.H;
         }
 
         if (ShowFooter)
         {
-            if (_footer == null)
+            if (Footer == null)
             {
-                _footer = new DataGridFooter<T>(_controller);
-                _footer.Parent = this;
+                Footer = new DataGridFooter<T>(_controller);
+                Footer.Parent = this;
             }
 
-            _footer.Layout(width, bodyHeight);
-            _footer.SetPosition(0, H - _footer.H);
-            bodyHeight -= _footer.H;
+            Footer.Layout(width, bodyHeight);
+            Footer.SetPosition(0, H - Footer.H);
+            bodyHeight -= Footer.H;
         }
 
         Body.Layout(width, bodyHeight);
-        Body.SetPosition(0, _header?.H ?? 0);
+        Body.SetPosition(0, Header?.H ?? 0);
 
         _controller.CalcColumnsWidth(new Size(width, height));
     }

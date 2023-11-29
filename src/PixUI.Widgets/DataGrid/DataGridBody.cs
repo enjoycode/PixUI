@@ -50,6 +50,8 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
             }
 
             Invalidate(InvalidAction.Repaint);
+            if (offset.Dx != 0)
+                _controller.DataGrid.Header?.Invalidate(InvalidAction.Repaint);
         }
 
         return offset;
