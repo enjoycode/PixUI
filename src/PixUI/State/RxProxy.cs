@@ -31,7 +31,7 @@ public sealed class RxProxy<T> : State<T>
         get => _getter();
         set
         {
-            if (_setter == null) throw new NotSupportedException();
+            if (_setter == null) throw new NotSupportedException("状态值只读");
             _setter(value);
         }
     }
