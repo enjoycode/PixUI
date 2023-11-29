@@ -25,8 +25,6 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
     private readonly Func<T, int, Widget> _cellBuilder;
     private readonly List<CellCache<Widget>> _cellWidgets = new();
 
-    private static readonly CellCacheComparer<Widget> _cellCacheComparer = new();
-
     public float LeftToDataGrid => CachedLeft;
 
     protected internal override void PaintCell(Canvas canvas, DataGridController<T> controller, int rowIndex,
@@ -46,7 +44,7 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
     private Widget GetOrMakeCellWidget(int rowIndex, DataGridController<T> controller, in Rect cellRect)
     {
         var pattern = new CellCache<Widget>(rowIndex, null);
-        var index = _cellWidgets.BinarySearch(pattern, _cellCacheComparer);
+        var index = _cellWidgets.BinarySearch(pattern, CellCacheComparerForWidget.Instance);
         if (index >= 0)
             return _cellWidgets[index].CachedItem!;
 
@@ -67,7 +65,7 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
     internal Widget? GetCellWidget(int rowIndex)
     {
         var pattern = new CellCache<Widget>(rowIndex, null);
-        var index = _cellWidgets.BinarySearch(pattern, _cellCacheComparer);
+        var index = _cellWidgets.BinarySearch(pattern, CellCacheComparerForWidget.Instance);
         //TODO:临时修复由于快速滚动后开始新的HitTest,但当前rowIndex承载的Widget还未创建
         if (index < 0) return null;
         //Debug.Assert(index >= 0);
@@ -92,4 +90,9 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
         else
             _cellWidgets.RemoveAll(t => t.RowIndex >= rowIndex);
     }
+}
+
+internal static class CellCacheComparerForWidget
+{
+    internal static readonly CellCacheComparer<Widget> Instance = new();
 }

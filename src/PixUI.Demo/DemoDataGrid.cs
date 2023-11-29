@@ -16,7 +16,8 @@ namespace PixUI.Demo.Mac
                 {
                     Columns =
                     {
-                        new DataGridTextColumn<Person>("Name", p => p.Name) { Width = 560 },
+                        new DataGridRowNumColumn<Person>("行号") { Width = 60, Frozen = true},
+                        new DataGridTextColumn<Person>("Name", p => p.Name) { Width = 500 },
                         new DataGridGroupColumn<Person>("Gender")
                         {
                             new DataGridIconColumn<Person>("Icon", p =>
