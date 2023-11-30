@@ -122,12 +122,13 @@ public sealed class DynamicWidgetMeta
 public sealed class DynamicPropertyMeta
 {
     public DynamicPropertyMeta(string name, Type runtimeType, bool allowNull, bool initSetter = false,
-        DynamicValue? initValue = null)
+        DynamicValue? initValue = null, string? editor = null)
     {
         Name = name;
         AllowNull = allowNull;
         IsInitSetter = initSetter;
         InitValue = initValue;
+        Editor = editor;
         //判断是否状态类型
         if (typeof(State).IsAssignableFrom(runtimeType))
         {
@@ -153,6 +154,7 @@ public sealed class DynamicPropertyMeta
     public readonly bool AllowNull;
     public readonly bool IsInitSetter;
     public readonly bool IsState;
+    public readonly string? Editor; //指定属性编辑器的名称
 
     /// <summary>
     /// 仅用于设计时创建实例时的初始化值

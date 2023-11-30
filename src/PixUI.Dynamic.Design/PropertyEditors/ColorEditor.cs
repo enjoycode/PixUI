@@ -1,10 +1,9 @@
-using System;
-
 namespace PixUI.Dynamic.Design;
 
-public sealed class ColorEditor : SingleChildWidget
+public sealed class ColorEditor : ValueEditorBase
 {
-    public ColorEditor(State<Color?> color)
+    // ReSharper disable once UnusedParameter.Local
+    public ColorEditor(State<Color?> color, DesignController controller) : base(controller)
     {
         _color = color;
 

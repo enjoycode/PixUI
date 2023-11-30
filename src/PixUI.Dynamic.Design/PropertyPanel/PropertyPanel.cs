@@ -62,7 +62,7 @@ public sealed class PropertyPanel : SingleChildWidget
             _layoutGroupVisible.Value = false;
             _propGroupVisible.Value = false;
             _eventGroupVisible.Value = false;
-            _listView.Invalidate(InvalidAction.Relayout);
+            _listView.Relayout();
             return;
         }
 
@@ -74,7 +74,7 @@ public sealed class PropertyPanel : SingleChildWidget
         BuildPropertyGroup(element, meta);
 
         _listView.Controller.ResetScroll();
-        _listView.Invalidate(InvalidAction.Relayout);
+        _listView.Relayout();
     }
 
     private void BuildWidgetGroup(DesignElement element, DynamicWidgetMeta meta)

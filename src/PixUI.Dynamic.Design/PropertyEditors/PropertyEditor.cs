@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using BindingFlags = System.Reflection.BindingFlags;
 
 namespace PixUI.Dynamic.Design;
 
@@ -92,15 +91,17 @@ public sealed class PropertyEditor : Widget
         return valueType;
     }
 
-    private static Func<State, Widget> CreateEditorMaker(Type valueType, Type editorType)
+    private static Func<State, DesignController, Widget> CreateEditorMaker(Type valueType, Type editorType)
     {
         var stateType = typeof(State<>).MakeGenericType(valueType);
-        var ctorArg = Expression.Parameter(typeof(State));
-        var ctorInfo = editorType.GetConstructor(new[] { stateType });
+        var stateArg = Expression.Parameter(typeof(State));
+        var controllerArg = Expression.Parameter(typeof(DesignController));
+
+        var ctorInfo = editorType.GetConstructor(new[] { stateType, typeof(DesignController) });
         if (ctorInfo == null)
             throw new Exception("编辑器无指定状态的构造");
-        return Expression.Lambda<Func<State, Widget>>(
-            Expression.New(ctorInfo, Expression.Convert(ctorArg, stateType)), ctorArg
+        return Expression.Lambda<Func<State, DesignController, Widget>>(
+            Expression.New(ctorInfo, Expression.Convert(stateArg, stateType), controllerArg), stateArg, controllerArg
         ).Compile();
     }
 
@@ -125,7 +126,7 @@ public sealed class PropertyEditor : Widget
 
     public static void RegisterClassValueEditor<TValue, TEditor>(bool isDefault, string? name = null)
         where TValue : class
-        where TEditor : Widget
+        where TEditor : ValueEditorBase
     {
         name ??= typeof(TEditor).Name;
         var editor = new ValueEditorInfo(
@@ -140,6 +141,9 @@ public sealed class PropertyEditor : Widget
         _valueEditors.Add(editor);
     }
 
+    private static ValueEditorInfo? TryGetValueEditorByName(string name) =>
+        _valueEditors.FirstOrDefault(e => e.Name == name);
+
     /// <summary>
     /// 根据值类型获取默认的编辑器
     /// </summary>
@@ -153,10 +157,11 @@ public sealed class PropertyEditor : Widget
     private static Widget GetPropertyValueEditor(Type valueType, DesignElement element,
         DynamicPropertyMeta propertyMeta, out State? editingValue)
     {
-        //TODO:先判断是否指定编辑器
+        //先判断是否指定编辑器
+        var isAssignedEditor = !string.IsNullOrEmpty(propertyMeta.Editor);
 
         //判断是否枚举类型
-        if (valueType.IsEnum)
+        if (valueType.IsEnum && !isAssignedEditor)
         {
             var propState = new RxProxy<string?>(
                 () =>
@@ -174,7 +179,9 @@ public sealed class PropertyEditor : Widget
         }
 
         //获取注册的编辑器信息
-        var editorInfo = TryGetValueEditorByValueType(valueType);
+        var editorInfo = isAssignedEditor
+            ? TryGetValueEditorByName(propertyMeta.Editor!)
+            : TryGetValueEditorByValueType(valueType);
         if (editorInfo == null)
         {
             //TODO:
@@ -187,7 +194,7 @@ public sealed class PropertyEditor : Widget
         }
 
         editingValue = editorInfo.PropertyStateMaker(element, propertyMeta);
-        return editorInfo.EditorMaker(editingValue);
+        return editorInfo.EditorMaker(editingValue, element.Controller);
     }
 
     /// <summary>
