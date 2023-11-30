@@ -26,7 +26,7 @@ public abstract class DataGridTextColumnBase<T> : DataGridColumn<T>
             : CellStyle ?? controller.Theme.DefaultRowCellStyle;
 
         var ph = GetCellParagraph(rowIndex, cellRect, cellValue, style);
-        PaintCellParagraph(canvas, cellRect, style, ph);
+        DataGridPainter.PaintCellParagraph(canvas, cellRect, style, ph);
     }
 
     /// <summary>
@@ -41,7 +41,7 @@ public abstract class DataGridTextColumnBase<T> : DataGridColumn<T>
 
         index = ~index;
         //没找到开始新建
-        var ph = BuildCellParagraph(cellRect, style, cellValue, 1);
+        var ph = DataGridPainter.BuildCellParagraph(cellRect, style, cellValue, 1);
         var cellCachedWidget = new CellCache<Paragraph>(rowIndex, ph);
         _cellParagraphs.Insert(index, cellCachedWidget);
         return ph;

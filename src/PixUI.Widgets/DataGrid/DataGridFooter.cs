@@ -96,27 +96,15 @@ internal sealed class DataGridFooter<T> : Widget
             canvas.DrawRect(cellRect, paint);
         }
 
-        _controller.PaintCellBorder(canvas, cellRect);
+        DataGridPainter.PaintCellBorder(canvas, cellRect, _controller.Theme.BorderColor);
 
         if (string.IsNullOrEmpty(content)) return;
 
         canvas.Save();
         canvas.ClipRect(cellRect, ClipOp.Intersect, false);
         //TODO:暂使用可见框计算位置
-        using var ph = TextPainter.BuildParagraph(content, cellRect.Width, style.FontSize, style.Color ?? Colors.Black);
-        var ox = style.HorizontalAlignment switch
-        {
-            HorizontalAlignment.Center => (cellRect.Width - ph.MaxIntrinsicWidth) / 2f,
-            HorizontalAlignment.Right => cellRect.Width - ph.MaxIntrinsicWidth - CellStyle.CellPadding,
-            _ => CellStyle.CellPadding
-        };
-        var oy = style.VerticalAlignment switch
-        {
-            VerticalAlignment.Middle => (cellRect.Height - ph.Height) / 2f,
-            VerticalAlignment.Bottom => cellRect.Height - ph.Height - CellStyle.CellPadding,
-            _ => CellStyle.CellPadding
-        };
-        canvas.DrawParagraph(ph, ox + cellRect.Left, oy);
+        using var ph = DataGridPainter.BuildCellParagraph(cellRect, style, content, 1);
+        DataGridPainter.PaintCellParagraph(canvas, cellRect, style, ph);
         canvas.Restore();
     }
 }

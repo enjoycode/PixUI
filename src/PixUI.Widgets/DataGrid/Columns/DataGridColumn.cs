@@ -97,7 +97,7 @@ public abstract class DataGridColumn<T>
     /// <summary>
     ///  画标题，允许子类特殊绘制(如CheckBoxColumn)
     /// </summary>
-    internal virtual void PaintHeader(Canvas canvas, Rect cellRect, DataGridTheme theme)
+    protected internal virtual void PaintHeader(Canvas canvas, Rect cellRect, DataGridTheme theme)
     {
         var cellStyle = HeaderCellStyle ?? theme.DefaultHeaderCellStyle;
 
@@ -109,67 +109,12 @@ public abstract class DataGridColumn<T>
         }
 
         //画文本
-        using var ph = BuildCellParagraph(cellRect, cellStyle, Label, 2);
-        PaintCellParagraph(canvas, cellRect, cellStyle, ph);
+        using var ph = DataGridPainter.BuildCellParagraph(cellRect, cellStyle, Label, 2);
+        DataGridPainter.PaintCellParagraph(canvas, cellRect, cellStyle, ph);
     }
 
     protected internal virtual void PaintCell(Canvas canvas, DataGridController<T> controller, int rowIndex,
         Rect cellRect) { }
-
-    internal static Paragraph BuildCellParagraph(Rect rect, CellStyle style, string text, int maxLines)
-    {
-        using var ts = new TextStyle
-        {
-            Color = style.Color ?? Colors.Black, FontSize = style.FontSize,
-            FontStyle = new FontStyle(style.FontWeight, FontSlant.Upright),
-            Height = 1,
-        };
-
-        var textAlign = TextAlign.Left; //default value for web
-        switch (style.HorizontalAlignment)
-        {
-            case HorizontalAlignment.Right:
-                textAlign = TextAlign.Right;
-                break;
-            case HorizontalAlignment.Center:
-                textAlign = TextAlign.Center;
-                break;
-        }
-
-        using var ps = new ParagraphStyle
-            { MaxLines = (uint)maxLines, TextStyle = ts, Height = 1, TextAlign = textAlign };
-        using var pb = new ParagraphBuilder(ps);
-
-        pb.PushStyle(ts);
-        pb.AddText(text);
-        pb.Pop();
-        var ph = pb.Build();
-        ph.Layout(rect.Width - CellStyle.CellPadding * 2);
-        return ph;
-    }
-
-    /// <summary>
-    /// 根据上下对齐方式画文本
-    /// </summary>
-    internal static void PaintCellParagraph(Canvas canvas, Rect rect, CellStyle style, Paragraph paragraph)
-    {
-        if (style.VerticalAlignment == VerticalAlignment.Middle)
-        {
-            var x = rect.Left;
-            var y = rect.Top + (rect.Height - paragraph.Height) / 2;
-            canvas.DrawParagraph(paragraph, x + CellStyle.CellPadding, y);
-        }
-        else if (style.VerticalAlignment == VerticalAlignment.Bottom)
-        {
-            var x = rect.Left;
-            var y = rect.Bottom;
-            canvas.DrawParagraph(paragraph, x + CellStyle.CellPadding, y - CellStyle.CellPadding - paragraph.Height);
-        }
-        else
-        {
-            canvas.DrawParagraph(paragraph, rect.Left + CellStyle.CellPadding, rect.Top + CellStyle.CellPadding);
-        }
-    }
 
     /// <summary>
     /// 尝试向上合并单元格

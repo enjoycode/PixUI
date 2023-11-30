@@ -575,16 +575,6 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
     #endregion
 
-    #region ====Paint Utils====
-
-    internal void PaintCellBorder(Canvas canvas, in Rect cellRect)
-    {
-        var paint = PaintUtils.Shared(Theme.BorderColor, PaintStyle.Stroke, 1);
-        canvas.DrawRect(cellRect, paint);
-    }
-
-    #endregion
-
     #region ====Add / Remove / Refresh=====
 
     public void Add(T item)

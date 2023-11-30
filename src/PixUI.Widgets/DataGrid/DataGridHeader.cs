@@ -73,7 +73,7 @@ internal sealed class DataGridHeader<T> : Widget
     {
         var cellRect = GetHeaderCellRect(column);
         column.PaintHeader(canvas, cellRect, _controller.Theme);
-        _controller.PaintCellBorder(canvas, cellRect);
+        DataGridPainter.PaintCellBorder(canvas, cellRect, _controller.Theme.BorderColor);
 
         if (column.Parent != null && !paintedGroupColumns.Contains(column.Parent))
         {

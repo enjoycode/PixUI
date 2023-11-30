@@ -216,7 +216,7 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
 
             var borderRect = new Rect(col.CachedVisibleLeft, cellRect.Top,
                 col.CachedVisibleRight, cellRect.Bottom);
-            _controller.PaintCellBorder(canvas, borderRect);
+            DataGridPainter.PaintCellBorder(canvas, borderRect, _controller.Theme.BorderColor);
 
             offsetY += rowHeight;
         }
