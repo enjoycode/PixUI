@@ -20,7 +20,7 @@ public enum ColumnWidthType
     Fixed
 }
 
-public sealed class ColumnWidth
+public sealed class ColumnWidth //TODO: maybe use struct
 {
     private ColumnWidth(ColumnWidthType type, float value, float minValue)
     {
