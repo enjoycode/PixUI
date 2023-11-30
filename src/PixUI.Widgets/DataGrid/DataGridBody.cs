@@ -49,9 +49,13 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
                     _controller.ClearCacheOnScroll(false, newVisibleRowEnd);
             }
 
-            Invalidate(InvalidAction.Repaint);
+            Repaint();
             if (offset.Dx != 0)
-                _controller.DataGrid.Header?.Invalidate(InvalidAction.Repaint);
+            {
+                //TODO: 考虑在这里重新计算布局可视列，而不是在DataGrid绘制每次计算
+                _controller.DataGrid.Header?.Repaint();
+                _controller.DataGrid.Footer?.Repaint();
+            }
         }
 
         return offset;

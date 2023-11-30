@@ -11,8 +11,10 @@ public sealed class DataGridTheme
     {
         DefaultHeaderCellStyle = headerCellStyle ?? new CellStyle
         {
-            Color = Colors.Black, BackgroundColor = new Color(0xFFF5F7FA),
-            HorizontalAlignment = HorizontalAlignment.Center, FontWeight = FontWeight.Bold,
+            Color = Colors.Black,
+            BackgroundColor = 0xFFF5F7FA,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            FontWeight = FontWeight.Bold,
         };
 
         DefaultRowCellStyle = rowCellStyle ?? new CellStyle { Color = Colors.Black };
@@ -24,13 +26,13 @@ public sealed class DataGridTheme
     public float RowHeight = 28f;
     public float CellPadding = 5.0f;
 
-    public Color BorderColor = new(0xFFEBEEF5);
+    public Color BorderColor = 0xFFEBEEF5;
 
     public bool StripeRows = true;
-    public Color StripeBgColor = new(0xFFFAFAFA);
+    public Color StripeBgColor = 0xFFFAFAFA;
 
     public bool HighlightingCurrentCell = false;
     public bool HighlightingCurrentRow = true;
 
-    public Color HighlightRowBgColor = new(0x30263238);
+    public Color HighlightRowBgColor = 0x30263238;
 }

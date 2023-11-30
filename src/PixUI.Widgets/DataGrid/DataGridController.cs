@@ -36,7 +36,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
     internal float TotalRowsHeight => DataView == null ? 0f : DataView.Count * Theme.RowHeight;
 
-    internal float TotalColumnsWidth => _cachedLeafColumns.Sum(c => c.LayoutWidth);
+    internal float TotalColumnsWidth => CachedLeafColumns.Sum(c => c.LayoutWidth);
 
     /// <summary>
     /// 是否包含冻结列
@@ -93,13 +93,18 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
     #region ----Cached Properties----
 
-    // 所有非分组的列集合
-    private readonly IList<DataGridColumn<T>> _cachedLeafColumns = new List<DataGridColumn<T>>();
+    /// <summary>
+    /// 所有非分组的列集合
+    /// </summary>
+    internal readonly IList<DataGridColumn<T>> CachedLeafColumns = new List<DataGridColumn<T>>();
 
+    /// <summary>
+    /// 所有可见列集合
+    /// </summary>
     internal readonly IList<DataGridColumn<T>> CachedVisibleColumns = new List<DataGridColumn<T>>();
 
-    // 缓存的组件尺寸
-    private Size _cachedWidgetSize = new Size(0, 0);
+    // 缓存的DataGrid组件尺寸, TODO:考虑是否可以移除
+    private Size _cachedDataGridSize = new Size(0, 0);
 
     private float _cachedScrollLeft = 0.0f;
     private float _cachedScrollRight = 0.0f;
@@ -196,7 +201,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
     private void ClearAllCache()
     {
         //TODO:暂所有列，考虑仅可见列
-        foreach (var column in _cachedLeafColumns)
+        foreach (var column in CachedLeafColumns)
         {
             column.ClearAllCache();
         }
@@ -205,7 +210,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
     internal void ClearCacheOnScroll(bool isScrollDown, int rowIndex)
     {
         //Console.WriteLine($"---------->ClearCache: down={isScrollDown} row={rowIndex}");
-        foreach (var column in _cachedLeafColumns /*TODO:暂所有列，考虑仅可见列*/)
+        foreach (var column in CachedLeafColumns /*TODO:暂所有列，考虑仅可见列*/)
         {
             column.ClearCacheOnScroll(isScrollDown, rowIndex);
         }
@@ -230,8 +235,9 @@ public sealed class DataGridController<T> /* where T : notnull*/
                 }
 
                 //重新计算所有列宽并重绘
-                CalcColumnsWidth(_cachedWidgetSize, true);
-                _owner?.Invalidate(InvalidAction.Repaint);
+                CalcColumnsWidth(_cachedDataGridSize, true);
+                //TODO:考虑在这里重新计算布局可视列，而不是每次在DataGrid重绘时计算
+                _owner?.Repaint();
             }
         }
     }
@@ -262,7 +268,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
         }
 
         // if (needScroll)
-        _owner?.Invalidate(InvalidAction.Repaint);
+        _owner?.Repaint();
     }
 
     internal bool HitTestInHeader(float x, float y)
@@ -354,7 +360,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
     {
         if (_owner is { IsMounted: true })
         {
-            CalcColumnsWidth(_cachedWidgetSize, true);
+            CalcColumnsWidth(_cachedDataGridSize, true);
             Invalidate();
         }
     }
@@ -364,26 +370,26 @@ public sealed class DataGridController<T> /* where T : notnull*/
     /// </summary>
     internal void CalcColumnsWidth(in Size widgetSize, bool force = false)
     {
-        var needCalc = _cachedWidgetSize.Width != widgetSize.Width;
-        if (ScrollController.OffsetX > 0 && widgetSize.Width > _cachedWidgetSize.Width)
+        var needCalc = _cachedDataGridSize.Width != widgetSize.Width;
+        if (ScrollController.OffsetX > 0 && widgetSize.Width > _cachedDataGridSize.Width)
         {
             //如果变宽了且有横向滚动，需要扣减
-            var deltaX = widgetSize.Width - _cachedWidgetSize.Width;
+            var deltaX = widgetSize.Width - _cachedDataGridSize.Width;
             ScrollController.OffsetX = Math.Max(ScrollController.OffsetX - deltaX, 0);
         }
 
-        _cachedWidgetSize = widgetSize;
+        _cachedDataGridSize = widgetSize;
         if (!needCalc && !force) return;
 
         //先计算固定宽度列
-        var fixedColumns = _cachedLeafColumns
+        var fixedColumns = CachedLeafColumns
             .Where(c => c.Width.Type == ColumnWidthType.Fixed).ToArray();
         var fixedWidth = fixedColumns.Sum(c => c.Width.Value);
-        var leftWidth = _cachedWidgetSize.Width - fixedWidth;
-        var leftColumns = _cachedLeafColumns.Count - fixedColumns.Length;
+        var leftWidth = _cachedDataGridSize.Width - fixedWidth;
+        var leftColumns = CachedLeafColumns.Count - fixedColumns.Length;
 
         //再计算百分比列宽度
-        var percentColumns = _cachedLeafColumns
+        var percentColumns = CachedLeafColumns
             .Where(c => c.Width.Type == ColumnWidthType.Percent).ToArray();
         var percentWidth = percentColumns.Sum(c =>
         {
@@ -394,7 +400,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
         leftColumns -= percentColumns.Length;
 
         //最后计算自动列宽
-        var autoColumns = _cachedLeafColumns
+        var autoColumns = CachedLeafColumns
             .Where(c => c.Width.Type == ColumnWidthType.Auto).ToArray();
         foreach (var col in autoColumns)
         {
@@ -410,7 +416,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
         CachedVisibleColumns.Clear();
 
         var colStartIndex = 0;
-        var colEndIndex = _cachedLeafColumns.Count - 1;
+        var colEndIndex = CachedLeafColumns.Count - 1;
         var remainWidth = size.Width;
         var offsetX = 0f;
         var needScroll = size.Width < TotalColumnsWidth;
@@ -419,9 +425,9 @@ public sealed class DataGridController<T> /* where T : notnull*/
         if (needScroll && HasFrozen)
         {
             //先计算左侧冻结列
-            for (var i = 0; i < _cachedLeafColumns.Count; i++)
+            for (var i = 0; i < CachedLeafColumns.Count; i++)
             {
-                var col = _cachedLeafColumns[i];
+                var col = CachedLeafColumns[i];
                 if (!col.Frozen)
                 {
                     colStartIndex = i;
@@ -440,9 +446,9 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
             //再计算右侧冻结列
             var rightOffsetX = 0.0f;
-            for (var i = _cachedLeafColumns.Count - 1; i >= 0; i--)
+            for (var i = CachedLeafColumns.Count - 1; i >= 0; i--)
             {
-                var col = _cachedLeafColumns[i];
+                var col = CachedLeafColumns[i];
                 if (!col.Frozen)
                 {
                     colEndIndex = i;
@@ -470,7 +476,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
             var skipWidth = 0.0f;
             for (var i = colStartIndex; i <= colEndIndex; i++)
             {
-                var col = _cachedLeafColumns[i];
+                var col = CachedLeafColumns[i];
                 skipWidth += col.LayoutWidth;
                 if (skipWidth <= ScrollController.OffsetX) continue;
 
@@ -482,7 +488,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
         for (var i = colStartIndex; i <= colEndIndex; i++)
         {
-            var col = _cachedLeafColumns[i];
+            var col = CachedLeafColumns[i];
             col.CachedLeft = offsetX;
             col.CachedVisibleLeft = Math.Max(_cachedScrollLeft, col.CachedLeft);
             col.CachedVisibleRight = Math.Min(_cachedScrollRight, col.CachedLeft + col.LayoutWidth);
@@ -523,7 +529,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
             hitColumn.CachedVisibleRight - 2, top + Theme.RowHeight - 1);
     }
 
-    internal void ClearLeafColumns() => _cachedLeafColumns.Clear();
+    internal void ClearLeafColumns() => CachedLeafColumns.Clear();
 
     internal void GetLeafColumns(DataGridColumn<T> column, bool? parentFrozen)
     {
@@ -541,7 +547,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
         }
         else
         {
-            _cachedLeafColumns.Add(column);
+            CachedLeafColumns.Add(column);
         }
     }
 
@@ -557,14 +563,14 @@ public sealed class DataGridController<T> /* where T : notnull*/
         }
         else
         {
-            _cachedLeafColumns.Remove(column);
+            CachedLeafColumns.Remove(column);
         }
     }
 
     internal void CheckHasFrozen()
     {
         //TODO:纠正一些错误的冻结列设置,如全部冻结，中间有冻结等
-        HasFrozen = _cachedLeafColumns.Any(c => c.Frozen);
+        HasFrozen = CachedLeafColumns.Any(c => c.Frozen);
     }
 
     #endregion
@@ -627,7 +633,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
         var curRowIndex = CurrentRowIndex;
         if (curRowIndex < 0) return;
 
-        foreach (var column in _cachedLeafColumns)
+        foreach (var column in CachedLeafColumns)
         {
             column.ClearCacheAt(curRowIndex);
         }

@@ -84,7 +84,7 @@ internal sealed class InvalidQueue
     /// 只允许UI thread 添加，动画控制器只向ui thread递交修改状态请求
     /// </summary>
     /// <returns>false=widget is not mounted and can't add to queue</returns>
-    internal static bool Add(Widget widget, InvalidAction action, IDirtyArea? item)
+    internal static bool Add(Widget widget, InvalidAction action, IDirtyArea? dirtyArea)
     {
         //暂在这里判断Widget是否已挂载
         if (!widget.IsMounted) return false;
@@ -118,7 +118,7 @@ internal sealed class InvalidQueue
 
             //When used for overlay, only Relayout invalid add to queue.
             if (action == InvalidAction.Relayout)
-                win.OverlayInvalidQueue.AddInternal(widget, action, item);
+                win.OverlayInvalidQueue.AddInternal(widget, action, dirtyArea);
         }
         else
         {
@@ -128,7 +128,7 @@ internal sealed class InvalidQueue
                 return false;
             }
 
-            win.WidgetsInvalidQueue.AddInternal(widget, action, item);
+            win.WidgetsInvalidQueue.AddInternal(widget, action, dirtyArea);
         }
 
         if (!win.HasPostInvalidateEvent)

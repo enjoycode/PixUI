@@ -24,7 +24,7 @@ namespace PixUI.Demo
                     City = "City" + (i / 4).ToString(),
                     Name = "Name" + i,
                     Female = i % 2 == 0,
-                    Score = random.Next(),
+                    Score = random.Next(0, 100),
                 });
             }
 

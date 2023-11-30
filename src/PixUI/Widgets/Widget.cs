@@ -528,20 +528,22 @@ public abstract class Widget : IDisposable
 
     #region ====StateChange & Invalidate====
 
-    public void Invalidate(InvalidAction action, IDirtyArea? area = null)
-    {
-        InvalidQueue.Add(this, action, area);
-    }
+    /// <summary>
+    /// 重新绘制
+    /// </summary>
+    public void Repaint(IDirtyArea? dirtyArea = null) => InvalidQueue.Add(this, InvalidAction.Repaint, dirtyArea);
 
-    protected virtual void RepaintOnStateChanged(State state)
-    {
-        InvalidQueue.Add(this, InvalidAction.Repaint, null);
-    }
+    /// <summary>
+    /// 重新布局并重绘
+    /// </summary>
+    public void Relayout() => InvalidQueue.Add(this, InvalidAction.Relayout, null);
 
-    protected virtual void RelayoutOnStateChanged(State state)
-    {
-        InvalidQueue.Add(this, InvalidAction.Relayout, null);
-    }
+    [Obsolete("Use Repaint or Relayout")]
+    public void Invalidate(InvalidAction action, IDirtyArea? area = null) => InvalidQueue.Add(this, action, area);
+
+    protected virtual void RepaintOnStateChanged(State state) => InvalidQueue.Add(this, InvalidAction.Repaint, null);
+
+    protected virtual void RelayoutOnStateChanged(State state) => InvalidQueue.Add(this, InvalidAction.Relayout, null);
 
     #endregion
 

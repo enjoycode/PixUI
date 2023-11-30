@@ -27,7 +27,7 @@ public sealed class DataGrid<T> : Widget, IMouseRegion
     private DataGridTheme _theme = DataGridTheme.Default;
 
     public bool ShowHeader { get; init; } = true;
-    public bool ShowFooter { get; init; } = false;
+    private bool ShowFooter => Footer != null;
 
     public DataGridTheme Theme
     {
@@ -40,6 +40,34 @@ public sealed class DataGrid<T> : Widget, IMouseRegion
     }
 
     public DataGridColumns<T> Columns => _controller.Columns;
+
+    public DataGridFooterCell[]? FooterCells
+    {
+        get => Footer?.Cells;
+        set
+        {
+            var hasOld = Footer != null;
+            if (hasOld)
+            {
+                Footer!.Parent = null;
+                Footer.Dispose();
+                Footer = null;
+            }
+
+            if ((value == null || value.Length == 0))
+            {
+                if (hasOld) Relayout();
+            }
+            else
+            {
+                Footer = new DataGridFooter<T>(_controller);
+                Footer.Parent = this;
+                Footer.Cells = value;
+                if (hasOld) Footer.Repaint();
+                else Relayout();
+            }
+        }
+    }
 
     public MouseRegion MouseRegion { get; }
 
@@ -76,13 +104,7 @@ public sealed class DataGrid<T> : Widget, IMouseRegion
 
         if (ShowFooter)
         {
-            if (Footer == null)
-            {
-                Footer = new DataGridFooter<T>(_controller);
-                Footer.Parent = this;
-            }
-
-            Footer.Layout(width, bodyHeight);
+            Footer!.Layout(width, bodyHeight);
             Footer.SetPosition(0, H - Footer.H);
             bodyHeight -= Footer.H;
         }

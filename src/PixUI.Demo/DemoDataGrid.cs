@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace PixUI.Demo.Mac
 {
     public sealed class DemoDataGrid : View
@@ -22,8 +24,7 @@ namespace PixUI.Demo.Mac
                         new DataGridRowNumColumn<Person>("行号") { Width = 60, Frozen = true },
                         new DataGridTextColumn<Person>("City", p => p.City)
                         {
-                            Width = 100, AutoMergeCells = true,
-                            CellStyle = new() { HorizontalAlignment = HorizontalAlignment.Center }
+                            Width = 100, AutoMergeCells = true, CellStyle = CellStyle.AlignCenter()
                         },
                         new DataGridTextColumn<Person>("Name", p => p.Name) { Width = 400 },
                         new DataGridGroupColumn<Person>("Gender")
@@ -42,6 +43,11 @@ namespace PixUI.Demo.Mac
                                 OnTap = _ => Notification.Info(person.Name)
                             },
                             80) { Frozen = true },
+                    },
+                    FooterCells = new DataGridFooterCell[]
+                    {
+                        new(1, 4) { Text = "平均:", CellStyle = CellStyle.AlignMiddleRight().WithBackgroud(0xFFF5F7FA) },
+                        new(5, () => _controller.DataView!.Average(o => o.Score).ToString()),
                     }
                 }
             };

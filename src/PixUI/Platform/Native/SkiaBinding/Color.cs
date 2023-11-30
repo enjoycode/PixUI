@@ -143,7 +143,7 @@ public readonly struct Color : IEquatable<Color>
 
     public readonly override int GetHashCode() => color.GetHashCode();
 
-    public static implicit operator Color(uint color) => new Color(color);
+    public static implicit operator Color(uint color) => new (color);
 
     public static explicit operator uint(Color color) => color.color;
 

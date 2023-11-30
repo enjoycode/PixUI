@@ -15,5 +15,5 @@ public sealed class DataGridRowNumColumn<T> : DataGridTextColumnBase<T>
 
 internal static class DefaultCellStyleForRowNum
 {
-    internal static readonly CellStyle Instance = new() { HorizontalAlignment = HorizontalAlignment.Center };
+    internal static readonly CellStyle Instance = CellStyle.AlignCenter();
 }
