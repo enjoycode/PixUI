@@ -18,9 +18,6 @@ public sealed class PropertyEditor : Widget
         RegisterStructValueEditor<Color, ColorEditor>(true);
     }
 
-    /// <summary>
-    /// 新建属性编辑器
-    /// </summary>
     public PropertyEditor(DesignElement element, DynamicPropertyMeta propertyMeta)
     {
 #if DEBUG
@@ -91,17 +88,17 @@ public sealed class PropertyEditor : Widget
         return valueType;
     }
 
-    private static Func<State, DesignController, Widget> CreateEditorMaker(Type valueType, Type editorType)
+    private static Func<State, DesignElement, Widget> CreateEditorMaker(Type valueType, Type editorType)
     {
         var stateType = typeof(State<>).MakeGenericType(valueType);
         var stateArg = Expression.Parameter(typeof(State));
-        var controllerArg = Expression.Parameter(typeof(DesignController));
+        var elementArg = Expression.Parameter(typeof(DesignElement));
 
-        var ctorInfo = editorType.GetConstructor(new[] { stateType, typeof(DesignController) });
+        var ctorInfo = editorType.GetConstructor(new[] { stateType, typeof(DesignElement) });
         if (ctorInfo == null)
             throw new Exception("编辑器无指定状态的构造");
-        return Expression.Lambda<Func<State, DesignController, Widget>>(
-            Expression.New(ctorInfo, Expression.Convert(stateArg, stateType), controllerArg), stateArg, controllerArg
+        return Expression.Lambda<Func<State, DesignElement, Widget>>(
+            Expression.New(ctorInfo, Expression.Convert(stateArg, stateType), elementArg), stateArg, elementArg
         ).Compile();
     }
 
@@ -158,7 +155,7 @@ public sealed class PropertyEditor : Widget
         DynamicPropertyMeta propertyMeta, out State? editingValue)
     {
         //先判断是否指定编辑器
-        var isAssignedEditor = !string.IsNullOrEmpty(propertyMeta.Editor);
+        var isAssignedEditor = !string.IsNullOrEmpty(propertyMeta.EditorName);
 
         //判断是否枚举类型
         if (valueType.IsEnum && !isAssignedEditor)
@@ -180,7 +177,7 @@ public sealed class PropertyEditor : Widget
 
         //获取注册的编辑器信息
         var editorInfo = isAssignedEditor
-            ? TryGetValueEditorByName(propertyMeta.Editor!)
+            ? TryGetValueEditorByName(propertyMeta.EditorName!)
             : TryGetValueEditorByValueType(valueType);
         if (editorInfo == null)
         {
@@ -194,7 +191,7 @@ public sealed class PropertyEditor : Widget
         }
 
         editingValue = editorInfo.PropertyStateMaker(element, propertyMeta);
-        return editorInfo.EditorMaker(editingValue, element.Controller);
+        return editorInfo.EditorMaker(editingValue, element);
     }
 
     /// <summary>

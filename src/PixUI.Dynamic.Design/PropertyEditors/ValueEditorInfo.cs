@@ -5,7 +5,7 @@ namespace PixUI.Dynamic.Design;
 internal sealed class ValueEditorInfo
 {
     public ValueEditorInfo(string name, bool isDefault, Type valueType,
-        Func<State, DesignController, Widget> editorMaker,
+        Func<State, DesignElement, Widget> editorMaker,
         Func<DesignElement, DynamicPropertyMeta, State> propertyStateMaker
     )
     {
@@ -20,5 +20,5 @@ internal sealed class ValueEditorInfo
     public bool IsDefault { get; internal set; }
     public readonly Type ValueType;
     public readonly Func<DesignElement, DynamicPropertyMeta, State> PropertyStateMaker;
-    public readonly Func<State, DesignController, Widget> EditorMaker;
+    public readonly Func<State, DesignElement, Widget> EditorMaker;
 }

@@ -3,7 +3,7 @@ namespace PixUI.Dynamic.Design;
 public sealed class ColorEditor : ValueEditorBase
 {
     // ReSharper disable once UnusedParameter.Local
-    public ColorEditor(State<Color?> color, DesignController controller) : base(controller)
+    public ColorEditor(State<Color?> color, DesignElement element) : base(element)
     {
         _color = color;
 

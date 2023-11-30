@@ -2,12 +2,13 @@ namespace PixUI.Dynamic.Design;
 
 public abstract class ValueEditorBase : SingleChildWidget
 {
-
-    protected ValueEditorBase(DesignController controller)
+    protected ValueEditorBase(DesignElement element)
     {
-        Controller = controller;
+        Element = element;
     }
 
-    public readonly DesignController Controller;
-
+    /// <summary>
+    /// 当前编辑的属性所属的DesignElement
+    /// </summary>
+    public readonly DesignElement Element;
 }
