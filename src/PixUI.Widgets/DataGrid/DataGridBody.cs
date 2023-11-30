@@ -169,6 +169,8 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
 
         for (var j = startRow; j < _controller.DataView!.Count; j++)
         {
+            if (offsetY - deltaY >= maxHeight) break;
+
             var cellRect = Rect.FromLTWH(col.CachedLeft, offsetY - deltaY, col.LayoutWidth, rowHeight);
 
             //尝试合并单元格
@@ -178,7 +180,6 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
                 if (j >= lastMergeBeginRow && j <= lastMergeEndRow)
                 {
                     offsetY += rowHeight;
-                    if (offsetY >= maxHeight) break;
                     continue; //继续下一个循环
                 }
 
@@ -218,7 +219,6 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
             _controller.PaintCellBorder(canvas, borderRect);
 
             offsetY += rowHeight;
-            if (offsetY >= maxHeight) break;
         }
     }
 
