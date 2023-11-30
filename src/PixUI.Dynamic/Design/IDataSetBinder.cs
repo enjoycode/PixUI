@@ -9,4 +9,9 @@ public interface IDataSetBinder
     /// DataSet属性的名称
     /// </summary>
     string DataSetPropertyName { get; }
+
+    /// <summary>
+    /// 设计时改变了绑定的数据集
+    /// </summary>
+    void OnDataSetChanged();
 }
