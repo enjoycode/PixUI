@@ -10,6 +10,7 @@ public sealed class TreeView<T> : Widget, IScrollable
         _controller = controller;
         _controller.NodeHeight = nodeHeight;
         _controller.ShowCheckbox = showCheckbox;
+        _controller.AttachTreeView(this);
     }
 
     private readonly TreeController<T> _controller;
@@ -63,8 +64,6 @@ public sealed class TreeView<T> : Widget, IScrollable
 
     public override bool IsOpaque => _color != null && _color.Value.Alpha == 0xFF;
 
-    protected override void OnMounted() => _controller.InitNodes(this);
-
     public override void VisitChildren(Func<Widget, bool> action)
     {
         foreach (var node in _controller.Nodes)
@@ -75,12 +74,13 @@ public sealed class TreeView<T> : Widget, IScrollable
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
-        SetSize(width, height);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
+        SetSize(maxSize.Width, maxSize.Height);
 
         var totalWidth = 0f;
         var totalHeight = 0f;
+        
+        _controller.TryBuildNodes();
         foreach (var node in _controller.Nodes)
         {
             node.Layout(float.PositiveInfinity, float.PositiveInfinity);

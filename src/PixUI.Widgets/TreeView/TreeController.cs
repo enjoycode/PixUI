@@ -15,10 +15,22 @@ public sealed class TreeController<T>
     internal readonly List<TreeNode<T>> Nodes = new();
     internal readonly ScrollController ScrollController = new(ScrollDirection.Both);
 
+    internal Color HoverColor = 0xFFAAAAAA; //TODO: use Theme.HoverColor
+    internal float NodeIndent = 20;
+    internal float NodeHeight;
+    internal float TotalWidth = 0;
+    internal float TotalHeight = 0;
+
     /// <summary>
     /// 获取根节点只读列表
     /// </summary>
     public TreeNode<T>[] RootNodes => Nodes.ToArray();
+
+    internal void AttachTreeView(TreeView<T> treeView)
+    {
+        if (TreeView != null) throw new Exception("Can't attach twice");
+        TreeView = treeView;
+    }
 
     #region ----Selection----
 
@@ -27,20 +39,13 @@ public sealed class TreeController<T>
     /// <summary>
     /// 第一个选中的节点
     /// </summary>
-    public TreeNode<T>? FirstSelectedNode =>
-        _selectedNodes.Count > 0 ? _selectedNodes[0] : null;
+    public TreeNode<T>? FirstSelectedNode => _selectedNodes.Count > 0 ? _selectedNodes[0] : null;
 
     public TreeNode<T>[] SelectedNodes => _selectedNodes.ToArray();
 
     public event Action? SelectionChanged;
 
     #endregion
-
-    internal Color HoverColor = new Color(0xFFAAAAAA); //TODO: use Theme.HoverColor
-    internal float NodeIndent = 20;
-    internal float NodeHeight;
-    internal float TotalWidth = 0;
-    internal float TotalHeight = 0;
 
     #region ----Checkbox----
 
@@ -84,6 +89,8 @@ public sealed class TreeController<T>
 
     #endregion
 
+    #region ----DataSource----
+
     private IList<T>? _dataSource;
 
     public IList<T>? DataSource
@@ -94,30 +101,28 @@ public sealed class TreeController<T>
             _dataSource = value;
             // if (DataSource is RxList<T> rxList)
             //     rxList.AddBinding(this, BindingOptions.None);
-            if (TreeView != null)
-            {
-                Nodes.Clear();
-                InitNodes(TreeView);
-                if (TreeView.IsMounted)
-                    TreeView.Relayout();
-            }
+
+            Nodes.Clear(); //清除旧的节点
+            TreeView?.Relayout();
         }
     }
 
-    internal void InitNodes(TreeView<T> treeView)
+    internal void TryBuildNodes()
     {
-        TreeView = treeView;
-        if (_dataSource == null) return;
+        if (_dataSource == null || _dataSource.Count == 0) return;
+        if (Nodes.Count != 0) return; //has build
 
         foreach (var item in _dataSource)
         {
             var node = new TreeNode<T>(item, this);
             NodeBuilder(node);
             node.TryBuildCheckbox();
-            node.Parent = treeView;
+            node.Parent = TreeView;
             Nodes.Add(node);
         }
     }
+
+    #endregion
 
     #region ====Operations====
 

@@ -373,8 +373,28 @@ public abstract class Widget : IDisposable
     }
 
     /// <summary>
+    /// 缓存可用大小，并根据是否指定宽度高度取指定值与可用值的小值
+    /// </summary>
+    protected Size CacheAndGetMaxSize(float availableWidth, float availableHeight)
+    {
+        CachedAvailableWidth = Math.Max(0, availableWidth);
+        CachedAvailableHeight = Math.Max(0, availableHeight);
+        
+        var maxW = Width == null
+            ? CachedAvailableWidth
+            : Math.Min(Math.Max(0, Width.Value), CachedAvailableWidth);
+        
+        var maxH = Height == null
+            ? CachedAvailableHeight
+            : Math.Min(Math.Max(0, Height.Value), CachedAvailableHeight);
+
+        return new Size(maxW, maxH);
+    }
+
+    /// <summary>
     /// 缓存可用宽度，并根据是否指定宽度取指定值与可用值的小值
     /// </summary>
+    [Obsolete("Use CacheAndGetMaxSize()")]
     protected float CacheAndCheckAssignWidth(float availableWidth)
     {
         CachedAvailableWidth = Math.Max(0, availableWidth);
@@ -386,6 +406,7 @@ public abstract class Widget : IDisposable
     /// <summary>
     /// 缓存可用高度，并根据是否指定高度取指定值与可用值的小值
     /// </summary>
+    [Obsolete("Use CacheAndGetMaxSize()")]
     protected float CacheAndCheckAssignHeight(float availableHeight)
     {
         CachedAvailableHeight = Math.Max(0, availableHeight);

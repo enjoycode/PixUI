@@ -127,4 +127,12 @@ public static class RxProxyExtensions
     public static RxProxy<T> Observe<T>(this INotifyPropertyChanged obj, string propertyName,
         Func<T> getter, Action<T>? setter = null) =>
         new(obj, propertyName, getter, setter);
+
+    public static RxProxy<T> Observe<T>(this INotifyPropertyChanged obj,
+        Expression<Func<T>> getter, Action<T>? setter = null)
+    {
+        if (getter.Body is not MemberExpression member)
+            throw new NotSupportedException();
+        return new RxProxy<T>(obj, member.Member.Name, getter.Compile(), setter);
+    }
 }
