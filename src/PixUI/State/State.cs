@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace PixUI;
 
 [TSRename("StateBase")]
-public abstract class State
+public abstract class State : IDisposable
 {
     private List<Action<State>>? _bindings;
     private static readonly EmptyState _emptyState = new EmptyState();
@@ -40,6 +40,8 @@ public abstract class State
             _bindings[i](this);
         }
     }
+
+    public virtual void Dispose() => _bindings?.Clear();
 }
 
 internal sealed class EmptyState : State

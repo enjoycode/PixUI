@@ -3,15 +3,16 @@
 	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;
   &lt;Assembly Path="/Users/rick/Desktop/Standard/DevExpress.RichEdit.v22.2.Core.dll" /&gt;
 &lt;/AssemblyExplorer&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=6f7e9495_002D8993_002D4a3f_002Dbb97_002D281505b9ee74/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="EmitTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=6f7e9495_002D8993_002D4a3f_002Dbb97_002D281505b9ee74/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="EmitTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.Dynamic.ContainerTest.AddChildTest&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.Dynamic.ContainerTest.SetChildTest&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.Dynamic.ContainerTest.AddAndRemoveChildTest&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.StateTest.MakeEmptyTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.StateTest.RxProxyForINotifyPropertyChangedTest&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a58cc5d0_002D5832_002D407a_002Db44b_002D89255f8aa24a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="FindTypefaceTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a58cc5d0_002D5832_002D407a_002Db44b_002D89255f8aa24a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="FindTypefaceTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.Tests.DynamicTest&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.Dynamic.SerializationTest.ValueSerializationTest&lt;/TestId&gt;
@@ -20,6 +21,7 @@
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.MatrixTest.Test&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.Tests.EmitTest&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.StateTest.MakeEmptyTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.StateTest.RxProxyForINotifyPropertyChangedTest&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	
