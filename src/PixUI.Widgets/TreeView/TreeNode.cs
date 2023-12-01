@@ -61,8 +61,8 @@ public sealed class TreeNode<T> : Widget
     public bool IsExpanded { get; set; }
 
 
-    private int _animationFlag = 0; //0=none,1=expand,-1=collapse
-    private double _animationValue = 0;
+    private int _animationFlag; //0=none,1=expand,-1=collapse
+    private double _animationValue;
     private bool IsExpanding => _animationFlag == 1;
     private bool IsCollapsing => _animationFlag == -1;
 
@@ -115,7 +115,7 @@ public sealed class TreeNode<T> : Widget
     private void OnAnimationValueChanged()
     {
         _animationValue = _expandController!.Value;
-        Invalidate(InvalidAction.Relayout); //自身改变高度并通知上级
+        Relayout(); //自身改变高度并通知上级
     }
 
     /// <summary>
@@ -130,7 +130,7 @@ public sealed class TreeNode<T> : Widget
         foreach (var child in childrenList)
         {
             var node = new TreeNode<T>(child, _controller);
-            _controller.NodeBuilder(child, node);
+            _controller.NodeBuilder(node);
             node.TryBuildCheckbox();
             node.Parent = this;
             _children.Add(node);
@@ -283,8 +283,7 @@ public sealed class TreeNode<T> : Widget
         }
     }
 
-    protected internal override void OnChildSizeChanged(Widget child, float dx, float dy,
-        AffectsByRelayout affects)
+    protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
     {
         var oldWidth = W;
         var oldHeight = H;
@@ -324,8 +323,7 @@ public sealed class TreeNode<T> : Widget
         if (IsExpanding || IsCollapsing) //need clip expanding area
         {
             canvas.Save();
-            canvas.ClipRect(Rect.FromLTWH(0, 0, _controller.TreeView!.W, H), ClipOp.Intersect,
-                false);
+            canvas.ClipRect(Rect.FromLTWH(0, 0, _controller.TreeView!.W, H), ClipOp.Intersect, false);
         }
 
         _row.Paint(canvas, area);
@@ -491,9 +489,9 @@ public sealed class TreeNode<T> : Widget
         TryBuildExpandIcon();
         _expandController!.Forward(1f);
         if (ReferenceEquals(Parent, _controller.TreeView))
-            _controller.TreeView!.Invalidate(InvalidAction.Relayout);
+            _controller.TreeView!.Relayout();
         else
-            Invalidate(InvalidAction.Relayout);
+            Relayout();
     }
 
     /// <summary>

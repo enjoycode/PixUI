@@ -10,12 +10,20 @@ public sealed class TreeView<T> : Widget, IScrollable
         _controller = controller;
         _controller.NodeHeight = nodeHeight;
         _controller.ShowCheckbox = showCheckbox;
-        _controller.InitNodes(this);
     }
 
     private readonly TreeController<T> _controller;
-
     private State<Color>? _color;
+
+    public required TreeNodeBuilder<T> NodeBuilder
+    {
+        init => _controller.NodeBuilder = value;
+    }
+
+    public required TreeChildrenGetter<T> ChildrenGetter
+    {
+        init => _controller.ChildrenGetter = value;
+    }
 
     /// <summary>
     /// 背景色
@@ -44,9 +52,7 @@ public sealed class TreeView<T> : Widget, IScrollable
         var maxOffsetY = Math.Max(0, _controller.TotalHeight - H);
         var offset = _controller.ScrollController.OnScroll(dx, dy, maxOffsetX, maxOffsetY);
         if (!offset.IsEmpty)
-        {
-            Invalidate(InvalidAction.Repaint);
-        }
+            Repaint();
 
         return offset;
     }
@@ -56,6 +62,8 @@ public sealed class TreeView<T> : Widget, IScrollable
     #region ====Overrides====
 
     public override bool IsOpaque => _color != null && _color.Value.Alpha == 0xFF;
+
+    protected override void OnMounted() => _controller.InitNodes(this);
 
     public override void VisitChildren(Func<Widget, bool> action)
     {

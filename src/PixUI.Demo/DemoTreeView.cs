@@ -10,8 +10,8 @@ namespace PixUI.Demo.Mac
             {
                 Icon = MaterialIcons.Cloud, Text = "Cloud", Children = new List<TreeData>
                 {
-                    new TreeData { Icon = MaterialIcons.Train, Text = "Train" },
-                    new TreeData { Icon = MaterialIcons.AirplanemodeOn, Text = "AirPlane" },
+                    new() { Icon = MaterialIcons.Train, Text = "Train" },
+                    new() { Icon = MaterialIcons.AirplanemodeOn, Text = "AirPlane" },
                 }
             },
             new TreeData
@@ -19,30 +19,28 @@ namespace PixUI.Demo.Mac
                 Icon = MaterialIcons.BeachAccess, Text = "Beach",
                 Children = new List<TreeData>
                 {
-                    new TreeData
+                    new()
                     {
                         Icon = MaterialIcons.Cake, Text = "Cake", Children = new List<TreeData>
                         {
-                            new TreeData { Icon = MaterialIcons.Apple, Text = "Apple" },
-                            new TreeData { Icon = MaterialIcons.Adobe, Text = "Adobe" },
+                            new() { Icon = MaterialIcons.Apple, Text = "Apple" },
+                            new() { Icon = MaterialIcons.Adobe, Text = "Adobe" },
                         }
                     },
-                    new TreeData { Icon = MaterialIcons.Camera, Text = "Camera" },
+                    new() { Icon = MaterialIcons.Camera, Text = "Camera" },
                 }
             },
             new TreeData { Icon = MaterialIcons.Sunny, Text = "Sunny" }
         };
 
         private readonly TreeController<TreeData> _treeController1;
-        private bool _loading = false;
+        private bool _loading;
         private readonly TreeController<TreeData> _treeController2;
 
         public DemoTreeView()
         {
-            _treeController1 = new TreeController<TreeData>(BuildTreeNode, d => d.Children!);
-            _treeController1.DataSource = _treeDataSource;
-            _treeController2 = new TreeController<TreeData>(BuildTreeNode, d => d.Children!);
-            _treeController2.DataSource = _treeDataSource;
+            _treeController1 = new TreeController<TreeData> { DataSource = _treeDataSource };
+            _treeController2 = new TreeController<TreeData> { DataSource = _treeDataSource };
 
             Child = new Container()
             {
@@ -70,12 +68,20 @@ namespace PixUI.Demo.Mac
                                     new Expanded()
                                     {
                                         Child = new TreeView<TreeData>(_treeController1)
-                                        { Color = new Color(0xFFDCDCDC) }
+                                        {
+                                            Color = new Color(0xFFDCDCDC),
+                                            NodeBuilder = BuildTreeNode,
+                                            ChildrenGetter = d => d.Children!
+                                        }
                                     },
                                     new Expanded()
                                     {
                                         Child = new TreeView<TreeData>(_treeController2, true)
-                                        { Color = new Color(0xFFDCDCDC) }
+                                        {
+                                            Color = new Color(0xFFDCDCDC),
+                                            NodeBuilder = BuildTreeNode,
+                                            ChildrenGetter = d => d.Children!
+                                        }
                                     }
                                 }
                             }
@@ -85,8 +91,9 @@ namespace PixUI.Demo.Mac
             };
         }
 
-        private void BuildTreeNode(TreeData data, TreeNode<TreeData> node)
+        private void BuildTreeNode(TreeNode<TreeData> node)
         {
+            var data = node.Data;
             node.Icon = new Icon(data.Icon);
             node.Label = new Text(data.Text);
             node.IsLeaf = data.Children == null;

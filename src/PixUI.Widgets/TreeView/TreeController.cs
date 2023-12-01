@@ -3,19 +3,16 @@ using System.Collections.Generic;
 
 namespace PixUI;
 
-public sealed class TreeController<T> //: IStateBindable
-{
-    public TreeController(Action<T, TreeNode<T>> nodeBuilder,
-        Func<T, IList<T>> childrenGetter)
-    {
-        NodeBuilder = nodeBuilder;
-        ChildrenGetter = childrenGetter;
-    }
+public delegate void TreeNodeBuilder<T>(TreeNode<T> node);
 
+public delegate IList<T> TreeChildrenGetter<T>(T data);
+
+public sealed class TreeController<T>
+{
     internal TreeView<T>? TreeView { get; private set; }
-    internal readonly Action<T, TreeNode<T>> NodeBuilder;
-    internal readonly Func<T, IList<T>> ChildrenGetter;
-    internal readonly List<TreeNode<T>> Nodes = new List<TreeNode<T>>();
+    internal TreeNodeBuilder<T> NodeBuilder { get; set; } = null!;
+    internal TreeChildrenGetter<T> ChildrenGetter { get; set; } = null!;
+    internal readonly List<TreeNode<T>> Nodes = new();
     internal readonly ScrollController ScrollController = new(ScrollDirection.Both);
 
     /// <summary>
@@ -59,7 +56,7 @@ public sealed class TreeController<T> //: IStateBindable
 
     #region ----Loading----
 
-    private bool _isLoading = false;
+    private bool _isLoading;
     internal CircularProgressPainter? LoadingPainter { get; private set; }
 
     public bool IsLoading
@@ -72,7 +69,7 @@ public sealed class TreeController<T> //: IStateBindable
             if (_isLoading)
             {
                 LoadingPainter = new CircularProgressPainter();
-                LoadingPainter.Start(() => TreeView?.Invalidate(InvalidAction.Repaint));
+                LoadingPainter.Start(() => TreeView?.Repaint());
             }
             else
             {
@@ -81,7 +78,7 @@ public sealed class TreeController<T> //: IStateBindable
                 LoadingPainter = null;
             }
 
-            TreeView?.Invalidate(InvalidAction.Repaint);
+            TreeView?.Repaint();
         }
     }
 
@@ -102,7 +99,7 @@ public sealed class TreeController<T> //: IStateBindable
                 Nodes.Clear();
                 InitNodes(TreeView);
                 if (TreeView.IsMounted)
-                    TreeView.Invalidate(InvalidAction.Relayout);
+                    TreeView.Relayout();
             }
         }
     }
@@ -115,17 +112,12 @@ public sealed class TreeController<T> //: IStateBindable
         foreach (var item in _dataSource)
         {
             var node = new TreeNode<T>(item, this);
-            NodeBuilder(item, node);
+            NodeBuilder(node);
             node.TryBuildCheckbox();
             node.Parent = treeView;
             Nodes.Add(node);
         }
     }
-
-    //public void OnStateChanged(StateBase state, BindingOptions options)
-    //{
-    //    throw new NotImplementedException();
-    //}
 
     #region ====Operations====
 
@@ -179,7 +171,7 @@ public sealed class TreeController<T> //: IStateBindable
     public TreeNode<T> InsertNode(T child, TreeNode<T>? parentNode = null, int insertIndex = -1)
     {
         var node = new TreeNode<T>(child, this);
-        NodeBuilder(child, node);
+        NodeBuilder(node);
         if (parentNode == null)
         {
             node.Parent = TreeView;
@@ -187,7 +179,7 @@ public sealed class TreeController<T> //: IStateBindable
             Nodes.Insert(index, node);
             DataSource!.Insert(index, child);
             //强制重新布局
-            TreeView!.Invalidate(InvalidAction.Relayout);
+            TreeView!.Relayout();
         }
         else
         {
@@ -195,7 +187,7 @@ public sealed class TreeController<T> //: IStateBindable
             parentNode.InsertChild(insertIndex, node);
             //强制重新布局
             if (parentNode.IsExpanded)
-                parentNode.Invalidate(InvalidAction.Relayout);
+                parentNode.Relayout();
         }
 
         return node;
@@ -209,7 +201,7 @@ public sealed class TreeController<T> //: IStateBindable
             DataSource!.Remove(node.Data);
             node.Parent = null;
             //强制重新布局
-            TreeView!.Invalidate(InvalidAction.Relayout);
+            TreeView!.Relayout();
         }
         else
         {
@@ -218,7 +210,7 @@ public sealed class TreeController<T> //: IStateBindable
             node.Parent = null;
             //强制重新布局
             if (parentNode.IsExpanded)
-                parentNode.Invalidate(InvalidAction.Relayout);
+                parentNode.Relayout();
         }
 
         //如果是选择的，则清除
