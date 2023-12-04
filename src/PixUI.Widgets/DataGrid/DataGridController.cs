@@ -19,7 +19,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
     public DataGridTheme Theme => _owner!.Theme;
 
-    internal DataGrid<T> DataGrid => _owner!;
+    public DataGrid<T> DataGrid => _owner!;
 
     public DataGridColumns<T> Columns { get; }
 
