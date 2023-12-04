@@ -528,7 +528,11 @@ public sealed class DataGridController<T> /* where T : notnull*/
             hitColumn.CachedVisibleRight - 2, top + Theme.RowHeight - 1);
     }
 
-    internal void ClearLeafColumns() => CachedLeafColumns.Clear();
+    internal void ClearLeafColumns()
+    {
+        CachedLeafColumns.Clear();
+        HeaderRows = 1;
+    }
 
     internal void GetLeafColumns(DataGridColumn<T> column, bool? parentFrozen)
     {

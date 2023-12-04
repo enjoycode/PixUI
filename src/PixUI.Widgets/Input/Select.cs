@@ -7,9 +7,9 @@ namespace PixUI;
 /// <summary>
 /// 弹出选择列表，仅支持单选
 /// </summary>
-public sealed class Select<T> : InputBase<Widget>
+public abstract class SelectBase<T> : InputBase<Widget>
 {
-    public Select(State<T?> value, bool filterable = false)
+    protected SelectBase(State<T?> value, bool filterable = false)
         : base(filterable
             ? new EditableText(value.ToStateOfString())
             : new SelectText(value.ToStateOfString()))
@@ -111,6 +111,20 @@ public sealed class Select<T> : InputBase<Widget>
         _showing = false;
         _listPopup = null;
         _selectedValue.Value = data;
+    }
+}
+
+public sealed class Select<T> : SelectBase<T>
+{
+    public Select(State<T?> value, bool filterable = false) : base(value, filterable) { }
+}
+
+public sealed class EnumSelect<T> : SelectBase<T> where T : struct, Enum
+{
+    public EnumSelect(State<T> value) : base(value)
+    {
+        //TODO:use DisplayNameAttribute to build DisplayText
+        Options = Enum.GetValues<T>();
     }
 }
 
