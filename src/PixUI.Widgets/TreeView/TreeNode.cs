@@ -84,15 +84,7 @@ public sealed class TreeNode<T> : Widget
         }
     }
 
-    internal TreeNode<T>? ParentNode
-    {
-        get
-        {
-            if (Parent == null) return null;
-            if (Parent is TreeView<T>) return null;
-            return (TreeNode<T>)Parent;
-        }
-    }
+    public TreeNode<T>? ParentNode => Parent as TreeNode<T>;
 
     #endregion
 
@@ -462,6 +454,13 @@ public sealed class TreeNode<T> : Widget
 
     #region ====Operations====
 
+    public int IndexOf(TreeNode<T> child)
+    {
+        if (_children != null)
+            return _children.IndexOf(child);
+        return -1;
+    }
+    
     internal TreeNode<T>? FindNode(Predicate<T> predicate)
     {
         if (predicate(Data)) return this;
@@ -506,7 +505,7 @@ public sealed class TreeNode<T> : Widget
         var insertIndex = index < 0 ? _children!.Count : index;
         _children!.Insert(insertIndex, child);
         //同步数据
-        var dataChildren = _controller.ChildrenGetter(Data);
+        var dataChildren = _controller.ChildrenGetter(Data); //TODO: maybe null
         dataChildren.Insert(insertIndex, child.Data);
         //Reset HasLayout
         HasLayout = false;

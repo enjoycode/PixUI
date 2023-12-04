@@ -76,7 +76,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
             ClearAllCache();
 
             if (oldEmpty && newEmpty) return;
-            _owner?.Invalidate(InvalidAction.Repaint);
+            _owner?.Repaint();
         }
     }
 
@@ -104,10 +104,10 @@ public sealed class DataGridController<T> /* where T : notnull*/
     internal readonly IList<DataGridColumn<T>> CachedVisibleColumns = new List<DataGridColumn<T>>();
 
     // 缓存的DataGrid组件尺寸, TODO:考虑是否可以移除
-    private Size _cachedDataGridSize = new Size(0, 0);
+    private Size _cachedDataGridSize = new(0, 0);
 
-    private float _cachedScrollLeft = 0.0f;
-    private float _cachedScrollRight = 0.0f;
+    private float _cachedScrollLeft;
+    private float _cachedScrollRight;
 
     private DataGridHitTestResult<T>? _cachedHitInHeader;
     private DataGridHitTestResult<T>? _cachedHitInRows;
@@ -195,8 +195,6 @@ public sealed class DataGridController<T> /* where T : notnull*/
     #endregion
 
     #region ====Event Handles====
-
-    public void Invalidate() => _owner?.Invalidate(InvalidAction.Repaint);
 
     private void ClearAllCache()
     {
@@ -361,7 +359,8 @@ public sealed class DataGridController<T> /* where T : notnull*/
         if (_owner is { IsMounted: true })
         {
             CalcColumnsWidth(_cachedDataGridSize, true);
-            Invalidate();
+            ClearAllCache();
+            _owner?.Relayout(); //maybe changes header height
         }
     }
 
@@ -581,7 +580,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
     {
         _dataSource!.Add(item);
         //TODO: refresh DataView
-        _owner?.Invalidate(InvalidAction.Repaint);
+        _owner?.Body.Repaint();
     }
 
     public void Remove(T item)
@@ -603,7 +602,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
         _dataSource!.RemoveAt(rowIndex);
         ClearSelection(); //TODO: rowIndex when in selection
         ClearAllCache(); //TODO:仅移除并重设缓存
-        _owner?.Invalidate(InvalidAction.Repaint);
+        _owner?.Body.Repaint();
     }
 
     /// <summary>
@@ -612,7 +611,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
     public void Refresh()
     {
         ClearAllCache();
-        _owner?.Invalidate(InvalidAction.Repaint);
+        _owner?.Body.Repaint();
     }
 
     /// <summary>
@@ -628,7 +627,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
             column.ClearCacheAt(curRowIndex);
         }
 
-        _owner?.Invalidate(InvalidAction.Repaint); //TODO:暂简单全部重绘
+        _owner?.Body.Repaint(); //TODO:暂简单全部重绘
     }
 
     #endregion

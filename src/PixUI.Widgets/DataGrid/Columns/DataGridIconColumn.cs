@@ -25,7 +25,7 @@ public sealed class DataGridIconColumn<T> : DataGridColumn<T>
             : CellStyle ?? controller.Theme.DefaultRowCellStyle;
 
         //TODO: cache icon painter
-        using var iconPainter = new IconPainter(controller.Invalidate);
+        using var iconPainter = new IconPainter(() => controller.DataGrid.Body.Repaint() /*TODO: repaint column only*/);
         var offsetX = cellRect.Left + CellStyle.CellPadding;
         var offsetY = cellRect.Top;
         if (style.VerticalAlignment == VerticalAlignment.Middle)
