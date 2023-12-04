@@ -34,7 +34,7 @@ public sealed class TreeController<T>
 
     #region ----Selection----
 
-    private readonly List<TreeNode<T>> _selectedNodes = new List<TreeNode<T>>();
+    private readonly List<TreeNode<T>> _selectedNodes = new();
 
     /// <summary>
     /// 第一个选中的节点
@@ -102,6 +102,7 @@ public sealed class TreeController<T>
             // if (DataSource is RxList<T> rxList)
             //     rxList.AddBinding(this, BindingOptions.None);
 
+            _selectedNodes.Clear();
             Nodes.Clear(); //清除旧的节点
             TreeView?.Relayout();
         }
@@ -111,7 +112,7 @@ public sealed class TreeController<T>
     {
         if (_dataSource == null || _dataSource.Count == 0) return;
         if (Nodes.Count != 0) return; //has build
-
+        
         foreach (var item in _dataSource)
         {
             var node = new TreeNode<T>(item, this);
@@ -119,6 +120,9 @@ public sealed class TreeController<T>
             node.TryBuildCheckbox();
             node.Parent = TreeView;
             Nodes.Add(node);
+
+            if (node.IsSelected.Value)
+                SelectNode(node); //TODO:临时方案用于默认选中(第一个)节点
         }
     }
 
