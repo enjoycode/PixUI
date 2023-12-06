@@ -82,6 +82,8 @@ public struct DynamicValue
     public static implicit operator DynamicValue(Guid value) => new() { From = ValueSource.Const, Value = value };
     public static implicit operator DynamicValue(DateTime value) => new() { From = ValueSource.Const, Value = value };
 
+    public string StateName => From == ValueSource.State ? (Value as string ?? string.Empty) : string.Empty;
+
     public void Write(Utf8JsonWriter writer, DynamicPropertyMeta valueMeta)
     {
         if (!valueMeta.IsState)

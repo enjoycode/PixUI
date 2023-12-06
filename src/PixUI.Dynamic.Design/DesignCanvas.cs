@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace PixUI.Dynamic.Design;
@@ -7,6 +8,7 @@ public sealed class DesignCanvas : View, IDynamicView
     public DesignCanvas(DesignController controller)
     {
         _designController = controller;
+        _designController.DesignCanvas = this;
 
         Child = new Container
         {
@@ -32,6 +34,16 @@ public sealed class DesignCanvas : View, IDynamicView
             return new ValueTask<object?>();
 
         return ((IDynamicDataSetState)state.Value).GetRuntimeDataSet();
+    }
+
+    public State GetState(string name)
+    {
+        var state = _designController.FindState(name);
+        if (state == null)
+            throw new Exception($"Can't find state: {name}");
+        if (state.Type == DynamicStateType.DataSet)
+            throw new Exception($"State is DataSet: {name}");
+        return ((IDynamicValueState)state.Value!).GetRuntimeValue(state);
     }
 
     protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)

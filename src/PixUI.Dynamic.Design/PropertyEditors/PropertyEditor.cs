@@ -82,8 +82,6 @@ public sealed class PropertyEditor : Widget
         return button;
     }
 
-    public DesignController DesignController => _element.Controller;
-
     #region ====ValueEditors====
 
     private static readonly List<ValueEditorInfo> _valueEditors = new();
@@ -195,15 +193,24 @@ public sealed class PropertyEditor : Widget
     }
 
     /// <summary>
-    /// 获取设计器对应的属性值
+    /// 获取设计器对应的属性设计值
     /// </summary>
     private static object? GetPropertyValue(DesignElement element, DynamicPropertyMeta propertyMeta)
     {
         var exists = element.Data.TryGetPropertyValue(propertyMeta.Name, out var currentValue);
         if (exists)
         {
-            if (currentValue!.Value.From != ValueSource.Const) throw new NotImplementedException();
-            return currentValue.Value.Value;
+            var valueSource = currentValue!.Value.From;
+            if (valueSource == ValueSource.Const)
+                return currentValue.Value.Value;
+            if (valueSource == ValueSource.State)
+            {
+                var state = element.Controller.FindState(currentValue.Value.StateName);
+                var stateValue = state?.Value as IDynamicValueState;
+                return stateValue?.GetRuntimeValue(state!);
+            }
+
+            throw new NotSupportedException("Unknown property value source");
         }
 
         //TODO: none nullable get default value
@@ -212,7 +219,7 @@ public sealed class PropertyEditor : Widget
     }
 
     /// <summary>
-    /// 设置设计器对应的属性值
+    /// 设置设计器对应的属性设计值
     /// </summary>
     private static void SetPropertyValue(DesignElement element, DynamicPropertyMeta propertyMeta, object? newValue)
     {
@@ -241,10 +248,21 @@ public sealed class PropertyEditor : Widget
     /// <summary>
     /// 绑定状态属性至状态
     /// </summary>
-    private void BindPropertyToState(DesignElement element, DynamicPropertyMeta propertyMeta)
+    private async void BindPropertyToState(DesignElement element, DynamicPropertyMeta propertyMeta)
     {
-        var dlg = new BindPropertyStateDialog(element, propertyMeta, _bindButtonColor!);
-        dlg.Show();
+        var dlg = new BindPropertyStateDialog(element, propertyMeta);
+        var res = await dlg.ShowAsync();
+        if (res != DialogResult.OK) return;
+
+        var dynamicValue = dlg.BindingValue;
+        var propertyValue = element.Data.SetPropertyValue(propertyMeta.Name, dynamicValue);
+        if (propertyMeta.IsInitSetter)
+            element.OnInitPropertyValueChanged();
+        else
+            element.SetPropertyValue(propertyValue);
+        
+        _bindButtonColor?.NotifyValueChanged();
+        EditingValue?.NotifyValueChanged();
     }
 
     #endregion

@@ -83,7 +83,7 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
 #endif
             }
 
-            if (IsMounted) Invalidate(InvalidAction.Relayout);
+            Relayout();
         }
     }
 
@@ -163,27 +163,29 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         if (Meta == null) throw new Exception();
 
         var newTarget = Meta.CreateInstance();
-        Child = newTarget; //set Child before reset properties
-
         //重设属性值
         if (Data.Properties != null)
         {
             foreach (var propertyValue in Data.Properties)
             {
-                SetPropertyValue(propertyValue);
+                SetPropertyValue(propertyValue, newTarget);
             }
         }
+
+        //必须在设置属性值后设置Child, 否则某些组件的required属性尚未初始化
+        Child = newTarget;
     }
 
     /// <summary>
     /// 设置目标组件的运行时属性值
     /// </summary>
-    public void SetPropertyValue(PropertyValue propertyValue)
+    public void SetPropertyValue(PropertyValue propertyValue, Widget? target = null)
     {
-        if (Meta == null || Target == null) throw new Exception();
+        target ??= Target;
+        if (Meta == null || target == null) throw new Exception();
 
         var propMeta = Meta.GetPropertyMeta(propertyValue.Name);
-        propMeta.SetRuntimeValue(Meta, Target, propertyValue.Value);
+        propMeta.SetRuntimeValue(Meta, target, propertyValue.Value, Controller.DesignCanvas);
     }
 
     /// <summary>

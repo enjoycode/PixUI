@@ -4,7 +4,7 @@ namespace PixUI.Dynamic.Design;
 
 internal sealed class BindPropertyStateDialog : Dialog
 {
-    public BindPropertyStateDialog(DesignElement element, DynamicPropertyMeta propertyMeta, State<Color> bindColor)
+    public BindPropertyStateDialog(DesignElement element, DynamicPropertyMeta propertyMeta)
     {
         Title.Value = "Bind Property To State";
         Width = 250;
@@ -18,29 +18,15 @@ internal sealed class BindPropertyStateDialog : Dialog
     private readonly DynamicPropertyMeta _propertyMeta;
     private readonly DataGridController<DynamicState> _dgController = new();
 
+    internal DynamicValue BindingValue { get; private set; }
+
     protected override Widget BuildBody()
     {
         //查询相同类型的状态列表
-        var valueType = _propertyMeta.ValueType;
-        var allowNull = false;
-        if (_propertyMeta.IsNullableValueType)
-        {
-            valueType = valueType.GenericTypeArguments[0];
-            allowNull = true;
-        }
-
-        DynamicStateType stateType;
-        if (valueType == typeof(string))
-            stateType = DynamicStateType.String;
-        else if (valueType == typeof(int))
-            stateType = DynamicStateType.Int;
-        else if (valueType == typeof(DateTime))
-            stateType = DynamicStateType.DateTime;
-        else
-            throw new NotImplementedException();
-
+        var stateType = DynamicState.GetStateTypeByValueType(_propertyMeta, out var allowNull);
         var list = _element.Controller.FindStatesByValueType(stateType, allowNull);
         _dgController.DataSource = list;
+        _dgController.TrySelectFirstRow();
 
         return new Container
         {
@@ -54,5 +40,22 @@ internal sealed class BindPropertyStateDialog : Dialog
                 }
             }
         };
+    }
+
+    protected override bool OnClosing(string result)
+    {
+        if (result == DialogResult.OK)
+        {
+            var selected = _dgController.CurrentRow;
+            if (selected == null)
+            {
+                Notification.Error("请先选择状态进行绑定");
+                return true;
+            }
+
+            BindingValue = new DynamicValue() { From = ValueSource.State, Value = selected.Name };
+        }
+
+        return false;
     }
 }
