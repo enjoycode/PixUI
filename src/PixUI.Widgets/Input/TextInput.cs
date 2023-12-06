@@ -1,16 +1,30 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace PixUI;
 
 public sealed class TextInput : InputBase<EditableText>
 {
-    public TextInput(State<string> text) : base(new EditableText(text))
+    public TextInput() { }
+
+    [SetsRequiredMembers]
+    public TextInput(State<string> text)
     {
-        Readonly = text.Readonly;
+        Text = text;
+    }
+
+    public required State<string> Text
+    {
+        init
+        {
+            Editor = new EditableText(value);
+            Readonly = value.Readonly;
+        }
     }
 
     public State<float>? FontSize
     {
-        get => _editor.FontSize;
-        set => _editor.FontSize = value;
+        get => Editor.FontSize;
+        set => Editor.FontSize = value;
     }
 
     public Widget? Prefix
@@ -25,17 +39,17 @@ public sealed class TextInput : InputBase<EditableText>
 
     public override State<bool>? Readonly
     {
-        get => _editor.Readonly;
-        set => _editor.Readonly = value;
+        get => Editor.Readonly;
+        set => Editor.Readonly = value;
     }
 
     public bool IsObscure
     {
-        set => _editor.IsObscure = value;
+        set => Editor.IsObscure = value;
     }
 
     public string HintText
     {
-        set => _editor.HintText = value;
+        set => Editor.HintText = value;
     }
 }

@@ -76,7 +76,12 @@ internal sealed class StateGroup : View
     {
         if (state.Type == DynamicStateType.DataSet)
         {
-            var dlg = DesignSettings.GetDataSetEditor?.Invoke(state);
+            var dlg = DesignSettings.GetDataSetStateEditor?.Invoke(state);
+            dlg?.Show();
+        }
+        else
+        {
+            var dlg = DesignSettings.GetValueStateEditor?.Invoke(state);
             dlg?.Show();
         }
     }

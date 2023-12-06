@@ -4,6 +4,9 @@ namespace PixUI;
 
 public abstract class InputBorder : ShapeBorder
 {
+    public static readonly InputBorder DefaultBorder =
+        new OutlineInputBorder(null, BorderRadius.All(Radius.Circular(4)));
+    
     public BorderSide BorderSide { get; protected set; }
 
     public override EdgeInsets Dimensions => EdgeInsets.All(BorderSide.Width);

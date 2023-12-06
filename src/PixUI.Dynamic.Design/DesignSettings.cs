@@ -4,7 +4,11 @@ namespace PixUI.Dynamic.Design;
 
 public static class DesignSettings
 {
-    public static Func<DynamicState, Dialog>? GetDataSetEditor;
+    public static Func<DynamicState, Dialog>? GetDataSetStateEditor;
 
-    public static Func<IDynamicStateValue>? MakeDataSetSettings;
+    public static Func<IDynamicDataSetState>? MakeDataSetState;
+
+    public static Func<DynamicState, Dialog>? GetValueStateEditor;
+
+    public static Func<IDynamicValueState>? MakeValueState;
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace PixUI;
@@ -9,27 +10,40 @@ namespace PixUI;
 /// </summary>
 public abstract class SelectBase<T> : InputBase<Widget>
 {
-    protected SelectBase(State<T?> value, bool filterable = false)
-        : base(filterable
-            ? new EditableText(value.ToStateOfString())
-            : new SelectText(value.ToStateOfString()))
+    protected SelectBase()
     {
-        _selectedValue = value;
-
         SuffixWidget = new ExpandIcon(new FloatTween(0, 0.5f).Animate(_expandAnimation));
-
-        if (_editor is IMouseRegion mouseRegion)
-            mouseRegion.MouseRegion.PointerTap += OnEditorTap;
-        if (_editor is IFocusable focusable)
-            focusable.FocusNode.FocusChanged += OnFocusChanged;
     }
 
-    private readonly State<T?> _selectedValue;
+    [SetsRequiredMembers]
+    protected SelectBase(State<T?> value) : this()
+    {
+        Value = value;
+    }
+
+    private readonly State<T?> _selectedValue = null!;
     private readonly ListPopupItemBuilder<T>? _optionBuilder;
     private readonly OptionalAnimationController _expandAnimation = new();
     private ListPopup<T>? _listPopup;
     private bool _showing;
     private Func<T, string>? _labelGetter;
+
+    public bool Filterable { get; init; }
+
+    public required State<T?> Value
+    {
+        init
+        {
+            _selectedValue = value;
+            Editor = Filterable
+                ? new EditableText(value.ToStateOfString())
+                : new SelectText(value.ToStateOfString());
+            if (Editor is IMouseRegion mouseRegion)
+                mouseRegion.MouseRegion.PointerTap += OnEditorTap;
+            if (Editor is IFocusable focusable)
+                focusable.FocusNode.FocusChanged += OnFocusChanged;
+        }
+    }
 
     public T[] Options { get; set; } = Array.Empty<T>();
 
@@ -47,13 +61,13 @@ public abstract class SelectBase<T> : InputBase<Widget>
     {
         get
         {
-            if (_editor is EditableText editableText) return editableText.Readonly;
-            return ((SelectText)_editor).Readonly;
+            if (Editor is EditableText editableText) return editableText.Readonly;
+            return ((SelectText)Editor).Readonly;
         }
         set
         {
-            if (_editor is EditableText editableText) editableText.Readonly = value;
-            else ((SelectText)_editor).Readonly = value;
+            if (Editor is EditableText editableText) editableText.Readonly = value;
+            else ((SelectText)Editor).Readonly = value;
         }
     }
 
@@ -116,11 +130,17 @@ public abstract class SelectBase<T> : InputBase<Widget>
 
 public sealed class Select<T> : SelectBase<T>
 {
-    public Select(State<T?> value, bool filterable = false) : base(value, filterable) { }
+    public Select() { }
+
+    [SetsRequiredMembers]
+    public Select(State<T?> value) : base(value) { }
 }
 
 public sealed class EnumSelect<T> : SelectBase<T> where T : struct, Enum
 {
+    public EnumSelect() { }
+
+    [SetsRequiredMembers]
     public EnumSelect(State<T> value) : base(value)
     {
         //TODO:use DisplayNameAttribute to build DisplayText
@@ -151,13 +171,12 @@ internal sealed class SelectText : TextBase, IMouseRegion, IFocusable
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
-        BuildParagraph(Text.Value, width);
+        BuildParagraph(Text.Value, maxSize.Width);
 
         var fontHeight = (FontSize?.Value ?? Theme.DefaultFontSize) + 4;
-        SetSize(width, Math.Min(height, fontHeight));
+        SetSize(maxSize.Width, Math.Min(maxSize.Height, fontHeight));
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)

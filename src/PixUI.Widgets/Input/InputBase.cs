@@ -4,26 +4,30 @@ namespace PixUI;
 
 public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
 {
-    protected InputBase(T editor)
+    protected InputBase()
     {
-        _editor = editor;
-        _editor.Parent = this;
-
         _focusedDecoration = new FocusedDecoration(this, GetFocusedBorder, GetUnFocusedBorder);
-        _focusedDecoration.AttachFocusChangedEvent(_editor);
     }
-
-    private static readonly InputBorder DefaultBorder =
-        new OutlineInputBorder(null, BorderRadius.All(Radius.Circular(4)));
 
     private Widget? _prefix;
     private Widget? _suffix;
-    protected readonly T _editor;
+    private readonly T _editor = null!;
 
     private InputBorder? _border;
     private State<EdgeInsets>? _padding;
-
     private readonly FocusedDecoration _focusedDecoration;
+
+    public required T Editor
+    {
+        protected get => _editor;
+        init
+        {
+            _editor = value;
+            _editor.Parent = this;
+
+            _focusedDecoration.AttachFocusChangedEvent(_editor);
+        }
+    }
 
     public State<EdgeInsets>? Padding
     {
@@ -33,7 +37,17 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
 
     public abstract State<bool>? Readonly { get; set; }
 
-    public bool IsReadonly => Readonly != null && Readonly.Value;
+    public bool IsReadonly => Readonly is { Value: true };
+
+    protected InputBorder? Border
+    {
+        get => _border;
+        set
+        {
+            _border = value;
+            Relayout();
+        }
+    }
 
     protected Widget? PrefixWidget
     {
@@ -47,8 +61,7 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
             if (_prefix == null) return;
 
             _prefix.Parent = this;
-            if (!IsMounted) return;
-            Invalidate(InvalidAction.Relayout);
+            Relayout();
         }
     }
 
@@ -64,19 +77,18 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
             if (_suffix == null) return;
 
             _suffix.Parent = this;
-            if (!IsMounted) return;
-            Invalidate(InvalidAction.Relayout);
+            Relayout();
         }
     }
 
     #region ====FocusedDecoration====
 
-    private ShapeBorder? GetUnFocusedBorder() => _border ?? DefaultBorder;
+    private ShapeBorder GetUnFocusedBorder() => _border ?? InputBorder.DefaultBorder;
 
     private ShapeBorder GetFocusedBorder()
     {
         //TODO: others
-        var border = _border ?? DefaultBorder;
+        var border = _border ?? InputBorder.DefaultBorder;
         if (border is OutlineInputBorder outline)
         {
             return new OutlineInputBorder(
@@ -109,8 +121,9 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
+        var width = maxSize.Width;
+        var height = maxSize.Height;
         var padding = _padding?.Value ?? EdgeInsets.All(4);
 
         // 扣除padding的宽高
@@ -152,7 +165,7 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
         var bounds = Rect.FromLTWH(0, 0, W, H);
-        var border = _border ?? DefaultBorder;
+        var border = _border ?? InputBorder.DefaultBorder;
 
         //画背景及边框
         border.Paint(canvas, bounds, IsReadonly ? Theme.DisabledBgColor : Colors.White);

@@ -1,27 +1,39 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 
 namespace PixUI;
 
 public sealed class NumberInput<T> : InputBase<EditableText> where T : struct, INumber<T>, IMinMaxValue<T>
 {
+    public NumberInput() { }
+
+    [SetsRequiredMembers]
     public NumberInput(T numberValue) : this(new RxValue<T>(numberValue)) { }
 
+    [SetsRequiredMembers]
     public NumberInput(State<T> number) : this(number.ToNullable()) { }
 
-    public NumberInput(State<T?> number) : base(new EditableText(number.ToString()))
-    {
-        _nullable = Bind(number, OnNullableChanged);
-        _editor.PreviewInput = OnPreviewInput;
-        _editor.CommitChanges = OnCommitChanges;
-    }
+    [SetsRequiredMembers]
+    public NumberInput(State<T?> number) => Number = number;
 
-    private readonly State<T?> _nullable;
+    private readonly State<T?> _nullable = null!;
+
+    public required State<T?> Number
+    {
+        init
+        {
+            _nullable = Bind(value, OnNullableChanged);
+            Editor = new EditableText(_nullable.ToString());
+            Editor.PreviewInput = OnPreviewInput;
+            Editor.CommitChanges = OnCommitChanges;
+        }
+    }
 
     public override State<bool>? Readonly
     {
-        get => _editor.Readonly;
-        set => _editor.Readonly = value;
+        get => Editor.Readonly;
+        set => Editor.Readonly = value;
     }
 
     public int Decimals { get; init; } = 0;
@@ -52,6 +64,6 @@ public sealed class NumberInput<T> : InputBase<EditableText> where T : struct, I
 
     private void OnNullableChanged(State state)
     {
-        _editor.Text.Value = state.ToString() ?? string.Empty;
+        Editor.Text.Value = state.ToString() ?? string.Empty;
     }
 }

@@ -31,7 +31,7 @@ public sealed class DesignCanvas : View, IDynamicView
         if (state == null || state.Type != DynamicStateType.DataSet || state.Value == null)
             return new ValueTask<object?>();
 
-        return ((IDynamicDataSetStateValue)state.Value).GetRuntimeDataSet();
+        return ((IDynamicDataSetState)state.Value).GetRuntimeDataSet();
     }
 
     protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)

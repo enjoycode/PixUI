@@ -49,6 +49,9 @@ partial class DesignController
 
             //Type
             writer.WriteString(nameof(DynamicState.Type), state.Type.ToString());
+            //AllowNull
+            if (state.Type != DynamicStateType.DataSet)
+                writer.WriteBoolean(nameof(DynamicState.AllowNull), state.AllowNull);
             //Value
             if (state.Value == null)
             {
@@ -121,7 +124,7 @@ partial class DesignController
     {
         if (parentElement.Meta == null)
             return Array.Empty<DesignElement>();
-        
+
         var list = new List<DesignElement>();
         var start = parentElement.Meta.IsReversedWrapElement ? parentElement : parentElement.Child;
 
@@ -184,7 +187,7 @@ partial class DesignController
         {
             parent.Child = rootElement;
             RootElement = rootElement;
-            parent.Invalidate(InvalidAction.Relayout);
+            parent.Relayout();
         }
 
         Select(RootElement); // always select root element
@@ -217,25 +220,43 @@ partial class DesignController
 
     private static void ReadState(ref Utf8JsonReader reader, string name, IList<DynamicState> states)
     {
+        var state = new DynamicState { Name = name };
         reader.Read(); //{
         reader.Read(); //Type prop
-        reader.Read();
-        var type = Enum.Parse<DynamicStateType>(reader.GetString()!);
-        reader.Read(); //Value prop
-
-        if (type == DynamicStateType.DataSet)
+        reader.Read(); //Type value
+        state.Type = Enum.Parse<DynamicStateType>(reader.GetString()!);
+        if (state.Type == DynamicStateType.DataSet)
         {
-            var ds = DesignSettings.MakeDataSetSettings!();
-            ds.ReadFrom(ref reader);
-            var state = new DynamicState() { Name = name, Type = type, Value = ds };
-            states.Add(state);
+            reader.Read(); //Value prop
+            var peekReader = reader;
+            if (!(peekReader.Read() && peekReader.TokenType == JsonTokenType.Null))
+            {
+                var ds = DesignSettings.MakeDataSetState!();
+                ds.ReadFrom(ref reader);
+                state.Value = ds;
+            }
         }
         else
         {
-            throw new NotImplementedException();
+            //AllowNull
+            reader.Read(); //AllowNull prop
+            reader.Read(); //AllowNull value
+            state.AllowNull = reader.GetBoolean();
+
+            //Value
+            reader.Read(); //Value prop
+            var peekReader = reader;
+            if (!(peekReader.Read() && peekReader.TokenType == JsonTokenType.Null))
+            {
+                var vs = DesignSettings.MakeValueState!();
+                vs.ReadFrom(ref reader, state);
+                state.Value = vs;
+            }
         }
 
         reader.Read(); //}
+
+        states.Add(state);
     }
 
     private Widget ReadWidget(ref Utf8JsonReader reader, DynamicWidgetMeta? parentMeta, string slotName)
@@ -279,12 +300,12 @@ partial class DesignController
                 }
                 else if (childSlot.ContainerType == ContainerType.SingleChildReversed)
                 {
-                    var child = ReadWidget(ref reader, meta, childSlot!.PropertyName);
+                    var child = ReadWidget(ref reader, meta, childSlot.PropertyName);
                     element.Child = child;
                 }
                 else
                 {
-                    var child = ReadWidget(ref reader, meta, childSlot!.PropertyName);
+                    var child = ReadWidget(ref reader, meta, childSlot.PropertyName);
                     childSlot.SetChild(element.Target!, child);
                 }
             }

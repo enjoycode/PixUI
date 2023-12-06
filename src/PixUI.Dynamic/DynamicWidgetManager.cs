@@ -14,6 +14,8 @@ public static partial class DynamicWidgetManager
     {
         Register(MakeButtonMeta());
         Register(MakeTextMeta());
+        Register(MakeTextInputMeta());
+        Register(makeDatePickerMeta());
         Register(MakeRow());
         Register(MakeColumn());
         Register(MakeExpanded());

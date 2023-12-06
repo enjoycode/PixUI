@@ -1,31 +1,47 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace PixUI;
 
 public sealed class DatePicker : InputBase<EditableText>
 {
-    public DatePicker(State<DateTime?> value) : base(new EditableText(string.Empty))
+    public DatePicker()
     {
-        _value = Bind(value, OnValueChanged);
-        _textValue = Bind(_editor.Text, OnTextChanged);
-        if (value.Value != null) _textValue.Value = value.Value.Value.ToString(format);
-
         Padding = new RxValue<EdgeInsets>(EdgeInsets.Only(4, 4, 0, 4));
         SuffixWidget = new Button(icon: MaterialIcons.CalendarMonth)
         {
             Style = ButtonStyle.Transparent,
             OnTap = _ => SwitchPopup(),
         };
-
-        _editor.FocusNode.FocusChanged += OnFocusChanged;
     }
 
-    private readonly State<DateTime?> _value;
-    private readonly State<string> _textValue;
-    private readonly string format = "yyyy-MM-dd";
+    [SetsRequiredMembers]
+    public DatePicker(State<DateTime?> value) : this()
+    {
+        Value = value;
+    }
+
+    private readonly State<DateTime?> _value = null!;
+    private readonly State<string> _textValue = null!;
+    private const string format = "yyyy-MM-dd";
     private bool _showing;
     private DatePickerPopup? _popup;
+
+    public required State<DateTime?> Value
+    {
+        init
+        {
+            Editor = new EditableText(string.Empty);
+
+            _value = Bind(value, OnValueChanged);
+            _textValue = Bind(Editor.Text, OnTextChanged);
+            if (value.Value != null)
+                _textValue.Value = value.Value.Value.ToString(format);
+
+            Editor.FocusNode.FocusChanged += OnFocusChanged;
+        }
+    }
 
     public override State<bool>? Readonly { get; set; }
 

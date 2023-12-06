@@ -66,8 +66,14 @@ public struct DynamicValue
     public ValueSource From { get; set; }
     public object? Value { get; set; }
 
-    public static implicit operator DynamicValue(string any) => new() { From = ValueSource.Const, Value = any };
+    public static implicit operator DynamicValue(string value) => new() { From = ValueSource.Const, Value = value };
+    public static implicit operator DynamicValue(bool value) => new() { From = ValueSource.Const, Value = value };
+    public static implicit operator DynamicValue(int value) => new() { From = ValueSource.Const, Value = value };
     public static implicit operator DynamicValue(float value) => new() { From = ValueSource.Const, Value = value };
+    public static implicit operator DynamicValue(double value) => new() { From = ValueSource.Const, Value = value };
+    public static implicit operator DynamicValue(decimal value) => new() { From = ValueSource.Const, Value = value };
+    public static implicit operator DynamicValue(Guid value) => new() { From = ValueSource.Const, Value = value };
+    public static implicit operator DynamicValue(DateTime value) => new() { From = ValueSource.Const, Value = value };
 
     public void Write(Utf8JsonWriter writer, DynamicPropertyMeta valueMeta)
     {
@@ -94,8 +100,12 @@ public struct DynamicValue
     public static DynamicValue Read(ref Utf8JsonReader reader, DynamicPropertyMeta valueMeta)
     {
         var valueType = valueMeta.ValueType;
-        if (valueMeta.ValueType.IsValueType && valueMeta.IsState) //TODO:排除本身就是Nullable<>
-            valueType = typeof(Nullable<>).MakeGenericType(valueType);
+        if (valueMeta.ValueType.IsValueType && valueMeta.IsState)
+        {
+            //排除本身就是Nullable<>
+            if (!(valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Nullable<>)))
+                valueType = typeof(Nullable<>).MakeGenericType(valueType);
+        }
 
         var v = new DynamicValue();
 

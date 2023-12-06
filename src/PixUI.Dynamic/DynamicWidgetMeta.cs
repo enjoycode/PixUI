@@ -47,11 +47,11 @@ public sealed class DynamicWidgetMeta
         DynamicPropertyMeta[]? properties = null,
         DynamicEventMeta[]? events = null,
         ContainerSlot[]? slots = null)
-        where T : Widget, new()
+        where T : Widget
     {
         var widgetType = typeof(T);
         return new DynamicWidgetMeta(catalog ?? string.Empty, name ?? widgetType.Name,
-            widgetType, icon, () => new T(),
+            widgetType, icon, Activator.CreateInstance<T> /*use Emit?*/,
             properties, events, slots);
     }
 
