@@ -15,10 +15,18 @@ public sealed class DynamicWidgetData
     /// <summary>
     /// 指定属性是否已绑定至状态
     /// </summary>
-    public bool HasBindToState(string name)
+    public bool HasBindToState(string propertyName, out string stateName)
     {
-        if (TryGetPropertyValue(name, out var value))
-            return value!.Value.From == ValueSource.State;
+        stateName = null!;
+        if (TryGetPropertyValue(propertyName, out var value))
+        {
+            if (value!.Value.From == ValueSource.State)
+            {
+                stateName = value.Value.StateName;
+                return true;
+            }
+        }
+
         return false;
     }
 

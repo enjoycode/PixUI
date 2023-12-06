@@ -37,7 +37,7 @@ public sealed class PropertyEditor : Widget
         if (propertyMeta.IsState)
         {
             _bindButtonColor = new RxProxy<Color>(() =>
-                Element.Data.HasBindToState(propertyMeta.Name) ? Colors.Green : Colors.Black);
+                Element.Data.HasBindToState(propertyMeta.Name, out _) ? Colors.Green : Colors.Black);
             _bindButton = BuildBindButton();
             _bindButton.TextColor = _bindButtonColor;
             _bindButton.OnTap = _ => BindPropertyToState(element, propertyMeta);

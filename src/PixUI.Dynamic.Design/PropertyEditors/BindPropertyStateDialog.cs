@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace PixUI.Dynamic.Design;
 
@@ -26,7 +27,16 @@ internal sealed class BindPropertyStateDialog : Dialog
         var stateType = DynamicState.GetStateTypeByValueType(_propertyMeta, out var allowNull);
         var list = _element.Controller.FindStatesByValueType(stateType, allowNull);
         _dgController.DataSource = list;
-        _dgController.TrySelectFirstRow();
+        //选择
+        if (_element.Data.HasBindToState(_propertyMeta.Name, out var oldStateName))
+        {
+            var index = list.FindIndex(s => s.Name == oldStateName);
+            _dgController.SelectAt(index);
+        }
+        else
+        {
+            _dgController.TrySelectFirstRow();
+        }
 
         return new Container
         {

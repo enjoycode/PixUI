@@ -73,13 +73,13 @@ public sealed partial class DesignController
     public DynamicState? FindState(string name) =>
         StatesController.DataSource!.FirstOrDefault(s => s.Name == name);
 
-    public IList<DynamicState> FindStatesByValueType(DynamicStateType type, bool allowNull)
+    public List<DynamicState> FindStatesByValueType(DynamicStateType type, bool allowNull)
     {
         if (type == DynamicStateType.DataSet) throw new NotSupportedException();
 
         return StatesController.DataSource!
             .Where(s => s.Type == type && s.AllowNull == allowNull)
-            .ToArray();
+            .ToList();
     }
 
     public IEnumerable<DynamicState> GetAllDataSet()
