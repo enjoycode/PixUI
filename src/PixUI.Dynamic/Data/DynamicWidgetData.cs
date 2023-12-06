@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace PixUI.Dynamic;
 
@@ -11,9 +10,17 @@ namespace PixUI.Dynamic;
 /// </summary>
 public sealed class DynamicWidgetData
 {
-    // public string Type { get; set; }
-
     public List<PropertyValue>? Properties { get; private set; }
+
+    /// <summary>
+    /// 指定属性是否已绑定至状态
+    /// </summary>
+    public bool HasBindToState(string name)
+    {
+        if (TryGetPropertyValue(name, out var value))
+            return value!.Value.From == ValueSource.State;
+        return false;
+    }
 
     public void AddPropertyValue(PropertyValue propertyValue)
     {
@@ -97,19 +104,16 @@ public struct DynamicValue
         writer.WriteEndObject();
     }
 
-    public static DynamicValue Read(ref Utf8JsonReader reader, DynamicPropertyMeta valueMeta)
+    public static DynamicValue Read(ref Utf8JsonReader reader, DynamicPropertyMeta propertyMeta)
     {
-        var valueType = valueMeta.ValueType;
-        if (valueMeta.ValueType.IsValueType && valueMeta.IsState)
-        {
-            //排除本身就是Nullable<>
-            if (!(valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Nullable<>)))
-                valueType = typeof(Nullable<>).MakeGenericType(valueType);
-        }
+        var valueType = propertyMeta.ValueType;
+        //如果是状态值且是值类型且不可空，则需要转换为可空值类型，否则下面Deserialize读取null时会报错
+        if (propertyMeta.IsState && propertyMeta.ValueType.IsValueType && !propertyMeta.IsNullableValueType)
+            valueType = typeof(Nullable<>).MakeGenericType(valueType);
 
         var v = new DynamicValue();
 
-        if (!valueMeta.IsState)
+        if (!propertyMeta.IsState)
         {
             v.From = ValueSource.Const;
             v.Value = JsonSerializer.Deserialize(ref reader, valueType);
@@ -138,6 +142,6 @@ public struct DynamicValue
 /// </summary>
 public sealed class PropertyValue
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     public DynamicValue Value { get; set; }
 }

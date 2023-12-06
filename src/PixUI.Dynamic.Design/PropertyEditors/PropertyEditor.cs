@@ -25,13 +25,22 @@ public sealed class PropertyEditor : Widget
 #endif
 
         _element = element;
-        var valueType = GetValueType(propertyMeta);
+        var valueType = propertyMeta.IsNullableValueType
+            ? propertyMeta.ValueType.GenericTypeArguments[0]
+            : propertyMeta.ValueType; //可空值类型转换为不可空值类型作为字典Key
         _targetEditor = GetPropertyValueEditor(valueType, element, propertyMeta, out var editingValue);
         _targetEditor.Parent = this;
         EditingValue = editingValue;
 
         if (propertyMeta.IsState)
+        {
+            _bindButtonColor = new RxProxy<Color>(() =>
+                _element.Data.HasBindToState(propertyMeta.Name) ? Colors.Green : Colors.Black);
             _bindButton = BuildBindButton();
+            _bindButton.TextColor = _bindButtonColor;
+            _bindButton.OnTap = _ => BindPropertyToState(element, propertyMeta);
+        }
+
         if (propertyMeta.AllowNull)
         {
             _deleteButton = BuildDeleteButton();
@@ -43,6 +52,7 @@ public sealed class PropertyEditor : Widget
     private readonly Widget _targetEditor;
     private readonly Button? _deleteButton;
     private readonly Button? _bindButton;
+    private readonly State<Color>? _bindButtonColor; //用于表示是否绑定状态
 
     internal readonly State? EditingValue;
 
@@ -74,19 +84,9 @@ public sealed class PropertyEditor : Widget
 
     public DesignController DesignController => _element.Controller;
 
-
     #region ====ValueEditors====
 
     private static readonly List<ValueEditorInfo> _valueEditors = new();
-
-    private static Type GetValueType(DynamicPropertyMeta valueMeta)
-    {
-        var valueType = valueMeta.ValueType;
-        if (valueType is { IsValueType: true, IsGenericType: true } &&
-            valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
-            valueType = valueType.GenericTypeArguments[0];
-        return valueType;
-    }
 
     private static Func<State, DesignElement, Widget> CreateEditorMaker(Type valueType, Type editorType)
     {
@@ -107,7 +107,7 @@ public sealed class PropertyEditor : Widget
         where TEditor : Widget
     {
         var valueType = typeof(TValue);
-        valueType = typeof(Nullable<>).MakeGenericType(valueType);
+        valueType = typeof(Nullable<>).MakeGenericType(valueType); //转换为可空值类型
 
         var editor = new ValueEditorInfo(
             typeof(TEditor).Name, isDefault, typeof(TValue),
@@ -238,6 +238,15 @@ public sealed class PropertyEditor : Widget
         editingValue?.NotifyValueChanged();
     }
 
+    /// <summary>
+    /// 绑定状态属性至状态
+    /// </summary>
+    private void BindPropertyToState(DesignElement element, DynamicPropertyMeta propertyMeta)
+    {
+        var dlg = new BindPropertyStateDialog(element, propertyMeta, _bindButtonColor!);
+        dlg.Show();
+    }
+
     #endregion
 
     #region ====Widget Overrides====
@@ -251,19 +260,18 @@ public sealed class PropertyEditor : Widget
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
         // var editorWidth = width - (_deleteButton == null ? 0 : _buttonSize.Value) -
         //                   (_bindButton == null ? 0 : _buttonSize.Value);
-        var editorWidth = width - _buttonSize.Value * 2; //暂不考虑有无删除或绑定按钮
+        var editorWidth = maxSize.Width - _buttonSize.Value * 2; //暂不考虑有无删除或绑定按钮
 
-        _targetEditor.Layout(editorWidth, height);
+        _targetEditor.Layout(editorWidth, maxSize.Height);
         _targetEditor.SetPosition(0, 0);
-        SetSize(width, _targetEditor.H);
+        SetSize(maxSize.Width, _targetEditor.H);
 
 
-        var right = width;
+        var right = maxSize.Width;
         if (_deleteButton != null)
         {
             _deleteButton.Layout(_buttonSize.Value, _buttonSize.Value);

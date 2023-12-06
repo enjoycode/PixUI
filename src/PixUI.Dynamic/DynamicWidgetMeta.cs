@@ -161,6 +161,13 @@ public sealed class DynamicPropertyMeta
     /// </summary>
     public readonly DynamicValue? InitValue;
 
+    /// <summary>
+    /// ValueType是否可空值类型
+    /// </summary>
+    public bool IsNullableValueType =>
+        ValueType is { IsValueType: true, IsGenericType: true } &&
+        ValueType.GetGenericTypeDefinition() == typeof(Nullable<>);
+
     public object? GetRuntimeValue(in DynamicValue source /*, IDynamicStateProvider stateProvider*/)
     {
         if (source.From != ValueSource.Const) throw new NotImplementedException();

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -63,7 +64,16 @@ public sealed partial class DesignController
     internal readonly DataGridController<DynamicState> StatesController = new();
 
     public DynamicState? FindState(string name) =>
-        StatesController.DataSource?.FirstOrDefault(s => s.Name == name);
+        StatesController.DataSource!.FirstOrDefault(s => s.Name == name);
+
+    public IList<DynamicState> FindStatesByValueType(DynamicStateType type, bool allowNull)
+    {
+        if (type == DynamicStateType.DataSet) throw new NotSupportedException();
+
+        return StatesController.DataSource!
+            .Where(s => s.Type == type && s.AllowNull == allowNull)
+            .ToArray();
+    }
 
     public IEnumerable<DynamicState> GetAllDataSet()
     {
