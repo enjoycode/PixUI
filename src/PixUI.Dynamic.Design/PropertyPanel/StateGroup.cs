@@ -4,9 +4,9 @@ namespace PixUI.Dynamic.Design;
 
 internal sealed class StateGroup : View
 {
-    public StateGroup(DataGridController<DynamicState> statesController)
+    public StateGroup(DesignController designController)
     {
-        _statesController = statesController;
+        _designController = designController;
 
         Child = new Collapse
         {
@@ -30,7 +30,7 @@ internal sealed class StateGroup : View
                     },
                     new Card
                     {
-                        Child = new DataGrid<DynamicState>(statesController)
+                        Child = new DataGrid<DynamicState>(_designController.StatesController)
                         {
                             Height = 118,
                             Columns =
@@ -52,7 +52,7 @@ internal sealed class StateGroup : View
         };
     }
 
-    private readonly DataGridController<DynamicState> _statesController;
+    private readonly DesignController _designController;
 
     private async void OnAddState(PointerEvent e)
     {
@@ -61,18 +61,18 @@ internal sealed class StateGroup : View
         if (dlgResult != DialogResult.OK) return;
 
         var item = new DynamicState() { Name = dlg.Name, Type = dlg.Type };
-        _statesController.Add(item);
+        _designController.StatesController.Add(item);
     }
 
     private void OnRemoveState(PointerEvent e)
     {
-        if (_statesController.CurrentRowIndex < 0) return;
+        if (_designController.StatesController.CurrentRowIndex < 0) return;
 
         //TODO: check usages
-        _statesController.RemoveAt(_statesController.CurrentRowIndex);
+        _designController.StatesController.RemoveAt(_designController.StatesController.CurrentRowIndex);
     }
 
-    private static void OnEditState(DynamicState state)
+    private async void OnEditState(DynamicState state)
     {
         if (state.Type == DynamicStateType.DataSet)
         {
@@ -82,7 +82,12 @@ internal sealed class StateGroup : View
         else
         {
             var dlg = DesignSettings.GetValueStateEditor?.Invoke(state);
-            dlg?.Show();
+            if (dlg != null)
+            {
+                var res = await dlg.ShowAsync();
+                if (res == DialogResult.OK)
+                    _designController.NotifyStateValueChanged?.Invoke(state);
+            }
         }
     }
 }

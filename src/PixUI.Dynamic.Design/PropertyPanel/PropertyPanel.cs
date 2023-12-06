@@ -10,11 +10,12 @@ public sealed class PropertyPanel : SingleChildWidget
         _controller = controller;
         _controller.SelectionChanged += OnSelectionChanged;
         _controller.NotifyLayoutPropertyChanged = OnNotifyLayoutPropertyChanged;
+        _controller.NotifyStateValueChanged = OnNotifyStateValueChanged;
 
         _layoutGroup = new PropertyGroup(_layoutGroupTitle);
         _listView = ListView<Widget>.From(new Widget[]
         {
-            new StateGroup(controller.StatesController),
+            new StateGroup(controller),
             _widgetGroup,
             new IfConditional(_layoutGroupVisible, () => _layoutGroup),
             new IfConditional(_propGroupVisible, () => _propGroup),
@@ -41,15 +42,35 @@ public sealed class PropertyPanel : SingleChildWidget
     private readonly State<bool> _eventGroupVisible = false;
 
     /// <summary>
+    /// 属性组的所有编辑器，用于状态值变更通知刷新
+    /// </summary>
+    private readonly List<PropertyEditor> _propertyEditors = new();
+
+    /// <summary>
     /// 附加的布局属性字典表
     /// </summary>
     private readonly Dictionary<string, State> _layoutProperties = new();
-
+    
     private void OnNotifyLayoutPropertyChanged(string layoutPropertyName)
     {
         if (_layoutProperties.TryGetValue(layoutPropertyName, out var editingValue))
         {
             editingValue.NotifyValueChanged();
+        }
+    }
+
+    private void OnNotifyStateValueChanged(DynamicState state)
+    {
+        foreach (var propertyEditor in _propertyEditors)
+        {
+            var propertyMeta = propertyEditor.PropertyMeta;
+            if (!propertyMeta.IsState) continue;
+
+            if (!propertyEditor.Element.Data.TryGetPropertyValue(propertyMeta.Name, out var propValue))
+                continue;
+
+            if (propValue!.Value.From == ValueSource.State && propValue.Value.StateName == state.Name)
+                propertyEditor.EditingValue?.NotifyValueChanged();
         }
     }
 
@@ -110,6 +131,7 @@ public sealed class PropertyPanel : SingleChildWidget
     private void BuildPropertyGroup(DesignElement element, DynamicWidgetMeta meta)
     {
         _propGroupVisible.Value = meta.Properties is { Length: > 0 };
+        _propertyEditors.Clear();
         if (!_propGroupVisible.Value) return;
 
         var propItems = new FormItem[meta.Properties!.Length];
@@ -117,6 +139,7 @@ public sealed class PropertyPanel : SingleChildWidget
         {
             var propName = meta.Properties[i].Name;
             var propEditor = new PropertyEditor(element, meta.Properties[i]);
+            _propertyEditors.Add(propEditor);
             propItems[i] = new($"{propName}:", propEditor);
             if ((propName == "Width" || propName == "Height") && propEditor.EditingValue != null)
                 _layoutProperties.Add(propName, propEditor.EditingValue);

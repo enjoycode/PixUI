@@ -49,9 +49,14 @@ public sealed partial class DesignController
     public DynamicWidgetMeta? CurrentToolboxItem { get; internal set; }
 
     /// <summary>
-    /// 通知属性面板附加的布局属性发生了变更
+    /// 外部(非属性编辑器)改变布局属性值时通知属性面板附加的布局属性发生了变更
     /// </summary>
     internal Action<string>? NotifyLayoutPropertyChanged;
+
+    /// <summary>
+    /// 状态编辑面板改变了状态值时通知属性面板状态值发生了变更
+    /// </summary>
+    internal Action<DynamicState>? NotifyStateValueChanged;
 
     /// <summary>
     /// 需要刷新大纲视图的事件

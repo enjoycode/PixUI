@@ -24,7 +24,9 @@ public sealed class PropertyEditor : Widget
         DebugLabel = propertyMeta.Name;
 #endif
 
-        _element = element;
+        Element = element;
+        PropertyMeta = propertyMeta;
+
         var valueType = propertyMeta.IsNullableValueType
             ? propertyMeta.ValueType.GenericTypeArguments[0]
             : propertyMeta.ValueType; //可空值类型转换为不可空值类型作为字典Key
@@ -35,7 +37,7 @@ public sealed class PropertyEditor : Widget
         if (propertyMeta.IsState)
         {
             _bindButtonColor = new RxProxy<Color>(() =>
-                _element.Data.HasBindToState(propertyMeta.Name) ? Colors.Green : Colors.Black);
+                Element.Data.HasBindToState(propertyMeta.Name) ? Colors.Green : Colors.Black);
             _bindButton = BuildBindButton();
             _bindButton.TextColor = _bindButtonColor;
             _bindButton.OnTap = _ => BindPropertyToState(element, propertyMeta);
@@ -48,14 +50,14 @@ public sealed class PropertyEditor : Widget
         }
     }
 
-    private readonly DesignElement _element;
+    internal readonly DesignElement Element;
+    internal readonly DynamicPropertyMeta PropertyMeta;
+    internal readonly State? EditingValue;
+
     private readonly Widget _targetEditor;
     private readonly Button? _deleteButton;
     private readonly Button? _bindButton;
     private readonly State<Color>? _bindButtonColor; //用于表示是否绑定状态
-
-    internal readonly State? EditingValue;
-
     private static readonly State<float> _buttonSize = 20f;
 
     private Button BuildBindButton()
@@ -260,7 +262,7 @@ public sealed class PropertyEditor : Widget
             element.OnInitPropertyValueChanged();
         else
             element.SetPropertyValue(propertyValue);
-        
+
         _bindButtonColor?.NotifyValueChanged();
         EditingValue?.NotifyValueChanged();
     }
