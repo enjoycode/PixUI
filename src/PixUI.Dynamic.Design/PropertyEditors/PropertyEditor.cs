@@ -31,23 +31,23 @@ public sealed class PropertyEditor : Widget
         var valueType = propertyMeta.IsNullableValueType
             ? propertyMeta.ValueType.GenericTypeArguments[0]
             : propertyMeta.ValueType; //可空值类型转换为不可空值类型作为字典Key
-        _targetEditor = GetPropertyValueEditor(valueType, element, propertyMeta, out var editingValue);
+        _targetEditor = GetPropertyValueEditor(valueType, this, out var editingValue);
         _targetEditor.Parent = this;
         EditingValue = editingValue;
 
         if (propertyMeta.IsState)
         {
-            _bindButtonColor = new RxProxy<Color>(() =>
-                Element.Data.HasBindToState(propertyMeta.Name, out _) ? Colors.Green : Colors.Black);
+            _bindingColorState = new RxProxy<Color>(() =>
+                Element.Data.HasBindToState(propertyMeta.Name, out _) ? 0xFF57A64A : Colors.Black);
             _bindButton = BuildBindButton();
-            _bindButton.TextColor = _bindButtonColor;
+            _bindButton.TextColor = _bindingColorState;
             _bindButton.OnTap = _ => BindPropertyToState(element, propertyMeta);
         }
 
         if (propertyMeta.AllowNull)
         {
             _deleteButton = BuildDeleteButton();
-            _deleteButton.OnTap = _ => DeletePropertyValue(element, propertyMeta, editingValue);
+            _deleteButton.OnTap = _ => DeletePropertyValue();
         }
     }
 
@@ -58,7 +58,7 @@ public sealed class PropertyEditor : Widget
     private readonly Widget _targetEditor;
     private readonly Button? _deleteButton;
     private readonly Button? _bindButton;
-    private readonly State<Color>? _bindButtonColor; //用于表示是否绑定状态
+    private readonly State<Color>? _bindingColorState; //用于表示状态属性是否绑定
     private static readonly State<float> _buttonSize = 20f;
 
     private Button BuildBindButton()
@@ -114,9 +114,9 @@ public sealed class PropertyEditor : Widget
         var editor = new ValueEditorInfo(
             name, isDefault, typeof(TValue),
             CreateEditorMaker(valueType, typeof(TEditor)),
-            (element, propertyMeta) => new RxProxy<TValue?>(
-                () => (TValue?)GetPropertyValue(element, propertyMeta),
-                newValue => SetPropertyValue(element, propertyMeta, newValue)
+            propertyEditor => new RxProxy<TValue?>(
+                () => (TValue?)GetPropertyValue(propertyEditor),
+                newValue => SetPropertyValue(propertyEditor, newValue)
             )
         );
 
@@ -131,9 +131,9 @@ public sealed class PropertyEditor : Widget
         var editor = new ValueEditorInfo(
             name, isDefault, typeof(TValue),
             CreateEditorMaker(typeof(TValue), typeof(TEditor)),
-            (element, propertyMeta) => new RxProxy<TValue?>(
-                () => (TValue?)GetPropertyValue(element, propertyMeta),
-                newValue => SetPropertyValue(element, propertyMeta, newValue)
+            propertyEditor => new RxProxy<TValue?>(
+                () => (TValue?)GetPropertyValue(propertyEditor),
+                newValue => SetPropertyValue(propertyEditor, newValue)
             )
         );
 
@@ -153,9 +153,11 @@ public sealed class PropertyEditor : Widget
 
     #region ====PropertyValue====
 
-    private static Widget GetPropertyValueEditor(Type valueType, DesignElement element,
-        DynamicPropertyMeta propertyMeta, out State? editingValue)
+    private static Widget GetPropertyValueEditor(Type valueType, PropertyEditor propertyEditor, out State? editingValue)
     {
+        var element = propertyEditor.Element;
+        var propertyMeta = propertyEditor.PropertyMeta;
+
         //先判断是否指定编辑器
         var isAssignedEditor = !string.IsNullOrEmpty(propertyMeta.EditorName);
 
@@ -165,13 +167,13 @@ public sealed class PropertyEditor : Widget
             var propState = new RxProxy<string?>(
                 () =>
                 {
-                    var enumValue = GetPropertyValue(element, propertyMeta);
+                    var enumValue = GetPropertyValue(propertyEditor);
                     return enumValue?.ToString(); //TODO: 考虑无值转换为枚举的默认值
                 },
                 v =>
                 {
                     var enumValue = Enum.Parse(valueType, v!);
-                    SetPropertyValue(element, propertyMeta, enumValue);
+                    SetPropertyValue(propertyEditor, enumValue);
                 });
             editingValue = propState;
             return new Select<string>(propState) { Options = Enum.GetNames(valueType) };
@@ -186,22 +188,23 @@ public sealed class PropertyEditor : Widget
             //TODO:
             editingValue = new RxProxy<string>(() =>
             {
-                var propValue = GetPropertyValue(element, propertyMeta);
+                var propValue = GetPropertyValue(propertyEditor);
                 return propValue?.ToString() ?? string.Empty;
             });
             return new Text((State<string>)editingValue);
         }
 
-        editingValue = editorInfo.PropertyStateMaker(element, propertyMeta);
+        editingValue = editorInfo.PropertyStateMaker(propertyEditor);
         return editorInfo.EditorMaker(editingValue, element);
     }
 
     /// <summary>
     /// 获取设计器对应的属性设计值
     /// </summary>
-    private static object? GetPropertyValue(DesignElement element, DynamicPropertyMeta propertyMeta)
+    private static object? GetPropertyValue(PropertyEditor propertyEditor)
     {
-        var exists = element.Data.TryGetPropertyValue(propertyMeta.Name, out var currentValue);
+        var exists =
+            propertyEditor.Element.Data.TryGetPropertyValue(propertyEditor.PropertyMeta.Name, out var currentValue);
         if (exists)
         {
             var valueSource = currentValue!.Value.From;
@@ -209,7 +212,7 @@ public sealed class PropertyEditor : Widget
                 return currentValue.Value.Value;
             if (valueSource == ValueSource.State)
             {
-                var state = element.Controller.FindState(currentValue.Value.StateName);
+                var state = propertyEditor.Element.Controller.FindState(currentValue.Value.StateName);
                 var stateValue = state?.Value as IDynamicValueState;
                 return stateValue?.Value; //注意非运行时值
             }
@@ -225,31 +228,31 @@ public sealed class PropertyEditor : Widget
     /// <summary>
     /// 设置设计器对应的属性设计值
     /// </summary>
-    private static void SetPropertyValue(DesignElement element, DynamicPropertyMeta propertyMeta, object? newValue)
+    private static void SetPropertyValue(PropertyEditor propertyEditor, object? newValue)
     {
         //属性编辑器设置的值不可能为null
         var dynamicValue = new DynamicValue { From = ValueSource.Const, Value = newValue };
-        var propertyValue = element.Data.SetPropertyValue(propertyMeta.Name, dynamicValue);
+        var propertyValue =
+            propertyEditor.Element.Data.SetPropertyValue(propertyEditor.PropertyMeta.Name, dynamicValue);
 
-        if (propertyMeta.IsInitSetter)
-            element.OnInitPropertyValueChanged();
+        if (propertyEditor.PropertyMeta.IsInitSetter)
+            propertyEditor.Element.OnInitPropertyValueChanged();
         else
-            element.SetPropertyValue(propertyValue);
+            propertyEditor.Element.SetPropertyValue(propertyValue);
 
-        //_bindButtonColor?.NotifyValueChanged(); //暂简单强制刷新绑定状态
+        propertyEditor._bindingColorState?.NotifyValueChanged(); //暂简单强制刷新绑定状态
     }
 
-    private static void DeletePropertyValue(DesignElement element, DynamicPropertyMeta propertyMeta,
-        State? editingValue)
+    private void DeletePropertyValue()
     {
-        element.Data.RemovePropertyValue(propertyMeta.Name);
-        if (propertyMeta.IsInitSetter)
-            element.OnInitPropertyValueChanged();
+        Element.Data.RemovePropertyValue(PropertyMeta.Name);
+        if (PropertyMeta.IsInitSetter)
+            Element.OnInitPropertyValueChanged();
         else
-            element.RemovePropertyValue(propertyMeta.Name);
+            Element.RemovePropertyValue(PropertyMeta.Name);
 
-        editingValue?.NotifyValueChanged();
-        //_bindButtonColor?.NotifyValueChanged(); //暂简单强制刷新绑定状态
+        EditingValue?.NotifyValueChanged();
+        _bindingColorState?.NotifyValueChanged(); //暂简单强制刷新绑定状态
     }
 
     /// <summary>
@@ -268,7 +271,7 @@ public sealed class PropertyEditor : Widget
         else
             element.SetPropertyValue(propertyValue);
 
-        _bindButtonColor?.NotifyValueChanged();
+        _bindingColorState?.NotifyValueChanged();
         EditingValue?.NotifyValueChanged();
     }
 

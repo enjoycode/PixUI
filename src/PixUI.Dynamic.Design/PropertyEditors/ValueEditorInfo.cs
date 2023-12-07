@@ -6,7 +6,7 @@ internal sealed class ValueEditorInfo
 {
     public ValueEditorInfo(string name, bool isDefault, Type valueType,
         Func<State, DesignElement, Widget> editorMaker,
-        Func<DesignElement, DynamicPropertyMeta, State> propertyStateMaker
+        Func<PropertyEditor, State> propertyStateMaker
     )
     {
         Name = name;
@@ -19,6 +19,6 @@ internal sealed class ValueEditorInfo
     public readonly string Name;
     public bool IsDefault { get; internal set; }
     public readonly Type ValueType;
-    public readonly Func<DesignElement, DynamicPropertyMeta, State> PropertyStateMaker;
+    public readonly Func<PropertyEditor, State> PropertyStateMaker;
     public readonly Func<State, DesignElement, Widget> EditorMaker;
 }
