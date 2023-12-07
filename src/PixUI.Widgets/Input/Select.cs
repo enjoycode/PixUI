@@ -98,6 +98,7 @@ public abstract class SelectBase<T> : InputBase<Widget>
             });
         _listPopup = new ListPopup<T>(Overlay!, optionBuilder, W + 8, Theme.DefaultFontSize + 8);
         _listPopup.DataSource = new List<T>(Options);
+        _listPopup.AutoFitInWindowWidth = true;
         //初始化选中的
         if (_selectedValue.Value != null)
             _listPopup.InitSelect(_selectedValue.Value!);

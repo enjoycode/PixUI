@@ -45,6 +45,8 @@ public sealed class DatePicker : InputBase<EditableText>
 
     public override State<bool>? Readonly { get; set; }
 
+    protected override void OnUnmounted() => HidePopup();
+
     private void SwitchPopup()
     {
         if (_showing) HidePopup();

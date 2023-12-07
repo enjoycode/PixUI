@@ -29,14 +29,14 @@ public sealed class Overlay : Widget, IRootWidget
         _children.Add(entry);
         entry.Layout(Window.Width, Window.Height);
 
-        Invalidate(InvalidAction.Repaint);
+        Repaint();
     }
 
     public void Remove(Widget entry)
     {
         if (!_children.Remove(entry)) return;
 
-        Invalidate(InvalidAction.Repaint);
+        Repaint();
     }
 
     #endregion

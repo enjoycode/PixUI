@@ -19,6 +19,11 @@ public abstract class Popup : Widget, IEventHook
     internal AnimationController? AnimationController => _transition?.AnimationController;
 
     /// <summary>
+    /// 弹出纠正X坐标适配窗体宽度
+    /// </summary>
+    public bool AutoFitInWindowWidth { get; set; }
+
+    /// <summary>
     /// 默认的沿Y缩放的打开动画
     /// </summary>
     public static readonly PopupTransitionBuilder DefaultTransitionBuilder =
@@ -66,6 +71,9 @@ public abstract class Popup : Widget, IEventHook
         Offset? origin = null;
         var winX = 0f;
         var winY = 0f;
+        var winWidth = Owner.Window.Width;
+        var winHeight = Owner.Window.Height;
+
         if (relativeTo != null)
         {
             var winPt = relativeTo.LocalToWindow(0, 0);
@@ -74,9 +82,13 @@ public abstract class Popup : Widget, IEventHook
 
             _proxy = new PopupProxy(this); //构建占位并计算布局
             target = _proxy;
+            //纠正X+W超出屏幕宽度
+            if (AutoFitInWindowWidth && winPt.X + offsetX + W > winWidth)
+                offsetX -= winPt.X + offsetX + W - winWidth;
+
             var popupHeight = H;
             //暂简单支持向下或向上弹出
-            if (winPt.Y + relativeTo.H + offsetY + popupHeight > Owner.Window.Height)
+            if (winPt.Y + relativeTo.H + offsetY + popupHeight > winHeight)
             {
                 //向上弹出
                 winX = winPt.X + offsetX;
@@ -103,7 +115,7 @@ public abstract class Popup : Widget, IEventHook
         if (relativeTo != null)
             target.SetPosition(winX, winY);
         else if (IsDialog)
-            target.SetPosition((Owner.Window.Width - W) / 2f, (Owner.Window.Height - H) / 2f);
+            target.SetPosition((winWidth - W) / 2f, (winHeight - H) / 2f);
 
         Owner.Window.EventHookManager.Add(this);
         Owner.Window.FocusManagerStack.Push(FocusManager);

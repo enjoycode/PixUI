@@ -6,6 +6,7 @@ public sealed class DatePickerPopup : Popup
 {
     public DatePickerPopup(Overlay overlay, State<DateTime?> value, Action hideAction) : base(overlay)
     {
+        AutoFitInWindowWidth = true;
         _child = new Card
         {
             Elevation = 8,
