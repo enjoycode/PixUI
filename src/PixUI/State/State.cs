@@ -11,6 +11,8 @@ public abstract class State : IDisposable
     private static readonly EmptyState _emptyState = new EmptyState();
 
     public static State Empty => _emptyState;
+    
+    public abstract object? BoxedValue { get; }
 
     public abstract bool Readonly { get; }
 
@@ -47,6 +49,8 @@ public abstract class State : IDisposable
 internal sealed class EmptyState : State
 {
     public override bool Readonly => true;
+
+    public override object? BoxedValue => null;
 }
 
 public abstract class State<T> : State

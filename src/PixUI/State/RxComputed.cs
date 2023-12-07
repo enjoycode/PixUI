@@ -56,6 +56,8 @@ public sealed class RxComputed<T> : State<T>
 
     public override bool Readonly => _setter == null;
 
+    public override object? BoxedValue => Value;
+
     public override T Value
     {
         get => _getter();

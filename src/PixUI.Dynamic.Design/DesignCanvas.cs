@@ -33,14 +33,18 @@ public sealed class DesignCanvas : View, IDynamicView
         if (state == null || state.Type != DynamicStateType.DataSet || state.Value == null)
             return new ValueTask<object?>();
 
-        return ((IDynamicDataSetState)state.Value).GetRuntimeDataSet();
+        return ((IDynamicDataSetState)state.Value).GetRuntimeDataSet(this);
     }
 
     public State GetState(string name)
     {
         var state = _designController.FindState(name);
         if (state == null)
+#if DEBUG
             throw new Exception($"Can't find state: {name}");
+#else
+            return State.Empty;
+#endif
         if (state.Type == DynamicStateType.DataSet)
             throw new Exception($"State is DataSet: {name}");
         return ((IDynamicValueState)state.Value!).GetRuntimeValue(state);

@@ -13,6 +13,8 @@ public sealed class RxValue<T> : State<T>
 
     public override bool Readonly => false;
 
+    public override object? BoxedValue => Value;
+
     public override T Value
     {
         get => _value;

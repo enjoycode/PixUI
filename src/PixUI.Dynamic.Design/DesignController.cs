@@ -17,7 +17,7 @@ public sealed partial class DesignController
     /// </summary>
     public readonly State<int> Zoom = 100;
 
-    internal DesignCanvas DesignCanvas { get; set; } = null!;
+    public DesignCanvas DesignCanvas { get; set; } = null!;
 
     public DesignElement RootElement { get; internal set; } = null!;
 

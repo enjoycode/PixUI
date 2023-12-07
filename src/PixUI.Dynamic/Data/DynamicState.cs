@@ -25,7 +25,7 @@ public interface IDynamicDataSetState : IDynamicState
 {
     void ReadFrom(ref Utf8JsonReader reader);
 
-    ValueTask<object?> GetRuntimeDataSet();
+    ValueTask<object?> GetRuntimeDataSet(IDynamicView dynamicView);
 }
 
 public enum DynamicStateType

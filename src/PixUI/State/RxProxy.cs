@@ -101,6 +101,8 @@ public sealed class RxProxy<T> : State<T>
         ).Compile();
     }
 
+    public override object? BoxedValue => Value;
+
     public override T Value
     {
         get => _getter();

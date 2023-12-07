@@ -10,14 +10,16 @@ public sealed class RxList<T> : State
     , IList<T>
 #endif
 {
-    public override bool Readonly { get; } = true;
-
-    private readonly IList<T> _source;
-
     public RxList(IList<T> source)
     {
         _source = source;
     }
+
+    private readonly IList<T> _source;
+
+    public override bool Readonly { get; } = true;
+
+    public override object? BoxedValue => _source;
 
     public static implicit operator RxList<T>(Collection<T> value) => new RxList<T>(value);
 
@@ -35,7 +37,7 @@ public sealed class RxList<T> : State
     public int Count => _source.Count;
 
     public bool IsReadOnly => _source.IsReadOnly;
-        
+
     public void CopyTo(T[] array, int arrayIndex) => _source.CopyTo(array, arrayIndex);
 #endif
 
