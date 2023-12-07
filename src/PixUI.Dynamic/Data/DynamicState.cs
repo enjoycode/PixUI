@@ -15,7 +15,7 @@ public interface IDynamicValueState : IDynamicState
     /// 获取设计时的值
     /// </summary>
     object? Value { get; }
-    
+
     void ReadFrom(ref Utf8JsonReader reader, DynamicState state);
 
     State GetRuntimeValue(DynamicState state);
@@ -76,12 +76,17 @@ public sealed class DynamicState
             allowNull = true;
         }
 
+        return GetStateTypeByValueType(valueType);
+    }
+
+    public static DynamicStateType GetStateTypeByValueType(Type noneNullableValueType)
+    {
         DynamicStateType stateType;
-        if (valueType == typeof(string))
+        if (noneNullableValueType == typeof(string))
             stateType = DynamicStateType.String;
-        else if (valueType == typeof(int))
+        else if (noneNullableValueType == typeof(int))
             stateType = DynamicStateType.Int;
-        else if (valueType == typeof(DateTime))
+        else if (noneNullableValueType == typeof(DateTime))
             stateType = DynamicStateType.DateTime;
         else
             throw new NotImplementedException();

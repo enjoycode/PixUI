@@ -17,7 +17,7 @@ internal interface IDataGridHostColumn
 /// </summary>
 public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
 {
-    protected DataGridHostColumn(string label, Func<T, int, Widget> cellBuilder) : base(label)
+    public DataGridHostColumn(string label, Func<T, int, Widget> cellBuilder) : base(label)
     {
         _cellBuilder = cellBuilder;
     }

@@ -4,7 +4,7 @@ namespace PixUI.Dynamic.Design;
 
 public static class DesignSettings
 {
-    public static Func<DynamicState, Dialog>? GetDataSetStateEditor;
+    public static Func<DesignController, DynamicState, Dialog>? GetDataSetStateEditor;
 
     public static Func<IDynamicDataSetState>? MakeDataSetState;
 

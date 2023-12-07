@@ -7,7 +7,6 @@ public sealed class Form : MultiChildWidget<FormItem>
     public Form() { }
 
     private int _columns = 1;
-    private HorizontalAlignment _labelAlignment = HorizontalAlignment.Right;
     private float _labelWidth = 120;
     private EdgeInsets _padding = EdgeInsets.All(5);
     private float _horizontalSpacing = 5f;
@@ -20,7 +19,7 @@ public sealed class Form : MultiChildWidget<FormItem>
         {
             if (_columns == value) return;
             _columns = value;
-            if (IsMounted) Invalidate(InvalidAction.Relayout);
+            Relayout();
         }
     }
 
@@ -31,18 +30,7 @@ public sealed class Form : MultiChildWidget<FormItem>
         {
             if (_padding == value) return;
             _padding = value;
-            if (IsMounted) Invalidate(InvalidAction.Relayout);
-        }
-    }
-
-    public HorizontalAlignment LabelAlignment
-    {
-        get => _labelAlignment;
-        set
-        {
-            if (_labelAlignment == value) return;
-            _labelAlignment = value;
-            if (IsMounted) Invalidate(InvalidAction.Relayout);
+            Relayout();
         }
     }
 
@@ -53,7 +41,7 @@ public sealed class Form : MultiChildWidget<FormItem>
         {
             if (_labelWidth == value) return;
             _labelWidth = value;
-            if (IsMounted) Invalidate(InvalidAction.Relayout);
+            Relayout();
         }
     }
 

@@ -16,6 +16,30 @@ public sealed class FormItem : Widget
 
     private readonly Widget _widget;
     private readonly string _label;
+    private HorizontalAlignment _labelHorizontalAlignment = HorizontalAlignment.Right;
+    private VerticalAlignment _labelVerticalAlignment = VerticalAlignment.Middle;
+
+    public HorizontalAlignment LabelHorizontalAlignment
+    {
+        get => _labelHorizontalAlignment;
+        set
+        {
+            if (_labelHorizontalAlignment == value) return;
+            _labelHorizontalAlignment = value;
+            Repaint();
+        }
+    }
+
+    public VerticalAlignment LabelVerticalAlignment
+    {
+        get => _labelVerticalAlignment;
+        set
+        {
+            if (_labelVerticalAlignment == value) return;
+            _labelVerticalAlignment = value;
+            Repaint();
+        }
+    }
 
     internal readonly int ColumnSpan;
     //TODO: tooltip property to show some tips
@@ -47,17 +71,23 @@ public sealed class FormItem : Widget
 
         var parent = (Form)Parent!;
         var lableWidth = parent.LabelWidth;
-        var alignment = parent.LabelAlignment;
+        var hAlignment = _labelHorizontalAlignment;
+        var vAlignment = _labelVerticalAlignment;
         //先画Label
         var x = 0f;
-        if (alignment == HorizontalAlignment.Center)
+        if (hAlignment == HorizontalAlignment.Center)
             x = (lableWidth - _cachedLabelParagraph!.MaxIntrinsicWidth) / 2;
-        else if (alignment == HorizontalAlignment.Right)
+        else if (hAlignment == HorizontalAlignment.Right)
             x = lableWidth - _cachedLabelParagraph!.MaxIntrinsicWidth;
+        var y = 0f;
+        if (vAlignment == VerticalAlignment.Middle)
+            y = (H - _cachedLabelParagraph!.Height) / 2f;
+        else if (vAlignment == VerticalAlignment.Bottom)
+            y = H - _cachedLabelParagraph!.Height;
+
         canvas.Save(); //TODO:优化不必要的Save and Clip
         canvas.ClipRect(Rect.FromLTWH(0, 0, lableWidth, H), ClipOp.Intersect, false);
-        canvas.DrawParagraph(_cachedLabelParagraph!, x,
-            (H - _cachedLabelParagraph!.Height) / 2f /*暂上下居中*/);
+        canvas.DrawParagraph(_cachedLabelParagraph!, x, y);
         canvas.Restore();
 
         //再画Widget
