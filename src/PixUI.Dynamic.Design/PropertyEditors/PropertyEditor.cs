@@ -290,28 +290,21 @@ public sealed class PropertyEditor : Widget
     {
         var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
-        // var editorWidth = width - (_deleteButton == null ? 0 : _buttonSize.Value) -
-        //                   (_bindButton == null ? 0 : _buttonSize.Value);
-        var editorWidth = maxSize.Width - _buttonSize.Value * 2; //暂不考虑有无删除或绑定按钮
-
-        _targetEditor.Layout(editorWidth, maxSize.Height);
+        _targetEditor.Layout(maxSize.Width - _buttonSize.Value * 2, maxSize.Height);
         _targetEditor.SetPosition(0, 0);
         SetSize(maxSize.Width, _targetEditor.H);
 
-
-        var right = maxSize.Width;
+        // 按钮固定位置
         if (_deleteButton != null)
         {
             _deleteButton.Layout(_buttonSize.Value, _buttonSize.Value);
-            right -= _deleteButton.W;
-            _deleteButton.SetPosition(right, (H - _deleteButton.H) / 2f);
+            _deleteButton.SetPosition(maxSize.Width - _buttonSize.Value, (H - _deleteButton.H) / 2f);
         }
 
         if (_bindButton != null)
         {
             _bindButton.Layout(_buttonSize.Value, _buttonSize.Value);
-            right -= _bindButton.W;
-            _bindButton.SetPosition(right, (H - _bindButton.H) / 2f);
+            _bindButton.SetPosition(maxSize.Width - _buttonSize.Value * 2, (H - _bindButton.H) / 2f);
         }
     }
 
