@@ -2,9 +2,11 @@ namespace PixUI.Dynamic;
 
 partial class DynamicWidgetManager
 {
+    private const string CatalogLayout = "Layout";
+    
     private static DynamicWidgetMeta MakeRow() => DynamicWidgetMeta.Make<Row>(
         MaterialIcons.ViewArray,
-        catalog: "Layout",
+        catalog: CatalogLayout,
         properties: new DynamicPropertyMeta[]
         {
             new(nameof(Row.Alignment), typeof(VerticalAlignment), false),
@@ -18,7 +20,7 @@ partial class DynamicWidgetManager
 
     private static DynamicWidgetMeta MakeColumn() => DynamicWidgetMeta.Make<Column>(
         MaterialIcons.ViewDay,
-        catalog: "Layout",
+        catalog: CatalogLayout,
         properties: new DynamicPropertyMeta[]
         {
             new(nameof(Column.Alignment), typeof(HorizontalAlignment), false),
@@ -32,7 +34,7 @@ partial class DynamicWidgetManager
 
     private static DynamicWidgetMeta MakeExpanded() => DynamicWidgetMeta.Make<Expanded>(
         MaterialIcons.AspectRatio,
-        catalog: "Layout",
+        catalog: CatalogLayout,
         properties: new DynamicPropertyMeta[]
         {
             new(nameof(Expanded.Flex), typeof(int), false)
@@ -45,7 +47,7 @@ partial class DynamicWidgetManager
 
     private static DynamicWidgetMeta MakeCenterMeta() => DynamicWidgetMeta.Make<Center>(
         MaterialIcons.CenterFocusStrong,
-        catalog: "Layout",
+        catalog: CatalogLayout,
         slots: new ContainerSlot[]
         {
             new(nameof(Center.Child), ContainerType.SingleChild)
@@ -53,7 +55,7 @@ partial class DynamicWidgetManager
 
     private static DynamicWidgetMeta MakeStackMeta() => DynamicWidgetMeta.Make<Stack>(
         MaterialIcons.Layers,
-        catalog: "Layout",
+        catalog: CatalogLayout,
         slots: new ContainerSlot[]
         {
             new(nameof(Stack.Children), ContainerType.MultiChild)

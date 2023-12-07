@@ -2,9 +2,11 @@ namespace PixUI.Dynamic;
 
 partial class DynamicWidgetManager
 {
+    private const string CatalogCommon = "Common";
+
     private static DynamicWidgetMeta MakeButtonMeta() => DynamicWidgetMeta.Make<Button>(
         MaterialIcons.SmartButton,
-        catalog: "Common",
+        catalog: CatalogCommon,
         properties: new DynamicPropertyMeta[]
         {
             new(nameof(Button.Text), typeof(State<string>), true, true, "Button"),
@@ -15,7 +17,7 @@ partial class DynamicWidgetManager
 
     private static DynamicWidgetMeta MakeTextMeta() => DynamicWidgetMeta.Make<Text>(
         MaterialIcons.Translate,
-        catalog: "Common",
+        catalog: CatalogCommon,
         properties: new DynamicPropertyMeta[]
         {
             new(nameof(Text.Text), typeof(State<string>), false, true, "Hello World"),

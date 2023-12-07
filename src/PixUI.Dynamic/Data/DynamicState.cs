@@ -11,6 +11,11 @@ public interface IDynamicState
 
 public interface IDynamicValueState : IDynamicState
 {
+    /// <summary>
+    /// 获取设计时的值
+    /// </summary>
+    object? Value { get; }
+    
     void ReadFrom(ref Utf8JsonReader reader, DynamicState state);
 
     State GetRuntimeValue(DynamicState state);

@@ -16,6 +16,7 @@ public sealed class PropertyEditor : Widget
         RegisterStructValueEditor<int, NumberEditor<int>>(true);
         RegisterStructValueEditor<float, NumberEditor<float>>(true);
         RegisterStructValueEditor<Color, ColorEditor>(true);
+        RegisterStructValueEditor<DateTime, DateEditor>(false);
     }
 
     public PropertyEditor(DesignElement element, DynamicPropertyMeta propertyMeta)
@@ -102,15 +103,16 @@ public sealed class PropertyEditor : Widget
         ).Compile();
     }
 
-    public static void RegisterStructValueEditor<TValue, TEditor>(bool isDefault)
+    public static void RegisterStructValueEditor<TValue, TEditor>(bool isDefault, string? name = null)
         where TValue : struct
         where TEditor : Widget
     {
+        name ??= typeof(TEditor).Name;
         var valueType = typeof(TValue);
         valueType = typeof(Nullable<>).MakeGenericType(valueType); //转换为可空值类型
 
         var editor = new ValueEditorInfo(
-            typeof(TEditor).Name, isDefault, typeof(TValue),
+            name, isDefault, typeof(TValue),
             CreateEditorMaker(valueType, typeof(TEditor)),
             (element, propertyMeta) => new RxProxy<TValue?>(
                 () => (TValue?)GetPropertyValue(element, propertyMeta),
@@ -209,7 +211,7 @@ public sealed class PropertyEditor : Widget
             {
                 var state = element.Controller.FindState(currentValue.Value.StateName);
                 var stateValue = state?.Value as IDynamicValueState;
-                return stateValue?.GetRuntimeValue(state!);
+                return stateValue?.Value; //注意非运行时值
             }
 
             throw new NotSupportedException("Unknown property value source");
@@ -233,6 +235,8 @@ public sealed class PropertyEditor : Widget
             element.OnInitPropertyValueChanged();
         else
             element.SetPropertyValue(propertyValue);
+
+        //_bindButtonColor?.NotifyValueChanged(); //暂简单强制刷新绑定状态
     }
 
     private static void DeletePropertyValue(DesignElement element, DynamicPropertyMeta propertyMeta,
@@ -245,6 +249,7 @@ public sealed class PropertyEditor : Widget
             element.RemovePropertyValue(propertyMeta.Name);
 
         editingValue?.NotifyValueChanged();
+        //_bindButtonColor?.NotifyValueChanged(); //暂简单强制刷新绑定状态
     }
 
     /// <summary>
