@@ -104,7 +104,11 @@ public sealed class TreeController<T>
 
             _selectedNodes.Clear();
             Nodes.Clear(); //清除旧的节点
-            TreeView?.Relayout();
+            if (TreeView is { IsMounted: true })
+            {
+                TryBuildNodes();
+                TreeView?.Relayout();
+            }
         }
     }
 
@@ -112,7 +116,7 @@ public sealed class TreeController<T>
     {
         if (_dataSource == null || _dataSource.Count == 0) return;
         if (Nodes.Count != 0) return; //has build
-        
+
         foreach (var item in _dataSource)
         {
             var node = new TreeNode<T>(item, this);
@@ -120,9 +124,6 @@ public sealed class TreeController<T>
             node.TryBuildCheckbox();
             node.Parent = TreeView;
             Nodes.Add(node);
-
-            if (node.IsSelected.Value)
-                SelectNode(node); //TODO:临时方案用于默认选中(第一个)节点
         }
     }
 

@@ -5,9 +5,13 @@ namespace PixUI;
 
 public sealed class TreeView<T> : Widget, IScrollable
 {
-    public TreeView(TreeController<T> controller, bool showCheckbox = false, float nodeHeight = 30)
+    public TreeView(TreeController<T> controller, 
+        TreeNodeBuilder<T> nodeBuilder, TreeChildrenGetter<T> childrenGetter,
+        bool showCheckbox = false, float nodeHeight = 30)
     {
         _controller = controller;
+        _controller.NodeBuilder = nodeBuilder;
+        _controller.ChildrenGetter = childrenGetter;
         _controller.NodeHeight = nodeHeight;
         _controller.ShowCheckbox = showCheckbox;
         _controller.AttachTreeView(this);
@@ -15,16 +19,6 @@ public sealed class TreeView<T> : Widget, IScrollable
 
     private readonly TreeController<T> _controller;
     private State<Color>? _color;
-
-    public required TreeNodeBuilder<T> NodeBuilder
-    {
-        init => _controller.NodeBuilder = value;
-    }
-
-    public required TreeChildrenGetter<T> ChildrenGetter
-    {
-        init => _controller.ChildrenGetter = value;
-    }
 
     /// <summary>
     /// 背景色
@@ -64,6 +58,8 @@ public sealed class TreeView<T> : Widget, IScrollable
 
     public override bool IsOpaque => _color != null && _color.Value.Alpha == 0xFF;
 
+    protected override void OnMounted() => _controller.TryBuildNodes();
+
     public override void VisitChildren(Func<Widget, bool> action)
     {
         foreach (var node in _controller.Nodes)
@@ -79,8 +75,7 @@ public sealed class TreeView<T> : Widget, IScrollable
 
         var totalWidth = 0f;
         var totalHeight = 0f;
-        
-        _controller.TryBuildNodes();
+
         foreach (var node in _controller.Nodes)
         {
             node.Layout(float.PositiveInfinity, float.PositiveInfinity);

@@ -28,7 +28,7 @@ public abstract class DynamicView : SingleChildWidget
         Root!.Window.BeforeDynamicViewChange(this);
         Child = to;
         Root!.Window.AfterDynamicViewChange(this); //TODO: 检查是否需要，因重新布局会同样处理
-        Invalidate(InvalidAction.Relayout); //这里始终重新布局
+        Relayout(); //这里始终重新布局
     }
 
     /// <summary>

@@ -17,18 +17,14 @@ public sealed class Toolbox : View
             Children =
             {
                 new TextInput(_searchKey) { Suffix = new Icon(MaterialIcons.Search) },
-                new TreeView<ToolboxNode>(_treeController)
+                new TreeView<ToolboxNode>(_treeController, (node) =>
                 {
-                    NodeBuilder = (node) =>
-                    {
-                        var data = node.Data;
-                        node.Label = new Text(data.IsCatelog ? data.CatelogName! : data.DynamicWidgetMeta!.Name);
-                        node.Icon = data.IsCatelog ? new(MaterialIcons.Folder) : new(data.DynamicWidgetMeta!.Icon);
-                        node.IsLeaf = !data.IsCatelog;
-                        node.IsExpanded = true;
-                    },
-                    ChildrenGetter = data => data.Children!
-                },
+                    var data = node.Data;
+                    node.Label = new Text(data.IsCatelog ? data.CatelogName! : data.DynamicWidgetMeta!.Name);
+                    node.Icon = data.IsCatelog ? new(MaterialIcons.Folder) : new(data.DynamicWidgetMeta!.Icon);
+                    node.IsLeaf = !data.IsCatelog;
+                    node.IsExpanded = true;
+                }, data => data.Children!)
             }
         };
     }

@@ -147,7 +147,7 @@ internal sealed class InvalidQueue
     /// <summary>
     /// 防止队列在消费时改动队列
     /// </summary>
-    private bool IsSuspended { get; set; } = false;
+    private bool IsSuspended { get; set; }
 
     internal bool IsEmpty => _queue.Count == 0;
 

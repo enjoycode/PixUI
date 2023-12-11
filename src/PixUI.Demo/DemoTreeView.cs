@@ -67,20 +67,18 @@ namespace PixUI.Demo.Mac
                                 {
                                     new Expanded()
                                     {
-                                        Child = new TreeView<TreeData>(_treeController1)
+                                        Child = new TreeView<TreeData>(_treeController1, BuildTreeNode,
+                                            d => d.Children!)
                                         {
                                             Color = new Color(0xFFDCDCDC),
-                                            NodeBuilder = BuildTreeNode,
-                                            ChildrenGetter = d => d.Children!
                                         }
                                     },
                                     new Expanded()
                                     {
-                                        Child = new TreeView<TreeData>(_treeController2, true)
+                                        Child = new TreeView<TreeData>(_treeController2, BuildTreeNode,
+                                            d => d.Children!, true)
                                         {
                                             Color = new Color(0xFFDCDCDC),
-                                            NodeBuilder = BuildTreeNode,
-                                            ChildrenGetter = d => d.Children!
                                         }
                                     }
                                 }
