@@ -69,8 +69,7 @@ public abstract class Widget : IDisposable
         {
             if (value == IsLayoutTight) return;
             SetFlagValue(value, LayoutTightMask);
-            if (IsMounted)
-                Invalidate(InvalidAction.Relayout);
+            Relayout();
         }
     }
 
@@ -85,15 +84,9 @@ public abstract class Widget : IDisposable
             if (IsMounted == value) return;
 
             if (value)
-            {
                 _flag |= MountedMask;
-                OnMounted();
-            }
             else
-            {
                 _flag &= ~(MountedMask);
-                OnUnmounted();
-            }
         }
     }
 
@@ -339,6 +332,7 @@ public abstract class Widget : IDisposable
             child.Mount();
             return false;
         });
+        OnMounted();
     }
 
     private void Unmount()
@@ -351,25 +345,25 @@ public abstract class Widget : IDisposable
             child.Unmount();
             return false;
         });
+        OnUnmounted();
     }
 
     public virtual void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
         var hasChildren = false;
         SetSize(0, 0);
         VisitChildren(child =>
         {
             hasChildren = true;
-            child.Layout(width, height);
+            child.Layout(maxSize.Width, maxSize.Height);
             SetSize(Math.Max(W, child.W), Math.Max(H, child.H));
             return false;
         });
 
         if (!hasChildren)
-            SetSize(width, height);
+            SetSize(maxSize.Width, maxSize.Height);
     }
 
     /// <summary>
@@ -379,11 +373,11 @@ public abstract class Widget : IDisposable
     {
         CachedAvailableWidth = Math.Max(0, availableWidth);
         CachedAvailableHeight = Math.Max(0, availableHeight);
-        
+
         var maxW = Width == null
             ? CachedAvailableWidth
             : Math.Min(Math.Max(0, Width.Value), CachedAvailableWidth);
-        
+
         var maxH = Height == null
             ? CachedAvailableHeight
             : Math.Min(Math.Max(0, Height.Value), CachedAvailableHeight);

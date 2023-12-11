@@ -5,7 +5,7 @@ namespace PixUI;
 
 public sealed class TreeView<T> : Widget, IScrollable
 {
-    public TreeView(TreeController<T> controller, 
+    public TreeView(TreeController<T> controller,
         TreeNodeBuilder<T> nodeBuilder, TreeChildrenGetter<T> childrenGetter,
         bool showCheckbox = false, float nodeHeight = 30)
     {
@@ -15,6 +15,7 @@ public sealed class TreeView<T> : Widget, IScrollable
         _controller.NodeHeight = nodeHeight;
         _controller.ShowCheckbox = showCheckbox;
         _controller.AttachTreeView(this);
+        _controller.TryBuildNodes();
     }
 
     private readonly TreeController<T> _controller;
@@ -57,8 +58,6 @@ public sealed class TreeView<T> : Widget, IScrollable
     #region ====Overrides====
 
     public override bool IsOpaque => _color != null && _color.Value.Alpha == 0xFF;
-
-    protected override void OnMounted() => _controller.TryBuildNodes();
 
     public override void VisitChildren(Func<Widget, bool> action)
     {

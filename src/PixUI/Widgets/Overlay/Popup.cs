@@ -209,11 +209,11 @@ internal sealed class PopupProxy : Widget
 {
     internal PopupProxy(Popup popup)
     {
-        //直接布局方便计算显示位置，后续不用再计算
-        popup.Layout(popup.Owner.Window.Width, popup.Owner.Window.Height);
-
         _popup = popup;
         _popup.Parent = this;
+        
+        //直接布局方便计算显示位置，后续不用再计算
+        popup.Layout(popup.Owner.Window.Width, popup.Owner.Window.Height);
     }
 
     private readonly Popup _popup;

@@ -103,17 +103,15 @@ public sealed class TreeController<T>
             //     rxList.AddBinding(this, BindingOptions.None);
 
             _selectedNodes.Clear();
-            Nodes.Clear(); //清除旧的节点
-            if (TreeView is { IsMounted: true })
-            {
-                TryBuildNodes();
-                TreeView?.Relayout();
-            }
+            Nodes.Clear();
+            TryBuildNodes();
+            TreeView?.Relayout();
         }
     }
 
     internal void TryBuildNodes()
     {
+        if (NodeBuilder == null!) return;
         if (_dataSource == null || _dataSource.Count == 0) return;
         if (Nodes.Count != 0) return; //has build
 

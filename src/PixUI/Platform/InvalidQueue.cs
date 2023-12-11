@@ -178,6 +178,7 @@ internal sealed class InvalidQueue
                     if (CanMerge(action, exist.Action))
                     {
                         exist.Widget = widget;
+                        exist.Action = action; //可能新的上级要求重新布局
                         insertPos = -1;
                         break;
                     }
