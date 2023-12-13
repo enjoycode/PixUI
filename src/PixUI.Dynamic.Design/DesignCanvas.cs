@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace PixUI.Dynamic.Design;
 
-public sealed class DesignCanvas : View, IDynamicView
+public sealed class DesignCanvas : View, IDynamicContext
 {
     public DesignCanvas(DesignController controller)
     {
@@ -27,28 +27,7 @@ public sealed class DesignCanvas : View, IDynamicView
 
     private readonly DesignController _designController;
 
-    public ValueTask<object?> GetDataSet(string name)
-    {
-        var state = _designController.FindState(name);
-        if (state == null || state.Type != DynamicStateType.DataSet || state.Value == null)
-            return new ValueTask<object?>();
-
-        return ((IDynamicDataSetState)state.Value).GetRuntimeDataSet(this);
-    }
-
-    public State GetState(string name)
-    {
-        var state = _designController.FindState(name);
-        if (state == null)
-#if DEBUG
-            throw new Exception($"Can't find state: {name}");
-#else
-            return State.Empty;
-#endif
-        if (state.Type == DynamicStateType.DataSet)
-            throw new Exception($"State is DataSet: {name}");
-        return ((IDynamicValueState)state.Value!).GetRuntimeValue(state);
-    }
+    DynamicState? IDynamicContext.FindState(string name) => _designController.FindState(name);
 
     protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)
     {

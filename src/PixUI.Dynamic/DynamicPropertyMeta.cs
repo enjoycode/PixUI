@@ -54,7 +54,7 @@ public sealed class DynamicPropertyMeta
         ValueType is { IsValueType: true, IsGenericType: true } &&
         ValueType.GetGenericTypeDefinition() == typeof(Nullable<>);
 
-    public object? GetRuntimeValue(in DynamicValue source, IDynamicView dynamicView)
+    public object? GetRuntimeValue(in DynamicValue source, IDynamicContext dynamicContext)
     {
         if (source.From == ValueSource.Const)
         {
@@ -70,18 +70,18 @@ public sealed class DynamicPropertyMeta
 
         if (source.From == ValueSource.State)
         {
-            return dynamicView.GetState(source.StateName);
+            return dynamicContext.GetState(source.StateName);
         }
 
         throw new NotImplementedException();
     }
 
     public void SetRuntimeValue(DynamicWidgetMeta meta, Widget target, in DynamicValue propertyValue,
-        IDynamicView dynamicView)
+        IDynamicContext dynamicContext)
     {
         //TODO: emit 优化，暂用反射
 
-        var runtimeValue = GetRuntimeValue(propertyValue, dynamicView);
+        var runtimeValue = GetRuntimeValue(propertyValue, dynamicContext);
         var propInfo = meta.WidgetType.GetProperty(Name);
         propInfo!.SetValue(target, runtimeValue);
     }

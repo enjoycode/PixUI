@@ -16,5 +16,5 @@ public interface IEventAction
     /// </summary>
     void ReadProperties(ref Utf8JsonReader reader);
 
-    void Run(IDynamicView dynamicView, object? eventArg = null);
+    void Run(IDynamicContext dynamicContext, object? eventArg = null);
 }

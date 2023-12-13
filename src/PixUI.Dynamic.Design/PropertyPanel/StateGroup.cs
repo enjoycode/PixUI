@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace PixUI.Dynamic.Design;
 
@@ -56,7 +57,7 @@ internal sealed class StateGroup : View
 
     private async void OnAddState(PointerEvent e)
     {
-        var dlg = new NewStateDialog();
+        var dlg = new NewStateDialog(_designController);
         var dlgResult = await dlg.ShowAsync();
         if (dlgResult != DialogResult.OK) return;
 

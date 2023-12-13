@@ -195,7 +195,7 @@ partial class DesignController
                     ReadStates(ref reader);
                     break;
                 case "Root":
-                    rootElement = (DesignElement)ReadWidget(ref reader, null, string.Empty);
+                    rootElement = (DesignElement)ReadWidget(ref reader, string.Empty);
                     break;
             }
         }
@@ -276,7 +276,7 @@ partial class DesignController
         states.Add(state);
     }
 
-    private Widget ReadWidget(ref Utf8JsonReader reader, DynamicWidgetMeta? parentMeta, string slotName)
+    private Widget ReadWidget(ref Utf8JsonReader reader, string slotName)
     {
         Widget result = null!;
         DesignElement element = null!;
@@ -313,16 +313,16 @@ partial class DesignController
             {
                 if (childSlot!.ContainerType == ContainerType.MultiChild)
                 {
-                    ReadWidgetArray(ref reader, meta, element.Target!, childSlot);
+                    ReadWidgetArray(ref reader, element.Target!, childSlot);
                 }
                 else if (childSlot.ContainerType == ContainerType.SingleChildReversed)
                 {
-                    var child = ReadWidget(ref reader, meta, childSlot.PropertyName);
+                    var child = ReadWidget(ref reader, childSlot.PropertyName);
                     element.Child = child;
                 }
                 else
                 {
-                    var child = ReadWidget(ref reader, meta, childSlot.PropertyName);
+                    var child = ReadWidget(ref reader, childSlot.PropertyName);
                     childSlot.SetChild(element.Target!, child);
                 }
             }
@@ -367,15 +367,14 @@ partial class DesignController
         return res;
     }
 
-    private void ReadWidgetArray(ref Utf8JsonReader reader, DynamicWidgetMeta parentMeta, Widget parent,
-        ContainerSlot childrenSlot)
+    private void ReadWidgetArray(ref Utf8JsonReader reader, Widget parent, ContainerSlot childrenSlot)
     {
         while (reader.Read())
         {
             if (reader.TokenType == JsonTokenType.EndArray) break;
             if (reader.TokenType != JsonTokenType.StartObject) continue;
 
-            var child = ReadWidget(ref reader, parentMeta, childrenSlot.PropertyName);
+            var child = ReadWidget(ref reader, childrenSlot.PropertyName);
             childrenSlot.AddChild(parent, child);
         }
     }

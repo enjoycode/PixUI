@@ -325,6 +325,7 @@ public abstract class Widget : IDisposable
     private void Mount()
     {
         if (SuspendingMount) return;
+        if (IsMounted) return;
 
         IsMounted = true;
         VisitChildren(child =>
@@ -338,6 +339,7 @@ public abstract class Widget : IDisposable
     private void Unmount()
     {
         if (SuspendingMount) return;
+        if (!IsMounted) return;
 
         IsMounted = false;
         VisitChildren(child =>

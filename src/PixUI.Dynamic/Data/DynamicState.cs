@@ -23,9 +23,14 @@ public interface IDynamicValueState : IDynamicState
 
 public interface IDynamicDataSetState : IDynamicState
 {
+    /// <summary>
+    /// 数据集变更事件，用于通知绑定的组件刷新数据
+    /// </summary>
+    event Action DataSetValueChanged;
+
     void ReadFrom(ref Utf8JsonReader reader);
 
-    ValueTask<object?> GetRuntimeDataSet(IDynamicView dynamicView);
+    ValueTask<object?> GetRuntimeDataSet(IDynamicContext dynamicContext);
 }
 
 public enum DynamicStateType

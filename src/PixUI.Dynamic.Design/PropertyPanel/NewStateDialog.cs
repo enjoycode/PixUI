@@ -1,16 +1,20 @@
 using System;
+using System.Linq;
 
 namespace PixUI.Dynamic.Design;
 
 internal sealed class NewStateDialog : Dialog
 {
-    public NewStateDialog()
+    public NewStateDialog(DesignController designController)
     {
         Width = 300;
         Height = 210;
         Title.Value = "Add State";
+
+        _designController = designController;
     }
 
+    private readonly DesignController _designController;
     private readonly State<string> _name = "";
     private readonly State<string?> _type = "DataSet";
 
@@ -33,5 +37,19 @@ internal sealed class NewStateDialog : Dialog
                 }
             }
         };
+    }
+
+    protected override bool OnClosing(string result)
+    {
+        if (result != DialogResult.OK) return false;
+
+        //检查名称是否已存在
+        if (_designController.StatesController.DataSource!.Any(s => s.Name == Name))
+        {
+            Notification.Error("状态名称已存在");
+            return true;
+        }
+
+        return false;
     }
 }

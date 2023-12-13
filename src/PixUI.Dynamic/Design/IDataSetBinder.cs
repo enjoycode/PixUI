@@ -6,12 +6,7 @@ namespace PixUI;
 public interface IDataSetBinder
 {
     /// <summary>
-    /// DataSet属性的名称
+    /// 数据集发生变更后刷新数据
     /// </summary>
-    string DataSetPropertyName { get; }
-
-    /// <summary>
-    /// 设计时改变了绑定的数据集
-    /// </summary>
-    void OnDataSetChanged();
+    void OnDataSetValueChanged();
 }

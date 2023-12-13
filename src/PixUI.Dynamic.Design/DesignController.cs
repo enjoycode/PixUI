@@ -37,7 +37,7 @@ public sealed partial class DesignController
                 _cachedBgImage = Image.FromEncodedData(_background.ImageData);
             }
 
-            RootElement.Invalidate(InvalidAction.Repaint);
+            RootElement.Repaint();
         }
     }
 
