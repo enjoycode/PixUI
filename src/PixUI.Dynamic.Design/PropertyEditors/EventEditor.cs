@@ -64,6 +64,7 @@ public sealed class EventEditor : Widget
 
     private void OnDelete()
     {
+        _element.Data.RemoveEventValue(_eventMeta.Name);
         _actionName.NotifyValueChanged();
     }
 
