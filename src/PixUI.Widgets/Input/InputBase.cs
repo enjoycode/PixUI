@@ -14,6 +14,7 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
     private readonly T _editor = null!;
 
     private InputBorder? _border;
+    private State<Color>? _fillColor;
     private State<EdgeInsets>? _padding;
     private readonly FocusedDecoration _focusedDecoration;
 
@@ -47,6 +48,12 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
             _border = value;
             Relayout();
         }
+    }
+
+    public State<Color>? FillColor
+    {
+        get => _fillColor;
+        set => _fillColor = Bind(_fillColor, value, RepaintOnStateChanged);
     }
 
     protected Widget? PrefixWidget
@@ -168,7 +175,8 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
         var border = _border ?? InputBorder.DefaultBorder;
 
         //画背景及边框
-        border.Paint(canvas, bounds, IsReadonly ? Theme.DisabledBgColor : Colors.White);
+        var fillColor = _fillColor?.Value ?? Colors.White;
+        border.Paint(canvas, bounds, IsReadonly ? Theme.DisabledBgColor : fillColor);
 
         PaintChildren(canvas, area);
     }

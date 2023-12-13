@@ -26,13 +26,22 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     internal const float DefaultHeight = 30;
     internal const float StandardRadius = 4;
 
+    private readonly State<string>? _text;
     private State<float>? _outlineWidth;
     private State<Color>? _textColor;
     private State<float>? _fontSize;
 
     private bool _drawMask;
 
-    public State<string>? Text { get; init; }
+    public State<string>? Text
+    {
+        get => _text;
+        init
+        {
+            _text = value;
+            _text?.AddListener(RelayoutOnStateChanged);
+        }
+    }
 
     public State<IconData>? Icon { get; init; }
 
@@ -81,7 +90,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         if (e.Buttons != PointerButtons.Left) return;
 
         _drawMask = true;
-        Invalidate(InvalidAction.Repaint);
+        Repaint();
     }
 
     private void OnPointerUp(PointerEvent e)
@@ -89,7 +98,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         if (e.Buttons != PointerButtons.Left) return;
 
         _drawMask = false;
-        Invalidate(InvalidAction.Repaint);
+        Repaint();
     }
 
     #endregion
@@ -128,17 +137,15 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     /// </summary>
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
+        var width = maxSize.Width;
+        var height = maxSize.Height;
 
         TryBuildContent();
         _iconWidget?.Layout(width, height);
         _textWidget?.Layout(width - (_iconWidget?.W ?? 0), height);
         var contentWidth = (_iconWidget?.W ?? 0) + (_textWidget?.W ?? 0);
-        if (Width == null)
-            SetSize(Math.Max(DefaultHeight, contentWidth + 16 /*padding*/), height);
-        else
-            SetSize(width, height);
+        SetSize(Width == null ? Math.Max(DefaultHeight, contentWidth + 16 /*padding*/) : width, height);
 
         //TODO: 根据icon位置计算
         // var contentHeight = Math.Max(_iconWidget?.H ?? 0, _textWidget?.H ?? 0);

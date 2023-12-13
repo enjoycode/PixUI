@@ -12,6 +12,8 @@ public sealed class DynamicWidgetData
 {
     public List<PropertyValue>? Properties { get; private set; }
 
+    public List<EventValue>? Events { get; private set; }
+
     /// <summary>
     /// 指定属性是否已绑定至状态
     /// </summary>
@@ -68,6 +70,28 @@ public sealed class DynamicWidgetData
     {
         Properties?.RemoveAll(p => p.Name == name);
     }
+
+    public bool TryGetEventValue(string name, out EventValue value)
+    {
+        value = null!;
+        if (Events == null || Events.Count == 0)
+            return false;
+
+        var exists = Events.FirstOrDefault(p => p.Name == name);
+        if (exists != null)
+            value = exists;
+
+        return exists != null;
+    }
+
+    public void SetEventValue(string name, IEventAction action)
+    {
+        Events ??= new List<EventValue>();
+        Events.RemoveAll(e => e.Name == name);
+        Events.Add(new EventValue { Name = name, Action = action });
+    }
+
+    public void RemoveEventValue(string name) => Events?.RemoveAll(e => e.Name == name);
 }
 
 public enum ValueSource
@@ -154,4 +178,14 @@ public sealed class PropertyValue
 {
     public string Name { get; set; } = null!;
     public DynamicValue Value { get; set; }
+}
+
+/// <summary>
+/// 设计时组件的事件行为定义
+/// </summary>
+public sealed class EventValue
+{
+    public string Name { get; set; } = null!;
+
+    public IEventAction Action { get; set; } = null!;
 }

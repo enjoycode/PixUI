@@ -12,6 +12,10 @@ partial class DynamicWidgetManager
             new(nameof(Button.Text), typeof(State<string>), true, true, "Button"),
             new(nameof(Button.Icon), typeof(State<IconData>), true, true),
             new(nameof(Button.TextColor), typeof(State<Color>), true)
+        },
+        events: new DynamicEventMeta[]
+        {
+            new(nameof(Button.OnTap))
         }
     );
 

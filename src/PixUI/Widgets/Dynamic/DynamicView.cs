@@ -2,9 +2,9 @@ namespace PixUI;
 
 public delegate Widget TransitionBuilder(Animation<double> animation, Widget child);
 
-public abstract class DynamicView : SingleChildWidget
+public class DynamicView : SingleChildWidget
 {
-    protected DynamicView()
+    public DynamicView()
     {
         IsLayoutTight = false; //默认非紧凑布局
     }
@@ -17,7 +17,7 @@ public abstract class DynamicView : SingleChildWidget
     /// <summary>
     /// 直接替换
     /// </summary>
-    protected void ReplaceTo(Widget? to)
+    public void ReplaceTo(Widget? to)
     {
         if (!IsMounted)
         {

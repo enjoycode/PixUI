@@ -92,14 +92,18 @@ public sealed class Card : SingleChildWidget
         //先画阴影
         if (elevation > 0)
         {
+            canvas.Save();
+            canvas.ClipPath(outerPath, ClipOp.Difference, true);
             canvas.DrawShadow(outerPath, shadowColor, elevation,
                 shadowColor.Alpha != 0xFF, Root!.Window.ScaleFactor);
+            canvas.Restore();
         }
 
         //Clip外形后填充背景及边框
         canvas.Save();
         canvas.ClipPath(outerPath, ClipOp.Intersect, true);
-        canvas.Clear(color);
+        var fill = PaintUtils.Shared(color);
+        canvas.DrawRect(rect, fill);
         shape.Paint(canvas, rect);
 
         PaintChildren(canvas, area);

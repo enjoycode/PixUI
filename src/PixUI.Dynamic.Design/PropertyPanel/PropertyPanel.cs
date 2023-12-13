@@ -42,7 +42,7 @@ public sealed class PropertyPanel : SingleChildWidget
     private readonly State<bool> _eventGroupVisible = false;
 
     /// <summary>
-    /// 属性组的所有编辑器，用于状态值变更通知刷新
+    /// 属性组的所有编辑器，用于状态编辑面板的状态值变更通知刷新
     /// </summary>
     private readonly List<PropertyEditor> _propertyEditors = new();
 
@@ -50,7 +50,7 @@ public sealed class PropertyPanel : SingleChildWidget
     /// 附加的布局属性字典表
     /// </summary>
     private readonly Dictionary<string, State> _layoutProperties = new();
-    
+
     private void OnNotifyLayoutPropertyChanged(string layoutPropertyName)
     {
         if (_layoutProperties.TryGetValue(layoutPropertyName, out var editingValue))
@@ -93,6 +93,7 @@ public sealed class PropertyPanel : SingleChildWidget
         BuildWidgetGroup(element, meta);
         BuildLayoutGroup(element, meta);
         BuildPropertyGroup(element, meta);
+        BuildEventGroup(element, meta);
 
         _listView.Controller.ResetScroll();
         _listView.Relayout();
@@ -146,5 +147,21 @@ public sealed class PropertyPanel : SingleChildWidget
         }
 
         _propGroup.SetItems(propItems);
+    }
+
+    private void BuildEventGroup(DesignElement element, DynamicWidgetMeta meta)
+    {
+        _eventGroupVisible.Value = meta.Events is { Length: > 0 };
+        if (!_eventGroupVisible.Value) return;
+
+        var eventItems = new FormItem[meta.Events!.Length];
+        for (var i = 0; i < eventItems.Length; i++)
+        {
+            var eventName = meta.Events[i].Name;
+            var eventEditor = new EventEditor(element, meta.Events[i]);
+            eventItems[i] = new($"{eventName}:", eventEditor);
+        }
+
+        _eventGroup.SetItems(eventItems);
     }
 }

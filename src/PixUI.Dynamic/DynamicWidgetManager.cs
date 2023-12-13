@@ -26,6 +26,15 @@ public static partial class DynamicWidgetManager
 
     private static readonly Dictionary<string, DynamicWidgetMeta> _dynamicWidgets = new();
 
+    private static IEventActionManager? _eventActionManager;
+
+    public static IEventActionManager EventActionManager => _eventActionManager!;
+
+    public static void TryInitEventActionManager(Func<IEventActionManager> creator)
+    {
+        _eventActionManager ??= creator();
+    }
+
     public static void Register(DynamicWidgetMeta dynamicWidgetMeta, bool replaceExists = false)
     {
         if (_dynamicWidgets.ContainsKey(dynamicWidgetMeta.Name) && !replaceExists)

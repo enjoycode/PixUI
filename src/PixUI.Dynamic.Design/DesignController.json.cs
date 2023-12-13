@@ -90,8 +90,25 @@ partial class DesignController
             }
         }
 
+        // Events
+        if (data.Events is { Count: > 0 })
+        {
+            writer.WritePropertyName("Events");
+            writer.WriteStartObject();
+            foreach (var eventValue in data.Events)
+            {
+                writer.WritePropertyName(eventValue.Name);
+                writer.WriteStartObject();
+                writer.WriteString("Handler", eventValue.Action.ActionName);
+                eventValue.Action.WriteProperties(writer);
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndObject();
+        }
+
         // Slots
-        if (element.IsContainer && element.Child != null)
+        if (element is { IsContainer: true, Child: not null })
         {
             var childs = GetAllChildrenElements(element);
             var slots = childs.GroupBy(c => c.SlotName);
@@ -290,7 +307,7 @@ partial class DesignController
             }
             else if (propName == "Events")
             {
-                throw new NotImplementedException();
+                ReadEvents(ref reader, element);
             }
             else if (meta.IsSlot(propName, out var childSlot))
             {
@@ -321,6 +338,33 @@ partial class DesignController
         }
 
         return result;
+    }
+
+    private static void ReadEvents(ref Utf8JsonReader reader, DesignElement element)
+    {
+        reader.Read(); //{
+
+        while (reader.Read())
+        {
+            if (reader.TokenType == JsonTokenType.EndObject) break;
+
+            var eventName = reader.GetString()!;
+            var eventAction = ReadEventAction(ref reader);
+            element.Data.SetEventValue(eventName, eventAction);
+        }
+    }
+
+    private static IEventAction ReadEventAction(ref Utf8JsonReader reader)
+    {
+        reader.Read(); //{
+        reader.Read(); // Handler prop
+        Debug.Assert(reader.GetString() == "Handler");
+        reader.Read(); // Handler value
+        var handler = reader.GetString()!;
+        //根据类型创建实例
+        var res = DynamicWidgetManager.EventActionManager.Create(handler);
+        res.ReadProperties(ref reader);
+        return res;
     }
 
     private void ReadWidgetArray(ref Utf8JsonReader reader, DynamicWidgetMeta parentMeta, Widget parent,
