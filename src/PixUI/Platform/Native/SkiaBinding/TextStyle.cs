@@ -9,7 +9,7 @@ namespace PixUI
 
         public TextStyle() : this(SkiaApi.sk_text_style_new(), true)
         {
-            if (UIApplication.Current.IsWasm)
+            if (OperatingSystem.IsBrowser())
                 SetFontFamilies(new[] { FontCollection.DefaultFamilyName });
         }
 

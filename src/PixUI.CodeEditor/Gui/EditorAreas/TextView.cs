@@ -8,7 +8,7 @@ namespace CodeEditor
         public TextView(TextEditor textEditor) : base(textEditor)
         {
             //TODO: 从Theme取Font设置 and Web use FontCollection.DefaultFontFamily
-            var typeface = UIApplication.Current.IsWasm
+            var typeface = OperatingSystem.IsBrowser()
                 ? FontCollection.Instance.FindTypeface(FontCollection.DefaultFamilyName, false, false)
                 : FontCollection.Instance.DefaultFallback('X', null, false, false);
             var defaultFont = new Font(typeface, Theme.FontSize);

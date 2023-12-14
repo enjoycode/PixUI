@@ -8,8 +8,6 @@ public sealed class BlazorApplication : UIApplication
     internal static HttpClient HttpClient = null!;
     internal static BlazorWindow Window { get; private set; } = null!;
 
-    public override bool IsWasm => true;
-
     protected override void PushWebHistory(string fullPath, int index)
         => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("PushWebHistory", fullPath, index);
 

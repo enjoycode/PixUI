@@ -11,8 +11,6 @@ public abstract class UIApplication
 
     public static UIApplication Current { get; protected set; } = null!;
 
-    public virtual bool IsWasm => false; //TODO: remove use OperatingSystem.IsBrowser()
-
     /// <summary>
     /// 仅Blazor应用
     /// </summary>
@@ -54,7 +52,7 @@ public abstract class UIApplication
         {
             ctx.Canvas = widgetsCanvas;
             window.WidgetsInvalidQueue.RenderFrame(ctx);
-            if (IsWasm)
+            if (OperatingSystem.IsBrowser())
                 widgetsCanvas.Surface!.Flush();
 #if __WEB__
             window.FlushOffscreenSurface();
