@@ -213,9 +213,9 @@
     }
 
     function SetInputRect(x, y, w, h) {
-        _htmlInput.style.left = x
-        _htmlInput.style.top = y + h
-        _htmlInput.style.width = w
+        _htmlInput.style.left = x.toString() + 'px'
+        _htmlInput.style.top = (y + h).toString() + 'px'
+        _htmlInput.style.width = w.toString() + 'px'
     }
 
     function StopTextInput() {

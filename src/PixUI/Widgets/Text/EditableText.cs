@@ -66,7 +66,13 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         if (e.IsFocused)
         {
             if (!IsReadonly)
+            {
                 e.Window.StartTextInput();
+                var winPt = LocalToWindow(0, 0);
+                var inputRect = Rect.FromLTWH(winPt.X, winPt.Y, W, H);
+                e.Window.SetTextInputRect(inputRect);
+            }
+
             _caret.Show();
         }
         else
