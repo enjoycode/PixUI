@@ -212,6 +212,12 @@
         DotNet.invokeMethod(_asmName, "OnTextInput", s)
     }
 
+    function SetInputRect(x, y, w, h) {
+        _htmlInput.style.left = x
+        _htmlInput.style.top = y + h
+        _htmlInput.style.width = w
+    }
+
     function StopTextInput() {
         _htmlInput.blur();
         _htmlInput.value = '';
@@ -254,7 +260,8 @@
         CreateInput()
         let glHandel = GetGLContext()
         let routePath = document.location.hash.length > 0 ? document.location.hash.substring(1) : null
-        await DotNet.invokeMethodAsync(_asmName, "Run", glHandel, window.innerWidth, window.innerHeight, window.devicePixelRatio, routePath)
+        let isMacOS = navigator.userAgent.includes("Mac")
+        await DotNet.invokeMethodAsync(_asmName, "Run", glHandel, window.innerWidth, window.innerHeight, window.devicePixelRatio, routePath, isMacOS)
         BindEvents()
     }
 </script>

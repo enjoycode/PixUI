@@ -15,19 +15,19 @@ public class Program
         var host = builder.Build();
         BlazorApplication.JSRuntime = host.Services.GetRequiredService<IJSRuntime>();
         BlazorApplication.HttpClient = host.Services.GetService<HttpClient>()!;
-        
+
         await host.RunAsync();
     }
 
     [JSInvokable]
-    public static async Task Run(int glHandle, int width, int height, float ratio, string? routePath)
+    public static async Task Run(int glHandle, int width, int height, float ratio, string? routePath, bool isMacOS)
     {
         //初始化默认字体
         await using var fontDataStream =
             await BlazorApplication.HttpClient.GetStreamAsync("/fonts/MiSans-Regular.woff2");
         using var fontData = SKData.Create(fontDataStream);
         FontCollection.Instance.RegisterTypefaceToAsset(fontData!, FontCollection.DefaultFamilyName, false);
-        
-        BlazorApplication.Run(() => new DemoRoute(), glHandle, width, height, ratio, routePath);
+
+        BlazorApplication.Run(() => new DemoRoute(), glHandle, width, height, ratio, routePath, isMacOS);
     }
 }

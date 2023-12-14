@@ -91,6 +91,10 @@ public sealed class BlazorWindow : UIWindow
     public override void StopTextInput() =>
         ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("StopTextInput");
 
+    public override void SetTextInputRect(Rect rect) =>
+        ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("SetInputRect",
+            rect.X, rect.Y, rect.Width, rect.Height);
+
     internal void RouteGoto(int historyId) => RouteHistoryManager.Goto(historyId);
 
     internal void RoutePush(string path) => RouteHistoryManager.Push(path);

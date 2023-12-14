@@ -11,6 +11,8 @@ public abstract class UIApplication
 
     public static UIApplication Current { get; protected set; } = null!;
 
+    public virtual bool IsMacOS() => OperatingSystem.IsMacOS();
+
     /// <summary>
     /// 仅Blazor应用
     /// </summary>

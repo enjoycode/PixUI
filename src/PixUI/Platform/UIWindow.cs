@@ -17,7 +17,7 @@ public abstract class UIWindow
 
         PaintDebugger.EnableChanged += () => RootWidget.Invalidate(InvalidAction.Repaint);
 
-        UIWindow.Current = this; //TODO:暂单窗体
+        Current = this; //TODO:暂单窗体
     }
 
     #region ====Fields & Properties====
