@@ -4,7 +4,7 @@ namespace PixUI;
 
 public sealed class EditableText : TextBase, IMouseRegion, IFocusable
 {
-    public EditableText(State<string> text) : base(text)
+    public EditableText()
     {
         MouseRegion = new MouseRegion(() => Cursors.IBeam);
         MouseRegion.PointerDown += _OnPointerDown;

@@ -75,10 +75,7 @@ namespace PixUI.Demo
                             },
                             new Select<string>(_selectedValue)
                             {
-                                Width = 200, Options = new[]
-                                {
-                                    "无锡", "上海", "苏州"
-                                }
+                                Width = 200, Options = new[] { "无锡", "上海", "苏州" }
                             },
                             new TextInput("Hello World!")
                             {

@@ -8,6 +8,7 @@ public sealed class DatePicker : InputBase<EditableText>
 {
     public DatePicker()
     {
+        Editor = new EditableText { Text = string.Empty };
         Padding = new RxValue<EdgeInsets>(EdgeInsets.Only(4, 4, 0, 4));
         SuffixWidget = new Button(icon: MaterialIcons.CalendarMonth)
         {
@@ -32,8 +33,6 @@ public sealed class DatePicker : InputBase<EditableText>
     {
         init
         {
-            Editor = new EditableText(string.Empty);
-
             _value = Bind(value, OnValueChanged);
             _textValue = Bind(Editor.Text, OnTextChanged);
             if (value.Value != null)

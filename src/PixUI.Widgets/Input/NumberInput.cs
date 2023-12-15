@@ -6,7 +6,12 @@ namespace PixUI;
 
 public sealed class NumberInput<T> : InputBase<EditableText> where T : struct, INumber<T>, IMinMaxValue<T>
 {
-    public NumberInput() { }
+    public NumberInput()
+    {
+        Editor = new EditableText();
+        Editor.PreviewInput = OnPreviewInput;
+        Editor.CommitChanges = OnCommitChanges;
+    }
 
     [SetsRequiredMembers]
     public NumberInput(T numberValue) : this(new RxValue<T>(numberValue)) { }
@@ -15,7 +20,7 @@ public sealed class NumberInput<T> : InputBase<EditableText> where T : struct, I
     public NumberInput(State<T> number) : this(number.ToNullable()) { }
 
     [SetsRequiredMembers]
-    public NumberInput(State<T?> number) => Number = number;
+    public NumberInput(State<T?> number) : this() => Number = number;
 
     private readonly State<T?> _nullable = null!;
 
@@ -24,9 +29,7 @@ public sealed class NumberInput<T> : InputBase<EditableText> where T : struct, I
         init
         {
             _nullable = Bind(value, OnNullableChanged);
-            Editor = new EditableText(_nullable.ToString());
-            Editor.PreviewInput = OnPreviewInput;
-            Editor.CommitChanges = OnCommitChanges;
+            Editor.Text = _nullable.ToString();
         }
     }
 

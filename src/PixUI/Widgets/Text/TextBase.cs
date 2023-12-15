@@ -6,12 +6,8 @@ public abstract class TextBase : Widget
 {
     protected TextBase() { }
 
-    protected TextBase(State<string> text)
-    {
-        Text = text;
-    }
-
-    private State<string> _text = string.Empty;
+    private static readonly State<string> EmptyText = new RxProxy<string>(() => string.Empty);
+    private State<string> _text = EmptyText;
     private State<float>? _fontSize;
     private State<FontWeight>? _fontWeight;
     private State<Color>? _textColor;
@@ -24,7 +20,7 @@ public abstract class TextBase : Widget
     public State<string> Text
     {
         get => _text;
-        init => _text = Bind(value, this is EditableText ? RepaintOnStateChanged : RelayoutOnStateChanged);
+        set => _text = Bind(_text, value, this is EditableText ? RepaintOnStateChanged : RelayoutOnStateChanged)!;
     }
 
     protected virtual bool ForceHeight { get; } = false;

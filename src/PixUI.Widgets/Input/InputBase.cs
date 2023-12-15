@@ -18,9 +18,9 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
     private State<EdgeInsets>? _padding;
     private readonly FocusedDecoration _focusedDecoration;
 
-    public required T Editor
+    protected T Editor
     {
-        protected get => _editor;
+        get => _editor;
         init
         {
             _editor = value;
@@ -141,7 +141,6 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
             SetSize(width, height);
             return;
         }
-
 
         // 布局计算子组件
         if (_prefix != null)

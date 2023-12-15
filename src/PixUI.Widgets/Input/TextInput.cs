@@ -4,10 +4,13 @@ namespace PixUI;
 
 public sealed class TextInput : InputBase<EditableText>
 {
-    public TextInput() { }
+    public TextInput()
+    {
+        Editor = new EditableText();
+    }
 
     [SetsRequiredMembers]
-    public TextInput(State<string> text)
+    public TextInput(State<string> text) : this()
     {
         Text = text;
     }
@@ -16,7 +19,7 @@ public sealed class TextInput : InputBase<EditableText>
     {
         init
         {
-            Editor = new EditableText(value);
+            Editor.Text = value;
             Readonly = value.Readonly;
         }
     }

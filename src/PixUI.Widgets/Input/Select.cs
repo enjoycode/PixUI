@@ -10,19 +10,20 @@ namespace PixUI;
 /// </summary>
 public abstract class SelectBase<T> : InputBase<Widget>
 {
-    protected SelectBase()
+    protected SelectBase(bool filterable)
     {
         SuffixWidget = new ExpandIcon(new FloatTween(0, 0.5f).Animate(_expandAnimation));
-    }
-
-    [SetsRequiredMembers]
-    protected SelectBase(State<T?> value) : this()
-    {
-        Value = value;
+        Editor = filterable
+            ? new EditableText()
+            : new SelectText();
+        if (Editor is IMouseRegion mouseRegion)
+            mouseRegion.MouseRegion.PointerTap += OnEditorTap;
+        if (Editor is IFocusable focusable)
+            focusable.FocusNode.FocusChanged += OnFocusChanged;
     }
 
     private readonly State<T?> _selectedValue = null!;
-    private readonly ListPopupItemBuilder<T>? _optionBuilder;
+    private readonly ListPopupItemBuilder<T>? _optionBuilder = null;
     private readonly OptionalAnimationController _expandAnimation = new();
     private ListPopup<T>? _listPopup;
     private bool _showing;
@@ -30,18 +31,12 @@ public abstract class SelectBase<T> : InputBase<Widget>
 
     public bool Filterable { get; init; }
 
-    public required State<T?> Value
+    public State<T?> Value
     {
         init
         {
             _selectedValue = value;
-            Editor = Filterable
-                ? new EditableText(value.ToStateOfString())
-                : new SelectText(value.ToStateOfString());
-            if (Editor is IMouseRegion mouseRegion)
-                mouseRegion.MouseRegion.PointerTap += OnEditorTap;
-            if (Editor is IFocusable focusable)
-                focusable.FocusNode.FocusChanged += OnFocusChanged;
+            ((TextBase)Editor).Text = value.ToStateOfString();
         }
     }
 
@@ -90,7 +85,7 @@ public abstract class SelectBase<T> : InputBase<Widget>
 
         var optionBuilder =
             _optionBuilder ??
-            ((data, index, isHover, isSelected) =>
+            ((data, _, _, isSelected) =>
             {
                 var color = RxComputed<Color>.Make(isSelected, v => v ? Colors.White : Colors.Black);
                 return new Text(_labelGetter != null ? _labelGetter(data) : data?.ToString() ?? "")
@@ -131,19 +126,23 @@ public abstract class SelectBase<T> : InputBase<Widget>
 
 public sealed class Select<T> : SelectBase<T>
 {
-    public Select() { }
+    public Select() : base(false) { }
 
     [SetsRequiredMembers]
-    public Select(State<T?> value) : base(value) { }
+    public Select(State<T?> value) : this()
+    {
+        Value = value;
+    }
 }
 
 public sealed class EnumSelect<T> : SelectBase<T> where T : struct, Enum
 {
-    public EnumSelect() { }
+    public EnumSelect() : base(false) { }
 
     [SetsRequiredMembers]
-    public EnumSelect(State<T> value) : base(value)
+    public EnumSelect(State<T> value) : this()
     {
+        Value = value;
         //TODO:use DisplayNameAttribute to build DisplayText
         Options = Enum.GetValues<T>();
     }
@@ -151,14 +150,8 @@ public sealed class EnumSelect<T> : SelectBase<T> where T : struct, Enum
 
 internal sealed class SelectText : TextBase, IMouseRegion, IFocusable
 {
-    public SelectText(State<string> text) : base(text)
-    {
-        MouseRegion = new MouseRegion();
-        FocusNode = new FocusNode();
-    }
-
-    public MouseRegion MouseRegion { get; }
-    public FocusNode FocusNode { get; }
+    public MouseRegion MouseRegion { get; } = new();
+    public FocusNode FocusNode { get; } = new();
 
     private State<bool>? _readonly;
 
