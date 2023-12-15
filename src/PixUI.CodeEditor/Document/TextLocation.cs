@@ -1,96 +1,93 @@
 using System;
 
-namespace CodeEditor
+namespace CodeEditor;
+
+/// <summary>
+/// A line/column position.
+/// Text editor lines/columns are counting from zero.
+/// </summary>
+public struct TextLocation : IComparable<TextLocation>, IEquatable<TextLocation>
 {
+    internal const int MaxColumn = 0xFFFFFF; //int.MaxValue;
+
     /// <summary>
-    /// A line/column position.
-    /// Text editor lines/columns are counting from zero.
+    /// Represents no text location (-1, -1).
     /// </summary>
-    public struct TextLocation : IComparable<TextLocation>, IEquatable<TextLocation>
+    public static readonly TextLocation Empty = new TextLocation(-1, -1);
+
+    public TextLocation(int column, int line)
     {
-        internal const int MaxColumn = 0xFFFFFF; //int.MaxValue;
+        Line = line;
+        Column = column;
+    }
 
-        /// <summary>
-        /// Represents no text location (-1, -1).
-        /// </summary>
-        public static readonly TextLocation Empty = new TextLocation(-1, -1);
+    public int Line;
+    public int Column;
 
-        public TextLocation(int column, int line)
-        {
-            Line = line;
-            Column = column;
-        }
+    public bool IsEmpty => Column <= 0 && Line <= 0;
 
-        public int Line;
-        public int Column;
+    public override string ToString()
+    {
+        return $"(Line {Line}, Col {Column})";
+    }
 
-        public bool IsEmpty => Column <= 0 && Line <= 0;
+    public override int GetHashCode()
+    {
+        return unchecked(87 * Column.GetHashCode() ^ Line.GetHashCode());
+    }
 
-        public override string ToString()
-        {
-            return $"(Line {Line}, Col {Column})";
-        }
+    public override bool Equals(object? obj)
+    {
+        if (obj is TextLocation other)
+            return other == this;
 
-        public override int GetHashCode()
-        {
-            return unchecked(87 * Column.GetHashCode() ^ Line.GetHashCode());
-        }
+        return false;
+    }
 
-        public override bool Equals(object obj)
-        {
-            if (obj is TextLocation other)
-            {
-                return other == this;
-            }
+    public bool Equals(TextLocation other) => this == other;
 
-            return false;
-        }
+    public static bool operator ==(TextLocation a, TextLocation b)
+        => a.Column == b.Column && a.Line == b.Line;
 
-        public bool Equals(TextLocation other) => this == other;
+    public static bool operator !=(TextLocation a, TextLocation b)
+        => a.Column != b.Column || a.Line != b.Line;
 
-        public static bool operator ==(TextLocation a, TextLocation b)
-            => a.Column == b.Column && a.Line == b.Line;
+    public static bool operator <(TextLocation a, TextLocation b)
+    {
+        if (a.Line < b.Line)
+            return true;
+        if (a.Line == b.Line)
+            return a.Column < b.Column;
+        return false;
+    }
 
-        public static bool operator !=(TextLocation a, TextLocation b)
-            => a.Column != b.Column || a.Line != b.Line;
+    public static bool operator >(TextLocation a, TextLocation b)
+    {
+        if (a.Line > b.Line)
+            return true;
+        if (a.Line == b.Line)
+            return a.Column > b.Column;
+        return false;
+    }
 
-        public static bool operator <(TextLocation a, TextLocation b)
-        {
-            if (a.Line < b.Line)
-                return true;
-            if (a.Line == b.Line)
-                return a.Column < b.Column;
-            return false;
-        }
+    // public static bool operator <=(TextLocation a, TextLocation b)
+    // {
+    //     return !(a > b);
+    // }
+    //
+    // public static bool operator >=(TextLocation a, TextLocation b)
+    // {
+    //     return !(a < b);
+    // }
 
-        public static bool operator >(TextLocation a, TextLocation b)
-        {
-            if (a.Line > b.Line)
-                return true;
-            if (a.Line == b.Line)
-                return a.Column > b.Column;
-            return false;
-        }
+    public TextLocation Clone() => new TextLocation(Column, Line);
 
-        // public static bool operator <=(TextLocation a, TextLocation b)
-        // {
-        //     return !(a > b);
-        // }
-        //
-        // public static bool operator >=(TextLocation a, TextLocation b)
-        // {
-        //     return !(a < b);
-        // }
-
-        public TextLocation Clone() => new TextLocation(Column, Line);
-
-        public int CompareTo(TextLocation other)
-        {
-            if (this == other)
-                return 0;
-            if (this < other)
-                return -1;
-            return 1;
-        }
+    public int CompareTo(TextLocation other)
+    {
+        if (this == other)
+            return 0;
+        if (this < other)
+            return -1;
+        return 1;
     }
 }

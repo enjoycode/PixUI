@@ -31,13 +31,14 @@ public static class InputUtils
         };
     }
 
-    internal static Keys ConvertKeys(string key, string code, bool alt, bool control, bool shift)
+    internal static Keys ConvertKeys(string key, string code, bool alt, bool control, bool shift, bool meta)
     {
         // Console.WriteLine($"ConvertKeys: key={key} code={code} alt={alt} ctrl={control}, shift={shift}");
         var keys = Keys.None;
         if (alt) keys |= Keys.Alt;
         if (control) keys |= Keys.Control;
         if (shift) keys |= Keys.Shift;
+        if (meta) keys |= Keys.Meta;
 
         //TODO: numbers
         if (key.Length == 1)

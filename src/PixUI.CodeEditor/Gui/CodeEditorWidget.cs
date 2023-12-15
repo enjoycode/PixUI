@@ -42,9 +42,9 @@ namespace CodeEditor
         internal void RequestInvalidate(bool all, IDirtyArea? dirtyArea)
         {
             if (all)
-                Invalidate(InvalidAction.Repaint, dirtyArea);
+                Repaint(dirtyArea);
             else
-                _decoration.Invalidate(InvalidAction.Repaint);
+                _decoration.Repaint();
         }
 
         private void _OnFocusChanged(FocusChangedEvent e)

@@ -152,12 +152,10 @@ namespace PixUI.Platform.Mac
 
         public override void KeyDown(NSEvent theEvent)
         {
-            //临时判断Control键是否按下，用于拦截快捷键
-            if ((theEvent.ModifierFlags & NSEventModifierMask.ControlKeyMask) ==
-                NSEventModifierMask.ControlKeyMask)
+            //临时判断Command键是否按下，用于拦截快捷键
+            if ((theEvent.ModifierFlags & NSEventModifierMask.CommandKeyMask) == NSEventModifierMask.CommandKeyMask)
             {
-                var keyData =
-                    MacKeyCodeMap.ConvertKeyCode(theEvent.KeyCode, theEvent.ModifierFlags);
+                var keyData = MacKeyCodeMap.ConvertKeyCode(theEvent.KeyCode, theEvent.ModifierFlags);
                 //base.KeyDown(theEvent);
                 MacWindow.OnKeyDown(KeyEvent.UseDefault(keyData));
                 return;

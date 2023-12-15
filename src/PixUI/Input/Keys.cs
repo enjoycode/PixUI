@@ -187,6 +187,7 @@ public enum Keys
     Shift = 0x00010000,
     Control = 0x00020000,
     Alt = 0x00040000,
+    Meta = 0x00080000,
     Modifiers = unchecked((int)0xFFFF0000),
     IMEAccept = 0x0000001E,
     // Oem1 = 0x000000BA,

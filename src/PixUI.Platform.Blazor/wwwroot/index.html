@@ -158,13 +158,13 @@
             }
         }
         window.onkeydown = ev => {
-            DotNet.invokeMethod(_asmName, "OnKeyDown", ev.key, ev.code, ev.altKey, ev.ctrlKey, ev.shiftKey)
+            DotNet.invokeMethod(_asmName, "OnKeyDown", ev.key, ev.code, ev.altKey, ev.ctrlKey, ev.shiftKey, ev.metaKey)
             if (ev.code === 'Tab') {
                 ev.preventDefault();
             }
         }
         window.onkeyup = ev => {
-            DotNet.invokeMethod(_asmName, "OnKeyUp", ev.key, ev.code, ev.altKey, ev.ctrlKey, ev.shiftKey)
+            DotNet.invokeMethod(_asmName, "OnKeyUp", ev.key, ev.code, ev.altKey, ev.ctrlKey, ev.shiftKey, ev.metaKey)
             if (ev.code === 'Tab') {
                 ev.preventDefault();
             }

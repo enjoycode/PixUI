@@ -146,19 +146,15 @@ namespace PixUI.Platform.Mac
             }
 
             var keyData = KeysMap[keyCode];
-            //TODO: With modifiers
-            if ((modifierMask & NSEventModifierMask.ShiftKeyMask) ==
-                NSEventModifierMask.ShiftKeyMask)
+
+            if ((modifierMask & NSEventModifierMask.ShiftKeyMask) == NSEventModifierMask.ShiftKeyMask)
                 keyData |= Keys.Shift;
-            if ((modifierMask & NSEventModifierMask.ControlKeyMask) ==
-                NSEventModifierMask.ControlKeyMask)
+            if ((modifierMask & NSEventModifierMask.ControlKeyMask) == NSEventModifierMask.ControlKeyMask)
                 keyData |= Keys.Control;
-            if ((modifierMask & NSEventModifierMask.AlternateKeyMask) ==
-                NSEventModifierMask.AlternateKeyMask)
+            if ((modifierMask & NSEventModifierMask.AlternateKeyMask) == NSEventModifierMask.AlternateKeyMask)
                 keyData |= Keys.Alt;
-            // if ((modifierMask & NSEventModifierMask.CommandKeyMask) ==
-            //     NSEventModifierMask.CommandKeyMask)
-            //     keyData |= Keys.LWin;
+            if ((modifierMask & NSEventModifierMask.CommandKeyMask) == NSEventModifierMask.CommandKeyMask)
+                keyData |= Keys.Meta;
 
             return keyData;
         }

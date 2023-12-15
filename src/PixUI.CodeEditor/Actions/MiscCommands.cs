@@ -93,4 +93,15 @@ namespace CodeEditor
             editor.Document.UndoStack.Redo();
         }
     }
+
+    internal sealed class SelectAllCommand : IEditCommand
+    {
+        public void Execute(TextEditor editor)
+        {
+            var start = editor.Document.OffsetToPosition(0);
+            var end = editor.Document.OffsetToPosition(editor.Document.TextLength);
+            editor.SelectionManager.SetSelection(start, end);
+            editor.Controller.Widget.RequestInvalidate(false, null); //暂需要重绘选择区域
+        }
+    }
 }
