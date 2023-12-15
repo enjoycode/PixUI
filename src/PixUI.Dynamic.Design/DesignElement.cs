@@ -129,17 +129,19 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         MouseRegion.Opaque = !IsContainer;
         if (makeDefaultTarget)
         {
-            Child = Meta.CreateInstance();
+            var child = Meta.CreateInstance();
             if (Meta.Properties != null) //设置设计时初始化属性值
             {
                 var initProps = Meta.Properties.Where(p => p.InitValue != null);
                 foreach (var prop in initProps)
                 {
                     var propValue = Data.SetPropertyValue(prop.Name, prop.InitValue!.Value);
-                    SetPropertyValue(propValue);
+                    SetPropertyValue(propValue, child);
                 }
             }
 
+            Child = child; //注意设置初始化值后再设置Child
+            
             //暂在这里特殊处理Row, Column等IsLayoutTight的容器实例，默认添加占位的子组件
             if (Child is Row || Child is Column) //TODO: 应判断childMeta是否需要创建占位子组件
             {
