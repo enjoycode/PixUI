@@ -131,17 +131,17 @@ public readonly struct Color : IEquatable<Color>
     // 	colorf.ToHsv (out h, out s, out v);
     // }
 
-    public readonly override string ToString() => $"#{Alpha:x2}{Red:x2}{Green:x2}{Blue:x2}";
+    public override string ToString() => $"#{Alpha:x2}{Red:x2}{Green:x2}{Blue:x2}";
 
-    public readonly bool Equals(Color obj) => obj.color == color;
+    public bool Equals(Color obj) => obj.color == color;
 
-    public readonly override bool Equals(object other) => other is Color f && Equals(f);
+    public override bool Equals(object other) => other is Color f && Equals(f);
 
     public static bool operator ==(Color left, Color right) => left.Equals(right);
 
     public static bool operator !=(Color left, Color right) => !left.Equals(right);
 
-    public readonly override int GetHashCode() => color.GetHashCode();
+    public override int GetHashCode() => color.GetHashCode();
 
     public static implicit operator Color(uint color) => new (color);
 

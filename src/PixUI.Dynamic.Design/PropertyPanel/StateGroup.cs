@@ -33,7 +33,7 @@ internal sealed class StateGroup : View
                     {
                         Child = new DataGrid<DynamicState>(_designController.StatesController)
                         {
-                            Height = 118,
+                            Height = 119,
                             Columns =
                             {
                                 new DataGridTextColumn<DynamicState>("Name", s => s.Name),
