@@ -46,7 +46,7 @@ namespace PixUI.Demo.Mac
                     },
                     FooterCells = new DataGridFooterCell[]
                     {
-                        new(1, 4) { Text = "平均:", CellStyle = CellStyle.AlignMiddleRight().WithBackgroud(0xFFF5F7FA) },
+                        new(1, 4) { Text = "平均:", CellStyle = CellStyle.AlignMiddleRight().WithFillColor(0xFFF5F7FA) },
                         new(5, () => _controller.DataView!.Average(o => o.Score).ToString()),
                     }
                 }

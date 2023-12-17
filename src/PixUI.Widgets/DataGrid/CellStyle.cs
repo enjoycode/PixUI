@@ -1,21 +1,43 @@
+using System;
+
 namespace PixUI;
 
 public sealed class CellStyle
 {
     public const float CellPadding = 5.0f;
 
-    public CellStyle() { }
+    /// <summary>
+    /// 单元格文本颜色
+    /// </summary>
+    public Color? TextColor;
 
-    public Color? Color;
-    public Color? BackgroundColor;
+    /// <summary>
+    /// 单元格背景颜色
+    /// </summary>
+    public Color? FillColor;
+
+    [Obsolete("Use TextColor")]
+    public Color? Color
+    {
+        get => TextColor;
+        set => TextColor = value;
+    }
+
+    [Obsolete("Use FillColor")]
+    public Color? BackgroundColor
+    {
+        get => FillColor;
+        set => FillColor = value;
+    }
+
     public float FontSize = 15;
     public FontWeight FontWeight = FontWeight.Normal;
     public HorizontalAlignment HorizontalAlignment = HorizontalAlignment.Left;
     public VerticalAlignment VerticalAlignment = VerticalAlignment.Middle;
 
-    public CellStyle WithBackgroud(Color color)
+    public CellStyle WithFillColor(Color color)
     {
-        BackgroundColor = color;
+        FillColor = color;
         return this;
     }
 

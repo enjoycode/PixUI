@@ -94,7 +94,7 @@ public sealed class DynamicState
         else if (noneNullableValueType == typeof(DateTime))
             stateType = DynamicStateType.DateTime;
         else
-            throw new NotImplementedException();
+            throw new NotImplementedException($"ValueType: {noneNullableValueType} to DynamicStateType");
 
         return stateType;
     }

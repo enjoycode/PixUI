@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 
 namespace PixUI.Dynamic.Design;
 
@@ -24,18 +23,26 @@ internal sealed class BindPropertyStateDialog : Dialog
     protected override Widget BuildBody()
     {
         //查询相同类型的状态列表
-        var stateType = DynamicState.GetStateTypeByValueType(_propertyMeta, out var allowNull);
-        var list = _element.Controller.FindStatesByValueType(stateType, allowNull);
-        _dgController.DataSource = list;
-        //选择
-        if (_element.Data.HasBindToState(_propertyMeta.Name, out var oldStateName))
+        try
         {
-            var index = list.FindIndex(s => s.Name == oldStateName);
-            _dgController.SelectAt(index);
+            var stateType = DynamicState.GetStateTypeByValueType(_propertyMeta, out var allowNull);
+            var list = _element.Controller.FindStatesByValueType(stateType, allowNull);
+            _dgController.DataSource = list;
+
+            //选择
+            if (_element.Data.HasBindToState(_propertyMeta.Name, out var oldStateName))
+            {
+                var index = list.FindIndex(s => s.Name == oldStateName);
+                _dgController.SelectAt(index);
+            }
+            else
+            {
+                _dgController.TrySelectFirstRow();
+            }
         }
-        else
+        catch (Exception e)
         {
-            _dgController.TrySelectFirstRow();
+            Notification.Error($"获取状态列表异常: {e.Message}");
         }
 
         return new Container

@@ -11,13 +11,13 @@ public sealed class DataGridTheme
     {
         DefaultHeaderCellStyle = headerCellStyle ?? new CellStyle
         {
-            Color = Colors.Black,
-            BackgroundColor = 0xFFF5F7FA,
+            TextColor = Colors.Black,
+            FillColor = 0xFFF5F7FA,
             HorizontalAlignment = HorizontalAlignment.Center,
             FontWeight = FontWeight.Bold,
         };
 
-        DefaultRowCellStyle = rowCellStyle ?? new CellStyle { Color = Colors.Black };
+        DefaultRowCellStyle = rowCellStyle ?? new CellStyle { TextColor = Colors.Black, FillColor = Colors.White };
     }
 
     public readonly CellStyle DefaultHeaderCellStyle;
