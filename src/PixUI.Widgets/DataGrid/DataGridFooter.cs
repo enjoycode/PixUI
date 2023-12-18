@@ -90,9 +90,10 @@ internal sealed class DataGridFooter<T> : Widget
 
     private void PaintCell(Canvas canvas, in Rect cellRect, CellStyle style, string? content)
     {
-        if (style.BackgroundColor.HasValue)
+        var fillColor = style.FillColor ?? _controller.Theme.DefaultHeaderCellStyle.FillColor;
+        if (fillColor.HasValue)
         {
-            var paint = PaintUtils.Shared(style.BackgroundColor.Value);
+            var paint = PaintUtils.Shared(fillColor.Value);
             canvas.DrawRect(cellRect, paint);
         }
 

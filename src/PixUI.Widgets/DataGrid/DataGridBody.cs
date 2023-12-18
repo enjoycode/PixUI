@@ -199,7 +199,7 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
             //TODO:暂在这里画stripe背景
             if (!col.AutoMergeCells /*合并单元格时不支持*/ && Theme.StripeRows && j % 2 != 0)
             {
-                var paint = PaintUtils.Shared(Theme.StripeBgColor);
+                var paint = PaintUtils.Shared(Theme.StripeFillColor);
                 canvas.DrawRect(cellRect, paint);
             }
             else
@@ -231,7 +231,7 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
             {
                 if (Theme.HighlightingCurrentCell)
                 {
-                    var paint = PaintUtils.Shared(Theme.HighlightRowBgColor);
+                    var paint = PaintUtils.Shared(Theme.HighlightRowFillColor);
                     canvas.DrawRect(rowRect.Value, paint);
                 }
                 else

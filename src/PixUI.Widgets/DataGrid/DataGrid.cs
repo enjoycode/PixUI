@@ -35,7 +35,7 @@ public sealed class DataGrid<T> : Widget, IMouseRegion
         set
         {
             _theme = value;
-            _controller.DataGrid.Repaint();
+            Repaint();
         }
     }
 
