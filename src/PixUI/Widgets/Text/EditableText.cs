@@ -23,7 +23,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
     public readonly State<bool> Focused = false;
 
     private Paragraph? _hintParagraph;
-
+    private string? _hintText;
     private State<bool>? _readonly;
 
     public State<bool>? Readonly
@@ -46,7 +46,16 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
 
     public bool IsObscure { get; set; }
 
-    public string? HintText { get; set; }
+    public string? HintText
+    {
+        get => _hintText;
+        set
+        {
+            _hintText = value;
+            _hintParagraph = null;
+            Repaint();
+        }
+    }
 
     /// <summary>
     /// 验证输入的内容，返回false不接受输入
@@ -88,7 +97,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
     {
         if (IsReadonly) return;
 
-        var newText = Text.Value == null ? text : Text.Value.Insert(_caretPosition, text);
+        var newText = string.IsNullOrEmpty(Text.Value) ? text : Text.Value.Insert(_caretPosition, text);
         if (PreviewInput != null && !PreviewInput(newText))
             return;
 
@@ -219,11 +228,10 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
         TryBuildParagraph();
-        SetSize(width, Math.Min(height, FontHeight));
+        SetSize(maxSize.Width, Math.Min(maxSize.Height, FontHeight));
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)

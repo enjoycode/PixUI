@@ -30,6 +30,12 @@ public sealed class TextInput : InputBase<EditableText>
         set => Editor.FontSize = value;
     }
 
+    public State<Color>? TextColor
+    {
+        get => Editor.TextColor;
+        set => Editor.TextColor = value;
+    }
+
     public Widget? Prefix
     {
         set => PrefixWidget = value;
@@ -51,8 +57,9 @@ public sealed class TextInput : InputBase<EditableText>
         set => Editor.IsObscure = value;
     }
 
-    public string HintText
+    public string? HintText
     {
+        get => Editor.HintText;
         set => Editor.HintText = value;
     }
 }

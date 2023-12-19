@@ -12,6 +12,9 @@ partial class DynamicWidgetManager
         properties: new DynamicPropertyMeta[]
         {
             new(nameof(TextInput.Text), typeof(State<string>), false, true, initValue: string.Empty),
+            new(nameof(TextInput.HintText), typeof(string), true),
+            new(nameof(TextInput.TextColor), typeof(State<Color>), true),
+            new(nameof(TextInput.FillColor), typeof(State<Color>), true),
         }
     );
 
@@ -22,6 +25,8 @@ partial class DynamicWidgetManager
         {
             new(nameof(DatePicker.Value), typeof(State<DateTime?>), false, true,
                 initValue: DateTime.Today, editorName: "DateEditor"),
+            new(nameof(DatePicker.TextColor), typeof(State<Color>), true),
+            new(nameof(DatePicker.FillColor), typeof(State<Color>), true),
         }
     );
 }

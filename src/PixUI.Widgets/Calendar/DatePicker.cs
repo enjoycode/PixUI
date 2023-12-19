@@ -8,14 +8,17 @@ public sealed class DatePicker : InputBase<EditableText>
 {
     public DatePicker()
     {
+        Padding = new RxValue<EdgeInsets>(EdgeInsets.Only(4, 4, 0, 4));
+
         Editor = new EditableText { Text = string.Empty /*must assign*/ };
         Editor.FocusNode.FocusChanged += OnFocusChanged;
         Editor.Text.AddListener(OnTextChanged);
 
-        Padding = new RxValue<EdgeInsets>(EdgeInsets.Only(4, 4, 0, 4));
+        _iconColor = new RxProxy<Color>(() => Editor.TextColor?.Value ?? Colors.Black);
         SuffixWidget = new Button(icon: MaterialIcons.CalendarMonth)
         {
             Style = ButtonStyle.Transparent,
+            TextColor = _iconColor,
             OnTap = _ => SwitchPopup(),
         };
     }
@@ -27,6 +30,7 @@ public sealed class DatePicker : InputBase<EditableText>
     }
 
     private readonly State<DateTime?> _value = null!;
+    private readonly State<Color> _iconColor;
     private const string format = "yyyy-MM-dd";
     private bool _showing;
     private DatePickerPopup? _popup;
@@ -34,6 +38,16 @@ public sealed class DatePicker : InputBase<EditableText>
     public required State<DateTime?> Value
     {
         init => Bind(ref _value!, value, OnValueChanged, true);
+    }
+
+    public State<Color>? TextColor
+    {
+        get => Editor.TextColor;
+        set
+        {
+            Editor.TextColor = value;
+            _iconColor.NotifyValueChanged();
+        }
     }
 
     public override State<bool>? Readonly { get; set; }
