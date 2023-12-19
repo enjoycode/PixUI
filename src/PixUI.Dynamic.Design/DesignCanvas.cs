@@ -29,11 +29,11 @@ public sealed class DesignCanvas : View, IDynamicContext
 
     DynamicState? IDynamicContext.FindState(string name) => _designController.FindState(name);
 
-    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)
+    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
+        IDirtyArea? dirtyArea = null)
     {
         canvas.Save();
-        if (X != 0 || Y != 0)
-            canvas.Translate(X, Y);
+        canvas.Translate(X, Y);
         //注意忽略onlyTransform参数始终clip
         canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
     }

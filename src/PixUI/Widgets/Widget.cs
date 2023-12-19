@@ -481,15 +481,16 @@ public abstract class Widget : IDisposable
     /// </summary>
     /// <param name="canvas"></param>
     /// <param name="onlyTransform">用于脏区域绘制时仅转换坐标矩阵，不需要重复裁剪</param>
-    /// <param name="dirtyRect">用于脏区域绘制时裁剪区域</param>
+    /// <param name="dirtyArea">用于脏区域绘制时裁剪区域</param>
     protected internal virtual void BeforePaint(Canvas canvas, bool onlyTransform = false,
-        Rect? dirtyRect = null /*TODO: use IDirtyArea*/)
+        IDirtyArea? dirtyArea = null)
     {
         canvas.Translate(X, Y);
-        if (dirtyRect.HasValue)
+        if (dirtyArea != null)
         {
             Debug.Assert(onlyTransform == false);
-            canvas.ClipRect(dirtyRect.Value, ClipOp.Intersect, false); //不需要保存画布状态,InvalidQueue会恢复
+            //这里不需要保存画布状态,InvalidQueue会恢复
+            dirtyArea.ApplyClip(canvas);
         }
     }
 

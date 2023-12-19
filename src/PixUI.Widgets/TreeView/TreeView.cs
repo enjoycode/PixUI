@@ -113,7 +113,8 @@ public sealed class TreeView<T> : Widget, IScrollable
         _controller.TotalHeight += dy;
     }
 
-    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)
+    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
+        IDirtyArea? dirtyArea = null)
     {
         if (!onlyTransform)
         {
@@ -121,9 +122,7 @@ public sealed class TreeView<T> : Widget, IScrollable
             canvas.Translate(X, Y);
             canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
 
-            if (dirtyRect.HasValue)
-                canvas.ClipRect(dirtyRect.Value, ClipOp.Intersect, false);
-
+            dirtyArea?.ApplyClip(canvas);
             canvas.Translate(-ScrollOffsetX, -ScrollOffsetY);
         }
         else

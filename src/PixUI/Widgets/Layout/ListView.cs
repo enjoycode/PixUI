@@ -62,7 +62,7 @@ public sealed class ListViewController<T> : WidgetController<ListView<T>>
 public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
 {
     public static ListView<Widget> From(IList<Widget> widgets, ListViewController<Widget>? controller = null) =>
-        new((w, i) => w, widgets, controller);
+        new((w, _) => w, widgets, controller);
 
     public ListView(Func<T, int, Widget> itemBuilder, IList<T>? dataSource = null,
         ListViewController<T>? controller = null)
@@ -88,25 +88,23 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
             }
         }
 
-        if (IsMounted)
-            Invalidate(InvalidAction.Relayout);
+        Relayout();
     }
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
         float y = 0;
         foreach (var child in _children)
         {
-            child.Layout(width, float.PositiveInfinity);
+            child.Layout(maxSize.Width, float.PositiveInfinity);
             // child.W = width;
             child.SetPosition(0, y);
             y += child.H;
         }
 
-        SetSize(width, height);
+        SetSize(maxSize.Width, maxSize.Height);
     }
 
     protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
@@ -121,14 +119,15 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
         //不需要再通知上级了
     }
 
-    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)
+    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
+        IDirtyArea? dirtyArea = null)
     {
         canvas.Translate(X, Y);
         if (!onlyTransform)
         {
             canvas.Save();
             var selfBounds = Rect.FromLTWH(0, 0, W, H);
-            var clipRect = dirtyRect.HasValue ? Rect.Intersect(dirtyRect.Value, selfBounds) : selfBounds;
+            var clipRect = dirtyArea != null ? Rect.Intersect(dirtyArea.GetRect(), selfBounds) : selfBounds;
             canvas.ClipRect(clipRect, ClipOp.Intersect, false);
         }
 
@@ -150,7 +149,7 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
             if (child.Y >= ScrollOffsetY + H) break; //大于下边界
 
             child.BeforePaint(canvas);
-            child.Paint(canvas, null);
+            child.Paint(canvas);
             child.AfterPaint(canvas);
         }
     }
@@ -172,7 +171,7 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
 
         var offset = Controller.ScrollController.OnScroll(dx, dy, maxOffsetX, maxOffsetY);
         if (!offset.IsEmpty)
-            Invalidate(InvalidAction.Repaint);
+            Repaint();
         return offset;
     }
 

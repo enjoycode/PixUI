@@ -13,10 +13,10 @@ public sealed class AffectsByRelayout
     internal static readonly AffectsByRelayout Default = new();
 
     public Widget Widget = null!;
-    public float OldX = 0;
-    public float OldY = 0;
-    public float OldW = 0;
-    public float OldH = 0;
+    public float OldX;
+    public float OldY;
+    public float OldW;
+    public float OldH;
 
     private AffectsByRelayout() { }
 
@@ -60,7 +60,7 @@ internal sealed class InvalidWidget
     /// <summary>
     /// 上级要求重绘，子级要求重新布局的情况
     /// </summary>
-    internal bool RelayoutOnly = false;
+    internal bool RelayoutOnly;
 
     /// <summary>
     /// 用于局部重绘的对象,null表示全部重绘
@@ -143,6 +143,7 @@ internal sealed class InvalidQueue
     #endregion
 
     private readonly List<InvalidWidget> _queue = new(32);
+    private readonly RepaintArea _sharedDirtyArea = new(Rect.Empty);
 
     /// <summary>
     /// 防止队列在消费时改动队列
@@ -353,7 +354,7 @@ internal sealed class InvalidQueue
         widget.TryNotifyParentIfSizeChanged(affects.OldW, affects.OldH, affects);
     }
 
-    private static void RepaintWidget(PaintContext ctx, Widget widget, IDirtyArea? dirtyArea)
+    private void RepaintWidget(PaintContext ctx, Widget widget, IDirtyArea? dirtyArea)
     {
         var canvas = ctx.Canvas;
         //向上循环至Root，并找到需要开始绘制的Opaque组件
@@ -393,8 +394,8 @@ internal sealed class InvalidQueue
                 temp = widgetToRoot[i];
                 if (i == 0)
                 {
-                    var dirtyRect = dirtyArea?.GetRect() ?? Rect.FromLTWH(0, 0, temp.W, temp.H);
-                    temp.BeforePaint(canvas, false, dirtyRect);
+                    var dirty = dirtyArea ?? _sharedDirtyArea.Reset(Rect.FromLTWH(0, 0, temp.W, temp.H));
+                    temp.BeforePaint(canvas, false, dirty);
                     if (canvas.IsClipEmpty)
                     {
                         if (temp is IPaintEmptyClip paintEmptyClip)

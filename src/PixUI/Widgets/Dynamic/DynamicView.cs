@@ -69,7 +69,7 @@ public class DynamicView : SingleChildWidget
 
     private void OnAnimationValueChanged()
     {
-        Invalidate(InvalidAction.Repaint); //这里仅重绘，因开始动画前已强制重新布局
+        Repaint(); //这里仅重绘，因开始动画前已强制重新布局
     }
 
     private void OnAnimationStatusChanged(AnimationStatus status)
@@ -125,9 +125,10 @@ public class DynamicView : SingleChildWidget
         return base.HitTest(x, y, result);
     }
 
-    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)
+    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
+        IDirtyArea? dirtyArea = null)
     {
-        base.BeforePaint(canvas, onlyTransform, dirtyRect);
+        base.BeforePaint(canvas, onlyTransform, dirtyArea);
         if (!onlyTransform)
         {
             canvas.Save();

@@ -7,7 +7,7 @@ namespace PixUI;
 public interface IDirtyArea
 {
     /// <summary>
-    /// 已存在的无效区域合并新的无效区域
+    /// 已存在的脏区域合并新的脏区域
     /// </summary>
     void Merge(IDirtyArea? newArea);
 
@@ -25,6 +25,11 @@ public interface IDirtyArea
     /// 转换为子级对应的脏区域
     /// </summary>
     IDirtyArea? ToChild(Widget child);
+
+    /// <summary>
+    /// 裁剪重绘脏区域
+    /// </summary>
+    void ApplyClip(Canvas canvas);
 }
 
 /// <summary>
@@ -32,11 +37,17 @@ public interface IDirtyArea
 /// </summary>
 public sealed class RepaintArea : IDirtyArea
 {
-    private readonly Rect _rect;
+    private Rect _rect;
 
     public RepaintArea(Rect rect)
     {
         _rect = rect;
+    }
+
+    internal RepaintArea Reset(Rect rect)
+    {
+        _rect = rect;
+        return this;
     }
 
     public Rect GetRect() => _rect;
@@ -59,6 +70,8 @@ public sealed class RepaintArea : IDirtyArea
             _rect.Width, _rect.Height);
         return new RepaintArea(childRect);
     }
+
+    public void ApplyClip(Canvas canvas) => canvas.ClipRect(_rect, ClipOp.Intersect, false);
 
     public override string ToString() => $"RepaintArea[{_rect}]";
 }
@@ -124,7 +137,12 @@ internal sealed class RepaintChild : IDirtyArea
         return _current < 0 ? _lastDirtyArea : this;
     }
 
-    public override string ToString()
+    public void ApplyClip(Canvas canvas)
+    {
+        //do nothing now
+    }
+
+    public override string? ToString()
     {
         if (_current < 0)
             return _lastDirtyArea == null ? string.Empty : _lastDirtyArea.ToString();

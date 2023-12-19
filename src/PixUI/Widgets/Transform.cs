@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 /// <summary>
@@ -29,7 +27,7 @@ public class Transform : SingleChildWidget
         {
             if (_origin == value) return;
             _origin = value;
-            NeedInvalidate();
+            Repaint();
         }
     }
 
@@ -51,13 +49,7 @@ public class Transform : SingleChildWidget
         if (_transform == value) return;
 
         _transform = value;
-        NeedInvalidate();
-    }
-
-    private void NeedInvalidate()
-    {
-        if (IsMounted)
-            Invalidate(InvalidAction.Repaint);
+        Repaint();
     }
 
     internal Matrix4 EffectiveTransform
@@ -111,7 +103,8 @@ public class Transform : SingleChildWidget
         return hitChild;
     }
 
-    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)
+    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
+        IDirtyArea? dirtyArea = null)
     {
         if (Child == null) return;
 

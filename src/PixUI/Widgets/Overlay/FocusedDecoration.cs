@@ -112,7 +112,7 @@ internal sealed class FocusedDecorator : FlowDecorator<Widget>
     private void OnAnimationValueChanged()
     {
         _from!.LerpTo(_to, _tween!, _controller!.Value);
-        Invalidate(InvalidAction.Repaint);
+        Repaint();
     }
 
     private void OnAnimationStateChanged(AnimationStatus status)

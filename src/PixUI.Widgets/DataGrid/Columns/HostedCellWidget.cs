@@ -36,19 +36,19 @@ internal sealed class HostedCellWidget : Widget
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
-        SetSize(width, height);
-        _hostedWidget.Layout(width, height);
+        SetSize(maxSize.Width, maxSize.Height);
+        _hostedWidget.Layout(maxSize.Width, maxSize.Height);
         //TODO:根据对齐方式设置位置，暂简单居中
-        _hostedWidget.SetPosition((width - _hostedWidget.W) / 2, 0);
+        _hostedWidget.SetPosition((maxSize.Width - _hostedWidget.W) / 2, 0);
     }
 
-    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false, Rect? dirtyRect = null)
+    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
+        IDirtyArea? dirtyArea = null)
     {
         //这里需要重写处理滚动量,不用考虑列是否冻结，因取X值时会抵消横向滚动量
-        base.BeforePaint(canvas, onlyTransform, dirtyRect);
+        base.BeforePaint(canvas, onlyTransform, dirtyArea);
         canvas.Translate(-_dataGridBody.ScrollOffsetX, -_dataGridBody.ScrollOffsetY);
     }
 
