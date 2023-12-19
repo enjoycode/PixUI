@@ -291,7 +291,19 @@ public abstract class Widget : IDisposable
 
     #endregion
 
-    #region ====Bind====
+    #region ====Bind State====
+
+    protected static void BindState<T>(ref T? state, T? newState, Action<State> action) where T : State
+    {
+        if (ReferenceEquals(state, newState)) return;
+        
+        state?.RemoveListener(action);
+        state = newState;
+        state?.AddListener(action);
+        
+        //暂强制调用一次变更
+        action(state ?? State.Empty);
+    }
 
     /// <summary>
     /// 绑定状态至Widget,用于首次绑定

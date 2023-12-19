@@ -27,8 +27,9 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     internal const float StandardRadius = 4;
 
     private readonly State<string>? _text;
-    private State<float>? _outlineWidth;
+    private State<float>? _borderWidth;
     private State<Color>? _textColor;
+    private State<Color>? _fillColor;
     private State<float>? _fontSize;
 
     private bool _drawMask;
@@ -60,6 +61,12 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
             if (_textWidget != null) _textWidget.TextColor = _textColor;
             if (_iconWidget != null) _iconWidget.Color = _textColor;
         }
+    }
+
+    public State<Color>? FillColor
+    {
+        get => _fillColor;
+        set => BindState(ref _fillColor, value, RepaintOnStateChanged);
     }
 
     public State<float>? FontSize
@@ -204,9 +211,9 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
 
         var paint = PaintUtils.Shared();
         paint.Style = Style == ButtonStyle.Solid ? PaintStyle.Fill : PaintStyle.Stroke;
-        paint.StrokeWidth = Style == ButtonStyle.Outline ? (_outlineWidth?.Value ?? 2) : 0;
+        paint.StrokeWidth = Style == ButtonStyle.Outline ? (_borderWidth?.Value ?? 2) : 0;
         paint.AntiAlias = Shape != ButtonShape.Square;
-        paint.Color = new Color(0xFF3880FF); //TODO:
+        paint.Color = _fillColor?.Value ?? new Color(0xFF3880FF);
 
         switch (Shape)
         {
