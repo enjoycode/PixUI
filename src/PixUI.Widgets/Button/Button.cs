@@ -66,7 +66,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     public State<Color>? FillColor
     {
         get => _fillColor;
-        set => BindState(ref _fillColor, value, RepaintOnStateChanged);
+        set => Bind(ref _fillColor, value, RepaintOnStateChanged);
     }
 
     public State<float>? FontSize

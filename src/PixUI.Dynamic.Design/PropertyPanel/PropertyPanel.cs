@@ -24,7 +24,7 @@ public sealed class PropertyPanel : SingleChildWidget
 
         Child = new Container
         {
-            BgColor = new Color(0xFFF3F3F3),
+            FillColor = new Color(0xFFF3F3F3),
             Child = _listView
         };
     }

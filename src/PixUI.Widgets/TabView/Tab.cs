@@ -9,7 +9,7 @@ public sealed class Tab : SingleChildWidget, IMouseRegion
         MouseRegion = new MouseRegion(() => Cursors.Hand, false);
         MouseRegion.HoverChanged += _OnHoverChanged;
 
-        Bind(IsSelected, RepaintOnStateChanged); //TODO:待TabBar实现指示器后移除
+        IsSelected.AddListener(RepaintOnStateChanged);//TODO:待TabBar实现指示器后移除
     }
 
     public readonly State<bool> IsSelected = false;

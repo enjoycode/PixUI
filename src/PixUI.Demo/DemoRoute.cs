@@ -42,7 +42,7 @@ namespace PixUI.Demo
 
             return new SlideTransition(offsetAnimation)
             {
-                Child = new Container { Child = child, BgColor = Colors.White }
+                Child = new Container { Child = child, FillColor = Colors.White }
             };
         }
 
@@ -52,7 +52,7 @@ namespace PixUI.Demo
             {
                 Child = new MainMenu(BuildMenuItems()),
                 Height = 36,
-                BgColor = new Color(200, 200, 200),
+                FillColor = new Color(200, 200, 200),
             };
         }
 

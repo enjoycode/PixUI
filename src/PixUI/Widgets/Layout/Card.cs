@@ -18,31 +18,31 @@ public sealed class Card : SingleChildWidget
     public State<Color>? Color
     {
         get => _color;
-        set => _color = Bind(_color, value, RepaintOnStateChanged);
+        set => Bind(ref _color, value, RepaintOnStateChanged);
     }
 
     public State<Color>? ShadowColor
     {
         get => _shadowColor;
-        set => _shadowColor = Bind(_shadowColor, value, RepaintOnStateChanged);
+        set => Bind(ref _shadowColor, value, RepaintOnStateChanged);
     }
 
     public State<float>? Elevation
     {
         get => _elevation;
-        set => _elevation = Bind(_elevation, value, RepaintOnStateChanged);
+        set => Bind(ref _elevation, value, RepaintOnStateChanged);
     }
 
     public State<EdgeInsets>? Margin
     {
         get => _margin;
-        set => _margin = Bind(_margin, value, RelayoutOnStateChanged);
+        set => Bind(ref _margin, value, RelayoutOnStateChanged);
     }
 
     public State<ShapeBorder>? Shape
     {
         get => _shape;
-        set => _shape = Bind(_shape, value, RelayoutOnStateChanged);
+        set => Bind(ref _shape, value, RelayoutOnStateChanged);
     }
 
     #endregion

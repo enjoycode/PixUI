@@ -7,7 +7,7 @@ public sealed class Icon : Widget
     public Icon(State<IconData> data)
     {
         _painter = new IconPainter(OnIconFontLoaded);
-        _data = Bind(data, OnDataChanged);
+        Bind(ref _data!, data, OnDataChanged);
     }
 
     private readonly State<IconData> _data;
@@ -19,34 +19,33 @@ public sealed class Icon : Widget
     public State<float>? Size
     {
         get => _size;
-        set => _size = Bind(_size, value, OnSizeChanged);
+        set => Bind(ref _size, value, OnSizeChanged);
     }
 
     public State<Color>? Color
     {
         get => _color;
-        set => _color = Bind(_color, value, RepaintOnStateChanged);
+        set => Bind(ref _color, value, RepaintOnStateChanged);
     }
 
     private void OnIconFontLoaded()
     {
         if (!IsMounted) //有时候会作为其他组件的不可访问的子组件
-            Parent?.Invalidate(InvalidAction.Repaint,
-                new RepaintArea(Rect.FromLTWH(X, Y, W, H)));
+            Parent?.Repaint(new RepaintArea(Rect.FromLTWH(X, Y, W, H)));
         else
-            Invalidate(InvalidAction.Repaint);
+            Repaint();
     }
 
     private void OnDataChanged(State state)
     {
         _painter.Reset();
-        Invalidate(InvalidAction.Repaint);
+        Repaint();
     }
 
     private void OnSizeChanged(State state)
     {
         _painter.Reset();
-        Invalidate(InvalidAction.Relayout);
+        Relayout();
     }
 
     public override void Layout(float availableWidth, float availableHeight)

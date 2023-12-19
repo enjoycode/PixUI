@@ -100,7 +100,7 @@ public sealed class DemoCharts : View
         matrix.Translate(-(mapWidth / 2f), -(mapHeight / 2f));
         matrix.Translate(ox, oy);
 
-        BgColor = Colors.Green;
+        FillColor = Colors.Green;
 
         Child = new Column
         {

@@ -40,7 +40,7 @@ namespace PixUI.Demo.Mac
             return new Container()
             {
                 Padding = EdgeInsets.All(10),
-                BgColor = new Color(0xFFDCDCDC),
+                FillColor = new Color(0xFFDCDCDC),
                 Child = new Text(data.Text),
             };
         }

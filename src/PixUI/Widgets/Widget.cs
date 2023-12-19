@@ -130,7 +130,7 @@ public abstract class Widget : IDisposable
     public State<float>? Width
     {
         get => _width;
-        set => _width = Bind(_width, value, RelayoutOnStateChanged);
+        set => Bind(ref _width, value, RelayoutOnStateChanged);
     }
 
     /// <summary>
@@ -139,7 +139,7 @@ public abstract class Widget : IDisposable
     public State<float>? Height
     {
         get => _height;
-        set => _height = Bind(_height, value, RelayoutOnStateChanged);
+        set => Bind(ref _height, value, RelayoutOnStateChanged);
     }
 
     /// <summary>
@@ -293,41 +293,24 @@ public abstract class Widget : IDisposable
 
     #region ====Bind State====
 
-    protected static void BindState<T>(ref T? state, T? newState, Action<State> action) where T : State
+    /// <summary>
+    /// 绑定状态,在状态变更时执行相应的操作
+    /// </summary>
+    /// <param name="state">状态变量引用</param>
+    /// <param name="newState">新的状态</param>
+    /// <param name="action">状态变更时的操作</param>
+    /// <param name="forceAction">是否强制执行一次变更操作，否则只有已挂载时执行</param>
+    protected void Bind<T>(ref T? state, T? newState, Action<State> action, bool forceAction = false)
+        where T : State
     {
         if (ReferenceEquals(state, newState)) return;
-        
+
         state?.RemoveListener(action);
         state = newState;
         state?.AddListener(action);
-        
-        //暂强制调用一次变更
-        action(state ?? State.Empty);
-    }
-
-    /// <summary>
-    /// 绑定状态至Widget,用于首次绑定
-    /// </summary>
-    protected T Bind<T>(T newState, Action<State> action) where T : State
-    {
-        newState.AddListener(action);
-        return newState;
-    }
-
-    /// <summary>
-    /// 绑定状态至Widget,用于重新绑定
-    /// </summary>
-    protected T? Bind<T>(T? oldState, T? newState, Action<State> action) where T : State
-    {
-        if (ReferenceEquals(oldState, newState)) return newState;
-
-        oldState?.RemoveListener(action);
-        newState?.AddListener(action);
 
         //暂强制调用一次变更
-        action(newState ?? State.Empty);
-
-        return newState;
+        if (forceAction || IsMounted) action(state ?? State.Empty);
     }
 
     #endregion

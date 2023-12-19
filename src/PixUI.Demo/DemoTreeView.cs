@@ -70,7 +70,7 @@ namespace PixUI.Demo.Mac
                                         Child = new TreeView<TreeData>(_treeController1, BuildTreeNode,
                                             d => d.Children!)
                                         {
-                                            Color = new Color(0xFFDCDCDC),
+                                            FillColor = new Color(0xFFDCDCDC),
                                         }
                                     },
                                     new Expanded()
@@ -78,7 +78,7 @@ namespace PixUI.Demo.Mac
                                         Child = new TreeView<TreeData>(_treeController2, BuildTreeNode,
                                             d => d.Children!, true)
                                         {
-                                            Color = new Color(0xFFDCDCDC),
+                                            FillColor = new Color(0xFFDCDCDC),
                                         }
                                     }
                                 }

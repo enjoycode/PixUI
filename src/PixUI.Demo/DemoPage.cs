@@ -35,7 +35,7 @@ namespace PixUI.Demo
                     //Body
                     new Expanded { Child = BuildBody() },
                     //Footer
-                    new Container { Height = 20, BgColor = new Color(0xFFCA673B), DebugLabel = "DemoFooter" }
+                    new Container { Height = 20, FillColor = new Color(0xFFCA673B), DebugLabel = "DemoFooter" }
                 }
             };
         }

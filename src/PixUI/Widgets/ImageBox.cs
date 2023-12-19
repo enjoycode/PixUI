@@ -8,7 +8,7 @@ public sealed class ImageBox : Widget
 
     public ImageBox(State<ImageSource> imgSrc /*TODO: LoadingBuilder, ErrorBuilder*/)
     {
-        _imgSrc = Bind(imgSrc, RelayoutOnStateChanged);
+        Bind(ref _imgSrc!, imgSrc, RelayoutOnStateChanged);
     }
 
     public override bool IsOpaque
@@ -23,11 +23,10 @@ public sealed class ImageBox : Widget
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
         //TODO:根据是否指定大小及加载状态及加载的图像大小来计算
-        SetSize(width, height);
+        SetSize(maxSize.Width, maxSize.Height);
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)

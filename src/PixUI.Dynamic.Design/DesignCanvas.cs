@@ -12,7 +12,7 @@ public sealed class DesignCanvas : View, IDynamicContext
 
         Child = new Container
         {
-            BgColor = new Color(0xFFA2A2A2),
+            FillColor = new Color(0xFFA2A2A2),
             Padding = EdgeInsets.All(10),
             Child = new Card
             {

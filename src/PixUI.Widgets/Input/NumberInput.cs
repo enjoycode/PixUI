@@ -8,7 +8,7 @@ public sealed class NumberInput<T> : InputBase<EditableText> where T : struct, I
 {
     public NumberInput()
     {
-        Editor = new EditableText();
+        Editor = new EditableText { Text = string.Empty /*must assign*/ };
         Editor.PreviewInput = OnPreviewInput;
         Editor.CommitChanges = OnCommitChanges;
     }
@@ -26,11 +26,7 @@ public sealed class NumberInput<T> : InputBase<EditableText> where T : struct, I
 
     public required State<T?> Number
     {
-        init
-        {
-            _nullable = Bind(value, OnNullableChanged);
-            Editor.Text = _nullable.ToString();
-        }
+        init => Bind(ref _nullable!, value, OnNullableChanged, true);
     }
 
     public override State<bool>? Readonly

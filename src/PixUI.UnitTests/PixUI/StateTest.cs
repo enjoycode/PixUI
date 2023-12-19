@@ -38,8 +38,28 @@ public class StateTest
         Assert.True(hasChanged);
         Assert.True(proxy.Value == person.Name);
     }
+
+    [Test]
+    public void BindTest()
+    {
+        var w = new TestWidget() { Value = DateTime.Today };
+        Assert.True(w.Value.Value == DateTime.Today);
+
+        var d = new DatePicker() { Value = DateTime.Today };
+    }
     
-    public class Person: INotifyPropertyChanged
+    private sealed class TestWidget: Widget
+    {
+        private readonly State<DateTime?> _value = null!;
+        
+        public required State<DateTime?> Value
+        {
+            get => _value;
+            init => Bind(ref _value!, value, RepaintOnStateChanged);
+        }
+    }
+
+    private sealed class Person: INotifyPropertyChanged
     {
         private string _name = string.Empty;
 
@@ -51,7 +71,7 @@ public class StateTest
         
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

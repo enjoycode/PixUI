@@ -31,7 +31,7 @@ namespace PixUI.Demo.Mac
                     new Text(_title) { FontSize = _fontSize, TextColor = _color },
                     new Container
                     {
-                        BgColor = Colors.Gray,
+                        FillColor = Colors.Gray,
                         Width = 150,
                         Height = 50,
                         Child = new Center
@@ -42,7 +42,7 @@ namespace PixUI.Demo.Mac
                                 {
                                     Width = 50,
                                     Height = 50,
-                                    BgColor = Colors.Red
+                                    FillColor = Colors.Red
                                 }
                             }
                         }

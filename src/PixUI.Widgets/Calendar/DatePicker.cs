@@ -8,7 +8,10 @@ public sealed class DatePicker : InputBase<EditableText>
 {
     public DatePicker()
     {
-        Editor = new EditableText { Text = string.Empty };
+        Editor = new EditableText { Text = string.Empty /*must assign*/ };
+        Editor.FocusNode.FocusChanged += OnFocusChanged;
+        Editor.Text.AddListener(OnTextChanged);
+
         Padding = new RxValue<EdgeInsets>(EdgeInsets.Only(4, 4, 0, 4));
         SuffixWidget = new Button(icon: MaterialIcons.CalendarMonth)
         {
@@ -24,22 +27,13 @@ public sealed class DatePicker : InputBase<EditableText>
     }
 
     private readonly State<DateTime?> _value = null!;
-    private readonly State<string> _textValue = null!;
     private const string format = "yyyy-MM-dd";
     private bool _showing;
     private DatePickerPopup? _popup;
 
     public required State<DateTime?> Value
     {
-        init
-        {
-            _value = Bind(value, OnValueChanged);
-            _textValue = Bind(Editor.Text, OnTextChanged);
-            if (value.Value != null)
-                _textValue.Value = value.Value.Value.ToString(format);
-
-            Editor.FocusNode.FocusChanged += OnFocusChanged;
-        }
+        init => Bind(ref _value!, value, OnValueChanged, true);
     }
 
     public override State<bool>? Readonly { get; set; }
@@ -74,7 +68,7 @@ public sealed class DatePicker : InputBase<EditableText>
         if (!e.IsFocused)
         {
             // restore edit text to DateTime format
-            _textValue.Value = _value.Value == null ? string.Empty : _value.Value.Value.ToString(format);
+            Editor.Text.Value = _value.Value == null ? string.Empty : _value.Value.Value.ToString(format);
             // maybe lost focus by tap button
             if (!ReferenceEquals(e.NewFocusedWidget, SuffixWidget))
                 HidePopup();
@@ -87,12 +81,12 @@ public sealed class DatePicker : InputBase<EditableText>
 
     private void OnValueChanged(State state)
     {
-        _textValue.Value = _value.Value == null ? string.Empty : _value.Value.Value.ToString(format);
+        Editor.Text.Value = _value.Value == null ? string.Empty : _value.Value.Value.ToString(format);
     }
 
     private void OnTextChanged(State state)
     {
-        if (DateTime.TryParseExact(_textValue.Value, format,
+        if (DateTime.TryParseExact(Editor.Text.Value, format,
                 CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTime))
             _value.Value = dateTime;
     }

@@ -18,7 +18,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
     }
 
     private readonly Caret _caret;
-    private int _caretPosition = 0;
+    private int _caretPosition;
 
     public readonly State<bool> Focused = false;
 
@@ -29,7 +29,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
     public State<bool>? Readonly
     {
         get => _readonly;
-        set => _readonly = Bind(_readonly, value, OnReadonlyChanged);
+        set => Bind(ref _readonly, value, OnReadonlyChanged);
     }
 
     internal bool IsReadonly => _readonly != null && _readonly.Value;

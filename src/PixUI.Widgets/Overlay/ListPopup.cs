@@ -32,12 +32,12 @@ internal sealed class ListPopupItemWidget : SingleChildWidget, IMouseRegion
     internal ListPopupItemWidget(int index, State<bool> hoverState, State<bool> selectedState,
         Action<int> onSelect)
     {
-        _hoverState = Bind(hoverState, RepaintOnStateChanged);
+        Bind(ref _hoverState!, hoverState, RepaintOnStateChanged);
         _selectedState = selectedState;
 
         MouseRegion = new MouseRegion(() => Cursors.Hand);
         MouseRegion.HoverChanged += isHover => hoverState.Value = isHover;
-        MouseRegion.PointerTap += e => onSelect(index);
+        MouseRegion.PointerTap += _ => onSelect(index);
     }
 
     public MouseRegion MouseRegion { get; private set; }

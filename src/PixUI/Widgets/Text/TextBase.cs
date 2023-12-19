@@ -20,7 +20,7 @@ public abstract class TextBase : Widget
     public State<string> Text
     {
         get => _text;
-        set => _text = Bind(_text, value, this is EditableText ? RepaintOnStateChanged : RelayoutOnStateChanged)!;
+        set => Bind(ref _text!, value, this is EditableText ? RepaintOnStateChanged : RelayoutOnStateChanged);
     }
 
     protected virtual bool ForceHeight { get; } = false;
@@ -28,27 +28,26 @@ public abstract class TextBase : Widget
     public State<float>? FontSize
     {
         get => _fontSize;
-        set => _fontSize = Bind(_fontSize, value, RelayoutOnStateChanged);
+        set => Bind(ref _fontSize, value, RelayoutOnStateChanged);
     }
 
     public State<FontWeight>? FontWeight
     {
         get => _fontWeight;
-        set => _fontWeight = Bind(_fontWeight, value, RepaintOnStateChanged);
+        set => Bind(ref _fontWeight, value, RepaintOnStateChanged);
     }
 
     public State<Color>? TextColor
     {
         get => _textColor;
-        set => _textColor = Bind(_textColor, value, RepaintOnStateChanged);
+        set => Bind(ref _textColor, value, RepaintOnStateChanged);
     }
 
     public int MaxLines
     {
         set
         {
-            if (value <= 0)
-                throw new ArgumentException();
+            if (value <= 0) throw new ArgumentException();
             if (_maxLines != value)
             {
                 _maxLines = value;

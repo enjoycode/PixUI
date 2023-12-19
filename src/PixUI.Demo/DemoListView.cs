@@ -39,7 +39,7 @@ namespace PixUI.Demo.Mac
                     DebugLabel = $"Card{i.ToString()}",
                     Child = new Container()
                     {
-                        BgColor = Colors.Random(), Height = 192,
+                        FillColor = Colors.Random(), Height = 192,
                         Child = new Center()
                         {
                             DebugLabel = i.ToString(),

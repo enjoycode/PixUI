@@ -31,7 +31,7 @@ public class Conditional<T> : DynamicView //where T: IEquatable<T>
     public Conditional(State<T> state)
     {
         IsLayoutTight = true;
-        _state = Bind(state, OnStateChanged);
+        Bind(ref _state!, state, OnStateChanged);
     }
 
     private readonly State<T> _state;

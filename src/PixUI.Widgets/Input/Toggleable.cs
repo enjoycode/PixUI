@@ -20,7 +20,7 @@ public abstract class Toggleable : Widget, IMouseRegion
     protected void InitState(State<bool?> value, bool tristate)
     {
         _triState = tristate;
-        _value = Bind(value, OnValueChanged);
+        Bind(ref _value!, value, OnValueChanged);
         _positionController = new AnimationController(100, value.Value != null && value.Value.Value ? 1 : 0);
         _positionController.ValueChanged += OnPositionValueChanged;
     }

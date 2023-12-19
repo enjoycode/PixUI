@@ -33,7 +33,7 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
     public State<EdgeInsets>? Padding
     {
         get => _padding;
-        set => _padding = Bind(_padding, value, RelayoutOnStateChanged);
+        set => Bind(ref _padding, value, RelayoutOnStateChanged);
     }
 
     public abstract State<bool>? Readonly { get; set; }
@@ -53,7 +53,7 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
     public State<Color>? FillColor
     {
         get => _fillColor;
-        set => _fillColor = Bind(_fillColor, value, RepaintOnStateChanged);
+        set => Bind(ref _fillColor, value, RepaintOnStateChanged);
     }
 
     protected Widget? PrefixWidget

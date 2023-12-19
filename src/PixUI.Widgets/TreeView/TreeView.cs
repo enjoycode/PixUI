@@ -19,15 +19,15 @@ public sealed class TreeView<T> : Widget, IScrollable
     }
 
     private readonly TreeController<T> _controller;
-    private State<Color>? _color;
+    private State<Color>? _fillColor;
 
     /// <summary>
     /// 背景色
     /// </summary>
-    public State<Color>? Color
+    public State<Color>? FillColor
     {
-        get => _color;
-        set => _color = Bind(_color, value, RepaintOnStateChanged);
+        get => _fillColor;
+        set => Bind(ref _fillColor, value, RepaintOnStateChanged);
     }
 
     public Action<TreeNode<T>> OnCheckChanged
@@ -57,7 +57,7 @@ public sealed class TreeView<T> : Widget, IScrollable
 
     #region ====Overrides====
 
-    public override bool IsOpaque => _color != null && _color.Value.Alpha == 0xFF;
+    public override bool IsOpaque => _fillColor != null && _fillColor.Value.Alpha == 0xFF;
 
     public override void VisitChildren(Func<Widget, bool> action)
     {
@@ -141,15 +141,15 @@ public sealed class TreeView<T> : Widget, IScrollable
     {
         if (_controller.IsLoading)
         {
-            if (_color != null)
-                canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PaintUtils.Shared(_color.Value));
+            if (_fillColor != null)
+                canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PaintUtils.Shared(_fillColor.Value));
             _controller.LoadingPainter!.PaintToWidget(this, canvas);
             return;
         }
 
         // draw background color if has
-        if (_color != null)
-            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PaintUtils.Shared(_color.Value));
+        if (_fillColor != null)
+            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PaintUtils.Shared(_fillColor.Value));
 
         // draw nodes in visual region
         var dirtyRect = area?.GetRect() ?? Rect.FromLTWH(0, 0, W, H);

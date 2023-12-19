@@ -16,7 +16,7 @@ public sealed class TreeNode<T> : Widget
 
         _color = IsSelected.ToComputed(s => s ? Theme.FocusedColor : Colors.Black); //TODO: fix color
 
-        Bind(IsSelected, RepaintOnStateChanged);
+        IsSelected.AddListener(RepaintOnStateChanged);
     }
 
     #region ====Fields & Properties====

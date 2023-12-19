@@ -13,7 +13,7 @@ public sealed class LedBulb : Widget
     public State<Color> Color
     {
         get => _color;
-        set => _color = Bind(_color, value, RepaintOnStateChanged)!;
+        set => Bind(ref _color!, value, RepaintOnStateChanged);
     }
 
     private Color DarkColor => Colors.Dark(_color.Value);
@@ -22,7 +22,7 @@ public sealed class LedBulb : Widget
     public State<bool> On
     {
         get => _on;
-        set => _on = Bind(_on, value, RepaintOnStateChanged)!;
+        set => Bind(ref _on!, value, RepaintOnStateChanged);
     }
 
     public override void Layout(float availableWidth, float availableHeight)

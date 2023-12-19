@@ -17,7 +17,7 @@ namespace PixUI.Demo.Mac
                 DebugLabel = "DemoTransform.Green",
                 Width = 300,
                 Height = 300,
-                BgColor = Colors.Green,
+                FillColor = Colors.Green,
                 Child = new Transform(m2, new Offset(0, 0), false)
                 {
                     // Child = new HitTestWidget()
