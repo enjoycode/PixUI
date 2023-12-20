@@ -171,19 +171,19 @@ public class ListPopup<T> : Popup
         if (raiseChangedEvent)
             OnSelectionChanged?.Invoke(DataSource![index]);
 
-        Invalidate(InvalidAction.Repaint); //force repaint
+        Repaint(); //force repaint
     }
 
     public void UpdateFilter(Predicate<T> predicate)
     {
-        Invalidate(InvalidAction.Relayout); //强制自己重新布局
+        Relayout(); //强制自己重新布局
         // @ts-ignore
         ChangeDataSource(_fullDataSource?.Where(t => predicate(t)).ToList());
     }
 
     public void ClearFilter()
     {
-        Invalidate(InvalidAction.Relayout); //强制自己重新布局
+        Relayout(); //强制自己重新布局
         ChangeDataSource(_fullDataSource);
     }
 

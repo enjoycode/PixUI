@@ -18,7 +18,21 @@ partial class DynamicWidgetManager
         }
     );
 
-    private static DynamicWidgetMeta makeDatePickerMeta() => DynamicWidgetMeta.Make<DatePicker>(
+    private static DynamicWidgetMeta MakeSelectMeta() => DynamicWidgetMeta.Make<Select<string>>(
+        MaterialIcons.EditAttributes,
+        catalog: CatalogInput,
+        name: "Select",
+        properties: new DynamicPropertyMeta[]
+        {
+            new(nameof(Select<string>.Options), typeof(string[]), false),
+            new(nameof(Select<string>.Value), typeof(State<string?>), false, true,
+                initValue: string.Empty),
+            new(nameof(Select<string>.TextColor), typeof(State<Color>), true),
+            new(nameof(Select<string>.FillColor), typeof(State<Color>), true),
+        }
+    );
+
+    private static DynamicWidgetMeta MakeDatePickerMeta() => DynamicWidgetMeta.Make<DatePicker>(
         MaterialIcons.Today,
         catalog: CatalogInput,
         properties: new DynamicPropertyMeta[]

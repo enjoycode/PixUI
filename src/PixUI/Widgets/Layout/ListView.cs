@@ -136,9 +136,8 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
 
     protected internal override void AfterPaint(Canvas canvas)
     {
-        canvas.Translate(-X, -Y);
         canvas.Restore();
-        canvas.Translate(0, ScrollOffsetY);
+        canvas.Translate(-X, -Y);
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)

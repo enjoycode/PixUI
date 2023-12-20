@@ -12,10 +12,13 @@ public abstract class SelectBase<T> : InputBase<Widget>
 {
     protected SelectBase(bool filterable)
     {
-        SuffixWidget = new ExpandIcon(new FloatTween(0, 0.5f).Animate(_expandAnimation));
         Editor = filterable
             ? new EditableText()
             : new SelectText();
+
+        _iconColor = new RxProxy<Color>(() => TextColor?.Value ?? new Color(0xff5f6368));
+        SuffixWidget = new ExpandIcon(new FloatTween(0, 0.5f).Animate(_expandAnimation), color: _iconColor);
+
         if (Editor is IMouseRegion mouseRegion)
             mouseRegion.MouseRegion.PointerTap += OnEditorTap;
         if (Editor is IFocusable focusable)
@@ -25,6 +28,7 @@ public abstract class SelectBase<T> : InputBase<Widget>
     private readonly State<T?> _selectedValue = null!;
     private readonly ListPopupItemBuilder<T>? _optionBuilder = null;
     private readonly OptionalAnimationController _expandAnimation = new();
+    private readonly State<Color> _iconColor;
     private ListPopup<T>? _listPopup;
     private bool _showing;
     private Func<T, string>? _labelGetter;
@@ -33,6 +37,7 @@ public abstract class SelectBase<T> : InputBase<Widget>
 
     public State<T?> Value
     {
+        get => _selectedValue;
         init
         {
             _selectedValue = value;
@@ -50,6 +55,16 @@ public abstract class SelectBase<T> : InputBase<Widget>
     public Func<T, string> LabelGetter
     {
         set => _labelGetter = value;
+    }
+
+    public State<Color>? TextColor
+    {
+        get => ((TextBase)Editor).TextColor;
+        set
+        {
+            ((TextBase)Editor).TextColor = value;
+            _iconColor.NotifyValueChanged();
+        }
     }
 
     public override State<bool>? Readonly

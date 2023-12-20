@@ -17,6 +17,7 @@ public sealed class PropertyEditor : Widget
         RegisterStructValueEditor<float, NumberEditor<float>>(true);
         RegisterStructValueEditor<Color, ColorEditor>(true);
         RegisterStructValueEditor<DateTime, DateEditor>(false);
+        RegisterClassValueEditor<string[], StringArrayEditor>(true);
     }
 
     public PropertyEditor(DesignElement element, DynamicPropertyMeta propertyMeta)

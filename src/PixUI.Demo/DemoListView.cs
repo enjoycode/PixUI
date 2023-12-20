@@ -24,7 +24,12 @@ namespace PixUI.Demo.Mac
                             }
                         }
                     },
-                    new Expanded { Child = ListView<Widget>.From(BuildList(), listViewController) }
+                    new Expanded { Child = ListView<Widget>.From(BuildList(), listViewController) },
+                    new Container()
+                    {
+                        Height = 100, FillColor = Colors.Red,
+                        Child = new Center() { Child = new Button("Test") }
+                    }
                 }
             };
         }
