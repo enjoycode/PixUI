@@ -157,13 +157,21 @@ public struct DynamicValue
             reader.Read(); // {
             reader.Read(); // ValueSource
             var sourceName = reader.GetString()!;
-            v.From = sourceName switch
+            switch (sourceName)
             {
-                nameof(ValueSource.Const) => ValueSource.Const,
-                nameof(ValueSource.State) => ValueSource.State,
-                _ => throw new JsonException($"Unknown ValueSource: [{sourceName}]")
-            };
-            v.Value = JsonSerializer.Deserialize(ref reader, valueType /*TODO: options*/);
+                case nameof(ValueSource.Const):
+                    v.From = ValueSource.Const;
+                    v.Value = JsonSerializer.Deserialize(ref reader, valueType /*TODO: options*/);
+                    break;
+                case nameof(ValueSource.State):
+                    reader.Read();
+                    v.From = ValueSource.State;
+                    v.Value = reader.GetString();
+                    break;
+                default:
+                    throw new JsonException($"Unknown ValueSource: [{sourceName}]");
+            }
+
             reader.Read(); // }
         }
 
