@@ -22,6 +22,7 @@ public static partial class DynamicWidgetManager
         Register(MakeExpanded());
         Register(MakeStackMeta());
         Register(MakePositionedMeta());
+        Register(MakeCardMeta());
         Register(MakeCenterMeta());
     }
 

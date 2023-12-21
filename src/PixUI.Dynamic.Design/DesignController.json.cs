@@ -73,7 +73,16 @@ partial class DesignController
     {
         var meta = element.Meta;
         var data = element.Data;
-        if (meta == null) return; //skip 
+        if (meta == null)
+        {
+            //element is a placeholder.
+            writer.WriteStartObject();
+            writer.WriteNull("Type");
+            writer.WriteNumber("Width", element.W);
+            writer.WriteNumber("Height", element.H);
+            writer.WriteEndObject();
+            return;
+        }
 
         writer.WriteStartObject();
         // Type
@@ -291,7 +300,21 @@ partial class DesignController
             if (propName == "Type")
             {
                 reader.Read();
-                meta = DynamicWidgetManager.GetByName(reader.GetString()!);
+                var type = reader.GetString();
+                if (string.IsNullOrEmpty(type))
+                {
+                    //element is a placeholder
+                    reader.Read();
+                    reader.Read();
+                    var width = reader.GetSingle();
+                    reader.Read();
+                    reader.Read();
+                    var height = reader.GetSingle();
+                    result = element = new DesignElement(this, slotName) {Width = width, Height = height};
+                    continue;
+                }
+                
+                meta = DynamicWidgetManager.GetByName(type);
                 if (meta.IsReversedWrapElement)
                 {
                     result = meta.CreateInstance();

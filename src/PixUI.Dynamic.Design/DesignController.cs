@@ -115,7 +115,7 @@ public sealed partial class DesignController
 
     public DesignElement? FirstSelected => Selection.Count > 0 ? Selection[0] : null;
 
-    internal void Select(DesignElement element)
+    public void Select(DesignElement element)
     {
         if (Selection.Count == 1 && ReferenceEquals(Selection[0], element)) return;
 

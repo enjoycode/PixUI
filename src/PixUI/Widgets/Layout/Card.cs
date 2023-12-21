@@ -54,20 +54,18 @@ public sealed class Card : SingleChildWidget
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
-
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
         if (Child == null)
         {
-            SetSize(width, height);
+            SetSize(maxSize.Width, maxSize.Height);
             return;
         }
 
         var margin = _margin?.Value ?? EdgeInsets.All(DefaultMargin);
         var padding = Padding?.Value ?? EdgeInsets.All(0);
 
-        Child.Layout(width - margin.Horizontal - padding.Horizontal,
-            height - margin.Vertical - padding.Vertical);
+        Child.Layout(maxSize.Width - margin.Horizontal - padding.Horizontal,
+            maxSize.Height - margin.Vertical - padding.Vertical);
         Child.SetPosition(margin.Left + padding.Left, margin.Top + padding.Top);
         SetSize(Child.W + margin.Horizontal + padding.Horizontal,
             Child.H + margin.Vertical + padding.Vertical);

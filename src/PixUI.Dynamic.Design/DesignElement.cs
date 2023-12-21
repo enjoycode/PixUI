@@ -141,11 +141,19 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
             }
 
             Child = child; //注意设置初始化值后再设置Child
-            
+
             //暂在这里特殊处理Row, Column等IsLayoutTight的容器实例，默认添加占位的子组件
-            if (Child is Row || Child is Column) //TODO: 应判断childMeta是否需要创建占位子组件
+            if (Child is SingleChildWidget { IsLayoutTight: true })
             {
-                var defaultSlot = Meta!.Slots![0];
+                var defaultSlot = Meta.DefaultSlot;
+                defaultSlot.SetChild(Child, new DesignElement(Controller, defaultSlot.PropertyName)
+                {
+                    Width = 100, Height = 100,
+                });
+            }
+            else if (Child is Row || Child is Column) //TODO: 应判断childMeta是否需要创建占位子组件
+            {
+                var defaultSlot = Meta.DefaultSlot;
                 for (var i = 0; i < 3; i++)
                 {
                     defaultSlot.TryAddChild(Child, new DesignElement(Controller, "Children")
@@ -497,7 +505,7 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
             childDefaultSlot.TrySetChild(childWidget, childElement);
 
             parentDefaultSlot.TryReplaceChild(parentElement.Target!, this, childWidget);
-            parentElement.Invalidate(InvalidAction.Relayout);
+            parentElement.Relayout();
             Controller.Select(childElement);
         }
         else
@@ -540,7 +548,7 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
 
         if (defaultSlot.TryAddChild(Target!, childToBeAdded))
         {
-            Invalidate(InvalidAction.Relayout);
+            Relayout();
             Controller.Select(childElement);
             Controller.RaiseOutlineChanged();
         }
@@ -551,7 +559,7 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         var newChild = new DesignElement(Controller, meta, defaultSlot.PropertyName);
         if (defaultSlot.TrySetChild(Target!, newChild))
         {
-            Invalidate(InvalidAction.Relayout);
+            Relayout();
             Controller.Select(newChild);
             Controller.RaiseOutlineChanged();
         }
@@ -562,7 +570,7 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         //eg: drop widget to Expanded
         var newChild = new DesignElement(Controller, meta, defaultSlot.PropertyName);
         Child = newChild;
-        Parent?.Parent?.Invalidate(InvalidAction.Relayout); //暂强制重布局上级的上级
+        Parent?.Parent?.Relayout(); //暂强制重布局上级的上级
         Controller.Select(newChild);
         Controller.OnSelectionChanged();
     }

@@ -3,7 +3,7 @@ namespace PixUI.Dynamic;
 partial class DynamicWidgetManager
 {
     private const string CatalogLayout = "Layout";
-    
+
     private static DynamicWidgetMeta MakeRow() => DynamicWidgetMeta.Make<Row>(
         MaterialIcons.ViewArray,
         catalog: CatalogLayout,
@@ -51,6 +51,22 @@ partial class DynamicWidgetManager
         slots: new ContainerSlot[]
         {
             new(nameof(Center.Child), ContainerType.SingleChild)
+        });
+
+    private static DynamicWidgetMeta MakeCardMeta() => DynamicWidgetMeta.Make<Card>(
+        MaterialIcons.FeaturedVideo,
+        catalog: CatalogLayout,
+        properties: new DynamicPropertyMeta[]
+        {
+            new(nameof(Card.Margin), typeof(State<EdgeInsets>), true),
+            new(nameof(Card.Padding), typeof(State<EdgeInsets>), true),
+            new(nameof(Card.Color), typeof(State<Color>), true),
+            new(nameof(Card.ShadowColor), typeof(State<Color>), true),
+            new(nameof(Card.Elevation), typeof(State<float>), true),
+        },
+        slots: new ContainerSlot[]
+        {
+            new(nameof(Card.Child), ContainerType.SingleChild)
         });
 
     private static DynamicWidgetMeta MakeStackMeta() => DynamicWidgetMeta.Make<Stack>(

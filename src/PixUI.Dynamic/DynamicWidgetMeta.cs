@@ -82,6 +82,16 @@ public sealed class DynamicWidgetMeta
     public bool IsReversedWrapElement => Slots is { Length: 1 } &&
                                          Slots[0].ContainerType == ContainerType.SingleChildReversed;
 
+    public ContainerSlot DefaultSlot
+    {
+        get
+        {
+            if (!IsContainer)
+                throw new Exception($"[{WidgetType.Name}] is not a container");
+            return Slots![0];
+        }
+    }
+
     /// <summary>
     /// 根据名称查找属性定义，找不到报错
     /// </summary>
