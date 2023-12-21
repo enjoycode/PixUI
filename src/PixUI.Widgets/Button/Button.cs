@@ -27,6 +27,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     internal const float StandardRadius = 4;
 
     private readonly State<string>? _text;
+    private readonly State<IconData>? _icon;
     private State<float>? _borderWidth;
     private State<Color>? _textColor;
     private State<Color>? _fillColor;
@@ -37,14 +38,14 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     public State<string>? Text
     {
         get => _text;
-        init
-        {
-            _text = value;
-            _text?.AddListener(RelayoutOnStateChanged);
-        }
+        init => Bind(ref _text, value, RelayoutOnStateChanged);
     }
 
-    public State<IconData>? Icon { get; init; }
+    public State<IconData>? Icon
+    {
+        get => _icon;
+        init => Bind(ref _icon, value, RelayoutOnStateChanged);
+    }
 
     public ButtonStyle Style { get; set; } = ButtonStyle.Solid;
     public ButtonShape Shape { get; set; } = ButtonShape.Standard;
