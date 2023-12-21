@@ -196,26 +196,11 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
                 cellRect.Bottom += mergeDownCount * rowHeight;
             }
 
-            //TODO:暂在这里画stripe背景
-            if (!col.AutoMergeCells /*合并单元格时不支持*/ && Theme.StripeRows && j % 2 != 0)
-            {
-                var paint = PaintUtils.Shared(Theme.StripeFillColor);
-                canvas.DrawRect(cellRect, paint);
-            }
-            else
-            {
-                if (Theme.DefaultRowCellStyle.BackgroundColor.HasValue &&
-                    col.CellStyle == null && col.CellStyleGetter == null)
-                {
-                    var paint = PaintUtils.Shared(Theme.DefaultRowCellStyle.BackgroundColor.Value);
-                    canvas.DrawRect(cellRect, paint);
-                }
-            }
-
+            //画单元格(背景由各自具体实现处理)
             col.PaintCell(canvas, _controller, j, cellRect);
 
-            var borderRect = new Rect(col.CachedVisibleLeft, cellRect.Top,
-                col.CachedVisibleRight, cellRect.Bottom);
+            //画单元格边框
+            var borderRect = new Rect(col.CachedVisibleLeft, cellRect.Top, col.CachedVisibleRight, cellRect.Bottom);
             DataGridPainter.PaintCellBorder(canvas, borderRect, _controller.Theme.BorderColor);
 
             offsetY += rowHeight;

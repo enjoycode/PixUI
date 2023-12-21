@@ -13,31 +13,26 @@ public sealed class DataGridIconColumn<T> : DataGridColumn<T>
 
     private readonly Func<T, IconData?> _cellValueGetter;
 
-    protected internal override void PaintCell(Canvas canvas, DataGridController<T> controller, int rowIndex,
-        Rect cellRect)
+    protected internal override void PaintCell(Canvas canvas, DataGridController<T> controller,
+        int rowIndex, Rect cellRect)
     {
+        //先画背景
+        var cellStyle = PaintCellBackground(canvas, controller, rowIndex, cellRect);
+        //再画图标
         var row = controller.DataView![rowIndex];
         var icon = _cellValueGetter(row);
         if (icon == null) return;
-
-        var style = CellStyleGetter != null
-            ? CellStyleGetter(row, rowIndex)
-            : CellStyle ?? controller.Theme.DefaultRowCellStyle;
 
         //TODO: cache icon painter
         using var iconPainter = new IconPainter(() => controller.DataGrid.Body.Repaint() /*TODO: repaint column only*/);
         var offsetX = cellRect.Left + CellStyle.CellPadding;
         var offsetY = cellRect.Top;
-        if (style.VerticalAlignment == VerticalAlignment.Middle)
-        {
-            offsetY += (cellRect.Height - style.FontSize) / 2f;
-        }
-        else if (style.VerticalAlignment == VerticalAlignment.Bottom)
-        {
-            offsetY = offsetY - cellRect.Bottom - style.FontSize;
-        }
+        if (cellStyle.VerticalAlignment == VerticalAlignment.Middle)
+            offsetY += (cellRect.Height - cellStyle.FontSize) / 2f;
+        else if (cellStyle.VerticalAlignment == VerticalAlignment.Bottom)
+            offsetY = offsetY - cellRect.Bottom - cellStyle.FontSize;
 
-        iconPainter.Paint(canvas, style.FontSize, style.Color ?? Colors.Black, icon.Value,
+        iconPainter.Paint(canvas, cellStyle.FontSize, cellStyle.TextColor ?? Colors.Black, icon.Value,
             offsetX, offsetY);
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 
 namespace PixUI.Dynamic.Design;
@@ -7,23 +6,42 @@ public sealed class ColorEditor : ValueEditorBase
 {
     //TODO: 暂简单实现输入ARGB值
 
-    public ColorEditor(State<Color?> color, DesignElement element) : base(element)
+    public ColorEditor(State<Color?> state, DesignElement element) : base(element)
     {
-        var colorHex = color.ToComputed(
-            s => s.HasValue ? ((uint)s.Value).ToString("X2") : string.Empty,
-            v =>
-            {
-                if (uint.TryParse(v, NumberStyles.HexNumber, null, out var value))
-                    color.Value = value;
-            });
+        Bind(ref _state!, state, OnValueChanged, true);
 
-        var colorState = color.ToNoneNullable(Colors.Transparent);
-        //var iconState = color.ToComputed(v => v.HasValue ? MaterialIcons.Square : MaterialIcons.ColorLens);
-        //Child = new Button(icon: iconState) { TextColor = colorState, Style = ButtonStyle.Outline, OnTap = OnTap };
-
-        Child = new TextInput(colorHex)
+        var colorState = state.ToNoneNullable(Color.Empty);
+        Child = new TextInput(_text)
         {
-            Suffix = new Icon(MaterialIcons.Square) { Color = colorState }
+            Suffix = new Icon(MaterialIcons.Square) { Color = colorState },
+            OnCommitChanges = OnCommitChanges,
         };
+    }
+
+    private readonly State<Color?> _state;
+    private readonly State<string> _text = string.Empty;
+
+    private void OnValueChanged(State state)
+    {
+        _text.Value = _state.Value == null ? string.Empty : ((uint)_state.Value).ToString("X8");
+    }
+
+    private void OnCommitChanges(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            OnValueChanged(_state);
+            return;
+        }
+
+        if (uint.TryParse(text, NumberStyles.HexNumber, null, out var value))
+        {
+            _state.Value = new Color(value);
+        }
+        else
+        {
+            Notification.Warn("Color hex格式错误");
+            OnValueChanged(_state); //restore it
+        }
     }
 }

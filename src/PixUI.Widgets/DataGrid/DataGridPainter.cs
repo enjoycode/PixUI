@@ -2,10 +2,11 @@ namespace PixUI;
 
 public static class DataGridPainter
 {
-    public static Paragraph BuildCellParagraph(Rect rect, CellStyle style, string text, int maxLines)
+    public static Paragraph BuildCellParagraph(Rect rect, CellStyle style, CellStyle defaultStyle,
+        string text, int maxLines)
     {
         using var ts = new TextStyle();
-        ts.Color = style.Color ?? Colors.Black;
+        ts.Color = style.TextColor ?? (defaultStyle.TextColor ?? Colors.Black);
         ts.FontSize = style.FontSize;
         ts.FontStyle = new FontStyle(style.FontWeight, FontSlant.Upright);
         ts.Height = 1;

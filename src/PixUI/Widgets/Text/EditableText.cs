@@ -19,6 +19,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
 
     private readonly Caret _caret;
     private int _caretPosition;
+    private bool _changeByTextInput;
 
     public readonly State<bool> Focused = false;
 
@@ -101,8 +102,18 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         if (PreviewInput != null && !PreviewInput(newText))
             return;
 
+        _changeByTextInput = true;
         Text.Value = newText;
+        _changeByTextInput = false;
         _caretPosition += text.Length;
+    }
+
+    protected override void OnTextChanged(State state)
+    {
+        if (!_changeByTextInput)
+            _caretPosition = Text.Value.Length;
+
+        base.OnTextChanged(state);
     }
 
     private void _OnPointerDown(PointerEvent theEvent)
@@ -145,7 +156,9 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
     {
         if (IsReadonly || _caretPosition == 0) return;
 
+        _changeByTextInput = true;
         Text.Value = Text.Value.Remove(_caretPosition - 1, 1);
+        _changeByTextInput = false;
         _caretPosition--;
     }
 

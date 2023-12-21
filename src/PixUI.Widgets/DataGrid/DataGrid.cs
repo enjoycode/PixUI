@@ -24,19 +24,13 @@ public sealed class DataGrid<T> : Widget, IMouseRegion
     internal DataGridHeader<T>? Header { get; private set; }
     internal DataGridFooter<T>? Footer { get; private set; }
 
-    private DataGridTheme _theme = DataGridTheme.Default;
-
     public bool ShowHeader { get; init; } = true;
     private bool ShowFooter => Footer != null;
 
     public DataGridTheme Theme
     {
-        get => _theme;
-        set
-        {
-            _theme = value;
-            Repaint();
-        }
+        get => _controller.Theme;
+        set => _controller.Theme = value;
     }
 
     public DataGridColumns<T> Columns => _controller.Columns;

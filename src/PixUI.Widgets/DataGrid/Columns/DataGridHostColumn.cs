@@ -27,9 +27,11 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
 
     public float LeftToDataGrid => CachedLeft;
 
-    protected internal override void PaintCell(Canvas canvas, DataGridController<T> controller, int rowIndex,
-        Rect cellRect)
+    protected internal override void PaintCell(Canvas canvas, DataGridController<T> controller, 
+        int rowIndex, Rect cellRect)
     {
+        PaintCellBackground(canvas, controller, rowIndex, cellRect);
+        
         var cellWidget = GetOrMakeCellWidget(rowIndex, controller, cellRect);
         canvas.Translate(cellRect.Left, cellRect.Top);
         // cellWidget.BeforePaint(canvas);

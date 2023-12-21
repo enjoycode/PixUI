@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace PixUI;
@@ -61,5 +62,10 @@ public sealed class TextInput : InputBase<EditableText>
     {
         get => Editor.HintText;
         set => Editor.HintText = value;
+    }
+
+    public Action<string> OnCommitChanges
+    {
+        set => Editor.CommitChanges = value;
     }
 }

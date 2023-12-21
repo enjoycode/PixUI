@@ -102,19 +102,63 @@ public abstract class DataGridColumn<T>
         var cellStyle = HeaderCellStyle ?? theme.DefaultHeaderCellStyle;
 
         //画背景色
-        if (cellStyle.BackgroundColor != null)
+        if (cellStyle.FillColor != null)
         {
-            var paint = PaintUtils.Shared(cellStyle.BackgroundColor.Value);
+            var paint = PaintUtils.Shared(cellStyle.FillColor.Value);
             canvas.DrawRect(cellRect, paint);
         }
 
         //画文本
-        using var ph = DataGridPainter.BuildCellParagraph(cellRect, cellStyle, Label, 2);
+        using var ph = DataGridPainter.BuildCellParagraph(cellRect,
+            cellStyle, theme.DefaultHeaderCellStyle, Label, 2);
         DataGridPainter.PaintCellParagraph(canvas, cellRect, cellStyle, ph);
     }
 
-    protected internal virtual void PaintCell(Canvas canvas, DataGridController<T> controller, int rowIndex,
-        Rect cellRect) { }
+    /// <summary>
+    /// 画单元格背景，由具体实现根据需要调用
+    /// </summary>
+    /// <param name="canvas"></param>
+    /// <param name="controller"></param>
+    /// <param name="rowIndex"></param>
+    /// <param name="cellRect"></param>
+    /// <returns>单元格样式，优先级: CellStyleGetter > Column.CellStyle > Default</returns>
+    protected CellStyle PaintCellBackground(Canvas canvas, DataGridController<T> controller, int rowIndex,
+        in Rect cellRect)
+    {
+        var theme = controller.Theme;
+        //根据设置获取单元格样式
+        var cellStyle = CellStyleGetter != null
+            ? CellStyleGetter(controller.DataView![rowIndex], rowIndex)
+            : CellStyle ?? controller.Theme.DefaultRowCellStyle;
+
+        //画单元格背景
+        if (!AutoMergeCells /*合并单元格时不支持*/ && theme.StripeRows && rowIndex % 2 != 0)
+        {
+            var paint = PaintUtils.Shared(theme.StripeFillColor);
+            canvas.DrawRect(cellRect, paint);
+        }
+        else
+        {
+            var fillColor = cellStyle.FillColor ?? theme.DefaultRowCellStyle.FillColor;
+            if (fillColor.HasValue)
+            {
+                var paint = PaintUtils.Shared(fillColor.Value);
+                canvas.DrawRect(cellRect, paint);
+            }
+        }
+
+        return cellStyle;
+    }
+
+    /// <summary>
+    /// 画单元格内容
+    /// </summary>
+    /// <param name="canvas"></param>
+    /// <param name="controller"></param>
+    /// <param name="rowIndex"></param>
+    /// <param name="cellRect"></param>
+    protected internal virtual void PaintCell(Canvas canvas, DataGridController<T> controller,
+        int rowIndex, Rect cellRect) { }
 
     /// <summary>
     /// 尝试向上合并单元格

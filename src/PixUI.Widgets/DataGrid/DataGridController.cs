@@ -14,10 +14,19 @@ public sealed class DataGridController<T> /* where T : notnull*/
     internal readonly ScrollController ScrollController = new(ScrollDirection.Both);
 
     private DataGrid<T>? _owner;
+    private DataGridTheme _theme = DataGridTheme.Default;
 
     internal void Attach(DataGrid<T> dataGrid) => _owner = dataGrid;
 
-    public DataGridTheme Theme => _owner!.Theme;
+    public DataGridTheme Theme
+    {
+        get => _theme;
+        set
+        {
+            _theme = value;
+            Refresh();
+        }
+    }
 
     public DataGrid<T> DataGrid => _owner!;
 

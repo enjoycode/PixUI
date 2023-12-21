@@ -4,8 +4,6 @@ namespace PixUI;
 
 public abstract class TextBase : Widget
 {
-    protected TextBase() { }
-
     private static readonly State<string> EmptyText = new RxProxy<string>(() => string.Empty);
     private State<string> _text = EmptyText;
     private State<float>? _fontSize;
@@ -20,7 +18,7 @@ public abstract class TextBase : Widget
     public State<string> Text
     {
         get => _text;
-        set => Bind(ref _text!, value, this is EditableText ? RepaintOnStateChanged : RelayoutOnStateChanged);
+        set => Bind(ref _text!, value, OnTextChanged);
     }
 
     protected virtual bool ForceHeight { get; } = false;
@@ -59,6 +57,14 @@ public abstract class TextBase : Widget
                 }
             }
         }
+    }
+
+    protected virtual void OnTextChanged(State state)
+    {
+        if (this is EditableText)
+            RepaintOnStateChanged(state);
+        else
+            RelayoutOnStateChanged(state);
     }
 
     private void ClearCachedParagraph()

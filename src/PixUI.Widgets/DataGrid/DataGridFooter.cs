@@ -104,7 +104,8 @@ internal sealed class DataGridFooter<T> : Widget
         canvas.Save();
         canvas.ClipRect(cellRect, ClipOp.Intersect, false);
         //TODO:暂使用可见框计算位置
-        using var ph = DataGridPainter.BuildCellParagraph(cellRect, style, content, 1);
+        using var ph = DataGridPainter.BuildCellParagraph(cellRect,
+            style, _controller.Theme.DefaultHeaderCellStyle, content, 1);
         DataGridPainter.PaintCellParagraph(canvas, cellRect, style, ph);
         canvas.Restore();
     }

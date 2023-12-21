@@ -9,7 +9,7 @@ namespace PixUI;
 [JsonConverter(typeof(ColorJsonConverter))]
 public readonly struct Color : IEquatable<Color>
 {
-    public static readonly Color Empty;
+    public static readonly Color Empty = 0;
 
     public static Color FromArgb(byte alpha, byte red, byte green, byte blue) =>
         new(red, green, blue, alpha);
@@ -56,7 +56,7 @@ public readonly struct Color : IEquatable<Color>
         if (maxval == minval)
             return 0.0f;
 
-        float diff = (float)(maxval - minval);
+        float diff = maxval - minval;
         float rnorm = (maxval - r) / diff;
         float gnorm = (maxval - g) / diff;
         float bnorm = (maxval - b) / diff;
@@ -76,8 +76,8 @@ public readonly struct Color : IEquatable<Color>
 
     public float GetSaturation()
     {
-        byte minval = (byte)Math.Min(Red, Math.Min(Green, Blue));
-        byte maxval = (byte)Math.Max(Red, Math.Max(Green, Blue));
+        byte minval = Math.Min(Red, Math.Min(Green, Blue));
+        byte maxval = Math.Max(Red, Math.Max(Green, Blue));
 
         if (maxval == minval)
             return 0.0f;
@@ -135,7 +135,7 @@ public readonly struct Color : IEquatable<Color>
 
     public bool Equals(Color obj) => obj.color == color;
 
-    public override bool Equals(object other) => other is Color f && Equals(f);
+    public override bool Equals(object? other) => other is Color f && Equals(f);
 
     public static bool operator ==(Color left, Color right) => left.Equals(right);
 
@@ -143,7 +143,7 @@ public readonly struct Color : IEquatable<Color>
 
     public override int GetHashCode() => color.GetHashCode();
 
-    public static implicit operator Color(uint color) => new (color);
+    public static implicit operator Color(uint color) => new(color);
 
     public static explicit operator uint(Color color) => color.color;
 
@@ -224,7 +224,7 @@ public readonly struct Color : IEquatable<Color>
             }
 
             // success
-            color = (Color)number;
+            color = number;
 
             // alpha was not provided, so use 255
             if (len == 6)
