@@ -81,7 +81,8 @@ namespace PixUI.Demo
                             {
                                 Width = 200,
                                 Prefix = new Icon(MaterialIcons.Person),
-                                Suffix = new Icon(MaterialIcons.Search)
+                                Suffix = new Icon(MaterialIcons.Search),
+                                Border = new UnderlineInputBorder(Colors.Gray),
                             },
                             new TextInput("")
                             {

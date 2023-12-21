@@ -40,7 +40,7 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
 
     public bool IsReadonly => Readonly is { Value: true };
 
-    protected InputBorder? Border
+    public InputBorder? Border
     {
         get => _border;
         set
@@ -94,17 +94,14 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
 
     private ShapeBorder GetFocusedBorder()
     {
-        //TODO: others
         var border = _border ?? InputBorder.DefaultBorder;
-        if (border is OutlineInputBorder outline)
+        var borderSide = new BorderSide(Theme.FocusedColor, Theme.FocusedBorderWidth);
+        return border switch
         {
-            return new OutlineInputBorder(
-                new BorderSide(Theme.FocusedColor, Theme.FocusedBorderWidth),
-                outline.BorderRadius
-            );
-        }
-
-        throw new NotImplementedException();
+            OutlineInputBorder outline => new OutlineInputBorder(borderSide, outline.BorderRadius),
+            UnderlineInputBorder => new UnderlineInputBorder(borderSide),
+            _ => throw new NotImplementedException()
+        };
     }
 
     #endregion
