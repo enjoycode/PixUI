@@ -24,7 +24,8 @@ public sealed class DataGridController<T> /* where T : notnull*/
         set
         {
             _theme = value;
-            Refresh();
+            ClearAllCache();
+            _owner?.Repaint();
         }
     }
 

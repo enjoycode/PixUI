@@ -131,15 +131,19 @@ public struct DynamicValue
 
         writer.WriteStartObject();
 
-        var propName = From switch
+        switch (From)
         {
-            ValueSource.Const => nameof(ValueSource.Const),
-            ValueSource.State => nameof(ValueSource.State),
-            _ => throw new JsonException($"Unknown ValueSource")
-        };
-        writer.WritePropertyName(propName);
+            case ValueSource.Const:
+                writer.WritePropertyName(nameof(ValueSource.Const));
+                JsonSerializer.Serialize(writer, Value, valueType /*必须指定类型以适配某此自定义多态序列化*/);
+                break;
+            case ValueSource.State:
+                writer.WritePropertyName(nameof(ValueSource.State));
+                writer.WriteStringValue((string?)Value);
+                break;
+            default: throw new JsonException($"Unknown ValueSource");
+        }
 
-        JsonSerializer.Serialize(writer, Value, valueType /*必须指定类型以适配某此自定义多态序列化*/);
         writer.WriteEndObject();
     }
 

@@ -19,6 +19,7 @@ public sealed class PropertyEditor : Widget
         RegisterStructValueEditor<IconData, IconEditor>(true);
         RegisterStructValueEditor<EdgeInsets, EdgeInsetsEditor>(true);
         RegisterStructValueEditor<DateTime, DateEditor>(false);
+        RegisterClassValueEditor<InputBorder, InputBorderEditor>(true);
         RegisterClassValueEditor<string[], StringArrayEditor>(true);
     }
 
