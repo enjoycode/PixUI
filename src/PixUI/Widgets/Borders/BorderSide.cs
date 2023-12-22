@@ -1,3 +1,5 @@
+using System;
+
 namespace PixUI;
 
 public enum BorderStyle
@@ -9,9 +11,9 @@ public enum BorderStyle
 /// <summary>
 /// A side of a border of a box.
 /// </summary>
-public readonly struct BorderSide
+public readonly struct BorderSide : IEquatable<BorderSide>
 {
-    public static readonly BorderSide Empty = new BorderSide(Color.Empty, 0, BorderStyle.None);
+    public static readonly BorderSide Empty = new(Color.Empty, 0, BorderStyle.None);
 
     public readonly Color Color;
     public readonly float Width;
@@ -37,8 +39,7 @@ public readonly struct BorderSide
         // ReSharper disable once CompareOfFloatsByEqualityOperator
         if (t == 1) return b;
         var width = FloatUtils.Lerp(a.Width, b.Width, t);
-        if (width < 0f)
-            return BorderSide.Empty;
+        if (width < 0f) return Empty;
         if (a.Style == b.Style)
             return new BorderSide(Color.Lerp(a.Color, b.Color, t)!.Value, width, a.Style);
 
@@ -47,5 +48,22 @@ public readonly struct BorderSide
         return new BorderSide(Color.Lerp(colorA, colorB, t)!.Value, width);
     }
 
+#if __WEB__
     public BorderSide Clone() => new BorderSide(Color, Width, Style);
+#endif
+
+    #region ====IEquatable====
+
+    public static bool operator ==(BorderSide left, BorderSide right) => left.Equals(right);
+
+    public static bool operator !=(BorderSide left, BorderSide right) => !left.Equals(right);
+
+    public bool Equals(BorderSide other) =>
+        Color.Equals(other.Color) && Width.Equals(other.Width) && Style == other.Style;
+
+    public override bool Equals(object? obj) => obj is BorderSide other && Equals(other);
+
+    public override int GetHashCode() => HashCode.Combine(Color, Width, (int)Style);
+
+    #endregion
 }

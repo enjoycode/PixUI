@@ -28,4 +28,26 @@ public class JsonTest
         var edge4 = JsonSerializer.Deserialize<EdgeInsets>(bytes);
         Assert.True(edge3 == edge4);
     }
+
+    [Test]
+    public void InputBorderTest()
+    {
+        var b1 = new OutlineInputBorder(new BorderSide(Colors.Red, 2f), BorderRadius.Circular(4f));
+        var json = JsonSerializer.Serialize(b1, typeof(InputBorder));
+        var b2 = (OutlineInputBorder)JsonSerializer.Deserialize<InputBorder>(json)!;
+        Assert.True(b2.BorderRadius == b1.BorderRadius);
+        Assert.True(b2.BorderSide == b1.BorderSide);
+
+        var b3 = new UnderlineInputBorder(new BorderSide(Colors.Red, 2f));
+        json = JsonSerializer.Serialize(b3, typeof(InputBorder));
+        var b4 = (UnderlineInputBorder)JsonSerializer.Deserialize<InputBorder>(json)!;
+        Assert.True(b4.BorderSide == b3.BorderSide);
+    }
+
+    [Test]
+    public void OtherTest()
+    {
+        object? obj = null;
+        var json = JsonSerializer.Serialize(obj, typeof(int?));
+    }
 }

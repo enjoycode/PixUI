@@ -50,6 +50,10 @@ public readonly struct Radius : IEquatable<Radius>
     public static Radius operator *(Radius pt, float operand) =>
         new Radius(pt.X * operand, pt.Y * operand);
 
+    public static bool operator ==(Radius left, Radius right) => left.Equals(right);
+
+    public static bool operator !=(Radius left, Radius right) => !left.Equals(right);
+
     public bool Equals(Radius other) => X == other.X && Y == other.Y;
 
     public Radius Clone() => new Radius(X, Y);

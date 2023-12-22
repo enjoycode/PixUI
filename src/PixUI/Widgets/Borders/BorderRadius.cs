@@ -1,6 +1,8 @@
+using System;
+
 namespace PixUI;
 
-public readonly struct BorderRadius
+public readonly struct BorderRadius : IEquatable<BorderRadius>
 {
     public static readonly BorderRadius Empty = BorderRadius.All(Radius.Empty);
 
@@ -51,6 +53,14 @@ public readonly struct BorderRadius
     public static BorderRadius operator *(BorderRadius pt, float operand) =>
         new BorderRadius(pt.TopLeft * operand, pt.TopRight * operand,
             pt.BottomLeft * operand, pt.BottomRight * operand);
+
+    public bool Equals(BorderRadius other) =>
+        TopLeft == other.TopLeft && TopRight == other.TopRight &&
+        BottomLeft == other.BottomLeft && BottomRight == other.BottomRight;
+
+    public static bool operator ==(BorderRadius left, BorderRadius right) => left.Equals(right);
+
+    public static bool operator !=(BorderRadius left, BorderRadius right) => !left.Equals(right);
 
     public RRect ToRRect(in Rect rect) =>
         RRect.FromRectAndCorner(rect, TopLeft, TopRight, BottomLeft, BottomRight);

@@ -116,11 +116,16 @@ public struct DynamicValue
 
     public string StateName => From == ValueSource.State ? (Value as string ?? string.Empty) : string.Empty;
 
-    public void Write(Utf8JsonWriter writer, DynamicPropertyMeta valueMeta)
+    public void Write(Utf8JsonWriter writer, DynamicPropertyMeta propertyMeta)
     {
-        if (!valueMeta.IsState)
+        var valueType = propertyMeta.ValueType;
+        //如果是状态值且是值类型且不可空，则需要转换为可空值类型
+        if (propertyMeta.IsState && propertyMeta.ValueType.IsValueType && !propertyMeta.IsNullableValueType)
+            valueType = typeof(Nullable<>).MakeGenericType(valueType);
+
+        if (!propertyMeta.IsState)
         {
-            JsonSerializer.Serialize(writer, Value);
+            JsonSerializer.Serialize(writer, Value, valueType /*必须指定类型以适配某此自定义多态序列化*/);
             return;
         }
 
@@ -134,7 +139,7 @@ public struct DynamicValue
         };
         writer.WritePropertyName(propName);
 
-        JsonSerializer.Serialize(writer, Value);
+        JsonSerializer.Serialize(writer, Value, valueType /*必须指定类型以适配某此自定义多态序列化*/);
         writer.WriteEndObject();
     }
 

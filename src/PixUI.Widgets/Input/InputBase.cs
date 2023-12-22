@@ -90,11 +90,11 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
 
     #region ====FocusedDecoration====
 
-    private ShapeBorder GetUnFocusedBorder() => _border ?? InputBorder.DefaultBorder;
+    private ShapeBorder GetUnFocusedBorder() => _border ?? InputBorder.DefaultOutline;
 
     private ShapeBorder GetFocusedBorder()
     {
-        var border = _border ?? InputBorder.DefaultBorder;
+        var border = _border ?? InputBorder.DefaultOutline;
         var borderSide = new BorderSide(Theme.FocusedColor, Theme.FocusedBorderWidth);
         return border switch
         {
@@ -168,7 +168,7 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
         var bounds = Rect.FromLTWH(0, 0, W, H);
-        var border = _border ?? InputBorder.DefaultBorder;
+        var border = _border ?? InputBorder.DefaultOutline;
 
         //画背景及边框
         var fillColor = _fillColor?.Value ?? Colors.White;
