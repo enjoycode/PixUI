@@ -180,7 +180,7 @@ namespace CodeEditor
             }
 
             // paint background
-            var paint = PaintUtils.Shared(Theme.TextBgColor);
+            var paint = PixUI.Paint.Shared(Theme.TextBgColor);
             canvas.DrawRect(rect, paint);
 
             // paint lines one by one

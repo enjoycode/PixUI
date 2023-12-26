@@ -12,10 +12,10 @@ internal sealed class SelectedDecorator : FlowDecorator<DesignElement>
         var scaleRatio = Target.Controller.Zoom.Value / 100f;
         var borderSize = 3f;
 
-        var paint = PaintUtils.Shared(Theme.FocusedColor, PaintStyle.Stroke, borderSize * scaleRatio);
+        var paint = PixUI.Paint.Shared(Theme.FocusedColor, PaintStyle.Stroke, borderSize * scaleRatio);
         canvas.DrawRect(Rect.FromLTWH(0, 0, Target.W, Target.H), paint);
 
-        paint = PaintUtils.Shared(Theme.FocusedColor, PaintStyle.Fill, 1f * scaleRatio);
+        paint = PixUI.Paint.Shared(Theme.FocusedColor, PaintStyle.Fill, 1f * scaleRatio);
 
         DrawAnchor(canvas, paint, Target.GetAnchorRect(AnchorPosition.TopMiddle));
         DrawAnchor(canvas, paint, Target.GetAnchorRect(AnchorPosition.MiddleLeft));

@@ -15,7 +15,7 @@ public sealed class FadeTransition : SingleChildWidget
             return;
 
         var alpha = (byte)(255 * _opacity.Value);
-        var paint = PaintUtils.Shared(new Color(0, 0, 0, alpha));
+        var paint = PixUI.Paint.Shared(new Color(0, 0, 0, alpha));
         var rect = Rect.FromLTWH(Child.X, Child.Y, Child.W, Child.H);
         canvas.SaveLayer(paint, rect);
 

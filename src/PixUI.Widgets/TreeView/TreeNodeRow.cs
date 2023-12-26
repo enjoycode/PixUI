@@ -152,7 +152,7 @@ internal sealed class TreeNodeRow<T> : Widget, IMouseRegion
 
         if (_isHover)
         {
-            var paint = PaintUtils.Shared(Controller.HoverColor);
+            var paint = PixUI.Paint.Shared(Controller.HoverColor);
             canvas.DrawRect(
                 Rect.FromLTWH(0, 0, Controller.TreeView!.W, Controller.NodeHeight),
                 paint);

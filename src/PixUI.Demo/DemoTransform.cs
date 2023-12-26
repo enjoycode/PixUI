@@ -75,7 +75,7 @@ namespace PixUI.Demo.Mac
 
         public override void Paint(Canvas canvas, IDirtyArea? area = null)
         {
-            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PaintUtils.Shared(Colors.Red));
+            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(Colors.Red));
         }
     }
 }

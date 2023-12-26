@@ -216,12 +216,12 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
             {
                 if (Theme.HighlightingCurrentCell)
                 {
-                    var paint = PaintUtils.Shared(Theme.HighlightRowFillColor);
+                    var paint = PixUI.Paint.Shared(Theme.HighlightRowFillColor);
                     canvas.DrawRect(rowRect.Value, paint);
                 }
                 else
                 {
-                    var paint = PaintUtils.Shared(PixUI.Theme.FocusedColor,
+                    var paint = PixUI.Paint.Shared(PixUI.Theme.FocusedColor,
                         PaintStyle.Stroke, PixUI.Theme.FocusedBorderWidth);
                     canvas.DrawRect(rowRect.Value, paint);
                 }
@@ -233,7 +233,7 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
             var cellRect = _controller.GetCurrentCellRect();
             if (cellRect != null)
             {
-                var paint = PaintUtils.Shared(PixUI.Theme.FocusedColor, PaintStyle.Stroke,
+                var paint = PixUI.Paint.Shared(PixUI.Theme.FocusedColor, PaintStyle.Stroke,
                     PixUI.Theme.FocusedBorderWidth);
                 canvas.DrawRect(cellRect.Value, paint);
             }

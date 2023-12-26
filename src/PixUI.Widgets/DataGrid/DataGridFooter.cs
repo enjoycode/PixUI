@@ -93,7 +93,7 @@ internal sealed class DataGridFooter<T> : Widget
         var fillColor = style.FillColor ?? _controller.Theme.DefaultHeaderCellStyle.FillColor;
         if (fillColor.HasValue)
         {
-            var paint = PaintUtils.Shared(fillColor.Value);
+            var paint = PixUI.Paint.Shared(fillColor.Value);
             canvas.DrawRect(cellRect, paint);
         }
 

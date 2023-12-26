@@ -109,7 +109,7 @@ namespace PixUI
             fixed (char* ptr = text)
             {
                 SkiaApi.sk_canvas_draw_simple_text(Handle, ptr, new IntPtr(text.Length * 2), SKTextEncoding.Utf16,
-                    x, y, font.Handle, PaintUtils.Shared(color).Handle);
+                    x, y, font.Handle, PixUI.Paint.Shared(color).Handle);
             }
         }
 

@@ -39,7 +39,7 @@ namespace CodeEditor
             if (rect.Width <= 0 || rect.Height <= 0) return;
 
             // background
-            var paint = PaintUtils.Shared(Theme.LineBgColor);
+            var paint = PixUI.Paint.Shared(Theme.LineBgColor);
             canvas.DrawRect(rect, paint);
 
             // line numbers
@@ -48,8 +48,7 @@ namespace CodeEditor
             var maxHeight = (int)((Bounds.Height + visibleLineRemainder) / lineHeight) + 1;
             for (var y = 0; y < maxHeight; y++)
             {
-                var yPos = Bounds.Top + lineHeight * y - visibleLineRemainder +
-                           Theme.LineSpace;
+                var yPos = Bounds.Top + lineHeight * y - visibleLineRemainder + Theme.LineSpace;
                 if (rect.IntersectsWith(Bounds.Left, yPos, Bounds.Width, lineHeight))
                 {
                     var curLine = Document.GetFirstLogicalLine(

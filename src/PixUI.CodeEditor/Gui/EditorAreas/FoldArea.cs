@@ -11,12 +11,12 @@ namespace CodeEditor
 
         private Paint GetNormalPaint()
         {
-            return PaintUtils.Shared(new Color(200, 200, 200, 255), PaintStyle.Stroke, 1f);
+            return PixUI.Paint.Shared(new Color(200, 200, 200, 255), PaintStyle.Stroke, 1f);
         }
 
         private Paint GetSelectedPaint()
         {
-            return PaintUtils.Shared(new Color(200, 200, 200, 255), PaintStyle.Stroke, 1.5f);
+            return PixUI.Paint.Shared(new Color(200, 200, 200, 255), PaintStyle.Stroke, 1.5f);
         }
 
         private bool SelectedFoldingFrom(IList<FoldMarker> list)
@@ -66,7 +66,7 @@ namespace CodeEditor
             if (rect.Width <= 0 || rect.Height <= 0) return;
 
             //background
-            var paint = PaintUtils.Shared(TextEditor.Theme.TextBgColor);
+            var paint = PixUI.Paint.Shared(TextEditor.Theme.TextBgColor);
             canvas.DrawRect(rect, paint);
 
             var fontHeight = TextEditor.TextView.FontHeight;

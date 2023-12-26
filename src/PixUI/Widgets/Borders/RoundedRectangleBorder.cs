@@ -48,7 +48,7 @@ public sealed class RoundedRectangleBorder : OutlinedBorder
         var width = Side.Width;
         if (width == 0)
         {
-            var paint = PaintUtils.Shared();
+            var paint = PixUI.Paint.Shared();
             Side.ApplyPaint(paint);
             using var rrect = BorderRadius.ToRRect(rect);
             canvas.DrawRRect(rrect, paint);
@@ -58,7 +58,7 @@ public sealed class RoundedRectangleBorder : OutlinedBorder
             using var outer = BorderRadius.ToRRect(rect);
             using var inner = RRect.FromCopy(outer);
             inner.Deflate(width, width);
-            var paint = PaintUtils.Shared(Side.Color);
+            var paint = PixUI.Paint.Shared(Side.Color);
             canvas.DrawDRRect(outer, inner, paint);
         }
     }

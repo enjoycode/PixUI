@@ -67,7 +67,7 @@ public sealed class Checkbox : Toggleable
             var t = _value.Value == false ? 1.0f - tNormalized : tNormalized;
             var outer = OuterRectAt(origin, (float)t);
             var color = ColorAt(t);
-            var paint = PaintUtils.Shared(color);
+            var paint = PixUI.Paint.Shared(color);
 
             if (t <= 0.5)
             {
@@ -78,7 +78,7 @@ public sealed class Checkbox : Toggleable
             {
                 DrawBox(canvas, outer, paint, /*_side*/ null, true);
                 var strokePaint =
-                    PaintUtils.Shared(checkColor, PaintStyle.Stroke, _kStrokeWidth);
+                    PixUI.Paint.Shared(checkColor, PaintStyle.Stroke, _kStrokeWidth);
                 var tShrink = (t - 0.5) * 2.0;
                 if (_previousValue == null || _value.Value == null)
                     DrawDash(canvas, origin, tShrink, strokePaint);
@@ -90,10 +90,10 @@ public sealed class Checkbox : Toggleable
         else
         {
             var outer = OuterRectAt(origin, 1.0f);
-            var paint = PaintUtils.Shared(ColorAt(1.0));
+            var paint = PixUI.Paint.Shared(ColorAt(1.0));
             DrawBox(canvas, outer, paint, /*_side*/ null, true);
 
-            var strokePaint = PaintUtils.Shared(checkColor, PaintStyle.Stroke, _kStrokeWidth);
+            var strokePaint = PixUI.Paint.Shared(checkColor, PaintStyle.Stroke, _kStrokeWidth);
             if (tNormalized <= 0.5)
             {
                 var tShrink = 1.0 - tNormalized * 2.0;

@@ -69,9 +69,9 @@ public sealed class OutlineInputBorder : InputBorder
         outer.Deflate(BorderSide.Width / 2f, BorderSide.Width / 2f);
 
         if (fillColor != null)
-            canvas.DrawRRect(outer, PaintUtils.Shared(fillColor.Value));
+            canvas.DrawRRect(outer, PixUI.Paint.Shared(fillColor.Value));
 
-        var paint = PaintUtils.Shared();
+        var paint = PixUI.Paint.Shared();
         BorderSide.ApplyPaint(paint);
         paint.AntiAlias = true; //TODO: no radius no need
         canvas.DrawRRect(outer, paint);
@@ -110,9 +110,9 @@ public sealed class UnderlineInputBorder : InputBorder
     public override void Paint(Canvas canvas, in Rect rect, in Color? fillColor = null)
     {
         if (fillColor != null)
-            canvas.DrawRect(rect, PaintUtils.Shared(fillColor));
+            canvas.DrawRect(rect, PixUI.Paint.Shared(fillColor));
 
-        var paint = PaintUtils.Shared();
+        var paint = PixUI.Paint.Shared();
         BorderSide.ApplyPaint(paint);
         canvas.DrawLine(rect.Left, rect.Bottom, rect.Right, rect.Bottom, paint);
     }

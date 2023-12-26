@@ -70,7 +70,7 @@ public sealed class ButtonGroup : MultiChildWidget<Button>
         }
         
         //画分隔条
-        var paint = PaintUtils.Shared(Colors.White, PaintStyle.Stroke, 1);
+        var paint = PixUI.Paint.Shared(Colors.White, PaintStyle.Stroke, 1);
         for (var i = 1; i < _children.Count; i++)
         {
             var x = _children[i].X - 0.5f;

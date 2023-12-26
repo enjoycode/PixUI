@@ -41,13 +41,13 @@ public sealed class DropFileInput : SingleChildWidget, IMouseRegion
     {
         //Draw background
         using var rect = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, W, H), 5, 5);
-        var paint = PaintUtils.Shared(new Color(0xFFF2F2F2));
+        var paint = PixUI.Paint.Shared(new Color(0xFFF2F2F2));
         canvas.DrawRRect(rect, paint);
 
         base.Paint(canvas, area);
 
         //Draw dash border
-        paint = PaintUtils.Shared(Colors.Gray, PaintStyle.Stroke, 2f);
+        paint = PixUI.Paint.Shared(Colors.Gray, PaintStyle.Stroke, 2f);
         using var dash = PathEffect.CreateDash(new[] { 5f, 5f }, 10);
         paint.PathEffect = dash;
         canvas.DrawRRect(rect, paint);

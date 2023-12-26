@@ -21,7 +21,7 @@ internal sealed class EditorDecorator : FlowDecorator<CodeEditorWidget>
 
         // paint selection
         var textView = textEditor.TextView;
-        var paint = PaintUtils.Shared(textEditor.Theme.SelectionColor);
+        var paint = PixUI.Paint.Shared(textEditor.Theme.SelectionColor);
         foreach (var selection in textEditor.SelectionManager.SelectionCollection)
         {
             var startLine = selection.StartPosition.Line;

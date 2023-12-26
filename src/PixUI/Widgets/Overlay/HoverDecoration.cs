@@ -87,7 +87,7 @@ internal sealed class HoverDecorator : FlowDecorator<Widget>
         {
             canvas.Save();
             canvas.ClipPath(path, ClipOp.Intersect, false);
-            var paint = PaintUtils.Shared(_owner.HoverColor.Value);
+            var paint = PixUI.Paint.Shared(_owner.HoverColor.Value);
             // paint.BlendMode = _owner.BlendMode;
             canvas.DrawPath(path, paint);
             canvas.Restore();

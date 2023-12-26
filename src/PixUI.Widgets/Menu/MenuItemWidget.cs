@@ -139,7 +139,7 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
     {
         if (MenuItem.Type == MenuItemType.Divider)
         {
-            var paint = PaintUtils.Shared(Colors.Gray, PaintStyle.Stroke, 2);
+            var paint = PixUI.Paint.Shared(Colors.Gray, PaintStyle.Stroke, 2);
             var midY = H / 2;
             canvas.DrawLine(_controller.ItemPadding.Left, midY, W - _controller.ItemPadding.Horizontal, midY, paint);
             return;
@@ -147,7 +147,7 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
 
         if (_isHover)
         {
-            var paint = PaintUtils.Shared(_controller.HoverColor, PaintStyle.Fill);
+            var paint = PixUI.Paint.Shared(_controller.HoverColor, PaintStyle.Fill);
             canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), paint);
         }
 

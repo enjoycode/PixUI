@@ -75,7 +75,7 @@ internal sealed class CaretDecorator : FlowDecorator<Widget>
 
     protected override void PaintCore(Canvas canvas)
     {
-        var paint = PaintUtils.Shared();
+        var paint = PixUI.Paint.Shared();
         if (_owner.ColorBuilder == null)
         {
             paint.Color = new Color(0xFFFFFFFF);

@@ -161,7 +161,7 @@ public sealed class WuxiMap : Widget
             ImageFilter = ImageFilter.CreateDropShadow(s / _scale, s / _scale,
                 s * 2 / _scale, s * 2 / _scale, Colors.Black, null)
         };
-        var strokePaint = PaintUtils.Shared(Colors.Black, PaintStyle.Stroke, 2f / _scale);
+        var strokePaint = PixUI.Paint.Shared(Colors.Black, PaintStyle.Stroke, 2f / _scale);
 
         PaintLayer(_cityLayer, canvas, strokePaint, fillPaint);
         fillPaint.ImageFilter = null;

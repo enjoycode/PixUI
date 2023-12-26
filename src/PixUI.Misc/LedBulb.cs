@@ -48,14 +48,14 @@ public sealed class LedBulb : Widget
 
         // Draw the background ellipse
         var rectangle = Rect.FromLTWH(0 /*this.Padding.Left*/, 0 /*this.Padding.Top*/, diameter, diameter);
-        var paint = PaintUtils.Shared(darkColor);
+        var paint = PixUI.Paint.Shared(darkColor);
         paint.AntiAlias = true;
         canvas.DrawOval(rectangle, paint);
 
         // Draw the glow gradient
         using var gradient1 = Shader.CreateRadialGradient(rectangle.Center, rectangle.Width / 2f,
             new[] { lightColor, lightColor.WithAlpha(0) }, null, TileMode.Clamp);
-        paint = PaintUtils.Shared();
+        paint = PixUI.Paint.Shared();
         paint.Shader = gradient1;
         paint.AntiAlias = true;
         canvas.DrawOval(rectangle, paint);
@@ -68,7 +68,7 @@ public sealed class LedBulb : Widget
         var surroundColor = new Color(255, 255, 255, 0);
         using var gradient2 = Shader.CreateRadialGradient(whiteRect.Center, whiteRect.Width / 2f,
             new[] { reflectionColor, surroundColor }, null, TileMode.Clamp);
-        paint = PaintUtils.Shared();
+        paint = PixUI.Paint.Shared();
         paint.Shader = gradient2;
         paint.AntiAlias = true;
         canvas.DrawOval(whiteRect, paint);
@@ -76,7 +76,7 @@ public sealed class LedBulb : Widget
         // Draw the border
         if (_on.Value)
         {
-            paint = PaintUtils.Shared(Colors.Black.WithAlpha(85), PaintStyle.Stroke);
+            paint = PixUI.Paint.Shared(Colors.Black.WithAlpha(85), PaintStyle.Stroke);
             paint.AntiAlias = true;
             canvas.DrawOval(rectangle, paint);
         }

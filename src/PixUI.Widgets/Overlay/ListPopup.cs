@@ -58,9 +58,9 @@ internal sealed class ListPopupItemWidget : SingleChildWidget, IMouseRegion
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
         if (_selectedState.Value)
-            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PaintUtils.Shared(Theme.FocusedColor));
+            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(Theme.FocusedColor));
         else if (_hoverState.Value)
-            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PaintUtils.Shared(Theme.AccentColor));
+            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(Theme.AccentColor));
 
         base.Paint(canvas, area);
     }

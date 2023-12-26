@@ -141,14 +141,14 @@ public sealed class TreeView<T> : Widget, IScrollable
         if (_controller.IsLoading)
         {
             if (_fillColor != null)
-                canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PaintUtils.Shared(_fillColor.Value));
+                canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(_fillColor.Value));
             _controller.LoadingPainter!.PaintToWidget(this, canvas);
             return;
         }
 
         // draw background color if has
         if (_fillColor != null)
-            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PaintUtils.Shared(_fillColor.Value));
+            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(_fillColor.Value));
 
         // draw nodes in visual region
         var dirtyRect = area?.GetRect() ?? Rect.FromLTWH(0, 0, W, H);

@@ -35,7 +35,7 @@ public sealed class Radio : Toggleable
         var color = Color.Lerp(inactiveColor, activeColor, _positionController.Value);
 
         // outer circle
-        var paint = PaintUtils.Shared(color, PaintStyle.Stroke, 2);
+        var paint = PixUI.Paint.Shared(color, PaintStyle.Stroke, 2);
         paint.AntiAlias = true;
         canvas.DrawCircle(center.Dx, center.Dy, _kOuterRadius, paint);
 

@@ -662,7 +662,7 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
     private void DrawPlaceholder(Canvas canvas)
     {
         using var dash = PathEffect.CreateDash(new[] { 5f, 5f }, 10);
-        var paint = PaintUtils.Shared(Colors.Gray, PaintStyle.Stroke);
+        var paint = PixUI.Paint.Shared(Colors.Gray, PaintStyle.Stroke);
         paint.AntiAlias = true;
         paint.PathEffect = dash;
         canvas.DrawRect(Rect.FromLTWH(0.5f, 0.5f, W - 1, H - 1), paint);

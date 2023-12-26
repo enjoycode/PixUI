@@ -104,7 +104,7 @@ public abstract class DataGridColumn<T>
         //画背景色
         if (cellStyle.FillColor != null)
         {
-            var paint = PaintUtils.Shared(cellStyle.FillColor.Value);
+            var paint = PixUI.Paint.Shared(cellStyle.FillColor.Value);
             canvas.DrawRect(cellRect, paint);
         }
 
@@ -134,7 +134,7 @@ public abstract class DataGridColumn<T>
         //画单元格背景
         if (!AutoMergeCells /*合并单元格时不支持*/ && theme.StripeRows && rowIndex % 2 != 0)
         {
-            var paint = PaintUtils.Shared(theme.StripeFillColor);
+            var paint = PixUI.Paint.Shared(theme.StripeFillColor);
             canvas.DrawRect(cellRect, paint);
         }
         else
@@ -142,7 +142,7 @@ public abstract class DataGridColumn<T>
             var fillColor = cellStyle.FillColor ?? theme.DefaultRowCellStyle.FillColor;
             if (fillColor.HasValue)
             {
-                var paint = PaintUtils.Shared(fillColor.Value);
+                var paint = PixUI.Paint.Shared(fillColor.Value);
                 canvas.DrawRect(cellRect, paint);
             }
         }

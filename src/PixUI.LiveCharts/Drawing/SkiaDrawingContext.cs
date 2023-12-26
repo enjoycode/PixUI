@@ -111,7 +111,7 @@ public sealed class SkiaDrawingContext : DrawingContext
         //if (_clearOnBeginDraw) Canvas.Clear();
         if (Background != SKColor.Empty)
         {
-            Canvas.DrawRect(SKRect.FromLTWH(0, 0, Width, Height), PixUI.PaintUtils.Shared(Background));
+            Canvas.DrawRect(SKRect.FromLTWH(0, 0, Width, Height), SKPaint.Shared(Background));
         }
     }
 }

@@ -77,8 +77,8 @@ public sealed class Inspector : Widget
             _target.H - 1f);
         var borderColor = new Color(0x807F7EBE);
         var fillColor = new Color(0x80BDBDFC);
-        canvas.DrawRect(bounds, PaintUtils.Shared(fillColor));
-        canvas.DrawRect(bounds, PaintUtils.Shared(borderColor, PaintStyle.Stroke));
+        canvas.DrawRect(bounds, PixUI.Paint.Shared(fillColor));
+        canvas.DrawRect(bounds, PixUI.Paint.Shared(borderColor, PaintStyle.Stroke));
 
         //draw bounds text
         // var text = $"X: {_target.X} Y: {_target.Y} W: {_target.W} H: {_target.H}";

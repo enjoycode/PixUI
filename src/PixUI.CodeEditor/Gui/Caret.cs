@@ -173,12 +173,12 @@ namespace CodeEditor
             var cy = CanvasPosY;
             if (IsVisibleInCanvas)
             {
-                var paint = PaintUtils.Shared(_textEditor.Theme.CaretColor);
+                var paint = PixUI.Paint.Shared(_textEditor.Theme.CaretColor);
                 canvas.DrawRect(Rect.FromLTWH(cx, cy, CaretWidth, CaretHeight), paint);
             }
 
             // draw highlight background
-            var bgPaint = PaintUtils.Shared(_textEditor.Theme.LineHighlightColor);
+            var bgPaint = PixUI.Paint.Shared(_textEditor.Theme.LineHighlightColor);
             canvas.DrawRect(Rect.FromLTWH(textViewBounds.Left, cy, textViewBounds.Width, CaretHeight), bgPaint);
         }
     }

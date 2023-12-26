@@ -227,7 +227,7 @@ internal sealed class IconItem : Widget, IMouseRegion
         if (_isHover)
         {
             var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, W, H), 5, 5);
-            var paint = PaintUtils.Shared(Colors.Gray);
+            var paint = PixUI.Paint.Shared(Colors.Gray);
             canvas.DrawRRect(rrect, paint);
 
             _iconPainter.Paint(canvas, 30, 0xFFF7821B, _data, 10, 10);

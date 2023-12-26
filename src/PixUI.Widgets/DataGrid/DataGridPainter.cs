@@ -58,7 +58,7 @@ public static class DataGridPainter
 
     public static void PaintCellBorder(Canvas canvas, in Rect cellRect, Color borderColor /*TODO: use CellStyle*/)
     {
-        var paint = PaintUtils.Shared(borderColor, PaintStyle.Stroke, 1);
+        var paint = PixUI.Paint.Shared(borderColor, PaintStyle.Stroke, 1);
         canvas.DrawRect(cellRect, paint);
     }
 }

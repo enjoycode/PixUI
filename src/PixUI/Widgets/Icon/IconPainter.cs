@@ -36,7 +36,7 @@ public sealed class IconPainter : IDisposable
             _cachedGlyphId = _cachedFont.GetGlyphId(data.CodePoint);
         }
 
-        var paint = PaintUtils.Shared(color);
+        var paint = PixUI.Paint.Shared(color);
         canvas.DrawGlyph(_cachedGlyphId, offsetX, size + offsetY, 0, 0, _cachedFont!, paint);
     }
 

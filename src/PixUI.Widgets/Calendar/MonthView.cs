@@ -187,7 +187,7 @@ public sealed class MonthView : Widget, IMouseRegion
 
             if (_hitDay == i + 1 && !IsSelectedDate(i + 1))
             {
-                var paint = PaintUtils.Shared(new Color(0xFFAAAAAA) /*TODO: use Theme.HoverColor*/);
+                var paint = PixUI.Paint.Shared(new Color(0xFFAAAAAA) /*TODO: use Theme.HoverColor*/);
                 paint.AntiAlias = true;
                 canvas.DrawCircle(xIndex * _cellSize.Width + _cellSize.Width / 2,
                     _headerHeight + yIndex * _cellSize.Height + _cellSize.Height / 2,
@@ -196,7 +196,7 @@ public sealed class MonthView : Widget, IMouseRegion
 
             if (IsSelectedDate(i + 1))
             {
-                var paint = PaintUtils.Shared(Theme.AccentColor);
+                var paint = PixUI.Paint.Shared(Theme.AccentColor);
                 paint.AntiAlias = true;
                 canvas.DrawCircle(xIndex * _cellSize.Width + _cellSize.Width / 2,
                     _headerHeight + yIndex * _cellSize.Height + _cellSize.Height / 2,
@@ -205,7 +205,7 @@ public sealed class MonthView : Widget, IMouseRegion
 
             if (IsToday(i + 1))
             {
-                var paint = PaintUtils.Shared(Colors.Red, PaintStyle.Stroke, 1.5f);
+                var paint = PixUI.Paint.Shared(Colors.Red, PaintStyle.Stroke, 1.5f);
                 paint.AntiAlias = true;
                 canvas.DrawCircle(xIndex * _cellSize.Width + _cellSize.Width / 2,
                     _headerHeight + yIndex * _cellSize.Height + _cellSize.Height / 2,
