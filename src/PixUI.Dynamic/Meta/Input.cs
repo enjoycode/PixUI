@@ -16,7 +16,8 @@ partial class DynamicWidgetManager
             new(nameof(TextInput.TextColor), typeof(State<Color>), true),
             new(nameof(TextInput.FillColor), typeof(State<Color>), true),
             new(nameof(TextInput.Border), typeof(InputBorder), true),
-        }
+        },
+        initWidth: 111
     );
 
     private static DynamicWidgetMeta MakeSelectMeta() => DynamicWidgetMeta.Make<Select<string>>(
@@ -31,7 +32,8 @@ partial class DynamicWidgetManager
             new(nameof(Select<string>.TextColor), typeof(State<Color>), true),
             new(nameof(Select<string>.FillColor), typeof(State<Color>), true),
             new(nameof(Select<string>.Border), typeof(InputBorder), true),
-        }
+        },
+        initWidth: 111
     );
 
     private static DynamicWidgetMeta MakeDatePickerMeta() => DynamicWidgetMeta.Make<DatePicker>(
@@ -44,6 +46,7 @@ partial class DynamicWidgetManager
             new(nameof(DatePicker.TextColor), typeof(State<Color>), true),
             new(nameof(DatePicker.FillColor), typeof(State<Color>), true),
             new(nameof(DatePicker.Border), typeof(InputBorder), true),
-        }
+        },
+        initWidth: 111
     );
 }

@@ -614,12 +614,11 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var size = CacheAndGetMaxSize(availableWidth, availableHeight);
 
         if (Child == null)
         {
-            SetSize(width, height); //仅设置占位宽高
+            SetSize(size.Width, size.Height); //仅设置占位宽高
             return;
         }
 
@@ -663,7 +662,7 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
     private void DrawPlaceholder(Canvas canvas)
     {
         using var dash = PathEffect.CreateDash(new[] { 5f, 5f }, 10);
-        var paint = PaintUtils.Shared(Colors.Gray, PaintStyle.Stroke, 1f);
+        var paint = PaintUtils.Shared(Colors.Gray, PaintStyle.Stroke);
         paint.AntiAlias = true;
         paint.PathEffect = dash;
         canvas.DrawRect(Rect.FromLTWH(0.5f, 0.5f, W - 1, H - 1), paint);

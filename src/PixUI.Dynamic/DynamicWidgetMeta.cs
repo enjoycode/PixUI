@@ -13,7 +13,9 @@ public sealed class DynamicWidgetMeta
         Func<Widget> instanceMaker,
         DynamicPropertyMeta[]? properties = null,
         DynamicEventMeta[]? events = null,
-        ContainerSlot[]? slots = null)
+        ContainerSlot[]? slots = null,
+        float? initWidth = null,
+        float? initHeight = null)
     {
         _instanceMaker = instanceMaker;
         Catelog = catalog;
@@ -32,8 +34,10 @@ public sealed class DynamicWidgetMeta
         {
             var len = properties?.Length ?? 0;
             Properties = new DynamicPropertyMeta[len + 2];
-            Properties[0] = new DynamicPropertyMeta(nameof(Widget.Width), typeof(State<float>), true);
-            Properties[1] = new DynamicPropertyMeta(nameof(Widget.Height), typeof(State<float>), true);
+            Properties[0] = new DynamicPropertyMeta(nameof(Widget.Width), typeof(State<float>),
+                true, initValue: initWidth);
+            Properties[1] = new DynamicPropertyMeta(nameof(Widget.Height), typeof(State<float>),
+                true, initValue: initHeight);
             for (var i = 0; i < len; i++)
             {
                 Properties[i + 2] = properties![i];
@@ -46,13 +50,15 @@ public sealed class DynamicWidgetMeta
         string? name = null,
         DynamicPropertyMeta[]? properties = null,
         DynamicEventMeta[]? events = null,
-        ContainerSlot[]? slots = null)
+        ContainerSlot[]? slots = null,
+        float? initWidth = null,
+        float? initHeight = null)
         where T : Widget
     {
         var widgetType = typeof(T);
         return new DynamicWidgetMeta(catalog ?? string.Empty, name ?? widgetType.Name,
             widgetType, icon, Activator.CreateInstance<T> /*use Emit?*/,
-            properties, events, slots);
+            properties, events, slots, initWidth, initHeight);
     }
 
     private readonly Func<Widget> _instanceMaker;
