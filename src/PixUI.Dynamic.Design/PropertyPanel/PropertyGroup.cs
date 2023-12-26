@@ -9,14 +9,14 @@ public sealed class PropertyGroup : SingleChildWidget
         Child = new Collapse
         {
             Title = new Text(title) { FontWeight = FontWeight.Bold },
-            Body = new Form { Ref = _formRef, LabelWidth = 108 }
+            Body = new Form { LabelWidth = 108 }.RefBy(ref _formRef)
         };
     }
 
-    private readonly WidgetRef<Form> _formRef = new();
+    private readonly Form _formRef = null!;
 
     internal void SetItems(IList<FormItem> items)
     {
-        _formRef.Widget!.Children = items;
+        _formRef.Children = items;
     }
 }

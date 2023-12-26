@@ -145,11 +145,14 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
             //暂在这里特殊处理Row, Column等IsLayoutTight的容器实例，默认添加占位的子组件
             if (Child is SingleChildWidget { IsLayoutTight: true })
             {
-                var defaultSlot = Meta.DefaultSlot;
-                defaultSlot.SetChild(Child, new DesignElement(Controller, defaultSlot.PropertyName)
+                if (Meta.IsContainer)
                 {
-                    Width = 100, Height = 100,
-                });
+                    var defaultSlot = Meta.DefaultSlot;
+                    defaultSlot.SetChild(Child, new DesignElement(Controller, defaultSlot.PropertyName)
+                    {
+                        Width = 100, Height = 100,
+                    });
+                }
             }
             else if (Child is Row || Child is Column) //TODO: 应判断childMeta是否需要创建占位子组件
             {
