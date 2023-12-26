@@ -14,16 +14,15 @@ public sealed class Center : SingleChildWidget
     /// </summary>
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
         if (Child != null)
         {
-            Child.Layout(width, height);
-            Child.SetPosition((width - Child.W) / 2, (height - Child.H) / 2);
+            Child.Layout(maxSize.Width, maxSize.Height);
+            Child.SetPosition((maxSize.Width - Child.W) / 2, (maxSize.Height - Child.H) / 2);
         }
 
-        SetSize(width, height);
+        SetSize(maxSize.Width, maxSize.Height);
     }
 
     protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)

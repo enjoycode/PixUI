@@ -48,7 +48,7 @@ public abstract class Popup : Widget, IEventHook
     public void UpdatePosition(float x, float y)
     {
         SetPosition(x, y);
-        Invalidate(InvalidAction.Repaint);
+        Repaint();
     }
 
     /// <summary>
@@ -211,7 +211,7 @@ internal sealed class PopupProxy : Widget
     {
         _popup = popup;
         _popup.Parent = this;
-        
+
         //直接布局方便计算显示位置，后续不用再计算
         popup.Layout(popup.Owner.Window.Width, popup.Owner.Window.Height);
     }
@@ -223,7 +223,13 @@ internal sealed class PopupProxy : Widget
     public override bool ContainsPoint(float x, float y) => _popup.ContainsPoint(x, y);
 
     protected internal override bool HitTest(float x, float y, HitTestResult result)
-        => _popup.HitTest(x, y, result);
+    {
+        if (!ContainsPoint(x, y)) return false;
+
+        result.Add(this); //需要，子级有IMouseRegion的OnTap判断错误
+        _popup.HitTest(x, y, result);
+        return true;
+    }
 
     public override void Layout(float availableWidth, float availableHeight)
     {
