@@ -10,6 +10,7 @@ using LiveChartsCore.Measure;
 using LiveCharts;
 using LiveCharts.Drawing;
 using LiveChartsCore.VisualElements;
+using PixUI;
 
 namespace LiveCharts;
 
@@ -26,8 +27,7 @@ public sealed class PieChart : ChartView, IPieChartView<SkiaDrawingContext>
         Series = new ObservableCollection<ISeries>();
         VisualElements = new ObservableCollection<ChartElement<SkiaDrawingContext>>();
 
-        // var c = Controls[0].Controls[0];
-        // c.MouseDown += OnMouseDown;
+        MouseRegion.PointerDown += e => core?.InvokePointerDown(new(e.X, e.Y), e.Buttons == PointerButtons.Right);
     }
 
     #region ====Fields====
@@ -59,7 +59,7 @@ public sealed class PieChart : ChartView, IPieChartView<SkiaDrawingContext>
         var cc = (PieChart<SkiaDrawingContext>)core;
 #else
         if (core is not PieChart<SkiaDrawingContext> cc) throw new Exception("core not found");
-#endif        
+#endif
 
         if (strategy == TooltipFindingStrategy.Automatic)
             strategy = cc.Series.GetTooltipFindingStrategy();
@@ -78,7 +78,7 @@ public sealed class PieChart : ChartView, IPieChartView<SkiaDrawingContext>
             ? throw new Exception("core not found")
             : cc.VisualElements.SelectMany(visual =>
                 ((VisualElement<SkiaDrawingContext>)visual).IsHitBy(core, point));
-#endif        
+#endif
     }
 
     #endregion
@@ -86,12 +86,28 @@ public sealed class PieChart : ChartView, IPieChartView<SkiaDrawingContext>
     #region ====IPieChartView====
 
     public PieChart<SkiaDrawingContext> Core => (PieChart<SkiaDrawingContext>)core!;
-    
+
     /// <inheritdoc cref="IPieChartView{TDrawingContext}.MaxValue" />
-    public double? MaxValue { get => _maxValue; set { _maxValue = value; OnPropertyChanged(); } }
+    public double? MaxValue
+    {
+        get => _maxValue;
+        set
+        {
+            _maxValue = value;
+            OnPropertyChanged();
+        }
+    }
 
     /// <inheritdoc cref="IPieChartView{TDrawingContext}.MinValue" />
-    public double MinValue { get => _minValue; set { _minValue = value; OnPropertyChanged(); } }
+    public double MinValue
+    {
+        get => _minValue;
+        set
+        {
+            _minValue = value;
+            OnPropertyChanged();
+        }
+    }
 
     public IEnumerable<ISeries> Series
     {

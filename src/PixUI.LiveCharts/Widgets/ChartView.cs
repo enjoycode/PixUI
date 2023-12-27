@@ -142,7 +142,8 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
 
     public void OnDataPointerDown(IEnumerable<ChartPoint> points, LvcPoint pointer)
     {
-        throw new NotImplementedException();
+        DataPointerDown?.Invoke(this, points);
+        ChartPointPointerDown?.Invoke(this, points.FindClosestTo(pointer));
     }
 
     // public object SyncContext
@@ -269,7 +270,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
     public void OnVisualElementPointerDown(IEnumerable<VisualElement<SkiaDrawingContext>> visualElements,
         LvcPoint pointer)
     {
-        throw new NotImplementedException();
+        VisualElementsPointerDown?.Invoke(this, new VisualElementsEventArgs<SkiaDrawingContext>(CoreChart, visualElements, pointer));
     }
 
     public abstract IEnumerable<ChartPoint> GetPointsAt(LvcPoint point,

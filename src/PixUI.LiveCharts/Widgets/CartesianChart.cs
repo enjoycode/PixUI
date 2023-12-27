@@ -14,6 +14,7 @@ using LiveCharts.Drawing;
 using LiveCharts.Drawing.Geometries;
 using LiveCharts.Painting;
 using LiveChartsCore.VisualElements;
+using PixUI;
 
 namespace LiveCharts;
 
@@ -47,9 +48,9 @@ public sealed class CartesianChart : ChartView, ICartesianChartView<SkiaDrawingC
         VisualElements = new ObservableCollection<ChartElement<SkiaDrawingContext>>();
 
         // var c = Controls[0].Controls[0];
-        // c.MouseDown += OnMouseDown;
         // c.MouseWheel += OnMouseWheel;
-        // c.MouseUp += OnMouseUp;
+        MouseRegion.PointerDown += e => core?.InvokePointerDown(new(e.X, e.Y), e.Buttons == PointerButtons.Right);
+        MouseRegion.PointerUp += e => core?.InvokePointerUp(new(e.X, e.Y), e.Buttons == PointerButtons.Right);
     }
 
     #region ====Fields====
@@ -63,7 +64,9 @@ public sealed class CartesianChart : ChartView, ICartesianChartView<SkiaDrawingC
     private IEnumerable<ICartesianAxis> _yAxes = new List<Axis> { new() };
     private IEnumerable<Section<SkiaDrawingContext>> _sections = new List<Section<SkiaDrawingContext>>();
     private DrawMarginFrame<SkiaDrawingContext>? _drawMarginFrame;
-    private TooltipFindingStrategy _tooltipFindingStrategy = LiveChartsCore.LiveCharts.DefaultSettings.TooltipFindingStrategy;
+
+    private TooltipFindingStrategy _tooltipFindingStrategy =
+        LiveChartsCore.LiveCharts.DefaultSettings.TooltipFindingStrategy;
 
     #endregion
 
@@ -94,7 +97,7 @@ public sealed class CartesianChart : ChartView, ICartesianChartView<SkiaDrawingC
         var cc = (CartesianChart<SkiaDrawingContext>)core;
 #else
         if (core is not CartesianChart<SkiaDrawingContext> cc) throw new Exception("core not found");
-#endif        
+#endif
 
         if (strategy == TooltipFindingStrategy.Automatic)
             strategy = cc.Series.GetTooltipFindingStrategy();
@@ -113,7 +116,7 @@ public sealed class CartesianChart : ChartView, ICartesianChartView<SkiaDrawingC
             ? throw new Exception("core not found")
             : cc.VisualElements.SelectMany(visual =>
                 ((VisualElement<SkiaDrawingContext>)visual).IsHitBy(core, point));
-#endif        
+#endif
     }
 
     #endregion
@@ -200,13 +203,13 @@ public sealed class CartesianChart : ChartView, ICartesianChartView<SkiaDrawingC
         var cc = (CartesianChart<SkiaDrawingContext>)core;
 #else
         if (core is not CartesianChart<SkiaDrawingContext> cc) throw new Exception("core not found");
-#endif        
+#endif
         var xScaler = new Scaler(cc.DrawMarginLocation, cc.DrawMarginSize, cc.XAxes[xAxisIndex]);
         var yScaler = new Scaler(cc.DrawMarginLocation, cc.DrawMarginSize, cc.YAxes[yAxisIndex]);
 
         return new LvcPointD(xScaler.ToChartValues(point.X), yScaler.ToChartValues(point.Y));
     }
-    
+
     /// <inheritdoc cref="ICartesianChartView{TDrawingContext}.ScaleUIPoint(LvcPoint, int, int)" />
     [Obsolete("Use the ScalePixelsToData method instead.")]
     public double[] ScaleUIPoint(LvcPoint point, int xAxisIndex = 0, int yAxisIndex = 0)
@@ -222,7 +225,7 @@ public sealed class CartesianChart : ChartView, ICartesianChartView<SkiaDrawingC
         var cc = (CartesianChart<SkiaDrawingContext>)core;
 #else
         if (core is not CartesianChart<SkiaDrawingContext> cc) throw new Exception("core not found");
-#endif        
+#endif
 
         var xScaler = new Scaler(cc.DrawMarginLocation, cc.DrawMarginSize, cc.XAxes[xAxisIndex]);
         var yScaler = new Scaler(cc.DrawMarginLocation, cc.DrawMarginSize, cc.YAxes[yAxisIndex]);
