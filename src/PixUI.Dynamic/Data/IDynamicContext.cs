@@ -43,7 +43,7 @@ public static class DynamicContextExtensions
 #endif
         if (state.Type == DynamicStateType.DataSet)
             throw new Exception($"State is DataSet: {name}");
-        return ((IDynamicValueState)state.Value!).GetRuntimeValue(state);
+        return ((IDynamicValueState)state.Value!).GetRuntimeState(context, state);
     }
 
     /// <summary>

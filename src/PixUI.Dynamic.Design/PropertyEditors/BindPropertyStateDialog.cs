@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace PixUI.Dynamic.Design;
 
@@ -59,7 +60,7 @@ internal sealed class BindPropertyStateDialog : Dialog
         };
     }
 
-    protected override bool OnClosing(string result)
+    protected override ValueTask<bool> OnClosing(string result)
     {
         if (result == DialogResult.OK)
         {
@@ -67,12 +68,12 @@ internal sealed class BindPropertyStateDialog : Dialog
             if (selected == null)
             {
                 Notification.Error("请先选择状态进行绑定");
-                return true;
+                return new ValueTask<bool>(true);
             }
 
             BindingValue = new DynamicValue() { From = ValueSource.State, Value = selected.Name };
         }
 
-        return false;
+        return new ValueTask<bool>(false);
     }
 }

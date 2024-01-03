@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PixUI.Dynamic.Design;
 
@@ -39,17 +40,17 @@ internal sealed class NewStateDialog : Dialog
         };
     }
 
-    protected override bool OnClosing(string result)
+    protected override ValueTask<bool> OnClosing(string result)
     {
-        if (result != DialogResult.OK) return false;
+        if (result != DialogResult.OK) return new ValueTask<bool>(false);
 
         //检查名称是否已存在
         if (_designController.StatesController.DataSource!.Any(s => s.Name == Name))
         {
             Notification.Error("状态名称已存在");
-            return true;
+            return new ValueTask<bool>(true);
         }
 
-        return false;
+        return new ValueTask<bool>(false);
     }
 }

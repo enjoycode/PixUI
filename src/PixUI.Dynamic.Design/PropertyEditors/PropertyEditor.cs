@@ -207,8 +207,8 @@ public sealed class PropertyEditor : Widget
     /// </summary>
     private static object? GetPropertyValue(PropertyEditor propertyEditor)
     {
-        var exists =
-            propertyEditor.Element.Data.TryGetPropertyValue(propertyEditor.PropertyMeta.Name, out var currentValue);
+        var propName = propertyEditor.PropertyMeta.Name;
+        var exists = propertyEditor.Element.Data.TryGetPropertyValue(propName, out var currentValue);
         if (exists)
         {
             var valueSource = currentValue!.Value.From;
@@ -218,7 +218,7 @@ public sealed class PropertyEditor : Widget
             {
                 var state = propertyEditor.Element.Controller.FindState(currentValue.Value.StateName);
                 var stateValue = state?.Value as IDynamicValueState;
-                return stateValue?.Value; //注意非运行时值
+                return stateValue?.GetDesignValue(propertyEditor.Element.Controller.DesignCanvas); //注意非运行时值
             }
 
             throw new NotSupportedException("Unknown property value source");
@@ -236,8 +236,8 @@ public sealed class PropertyEditor : Widget
     {
         //属性编辑器设置的值不可能为null
         var dynamicValue = new DynamicValue { From = ValueSource.Const, Value = newValue };
-        var propertyValue =
-            propertyEditor.Element.Data.SetPropertyValue(propertyEditor.PropertyMeta.Name, dynamicValue);
+        var propName = propertyEditor.PropertyMeta.Name;
+        var propertyValue = propertyEditor.Element.Data.SetPropertyValue(propName, dynamicValue);
 
         if (propertyEditor.PropertyMeta.IsInitSetter)
             propertyEditor.Element.OnInitPropertyValueChanged();

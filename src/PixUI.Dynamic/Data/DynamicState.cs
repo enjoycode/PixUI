@@ -11,14 +11,17 @@ public interface IDynamicState
 
 public interface IDynamicValueState : IDynamicState
 {
+    void ReadFrom(ref Utf8JsonReader reader, DynamicState state);
+
     /// <summary>
     /// 获取设计时的值
     /// </summary>
-    object? Value { get; }
+    object? GetDesignValue(IDynamicContext ctx);
 
-    void ReadFrom(ref Utf8JsonReader reader, DynamicState state);
-
-    State GetRuntimeValue(DynamicState state);
+    /// <summary>
+    /// 获取运行时状态
+    /// </summary>
+    State GetRuntimeState(IDynamicContext ctx, DynamicState state);
 }
 
 public interface IDynamicDataSetState : IDynamicState

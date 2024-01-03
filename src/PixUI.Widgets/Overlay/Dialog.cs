@@ -122,12 +122,11 @@ public abstract class Dialog : Popup
     /// 关闭前处理
     /// </summary>
     /// <returns>true=abort close</returns>
-    protected virtual bool OnClosing(string result) => false;
+    protected virtual ValueTask<bool> OnClosing(string result) => new(false);
 
-    public void Close(string result)
+    public async void Close(string result)
     {
-        if (OnClosing(result)) return; //aborted
-
+        if (await OnClosing(result)) return; //aborted
         Hide();
         _closeDone?.SetResult(result);
     }
