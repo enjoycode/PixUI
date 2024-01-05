@@ -44,10 +44,9 @@ public sealed class Checkbox : Toggleable
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
-        SetSize(Math.Min(width, _kCheckboxSize), Math.Min(height, _kCheckboxSize));
+        SetSize(Math.Min(maxSize.Width, _kCheckboxSize), Math.Min(maxSize.Height, _kCheckboxSize));
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
@@ -130,12 +129,12 @@ public sealed class Checkbox : Toggleable
         var mid = new Offset(_kEdgeSize * 0.4f, _kEdgeSize * 0.7f);
         var end = new Offset(_kEdgeSize * 0.85f, _kEdgeSize * 0.25f);
 
-            
+
         if (t < 0.5)
         {
             var strokeT = t * 2.0;
             var drawMid = Offset.Lerp(start, mid, strokeT)!.Value;
-            canvas.DrawLine(origin.Dx + start.Dx, origin.Dy + start.Dy, 
+            canvas.DrawLine(origin.Dx + start.Dx, origin.Dy + start.Dy,
                 origin.Dx + drawMid.Dx, origin.Dy + drawMid.Dy, paint);
             //path.MoveTo(origin.Dx + start.Dx, origin.Dy + start.Dy);
             //path.LineTo(origin.Dx + drawMid.Dx, origin.Dy + drawMid.Dy);
@@ -144,8 +143,10 @@ public sealed class Checkbox : Toggleable
         {
             var strokeT = (t - 0.5) * 2.0;
             var drawEnd = Offset.Lerp(mid, end, strokeT)!.Value;
-            canvas.DrawLine(origin.Dx + start.Dx, origin.Dy + start.Dy, origin.Dx + mid.Dx + 0.8f, origin.Dy + mid.Dy + 0.8f, paint);
-            canvas.DrawLine(origin.Dx + mid.Dx, origin.Dy + mid.Dy, origin.Dx + drawEnd.Dx, origin.Dy + drawEnd.Dy, paint);
+            canvas.DrawLine(origin.Dx + start.Dx, origin.Dy + start.Dy, origin.Dx + mid.Dx + 0.8f,
+                origin.Dy + mid.Dy + 0.8f, paint);
+            canvas.DrawLine(origin.Dx + mid.Dx, origin.Dy + mid.Dy, origin.Dx + drawEnd.Dx, origin.Dy + drawEnd.Dy,
+                paint);
 
             //using var path = new Path(); //TODO: swapbuffer error on dx12
             //path.MoveTo(origin.Dx + start.Dx, origin.Dy + start.Dy);
