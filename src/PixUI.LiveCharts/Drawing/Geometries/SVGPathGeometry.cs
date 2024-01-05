@@ -22,6 +22,8 @@
 
 
 using System;
+using System.Collections.Generic;
+using LiveChartsCore.Drawing;
 
 namespace LiveCharts.Drawing.Geometries;
 
@@ -29,16 +31,15 @@ namespace LiveCharts.Drawing.Geometries;
 /// Defines a geometry that is built using from a svg path.
 /// </summary>
 /// <seealso cref="SizedGeometry" />
-public class SVGPathGeometry : SizedGeometry
+public class SVGPathGeometry : SizedGeometry, ISvgPath<SkiaDrawingContext>
 {
-    private string _svg = string.Empty;
-    internal SKPath? _svgPath;
+    private readonly Func<SKPath>? _pathSource;
+    private string? _svgPath;
 
-    // /// <summary>
-    // /// Initializes a new instance of the <see cref="SVGPathGeometry"/> class.
-    // /// </summary>
-    // public SVGPathGeometry() : base()
-    // { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SVGPathGeometry"/> class.
+    /// </summary>
+    public SVGPathGeometry() { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SVGPathGeometry"/> class.
@@ -46,36 +47,88 @@ public class SVGPathGeometry : SizedGeometry
     /// <param name="svgPath">The SVG path.</param>
     public SVGPathGeometry(SKPath svgPath)
     {
-        _svgPath = svgPath;
+        Path = svgPath;
     }
 
     /// <summary>
-    /// Gets or sets the SVG path.
+    /// Initializes a new instance of the <see cref="SVGPathGeometry"/> class,
+    /// when <see cref="Path"/> is null, The path will be obtained from the <paramref name="pathSource"/> function.
     /// </summary>
-    /// <value>
-    /// The SVG.
-    /// </value>
-    public string SVG { get => _svg; set { _svg = value; OnSVGPropertyChanged(); } }
+    /// <param name="pathSource">The path source.</param>
+    public SVGPathGeometry(Func<SKPath> pathSource)
+    {
+        _pathSource = pathSource;
+    }
+
+    /// <summary>
+    /// Svg paths are cached in this dictionary to prevent parsing multiple times the same path,
+    /// when you use the <see cref="SVGPathGeometry"/> class, keep in mind that the parsed paths are living in
+    /// memory, this has no secondary effects in most of the cases, but if you are parsing a lot of paths
+    /// (maybe over 500) then you must consider cleaning the cache when you no longer need a path.
+    /// </summary>
+    public static readonly Dictionary<string, SKPath> Cache = new();
+
+    /// <summary>
+    /// Gets or sets the path.
+    /// </summary>
+    public SKPath? Path { get; set; }
 
     /// <summary>
     /// Gets or sets whether the path should be fitted to the size of the geometry.
     /// </summary>
     public bool FitToSize { get; set; } = false;
 
+    /// <inheritdoc cref="ISvgPath{TDrawingContext}.SVGPath"/>
+    public string? SVGPath
+    {
+        get => _svgPath;
+        set
+        {
+            if (value == _svgPath) return;
+
+            _svgPath = value;
+            OnPathChanged(value);
+        }
+    }
+
     /// <inheritdoc cref="Geometry.OnDraw(SkiaDrawingContext, SKPaint)" />
     public override void OnDraw(SkiaDrawingContext context, SKPaint paint)
     {
-        if (_svgPath is null)
-            throw new Exception( $"{nameof(SVG)} property is null and there is not a defined path to draw.");
+        var path = Path ?? _pathSource?.Invoke();
+        if (path is null) return;
 
-        context.Canvas.Save();
+        DrawPath(context, paint, path);
+    }
+
+    private void OnPathChanged(string? path)
+    {
+        if (path is null)
+        {
+            Path = null;
+            return;
+        }
+
+        if (!Cache.TryGetValue(path, out var skPath))
+        {
+            skPath = SKPath.ParseSvgPathData(path);
+            Cache[path] = skPath;
+        }
+
+        Path = skPath;
+    }
+
+    /// <summary>
+    /// Draws the given path to the canvas.
+    /// </summary>
+    /// <param name="context">The context.</param>
+    /// <param name="path">The path.</param>
+    /// <param name="paint">The paint</param>
+    protected void DrawPath(SkiaDrawingContext context, SKPaint paint, SKPath path)
+    {
+        _ = context.Canvas.Save();
 
         var canvas = context.Canvas;
-#if __WEB__
-        var bounds = _svgPath.GetBounds();
-#else        
-        _ = _svgPath.GetTightBounds(out var bounds);
-#endif
+        _ = path.GetTightBounds(out var bounds);
 
         if (FitToSize)
         {
@@ -99,17 +152,8 @@ public class SVGPathGeometry : SizedGeometry
             canvas.Translate(-bounds.MidX, -bounds.MidY);
         }
 
-        canvas.DrawPath(_svgPath, paint);
+        canvas.DrawPath(path, paint);
 
         context.Canvas.Restore();
-    }
-
-    private void OnSVGPropertyChanged()
-    {
-#if __WEB__
-        throw new NotImplementedException();
-#else
-        _svgPath = SKPath.ParseSvgPathData(_svg);
-#endif
     }
 }
