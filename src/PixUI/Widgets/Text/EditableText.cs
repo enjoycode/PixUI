@@ -8,6 +8,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
     {
         MouseRegion = new MouseRegion(() => Cursors.IBeam);
         MouseRegion.PointerDown += _OnPointerDown;
+        MouseRegion.PointerMove += _OnPointerMove;
 
         FocusNode = new FocusNode();
         FocusNode.FocusChanged += _OnFocusChanged;
@@ -19,6 +20,8 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
 
     private readonly Caret _caret;
     private int _caretPosition;
+    private int _selectionStart;
+    private int _selectionEnd;
     private bool _changeByTextInput;
 
     public readonly State<bool> Focused = false;
@@ -90,6 +93,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
             if (!IsReadonly)
                 e.Window.StopTextInput();
             _caret.Hide();
+            ClearSelection();
             Commit();
         }
     }
@@ -98,14 +102,23 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
     {
         if (IsReadonly) return;
 
-        var newText = string.IsNullOrEmpty(Text.Value) ? text : Text.Value.Insert(_caretPosition, text);
+        var insertPos = _caretPosition;
+        var oldText = Text.Value;
+        if (_selectionStart != _selectionEnd)
+        {
+            oldText = oldText.Remove(_selectionStart, _selectionEnd - _selectionStart);
+            insertPos = _selectionStart;
+        }
+
+        var newText = oldText.Insert(insertPos, text);
         if (PreviewInput != null && !PreviewInput(newText))
             return;
 
         _changeByTextInput = true;
         Text.Value = newText;
         _changeByTextInput = false;
-        _caretPosition += text.Length;
+        _caretPosition = insertPos + text.Length;
+        _selectionStart = _selectionEnd = _caretPosition;
     }
 
     protected override void OnTextChanged(State state)
@@ -116,21 +129,64 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         base.OnTextChanged(state);
     }
 
-    private void _OnPointerDown(PointerEvent theEvent)
+    private int GetCaretPosition(float x, float y)
     {
-        var newPos = 0;
+        var res = 0;
         if (CachedParagraph != null)
         {
-            var pos = CachedParagraph.GetGlyphPositionAtCoordinate(theEvent.X, theEvent.Y);
+            var pos = CachedParagraph.GetGlyphPositionAtCoordinate(x, y);
             Log.Debug($"pos={pos.Position} affinity={pos.Affinity}");
-            newPos = pos.Position;
+            res = pos.Position;
         }
 
+        return res;
+    }
+
+    private void ClearSelection()
+    {
+        if (_selectionStart != _selectionEnd)
+        {
+            _selectionStart = _selectionEnd = _caretPosition;
+            Repaint();
+        }
+    }
+
+    private void _OnPointerDown(PointerEvent e)
+    {
+        if (e.Buttons != PointerButtons.Left) return;
+
+        var newPos = GetCaretPosition(e.X, e.Y);
         if (newPos != _caretPosition)
         {
             _caretPosition = newPos;
+            ClearSelection();
             _caret.NotifyPositionChanged(); //需要通知刷新
         }
+    }
+
+    private void _OnPointerMove(PointerEvent e)
+    {
+        if (e.Buttons != PointerButtons.Left) return;
+
+        var oldStart = _selectionStart;
+        var oldEnd = _selectionEnd;
+
+        var pos = GetCaretPosition(e.X, e.Y);
+        if (pos < _caretPosition)
+        {
+            _selectionStart = pos;
+            _selectionEnd = _caretPosition;
+        }
+        else if (pos > _caretPosition)
+        {
+            _selectionStart = _caretPosition;
+            _selectionEnd = pos;
+        }
+        else
+            _selectionStart = _selectionEnd = _caretPosition;
+
+        if (oldStart != _selectionStart || oldEnd != _selectionEnd)
+            Repaint();
     }
 
     private void _OnKeyDown(KeyEvent keyEvent)
@@ -152,20 +208,34 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         }
     }
 
+    private bool DeleteSelection()
+    {
+        if (_selectionStart == _selectionEnd) return false;
+
+        Text.Value = Text.Value.Remove(_selectionStart, _selectionEnd - _selectionStart);
+        _caretPosition = _selectionEnd = _selectionStart;
+        return true;
+    }
+
     private void DeleteBack()
     {
-        if (IsReadonly || _caretPosition == 0) return;
+        if (IsReadonly) return;
 
         _changeByTextInput = true;
-        Text.Value = Text.Value.Remove(_caretPosition - 1, 1);
+        if (!DeleteSelection() && _caretPosition != 0)
+        {
+            Text.Value = Text.Value.Remove(_caretPosition - 1, 1);
+            _caretPosition--;
+        }
+
         _changeByTextInput = false;
-        _caretPosition--;
     }
 
     private void MoveLeft()
     {
         if (_caretPosition == 0) return;
 
+        ClearSelection();
         _caretPosition--;
         _caret.NotifyPositionChanged();
     }
@@ -175,6 +245,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         if (_caretPosition == Text.Value.Length)
             return;
 
+        ClearSelection();
         _caretPosition++;
         _caret.NotifyPositionChanged();
     }
@@ -249,6 +320,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
+        const float offsetY = 2;
         if (string.IsNullOrEmpty(Text.Value) || Text.Value.Length == 0)
         {
             if (string.IsNullOrEmpty(HintText)) return;
@@ -257,7 +329,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
 
             canvas.Save();
             canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
-            canvas.DrawParagraph(_hintParagraph, 0, 2 /*offset*/);
+            canvas.DrawParagraph(_hintParagraph, 0, offsetY);
             canvas.Restore();
         }
         else
@@ -267,9 +339,23 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
 
             canvas.Save();
             canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
-            canvas.DrawParagraph(CachedParagraph, 0, 2 /*offset*/);
+            canvas.DrawParagraph(CachedParagraph, 0, offsetY);
+            DrawSelection(canvas);
             canvas.Restore();
         }
+    }
+
+    private void DrawSelection(Canvas canvas)
+    {
+        if (_selectionStart == _selectionEnd) return;
+
+        var s = CachedParagraph!.GetRectForPosition(_selectionStart, BoxHeightStyle.Tight, BoxWidthStyle.Tight);
+        var e = CachedParagraph!.GetRectForPosition(_selectionEnd - 1, BoxHeightStyle.Tight, BoxWidthStyle.Tight);
+        var rect = new Rect(s.Rect.Left, 0, e.Rect.Right, H);
+        var paint = PixUI.Paint.Shared(0xFFB3D7FF);
+        paint.BlendMode = BlendMode.Difference;
+        paint.AntiAlias = true;
+        canvas.DrawRect(rect, paint);
     }
 
     #endregion
