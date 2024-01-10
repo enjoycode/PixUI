@@ -1,9 +1,6 @@
-namespace CodeEditor
-{
-    public interface ITokensProvider
-    {
-        bool IsLeafNode(TSSyntaxNode node);
+namespace CodeEditor;
 
-        TokenType GetTokenType(TSSyntaxNode node);
-    }
+public interface ITokensProvider
+{
+    void Tokenize(Document document, int startLine, int endLine);
 }

@@ -52,6 +52,27 @@ namespace CodeEditor
         public uint context4;
         public IntPtr id;
         public IntPtr tree;
+        
+        /// <summary>
+        /// Get this node's start position in terms of rows and columns.
+        /// </summary>
+        public TSPoint StartPosition => new(context2, context3);
+        
+        /// <summary>
+        /// Get this node's end position in terms of rows and columns.
+        /// </summary>
+        public TSPoint EndPosition
+        {
+            get
+            {
+                unsafe
+                {
+                    TSPoint endPoint;
+                    TreeSitterApi.ts_node_end_point_wasm(this, &endPoint);
+                    return endPoint;
+                }
+            }
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -109,9 +130,9 @@ namespace CodeEditor
     {
         private const string LibTreeSitter = "tree-sitter";
 
-        //TODO: 临时使用，待使用NativeMemory.Free()
-        [LibraryImport(LibTreeSitter)]
-        internal static partial void ts_util_free(IntPtr ptr);
+        // 临时使用，待使用NativeMemory.Free()
+        // [LibraryImport(LibTreeSitter)]
+        // internal static partial void ts_util_free(IntPtr ptr);
 
         #region ====Parser====
 

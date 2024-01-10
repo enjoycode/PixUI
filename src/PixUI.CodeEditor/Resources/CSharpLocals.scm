@@ -1,41 +1,23 @@
-;; Definitions
-(variable_declarator
-  . (identifier) @definition.var)
+(class_declaration name: (identifier) @name) @definition.class
 
-(variable_declarator
-  (tuple_pattern
-    (identifier) @definition.var))
+(class_declaration bases: (base_list (_) @name)) @reference.class
 
-(declaration_expression
-  name: (identifier) @definition.var)
+(interface_declaration name: (identifier) @name) @definition.interface
 
-(for_each_statement
-  left: (identifier) @definition.var)
+(interface_declaration bases: (base_list (_) @name)) @reference.interface
 
-(for_each_statement
-  left: (tuple_pattern
-    (identifier) @definition.var))
+(method_declaration name: (identifier) @name) @definition.method
 
-(parameter
-  (identifier) @definition.parameter)
+(object_creation_expression type: (identifier) @name) @reference.class
 
-(method_declaration
-  name: (identifier) @definition.method)
+(type_parameter_constraints_clause target: (identifier) @name) @reference.class
 
-(local_function_statement
-  name: (identifier) @definition.method)
+(type_constraint type: (identifier) @name) @reference.class
 
-(property_declaration
-  name: (identifier) @definition)
+(variable_declaration type: (identifier) @name) @reference.class
 
-(type_parameter
-  (identifier) @definition.type)
+(invocation_expression function: (member_access_expression name: (identifier) @name)) @reference.send
 
-(class_declaration
-  name: (identifier) @definition)
+(namespace_declaration name: (identifier) @name) @definition.module
 
-;; References
-(identifier) @reference
-
-;; Scope
-(block) @scope
+(namespace_declaration name: (identifier) @name) @module

@@ -9,6 +9,7 @@ namespace PixUI.UnitTests.CodeEditor
 public sealed class Person
 {
     public string Name {get; set;}
+    public void SayHello { Console.WriteLine(Name); }
 }// */
 ";
         
@@ -28,8 +29,9 @@ public sealed class Person
         {
             var doc = new Document("Test.cs");
             doc.TextContent = SrcCode;
-
-            doc.SyntaxParser.TokenizeLine(3);
+            //doc.SyntaxParser.Tokenize(3, 4);
+            var line = doc.GetLineSegment(4);
+            line.DumpTokens(doc);
         }
     }
 }

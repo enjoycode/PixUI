@@ -32,7 +32,7 @@ namespace CodeEditor
 
         public Color LineNumberColor = new(0xFF606366);
 
-        public TextStyle TextStyle = new() { Color = new Color(0xFFA9B7C7), Height = 1 };
+        public TextStyle TextStyle = new() { Color = new Color(0xFFDCDCDC), Height = 1 };
 
         public TextStyle FoldedTextStyle = new()
         {
@@ -46,19 +46,19 @@ namespace CodeEditor
 
         private TextStyle _tokenErrorStyle = new() { Color = Colors.Red, Height = 1 };
 
-        private TextStyle _tokenTypeStyle = new() { Color = new Color(0xFF67DBF1), Height = 1 };
+        private TextStyle _tokenTypeStyle = new() { Color = 0xFF67DBF1, Height = 1 };
 
-        private TextStyle _tokenNumberStyle = new() { Color = new Color(0xFF6996BD), Height = 1 };
+        private TextStyle _tokenNumberStyle = new() { Color = 0xFF6996BD, Height = 1 };
 
-        private TextStyle _tokenStringStyle = new() { Color = new Color(0xFF98C379), Height = 1 };
+        private TextStyle _tokenStringStyle = new() { Color = 0xFF98C379, Height = 1 };
 
-        private TextStyle _tokenKeywordStyle = new() { Color = new Color(0xFFCC7927), Height = 1 };
+        private TextStyle _tokenKeywordStyle = new() { Color = 0xFFCC7927, Height = 1 };
 
-        private TextStyle _tokenCommentStyle = new() { Color = new Color(0xFF5F984F), Height = 1 };
+        private TextStyle _tokenCommentStyle = new() { Color = 0xFF5F984F, Height = 1 };
 
-        private TextStyle _tokenVariableStyle = new() { Color = new Color(0xFFE06C75), Height = 1 };
+        private TextStyle _tokenVariableStyle = new() { Color = 0xFFDCDCDC, Height = 1 };
 
-        private TextStyle _tokenFunctionStyle = new() { Color = new Color(0xFFFFC763), Height = 1 };
+        private TextStyle _tokenFunctionStyle = new() { Color = 0xFFFFC763, Height = 1 };
 
         /// <summary>
         /// 根据TokenType获取缓存的TextStyle

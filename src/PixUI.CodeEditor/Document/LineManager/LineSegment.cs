@@ -198,9 +198,11 @@ namespace CodeEditor
             _tokenColumnIndex = 0;
         }
 
-        internal void AddToken(TokenType type, int offset, int length)
+        internal void AddToken(TokenType type, int column, int length)
         {
-            var column = offset - Offset;
+            //TODO:暂简单处理多个匹配
+            if (column < _tokenColumnIndex) return;
+            
             //处理行首或间隙空格
             if (column > _tokenColumnIndex)
             {
@@ -283,6 +285,7 @@ namespace CodeEditor
         {
             if (_cachedParagraph != null) return _cachedParagraph!;
 
+            // ReSharper disable once UsingStatementResourceInitialization
             using var ps = new ParagraphStyle() { MaxLines = 1, Height = 1 };
             using var pb = new ParagraphBuilder(ps);
 
