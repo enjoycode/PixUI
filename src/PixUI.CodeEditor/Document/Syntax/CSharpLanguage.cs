@@ -258,7 +258,7 @@ initializer: [
 #else
             var lastNodeId = IntPtr.Zero;
 #endif
-            var result = new List<FoldMarker>(captures.Length);
+            var result = new List<FoldMarker>();
             foreach (var capture in captures)
             {
                 if (lastNodeId == capture.node.id) continue;

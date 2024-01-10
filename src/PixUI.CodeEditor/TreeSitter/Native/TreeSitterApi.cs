@@ -108,7 +108,7 @@ namespace CodeEditor
     internal static unsafe partial class TreeSitterApi
     {
         private const string LibTreeSitter = "tree-sitter";
-        
+
         //TODO: 临时使用，待使用NativeMemory.Free()
         [LibraryImport(LibTreeSitter)]
         internal static partial void ts_util_free(IntPtr ptr);
@@ -450,8 +450,10 @@ namespace CodeEditor
         internal static partial uint ts_query_string_count(IntPtr query);
 
         [LibraryImport(LibTreeSitter)]
-        internal static partial IntPtr ts_query_capture_name_for_id(IntPtr query, uint id,
-            ref uint length);
+        internal static partial IntPtr ts_query_capture_name_for_id(IntPtr query, uint id, ref uint length);
+
+        [LibraryImport(LibTreeSitter)]
+        internal static partial uint ts_query_start_byte_for_pattern(IntPtr query, uint pattern_index);
 
         [LibraryImport(LibTreeSitter)]
         internal static unsafe partial TsQueryPredicateStep* ts_query_predicates_for_pattern(
@@ -471,8 +473,7 @@ namespace CodeEditor
             TSPoint start, TSPoint end);
 
         [LibraryImport(LibTreeSitter)]
-        internal static partial void ts_query_cursor_exec(IntPtr queryCursor, IntPtr query,
-            TsNode node);
+        internal static partial void ts_query_cursor_exec(IntPtr queryCursor, IntPtr query, TsNode node);
 
         [LibraryImport(LibTreeSitter)]
         [return: MarshalAs(UnmanagedType.Bool)]

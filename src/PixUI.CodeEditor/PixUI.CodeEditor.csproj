@@ -25,6 +25,13 @@
       <ProjectReference Include="..\PixUI\PixUI.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Resources\CSharpHighlights.scm" />
+      <EmbeddedResource Include="Resources\CSharpHighlights.scm" />
+      <None Remove="Resources\CSharpLocals.scm" />
+      <EmbeddedResource Include="Resources\CSharpLocals.scm" />
+    </ItemGroup>
+
 <!--    <ItemGroup>-->
 <!--        <Content Include="libs\osx-x64\libtree-sitter.dylib">-->
 <!--            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->

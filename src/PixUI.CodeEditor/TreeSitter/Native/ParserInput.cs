@@ -2,6 +2,7 @@
 using System;
 using System.Runtime.InteropServices;
 using CodeEditor;
+using PixUI;
 
 namespace CodeEditor
 {
@@ -23,9 +24,8 @@ namespace CodeEditor
         [UnmanagedCallersOnly]
         internal static unsafe void* Read(void* payload, uint byteIndex, TSPoint* position, uint* bytesRead)
         {
-#if DEBUG
-            Console.WriteLine($"ParserInput.Read: index={byteIndex}");
-#endif
+            Log.Debug($"ParserInput.Read: index={byteIndex}");
+
             var gcHandle = GCHandle.FromIntPtr(new IntPtr(payload));
             var input = (ParserInput)gcHandle.Target!;
 
