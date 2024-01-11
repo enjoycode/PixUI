@@ -9,7 +9,7 @@ namespace CodeEditor;
 public sealed class SyntaxParser : IDisposable
 {
 #if __WEB__
-        internal const int ParserEncoding = 1;
+    internal const int ParserEncoding = 1;
 #else
     internal const int ParserEncoding = 2;
 #endif
@@ -158,8 +158,9 @@ public sealed class SyntaxParser : IDisposable
 #endif
         var newTree = _parser.Parse(tsInput, reset ? null : _oldTree);
         gcHandle.Free();
+
 #if DEBUG
-        Console.WriteLine($"SyntaxParser.Parse: 耗时{Stopwatch.GetElapsedTime(ts).TotalMilliseconds}ms");
+        Log.Debug($"SyntaxParser.Parse: 耗时{Stopwatch.GetElapsedTime(ts).TotalMilliseconds}ms");
 #endif
 
         //获取变动范围
@@ -201,36 +202,10 @@ public sealed class SyntaxParser : IDisposable
 #endif
         Language.Tokenize(_document, startLine, endLine);
 
+#if DEBUG
         Log.Debug($"Tokenize[{startLine}-{endLine}]耗时: {Stopwatch.GetElapsedTime(ts).TotalMilliseconds}ms");
+#endif
     }
-
-    // internal void TokenizeLine(int line)
-    // {
-    //     var lineSegment = _document.GetLineSegment(line);
-    //     var lineLength = lineSegment.Length;
-    //     if (lineLength == 0) return;
-    //
-    //     var lineStartPoint = new TSPoint(line, 0);
-    //     var lineEndPoint = new TSPoint(line, lineLength * ParserEncoding);
-    //     var lineNode = _oldTree!.Root.NamedDescendantForPosition(lineStartPoint, lineEndPoint);
-    //     // Console.WriteLine(lineNode);
-    //
-    //     lineSegment.BeginTokenize();
-    //
-    //     if (ContainsFullLine(lineNode!, lineSegment))
-    //     {
-    //         //VisitNode(lineNode!, lineSegment);
-    //     }
-    //     else
-    //     {
-    //         //TODO:
-    //         lineSegment.AddToken(TokenType.Unknown, lineSegment.Offset, lineSegment.Length);
-    //     }
-    //
-    //     lineSegment.EndTokenize();
-    //
-    //     //CodeToken.DumpLineTokens(lineSegment, _document);
-    // }
 
     #endregion
 

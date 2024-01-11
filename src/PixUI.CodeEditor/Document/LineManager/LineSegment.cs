@@ -202,7 +202,7 @@ namespace CodeEditor
         {
             //TODO:暂简单处理多个匹配
             if (column < _tokenColumnIndex) return;
-            
+
             //处理行首或间隙空格
             if (column > _tokenColumnIndex)
             {
@@ -245,7 +245,8 @@ namespace CodeEditor
 
         public int GetLeadingWhiteSpaces()
         {
-            if (_lineTokens == null) return 0;
+            //TODO: 连续两次回车后，当前行的_lineTokes==null(尚未Tokenize)，需要获取行文本前的空格
+            if (_lineTokens == null || _lineTokens.Count == 0) return 0;
             var firstTokenType = CodeToken.GetTokenType(_lineTokens[0]);
             if (firstTokenType != TokenType.WhiteSpace) return 0;
             return _lineTokens.Count > 1

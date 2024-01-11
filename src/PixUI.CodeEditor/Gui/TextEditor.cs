@@ -165,8 +165,7 @@ public sealed class TextEditor
             else
             {
                 Caret.Position = new TextLocation(
-                    Caret.Position.Column - replaceOffset + text.Length,
-                    Caret.Position.Line);
+                    Caret.Position.Column - replaceOffset + text.Length, Caret.Position.Line);
             }
         }
 
