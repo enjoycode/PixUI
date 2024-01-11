@@ -94,7 +94,7 @@ namespace CodeEditor
             if (token == null) return null;
 
             //排除无需提示的Token类型
-            var tokenType = CodeToken.GetTokenType(token.Value);
+            var tokenType = token.Value.Type;
             if (tokenType == TokenType.Comment || tokenType == TokenType.Constant ||
                 tokenType == TokenType.LiteralNumber || tokenType == TokenType.LiteralString ||
                 tokenType == TokenType.PunctuationBracket ||
@@ -102,7 +102,7 @@ namespace CodeEditor
                 tokenType == TokenType.WhiteSpace || tokenType == TokenType.Operator)
                 return null;
 
-            var tokenStartColumn = CodeToken.GetTokenStartColumn(token.Value);
+            var tokenStartColumn = token.Value.StartColumn;
             var len = pos.Column - tokenStartColumn;
             if (len <= 0) return null;
             var offset = lineSegment.Offset + tokenStartColumn;

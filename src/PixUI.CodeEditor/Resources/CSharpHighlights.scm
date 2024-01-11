@@ -213,7 +213,7 @@
   name: (identifier) @variable)
 
 ;; Lambda
-(lambda_expression) @variable
+;; (lambda_expression) @variable
 
 ;; Attribute
 (attribute) @attribute

@@ -31,7 +31,7 @@ namespace CodeEditor
 
         public int DelimiterLength { get; internal set; }
 
-        private IList<int>? _lineTokens;
+        private IList<CodeToken>? _lineTokens;
         private int _tokenColumnIndex; //仅用于Tokenize时缓存
         private Paragraph? _cachedParagraph;
 
@@ -194,7 +194,7 @@ namespace CodeEditor
         internal void BeginTokenize()
         {
             ClearCachedParagraph();
-            _lineTokens = new List<int>();
+            _lineTokens = new List<CodeToken>();
             _tokenColumnIndex = 0;
         }
 
@@ -206,11 +206,11 @@ namespace CodeEditor
             //处理行首或间隙空格
             if (column > _tokenColumnIndex)
             {
-                _lineTokens!.Add(CodeToken.Make(TokenType.WhiteSpace, _tokenColumnIndex));
+                _lineTokens!.Add(new(TokenType.WhiteSpace, _tokenColumnIndex));
                 _tokenColumnIndex = column;
             }
 
-            _lineTokens!.Add(CodeToken.Make(type, column));
+            _lineTokens!.Add(new(type, column));
             _tokenColumnIndex += length;
         }
 
@@ -219,11 +219,11 @@ namespace CodeEditor
             // 处理行尾空格
             if (_tokenColumnIndex < Length)
             {
-                _lineTokens!.Add(CodeToken.Make(TokenType.WhiteSpace, _tokenColumnIndex));
+                _lineTokens!.Add(new(TokenType.WhiteSpace, _tokenColumnIndex));
             }
         }
 
-        public int? GetTokenAt(int column)
+        public CodeToken? GetTokenAt(int column)
         {
             if (_lineTokens == null) return null;
 
@@ -231,7 +231,7 @@ namespace CodeEditor
             for (var i = _lineTokens.Count - 1; i >= 0; i--)
             {
                 var token = _lineTokens[i];
-                var tokenStartColumn = CodeToken.GetTokenStartColumn(token);
+                var tokenStartColumn = token.StartColumn;
                 if (tokenStartColumn < column && column <= tokenEndColumn)
                 {
                     return token;
@@ -247,10 +247,10 @@ namespace CodeEditor
         {
             //TODO: 连续两次回车后，当前行的_lineTokes==null(尚未Tokenize)，需要获取行文本前的空格
             if (_lineTokens == null || _lineTokens.Count == 0) return 0;
-            var firstTokenType = CodeToken.GetTokenType(_lineTokens[0]);
+            var firstTokenType = _lineTokens[0].Type;
             if (firstTokenType != TokenType.WhiteSpace) return 0;
             return _lineTokens.Count > 1
-                ? CodeToken.GetTokenStartColumn(_lineTokens[1])
+                ? _lineTokens[1].StartColumn
                 : Length;
         }
 
@@ -266,14 +266,14 @@ namespace CodeEditor
             for (var i = 0; i < _lineTokens.Count; i++)
             {
                 var token = _lineTokens[i];
-                var tokenStartColumn = CodeToken.GetTokenStartColumn(token);
+                var tokenStartColumn = token.StartColumn;
                 var tokenEndColumn = i == _lineTokens.Count - 1
                     ? Length
-                    : CodeToken.GetTokenStartColumn(_lineTokens[i + 1]);
+                    : _lineTokens[i + 1].StartColumn;
                 var tokenOffset =
                     document.PositionToOffset(new TextLocation(tokenStartColumn, LineNumber));
                 var tokenText = document.GetText(tokenOffset, tokenEndColumn - tokenStartColumn);
-                Console.WriteLine($"{CodeToken.GetTokenType(token)} \"{tokenText}\"");
+                Console.WriteLine($"{token.Type} \"{tokenText}\"");
             }
         }
 #endif
@@ -312,26 +312,22 @@ namespace CodeEditor
 
         private void BuildParagraphByTokens(ParagraphBuilder pb, TextEditor editor, int startIndex, int endIndex)
         {
-            var token = 0;
-            var tokenStartColumn = 0;
-            var tokenEndColumn = 0;
-            var tokenOffset = 0;
             for (var i = 0; i < _lineTokens!.Count; i++)
             {
-                token = _lineTokens[i];
-                tokenStartColumn = CodeToken.GetTokenStartColumn(token);
-                tokenEndColumn = i == _lineTokens.Count - 1
+                var token = _lineTokens[i];
+                var tokenStartColumn = token.StartColumn;
+                var tokenEndColumn = i == _lineTokens.Count - 1
                     ? Length
-                    : CodeToken.GetTokenStartColumn(_lineTokens[i + 1]);
+                    : _lineTokens[i + 1].StartColumn;
 
                 if (startIndex >= tokenEndColumn) continue;
 
                 // get token text, TODO: 优化避免生成字符串
-                tokenOffset = editor.Document.PositionToOffset(new TextLocation(tokenStartColumn, LineNumber));
+                var tokenOffset = editor.Document.PositionToOffset(new TextLocation(tokenStartColumn, LineNumber));
                 var tokenText = editor.Document.GetText(tokenOffset, tokenEndColumn - tokenStartColumn);
 
                 // add to paragraph
-                pb.PushStyle(editor.Theme.GetTokenStyle(CodeToken.GetTokenType(token)));
+                pb.PushStyle(editor.Theme.GetTokenStyle(token.Type));
                 pb.AddText(tokenText);
                 pb.Pop();
 

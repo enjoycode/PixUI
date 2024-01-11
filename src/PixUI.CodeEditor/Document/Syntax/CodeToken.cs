@@ -25,15 +25,17 @@ public enum TokenType
     Function,
 }
 
-internal static class CodeToken
+public readonly struct CodeToken
 {
-    internal static int Make(TokenType type, int startColumn)
+    private readonly int _value;
+
+    public CodeToken(TokenType type, int startColumn)
     {
-        return ((int)type << 24) | startColumn;
+        _value = ((int)type << 24) | startColumn;
     }
 
-    internal static int GetTokenStartColumn(int token) => token & 0xFFFFFF;
+    public TokenType Type => (TokenType)(_value >> 24);
+    public int StartColumn => _value & 0xFFFFFF;
 
-    internal static TokenType GetTokenType(int token) => (TokenType)(token >> 24);
-        
+    public override string ToString() => $"[{Type}, {StartColumn}]";
 }
