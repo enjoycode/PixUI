@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 
-namespace CodeEditor
+namespace CodeEditor;
+
+public interface IFoldingProvider
 {
-    public interface IFoldingProvider
-    {
-        List<FoldMarker>? GenerateFoldMarkers(Document document);
-    }
+    List<FoldMarker>? GenerateFoldMarkers(Document document);
 }

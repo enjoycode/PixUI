@@ -1,7 +1,6 @@
-namespace CodeEditor
+namespace CodeEditor;
+
+public interface ICodeLanguage : ITokensProvider, IFoldingProvider
 {
-    public interface ICodeLanguage : ITokensProvider, IFoldingProvider
-    {
-        char? GetAutoColsingPairs(char ch);
-    }
+    char? GetAutoColsingPairs(char ch);
 }

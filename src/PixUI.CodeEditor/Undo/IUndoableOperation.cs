@@ -1,9 +1,8 @@
-namespace CodeEditor
-{
-    public interface IUndoableOperation
-    {
-        void Undo();
+namespace CodeEditor;
 
-        void Redo();
-    }
+public interface IUndoableOperation
+{
+    void Undo();
+
+    void Redo();
 }
