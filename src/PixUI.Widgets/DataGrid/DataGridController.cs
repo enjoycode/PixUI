@@ -38,7 +38,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
     /// <summary>
     /// Header的行数，不包含分组列始终为1
     /// </summary>
-    internal int HeaderRows { get; private set; } = 1;
+    internal int HeaderRows => Columns.HeaderRows;
 
     internal float HeaderRowHeight { get; private set; } = 35f;
 
@@ -538,11 +538,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
             hitColumn.CachedVisibleRight - 2, top + Theme.RowHeight - 1);
     }
 
-    internal void ClearLeafColumns()
-    {
-        CachedLeafColumns.Clear();
-        HeaderRows = 1;
-    }
+    internal void ClearLeafColumns() => CachedLeafColumns.Clear();
 
     internal void GetLeafColumns(DataGridColumn<T> column, bool? parentFrozen)
     {
@@ -551,7 +547,6 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
         if (column is DataGridGroupColumn<T> groupColumn)
         {
-            HeaderRows += 1;
             foreach (var child in groupColumn.Children)
             {
                 child.Parent = groupColumn;
@@ -568,7 +563,6 @@ public sealed class DataGridController<T> /* where T : notnull*/
     {
         if (column is DataGridGroupColumn<T> groupColumn)
         {
-            HeaderRows -= 1;
             foreach (var child in groupColumn.Children)
             {
                 RemoveLeafColumns(child);
