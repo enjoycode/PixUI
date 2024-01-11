@@ -19,7 +19,7 @@ public sealed class SyntaxParser : IDisposable
         _document = document;
         // @ts-ignore for new TSParser();
         _parser = new TSParser(); //Don't use Initializer
-        _parser.Language = TSCSharpLanguage.Instance.Value;
+        _parser.Language = TSCSharpLanguage.Instance;
         Language = new CSharpLanguage();
     }
 
@@ -200,11 +200,108 @@ public sealed class SyntaxParser : IDisposable
 #if DEBUG
         var ts = Stopwatch.GetTimestamp();
 #endif
-        Language.Tokenize(_document, startLine, endLine);
+
+        for (var i = startLine; i < endLine; i++)
+        {
+            TokenizeLine(i);
+        }
 
 #if DEBUG
         Log.Debug($"Tokenize[{startLine}-{endLine}]耗时: {Stopwatch.GetElapsedTime(ts).TotalMilliseconds}ms");
 #endif
+    }
+
+    private void TokenizeLine(int line)
+    {
+        var lineSegment = _document.GetLineSegment(line);
+        var lineLength = lineSegment.Length;
+        if (lineLength == 0) return;
+
+        var lineStartPoint = new TSPoint(line, 0);
+        var lineEndPoint = new TSPoint(line, lineLength * ParserEncoding);
+        var lineNode = _oldTree!.Root.NamedDescendantForPosition(lineStartPoint, lineEndPoint);
+        // Console.WriteLine(lineNode);
+
+        lineSegment.BeginTokenize();
+
+        if (ContainsFullLine(lineNode!, lineSegment))
+        {
+            VisitNode(lineNode!, lineSegment);
+        }
+        else
+        {
+            //TODO:
+            lineSegment.AddToken(TokenType.Unknown, lineSegment.Offset, lineSegment.Length);
+        }
+
+        lineSegment.EndTokenize();
+
+        //CodeToken.DumpLineTokens(lineSegment, _document);
+    }
+
+    private void VisitChildren(TSSyntaxNode node, int count, LineSegment lineSegment)
+    {
+        var cursor = new TSTreeCursor(node);
+        cursor.GotoFirstChild();
+        for (var i = 0; i < count; i++)
+        {
+            var child = cursor.Current;
+            if (BeforeLine(child, lineSegment))
+            {
+                cursor.GotoNextSibling();
+                continue;
+            }
+
+            if (AfterLine(child, lineSegment)) break;
+            VisitNode(child, lineSegment);
+            cursor.GotoNextSibling();
+        }
+
+        cursor.Dispose();
+    }
+
+    private void VisitNode(TSSyntaxNode node, LineSegment lineSegment)
+    {
+        var childrenCount = node.ChildCount;
+        if (childrenCount > 0 && !Language.IsLeafNode(node))
+        {
+            VisitChildren(node, childrenCount, lineSegment);
+            return;
+        }
+
+        // leaf node now
+        // 注意: 1.可能跨行的Comment; 2.如下特例(" this._")会产生长度为0的MISSING节点
+        // member_access_expression [4, 0] - [4, 6]
+        //     expression: this_expression [4, 0] - [4, 4]
+        //     name: identifier [4, 5] - [4, 6]
+        // MISSING ; [4, 6] - [4, 6]
+        if (node.EndIndex <= node.StartIndex) return;
+
+        var tokenType = Language.GetTokenType(node);
+        var startOffset = Math.Max(node.StartIndex / ParserEncoding, lineSegment.Offset);
+        var length = Math.Min((node.EndIndex - node.StartIndex) / ParserEncoding, lineSegment.Length);
+        lineSegment.AddToken(tokenType, startOffset, length);
+    }
+
+    private static bool ContainsFullLine(TSSyntaxNode node, LineSegment lineSegment)
+    {
+        var nodeStartOffset = node.StartIndex / ParserEncoding;
+        var nodeEndOffset = node.EndIndex / ParserEncoding;
+
+        return nodeStartOffset <= lineSegment.Offset &&
+               (lineSegment.Offset + lineSegment.Length) <= nodeEndOffset;
+    }
+
+    private static bool BeforeLine(TSSyntaxNode node, LineSegment lineSegment)
+    {
+        var nodeEndOffset = node.EndIndex / ParserEncoding;
+        return nodeEndOffset < lineSegment.Offset;
+    }
+
+    private static bool AfterLine(TSSyntaxNode node, LineSegment lineSegment)
+    {
+        var nodeStartOffset = node.StartIndex / ParserEncoding;
+        return nodeStartOffset > (lineSegment.Offset + lineSegment.Length);
     }
 
     #endregion

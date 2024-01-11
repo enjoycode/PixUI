@@ -14,7 +14,7 @@ public sealed class TSLanguage
     public static TSLanguage Get(IntPtr ptr)
     {
         //always return TSCSharpLanguage instance now
-        return TSCSharpLanguage.Instance.Value;
+        return TSCSharpLanguage.Instance;
     }
 
     #endregion
@@ -84,7 +84,9 @@ public sealed class TSLanguage
 
 public static class TSCSharpLanguage
 {
-    public static Lazy<TSLanguage> Instance = new(() => new TSLanguage(tree_sitter_c_sharp()));
+    private static readonly Lazy<TSLanguage> _lazy = new(() => new TSLanguage(tree_sitter_c_sharp()));
+
+    public static TSLanguage Instance => _lazy.Value;
 
     [DllImport(TSLanguage.LibTreeSitterCSharp)]
     private static extern IntPtr tree_sitter_c_sharp();

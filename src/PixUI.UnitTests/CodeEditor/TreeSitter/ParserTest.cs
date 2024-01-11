@@ -9,7 +9,7 @@ namespace PixUI.UnitTests.TreeSitter
         [Test]
         public void Test1()
         {
-            var language = TSCSharpLanguage.Instance.Value;
+            var language = TSCSharpLanguage.Instance;
             using var parser = new TSParser { Language = language };
             using var tree = parser.Parse(@"
 class Person
@@ -28,7 +28,7 @@ class Person
         [Test]
         public void CSharpSymbolNames()
         {
-            var language = TSCSharpLanguage.Instance.Value;
+            var language = TSCSharpLanguage.Instance;
             var symbolCount = language.SymbolCount;
             for (var i = 0; i < symbolCount; i++)
             {

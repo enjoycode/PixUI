@@ -10,7 +10,7 @@ public class QueryTest
     [Test]
     public void Test1()
     {
-        var language = TSCSharpLanguage.Instance.Value;
+        var language = TSCSharpLanguage.Instance;
         using var parser = new TSParser();
         parser.Language = language;
         using var tree = parser.Parse(@"

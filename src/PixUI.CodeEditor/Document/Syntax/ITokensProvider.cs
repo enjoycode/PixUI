@@ -2,5 +2,7 @@ namespace CodeEditor;
 
 public interface ITokensProvider
 {
-    void Tokenize(Document document, int startLine, int endLine);
+    bool IsLeafNode(TSSyntaxNode node);
+
+    TokenType GetTokenType(TSSyntaxNode node);
 }

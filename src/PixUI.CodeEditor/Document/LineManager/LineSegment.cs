@@ -198,11 +198,9 @@ namespace CodeEditor
             _tokenColumnIndex = 0;
         }
 
-        internal void AddToken(TokenType type, int column, int length)
+        internal void AddToken(TokenType type, int offset, int length)
         {
-            //TODO:暂简单处理多个匹配
-            if (column < _tokenColumnIndex) return;
-
+            var column = offset - Offset;
             //处理行首或间隙空格
             if (column > _tokenColumnIndex)
             {
