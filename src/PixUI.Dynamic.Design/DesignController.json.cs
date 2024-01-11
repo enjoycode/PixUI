@@ -261,6 +261,10 @@ partial class DesignController
                 ds.ReadFrom(ref reader);
                 state.Value = ds;
             }
+            else
+            {
+                reader.Read(); //Value null
+            }
         }
         else
         {
@@ -277,6 +281,10 @@ partial class DesignController
                 var vs = DesignSettings.MakeValueState!();
                 vs.ReadFrom(ref reader, state);
                 state.Value = vs;
+            }
+            else
+            {
+                reader.Read(); //Value null
             }
         }
 
@@ -310,10 +318,10 @@ partial class DesignController
                     reader.Read();
                     reader.Read();
                     var height = reader.GetSingle();
-                    result = element = new DesignElement(this, slotName) {Width = width, Height = height};
+                    result = element = new DesignElement(this, slotName) { Width = width, Height = height };
                     continue;
                 }
-                
+
                 meta = DynamicWidgetManager.GetByName(type);
                 if (meta.IsReversedWrapElement)
                 {
