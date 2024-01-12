@@ -6,11 +6,11 @@ namespace PixUI.UnitTests.CodeEditor
     public class DocumentTest
     {
         private const string SrcCode = @"
-public sealed class Person
+public class Person
 {
-    public string Name {get; set;}
+    Action action = () => SayHello();
     public void SayHello { Console.WriteLine(Name); }
-}// */
+}
 ";
         
         [Test]
@@ -29,8 +29,8 @@ public sealed class Person
         {
             var doc = new Document("Test.cs");
             doc.TextContent = SrcCode;
-            //doc.SyntaxParser.Tokenize(3, 4);
-            var line = doc.GetLineSegment(4);
+            // doc.SyntaxParser.Tokenize(2, 3);
+            var line = doc.GetLineSegment(3);
             line.DumpTokens(doc);
         }
     }

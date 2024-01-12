@@ -171,6 +171,8 @@ public sealed class SyntaxParser : IDisposable
                 newTree.Handle, ref rangeCount);
 
             _oldTree!.Dispose();
+            
+            //rangeCount可能等于0, 每个range的startLine可能等于endLine
 
             _startLineOfChanged = (int)_edit.startPosition.row; //设为当前行
             _endLineOfChanged = _startLineOfChanged + 1;
@@ -179,7 +181,7 @@ public sealed class SyntaxParser : IDisposable
                 var startLine = (int)rangesPtr[i].StartPosition.row;
                 var endLine = (int)rangesPtr[i].EndPosition.row;
                 _startLineOfChanged = Math.Min(_startLineOfChanged, startLine);
-                _endLineOfChanged = Math.Max(_endLineOfChanged, endLine);
+                _endLineOfChanged = Math.Max(_endLineOfChanged, endLine + 1);
                 // Console.WriteLine(
                 //     $"{rangesPtr[i]} {rangesPtr[i].StartIndex}-{rangesPtr[i].EndIndex}");
             }
@@ -195,6 +197,9 @@ public sealed class SyntaxParser : IDisposable
 #endif
     }
 
+    /// <summary>
+    /// Tokenize lines range [startLine, endLine)
+    /// </summary>
     internal void Tokenize(int startLine, int endLine)
     {
 #if DEBUG
