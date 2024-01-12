@@ -151,9 +151,9 @@ internal sealed class CSharpLanguage : ICodeLanguage
     {
         var typeId = node.TypeId;
         var type = TSCSharpLanguage.Instance.GetType(typeId);
-        if (type == "identifier")
-            return GetIdentifierTokenType(node); //300ms
-        return TokenMap.TryGetValue(type, out var res) ? res : TokenType.Unknown;
+        return type == "identifier"
+            ? GetIdentifierTokenType(node)
+            : TokenMap.GetValueOrDefault(type, TokenType.Unknown);
     }
 
     private static TokenType GetIdentifierTokenType(TSSyntaxNode node)
@@ -178,6 +178,7 @@ internal sealed class CSharpLanguage : ICodeLanguage
             case "generic_name":
             case "array_type":
             case "base_list":
+            case "variable_declaration":
                 return TokenType.Type;
 
             case "argument":
@@ -185,6 +186,7 @@ internal sealed class CSharpLanguage : ICodeLanguage
             case "property_declaration":
                 return TokenType.Variable;
 
+            case "invocation_expression":
             case "method_declaration":
                 return TokenType.Function;
 
@@ -214,10 +216,11 @@ internal sealed class CSharpLanguage : ICodeLanguage
     /// <param name="node">MemberAccessNode, eg: "some.identifier"</param>
     private static TokenType GetIdentifierTypeFromMemberAccess(TSSyntaxNode node)
     {
-        if (node.Parent!.Parent!.Type == "invocation_expression")
+        if (node.Parent?.Parent?.Type == "invocation_expression" && node.NextNamedSibling == null)
             return TokenType.Function;
-        //TODO:查找上下文变量列表
-        return node.NextNamedSibling == null ? TokenType.Variable : TokenType.Type;
+        return TokenType.Unknown;
+        // //TODO:查找上下文变量列表
+        // return node.NextNamedSibling == null ? TokenType.Variable : TokenType.Type;
     }
 
     #endregion

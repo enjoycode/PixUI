@@ -6,9 +6,12 @@ namespace PixUI.UnitTests.CodeEditor
     public class DocumentTest
     {
         private const string SrcCode = @"
-public class 人员 //a
+public class Person
 {
-    
+    void Test()
+    {
+        System.Console.WriteLine('a');
+    }
 }
 ";
         
@@ -29,7 +32,7 @@ public class 人员 //a
             var doc = new Document("Test.cs");
             doc.TextContent = SrcCode;
             // doc.SyntaxParser.Tokenize(2, 3);
-            var line = doc.GetLineSegment(1);
+            var line = doc.GetLineSegment(5);
             line.DumpTokens(doc);
         }
     }
