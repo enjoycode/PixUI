@@ -12,14 +12,8 @@ namespace PixUI.UnitTests.TreeSitter
             var language = TSCSharpLanguage.Instance;
             using var parser = new TSParser { Language = language };
             using var tree = parser.Parse(@"
-class Person
+class 人员
 {
-    private char name = 'a';
-
-    public void SayHello()
-    {
-        System.Console.WriteLine(Name);
-    }
 } // */
 ");
             Console.WriteLine(tree.Root);
