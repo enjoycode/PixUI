@@ -5,17 +5,14 @@ namespace CodeEditor;
 
 internal sealed class CSharpLanguage : ICodeLanguage
 {
-    public char? GetAutoColsingPairs(char ch)
+    public char? GetAutoColsingPairs(char ch) => ch switch
     {
-        switch (ch)
-        {
-            case '{': return '}';
-            case '[': return ']';
-            case '(': return ')';
-            case '"': return '"';
-            default: return null;
-        }
-    }
+        '{' => '}',
+        '[' => ']',
+        '(' => ')',
+        '"' => '"',
+        _ => null
+    };
 
     #region ====ITokensProvider====
 

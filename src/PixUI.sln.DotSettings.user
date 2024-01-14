@@ -35,6 +35,7 @@
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.TreeSitter.QueryTest.Test1&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.CodeEditor.DocumentTest.TokenizeTest&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.TreeSitter.ParserTest.Test1&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net7.0::PixUI.UnitTests.TreeSitter.ParserTest.CSharpSymbolNames&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	

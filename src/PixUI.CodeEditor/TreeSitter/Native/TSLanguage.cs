@@ -51,7 +51,7 @@ public sealed class TSLanguage
         var ptr = Marshal.StringToHGlobalAnsi(name);
         var id = ts_language_symbol_for_name(Handle, ptr, (uint)name.Length, isNamed);
         Marshal.FreeHGlobal(ptr);
-        return id == 0 ? (ushort?)null : id;
+        return id == 0 ? null : id;
     }
 
     public int FieldCount => ts_language_field_count(Handle);
