@@ -175,12 +175,22 @@ internal sealed class CSharpLanguage : ICodeLanguage
             case "record_declaration":
             case "object_creation_expression":
             case "constructor_declaration":
-            case "generic_name":
             case "array_type":
             case "base_list":
             case "variable_declaration":
             case "nullable_type":
+
+            case "generic_name":
+            case "type_parameter":
+            case "type_argument_list":
                 return TokenType.Type;
+
+            case "constant_pattern":
+                return TokenType.Type;
+
+            case "declaration_pattern":
+            case "recursive_pattern":
+                return node.PrevNamedSibling == null ? TokenType.Type : TokenType.Variable;
 
             case "argument":
             case "variable_declarator":
@@ -192,12 +202,16 @@ internal sealed class CSharpLanguage : ICodeLanguage
                     : TokenType.Variable;
 
             case "parameter":
-                return node.NextNamedSibling == null ? TokenType.Variable : TokenType.Type;
+                return node.PrevNamedSibling == null || node.PrevNamedSibling.Value.Type == "parameter_modifier"
+                    ? TokenType.Type
+                    : TokenType.Variable;
 
             case "invocation_expression":
             case "method_declaration":
                 return TokenType.Function;
 
+            case "member_binding_expression":
+                return GetIdentifierTypeFromMemberBinding(node);
             case "qualified_name":
                 return GetIdentifierTypeFromQualifiedName(node);
             case "member_access_expression":
@@ -206,6 +220,19 @@ internal sealed class CSharpLanguage : ICodeLanguage
             default:
                 return TokenType.Unknown;
         }
+    }
+
+    private static TokenType GetIdentifierTypeFromMemberBinding(in TSNode node)
+    {
+        var parent = node.Parent!.Value.Parent;
+        if (parent?.Type == "conditional_access_expression")
+        {
+            var parentParent = parent.Value.Parent;
+            if (parentParent?.Type == "invocation_expression")
+                return TokenType.Function;
+        }
+
+        return TokenType.Unknown;
     }
 
     private static TokenType GetIdentifierTypeFromQualifiedName(in TSNode node)
