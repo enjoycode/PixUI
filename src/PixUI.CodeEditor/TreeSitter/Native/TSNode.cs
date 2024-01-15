@@ -1,4 +1,5 @@
 #if !__WEB__
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,34 +9,32 @@ using static CodeEditor.TreeSitterApi;
 
 namespace CodeEditor;
 
-public sealed class TSSyntaxNode : IEquatable<TSSyntaxNode>
+[StructLayout(LayoutKind.Sequential)]
+public unsafe struct TSNode : IEquatable<TSNode>
 {
-    internal TsNode NativeTsNode;
+    public uint context1;
+    public uint context2;
+    public uint context3;
+    public uint context4;
+    public IntPtr id;
+    public IntPtr tree;
 
-    internal static TSSyntaxNode? Create(TsNode node)
-    {
-        return node.id == IntPtr.Zero ? null : new TSSyntaxNode(node);
-    }
+    internal static TSNode? Create(TSNode node) => node.id == IntPtr.Zero ? null : node;
 
-    private TSSyntaxNode(TsNode node)
-    {
-        NativeTsNode = node;
-    }
+    /// <summary>
+    /// Get the <see cref="TSLanguage"/> that was used to parse this node's syntax tree.
+    /// </summary>
+    public TSLanguage Language => TSLanguage.Get(ts_tree_language(tree));
 
     /// <summary>
     /// Get this node's type as a numerical id.
     /// </summary>
-    public ushort TypeId => ts_node_symbol(NativeTsNode);
+    public ushort TypeId => ts_node_symbol(this);
 
     /// <summary>
     /// Get this node's type as a string
     /// </summary>
     public string Type => Language.GetType(TypeId); //Marshal.PtrToStringAnsi(ts_node_type(Handle));
-
-    /// <summary>
-    /// Get the <see cref="TSLanguage"/> that was used to parse this node's syntax tree.
-    /// </summary>
-    public TSLanguage Language => TSLanguage.Get(ts_tree_language(NativeTsNode.tree));
 
     /// <summary>
     /// Check if this node is named.
@@ -44,7 +43,7 @@ public sealed class TSSyntaxNode : IEquatable<TSSyntaxNode>
     /// Named nodes correspond to named rules in the grammar, whereas anonymous nodes
     /// correspond to string literals in the grammar
     /// </remarks>
-    public bool IsNamed() => ts_node_is_named(NativeTsNode);
+    public bool IsNamed() => ts_node_is_named(this);
 
     /// <summary>
     /// Check if this node is extra.
@@ -53,18 +52,18 @@ public sealed class TSSyntaxNode : IEquatable<TSSyntaxNode>
     /// Extra nodes represent things like comments, which are not required the grammar,
     /// but can appear anywhere.
     /// </remarks>
-    public bool IsExtra => ts_node_is_extra(NativeTsNode);
+    public bool IsExtra => ts_node_is_extra(this);
 
     /// <summary>
     /// Check if this node has been edited.
     /// </summary>
-    public bool HasChanges => ts_node_has_changes(NativeTsNode);
+    public bool HasChanges => ts_node_has_changes(this);
 
     /// <summary>
     /// Check if this node represents a syntax error or contains any syntax errors anywhere
     /// within it.
     /// </summary>
-    public bool HasError() => ts_node_has_error(NativeTsNode);
+    public bool HasError() => ts_node_has_error(this);
 
     /// <summary>
     /// Check if this node represents a syntax error.
@@ -82,17 +81,17 @@ public sealed class TSSyntaxNode : IEquatable<TSSyntaxNode>
     /// Missing nodes are inserted by the parser in order to recover from certain kinds of
     /// syntax errors.
     /// </remarks>
-    public bool IsMissing => ts_node_is_missing(NativeTsNode);
+    public bool IsMissing => ts_node_is_missing(this);
 
     /// <summary>
     /// Get the byte offsets where this node starts.
     /// </summary>
-    public int StartIndex => (int)ts_node_start_byte(NativeTsNode);
+    public int StartIndex => (int)ts_node_start_byte(this);
 
     /// <summary>
     /// Get the byte offsets where this node ends.
     /// </summary>
-    public int EndIndex => (int)ts_node_end_byte(NativeTsNode);
+    public int EndIndex => (int)ts_node_end_byte(this);
 
     /// <summary>
     /// Get the range of source code that this node represents, both in terms of raw bytes
@@ -107,12 +106,20 @@ public sealed class TSSyntaxNode : IEquatable<TSSyntaxNode>
     /// <summary>
     /// Get this node's start position in terms of rows and columns.
     /// </summary>
-    public TSPoint StartPosition => NativeTsNode.StartPosition;
+    public TSPoint StartPosition => new(context2, context3);
 
     /// <summary>
     /// Get this node's end position in terms of rows and columns.
     /// </summary>
-    public TSPoint EndPosition => NativeTsNode.EndPosition;
+    public TSPoint EndPosition
+    {
+        get
+        {
+            TSPoint endPoint;
+            ts_node_end_point_wasm(this, &endPoint);
+            return endPoint;
+        }
+    }
 
     /// <summary>
     /// Get the node's child at the given index, where zero represents the first
@@ -125,18 +132,17 @@ public sealed class TSSyntaxNode : IEquatable<TSSyntaxNode>
     /// if you might be iterating over a long list of children, you should use
     /// <see cref="Children"/> instead.
     /// </remarks>
-    public unsafe TSSyntaxNode Child(int index)
+    public TSNode Child(int index)
     {
-        TsNode child;
-        ts_node_child_wasm(NativeTsNode, (uint)index, &child);
-        return Create(child)!;
+        TSNode child;
+        ts_node_child_wasm(this, (uint)index, &child);
+        return Create(child)!.Value;
     }
 
     /// <summary>
     /// Get this node's number of children.
     /// </summary>
-    public int ChildCount => (int)ts_node_child_count(NativeTsNode);
-
+    public int ChildCount => (int)ts_node_child_count(this);
 
     /// <summary>
     /// Get the node's named child at the given index.
@@ -150,17 +156,17 @@ public sealed class TSSyntaxNode : IEquatable<TSSyntaxNode>
     /// if you might be iterating over a long list of children, you should use
     /// <see cref="NamedChildren"/> instead.
     /// </remarks>
-    public unsafe TSSyntaxNode NamedChild(int index)
+    public TSNode NamedChild(int index)
     {
-        TsNode child;
-        ts_node_named_child_wasm(NativeTsNode, (uint)index, &child);
-        return Create(child)!;
+        TSNode child;
+        ts_node_named_child_wasm(this, (uint)index, &child);
+        return Create(child)!.Value;
     }
 
     /// <summary>
     /// Get this node's number of children.
     /// </summary>
-    public int NamedChildCount => (int)ts_node_named_child_count(NativeTsNode);
+    public int NamedChildCount => (int)ts_node_named_child_count(this);
 
     /// <summary>
     /// Get the first child with the given field name.
@@ -171,13 +177,13 @@ public sealed class TSSyntaxNode : IEquatable<TSSyntaxNode>
     /// If multiple children may have the same field name, access them using
     /// <see cref="ChildrenByFieldName"/>
     /// </remarks>
-    public unsafe TSSyntaxNode ChildByFieldName(string fieldName)
+    public TSNode ChildByFieldName(string fieldName)
     {
         var ptr = Marshal.StringToHGlobalAnsi(fieldName);
-        TsNode child;
-        ts_node_child_by_field_name_wasm(NativeTsNode, ptr, (uint)fieldName.Length, &child);
+        TSNode child;
+        ts_node_child_by_field_name_wasm(this, ptr, (uint)fieldName.Length, &child);
         Marshal.FreeHGlobal(ptr);
-        return Create(child)!;
+        return Create(child)!.Value;
     }
 
     /// <summary>
@@ -186,17 +192,17 @@ public sealed class TSSyntaxNode : IEquatable<TSSyntaxNode>
     /// <seealso cref="ChildByFieldName"/>
     /// <param name="fieldId">Numerical field id</param>
     /// <returns>The child</returns>
-    public unsafe TSSyntaxNode ChildByFieldId(ushort fieldId)
+    public TSNode ChildByFieldId(ushort fieldId)
     {
-        TsNode child;
-        ts_node_child_by_field_id_wasm(NativeTsNode, fieldId, &child);
-        return Create(child)!;
+        TSNode child;
+        ts_node_child_by_field_id_wasm(this, fieldId, &child);
+        return Create(child)!.Value;
     }
 
     /// <summary>
     /// Iterate over this node's children.
     /// </summary>
-    public IEnumerable<TSSyntaxNode> Children
+    public IEnumerable<TSNode> Children
     {
         get
         {
@@ -214,9 +220,9 @@ public sealed class TSSyntaxNode : IEquatable<TSSyntaxNode>
     /// <summary>
     /// Iterate over this node's named children.
     /// </summary>
-    public IEnumerable<TSSyntaxNode> NamedChildren => Children.Where(x => x.IsNamed());
+    public IEnumerable<TSNode> NamedChildren => Children.Where(x => x.IsNamed());
 
-    public IEnumerable<KeyValuePair<string, TSSyntaxNode>> ChildrenWithFields
+    public IEnumerable<KeyValuePair<string, TSNode>> ChildrenWithFields
     {
         get
         {
@@ -225,121 +231,104 @@ public sealed class TSSyntaxNode : IEquatable<TSSyntaxNode>
             return Enumerable.Range(0, ChildCount).Select(_ =>
             {
                 var result = cursor.Current;
-                var key = cursor.FieldName;
+                var key = cursor.FieldName!;
                 cursor.GotoNextSibling();
-                return new KeyValuePair<string, TSSyntaxNode>(key, result);
+                return new KeyValuePair<string, TSNode>(key, result);
             }).Finally(cursor.Dispose);
         }
     }
 
-    public IEnumerable<KeyValuePair<string, TSSyntaxNode>> NamedChildrenWithFields =>
+    public IEnumerable<KeyValuePair<string, TSNode>> NamedChildrenWithFields =>
         ChildrenWithFields.Where(x => x.Value.IsNamed());
 
-    public IEnumerable<TSSyntaxNode> ChildrenByFieldName(string fieldName)
+    public IEnumerable<TSNode> ChildrenByFieldName(string fieldName)
     {
         var fieldId = Language.FieldIdForName(fieldName);
         return ChildrenByFieldId(fieldId ?? 0);
     }
 
-    public IEnumerable<TSSyntaxNode> ChildrenByFieldId(ushort fieldId)
+    public IEnumerable<TSNode> ChildrenByFieldId(ushort fieldId)
     {
-        using (var cursor = new TSTreeCursor(this))
+        using var cursor = new TSTreeCursor(this);
+        cursor.GotoFirstChild();
+
+        var done = false;
+        while (!done)
         {
-            cursor.GotoFirstChild();
-
-            var done = false;
-            while (!done)
-            {
-                while (cursor.FieldId != fieldId)
-                    if (!cursor.GotoNextSibling())
-                        yield break;
-
-                var result = cursor.Current;
-
+            while (cursor.FieldId != fieldId)
                 if (!cursor.GotoNextSibling())
-                    done = true;
+                    yield break;
 
-                yield return result;
-            }
+            var result = cursor.Current;
+
+            if (!cursor.GotoNextSibling())
+                done = true;
+
+            yield return result;
         }
     }
 
-    public TSSyntaxNode? Parent
+    public TSNode? Parent
     {
         get
         {
-            unsafe
-            {
-                TsNode parent;
-                ts_node_parent_wasm(NativeTsNode, &parent);
-                return Create(parent);
-            }
+            TSNode parent;
+            ts_node_parent_wasm(this, &parent);
+            return Create(parent);
         }
     }
 
-    public TSSyntaxNode? NextSibling
+    public TSNode? NextSibling
     {
         get
         {
-            unsafe
-            {
-                TsNode next;
-                ts_node_next_sibling_wasm(NativeTsNode, &next);
-                return Create(next);
-            }
+            TSNode next;
+            ts_node_next_sibling_wasm(this, &next);
+            return Create(next);
         }
     }
 
-    public TSSyntaxNode? PrevSibling
+    public TSNode? PrevSibling
     {
         get
         {
-            unsafe
-            {
-                TsNode prev;
-                ts_node_prev_sibling_wasm(NativeTsNode, &prev);
-                return Create(prev);
-            }
+            TSNode prev;
+            ts_node_prev_sibling_wasm(this, &prev);
+            return Create(prev);
         }
     }
 
-    public TSSyntaxNode? NextNamedSibling
+    public TSNode? NextNamedSibling
     {
         get
         {
-            unsafe
-            {
-                TsNode node;
-                ts_node_next_named_sibling_wasm(NativeTsNode, &node);
-                return Create(node);
-            }
+            TSNode node;
+            ts_node_next_named_sibling_wasm(this, &node);
+            return Create(node);
         }
     }
 
-    public TSSyntaxNode? PrevNamedSibling
+    public TSNode? PrevNamedSibling
     {
         get
         {
-            unsafe
-            {
-                TsNode prev;
-                ts_node_prev_named_sibling_wasm(NativeTsNode, &prev);
-                return Create(prev);
-            }
+            TSNode prev;
+            ts_node_prev_named_sibling_wasm(this, &prev);
+            return Create(prev);
         }
     }
 
-    internal unsafe TSSyntaxNode? DescendantForPosition(TSPoint start, TSPoint? end = null)
+    internal TSNode? DescendantForPosition(TSPoint start, TSPoint? end = null)
     {
-        TsNode child;
-        ts_node_descendant_for_point_range_wasm(NativeTsNode, start, end ?? start, &child);
+        TSNode child;
+        ts_node_descendant_for_point_range_wasm(this, start, end ?? start, &child);
         return Create(child);
     }
 
-    internal unsafe TSSyntaxNode? NamedDescendantForPosition(TSPoint start, TSPoint? end = null)
+    internal TSNode? NamedDescendantForPosition(TSPoint start, TSPoint? end = null)
     {
-        TsNode node;
-        ts_node_named_descendant_for_point_range_wasm(NativeTsNode, start, end ?? start, &node);
+        TSNode node;
+        ts_node_named_descendant_for_point_range_wasm(this, start, end ?? start, &node);
         return Create(node);
     }
 
@@ -354,7 +343,7 @@ public sealed class TSSyntaxNode : IEquatable<TSSyntaxNode>
         return sb.ToString();
     }
 
-    private static void DumpTree(TSSyntaxNode node, StringBuilder sb, int depth)
+    private static void DumpTree(TSNode node, StringBuilder sb, int depth)
     {
         sb.Append('\t', depth);
         if (node.IsNamed())
@@ -368,17 +357,9 @@ public sealed class TSSyntaxNode : IEquatable<TSSyntaxNode>
         }
     }
 
-    public TSTreeCursor Walk()
-    {
-        return new TSTreeCursor(this);
-    }
+    public bool Equals(TSNode other) => ts_node_eq(this, other);
 
-    public bool Equals(TSSyntaxNode other) => ts_node_eq(NativeTsNode, other.NativeTsNode);
-
-    public override int GetHashCode()
-    {
-        return NativeTsNode.id.ToInt32();
-    }
+    public override int GetHashCode() => id.ToInt32();
 }
 
 public static class EnumerableExtensions

@@ -5,23 +5,20 @@ using static CodeEditor.TreeSitterApi;
 
 namespace CodeEditor;
 
-public sealed class TSTreeCursor : IDisposable
+public sealed unsafe class TSTreeCursor : IDisposable
 {
     private TsTreeCursor _native;
 
-    internal TSTreeCursor(TSSyntaxNode initial)
+    internal TSTreeCursor(TSNode initial)
     {
-        unsafe
-        {
-            TsTreeCursor cursor;
-            ts_tree_cursor_new_wasm(initial.NativeTsNode, &cursor);
-            _native = cursor;
-        }
+        TsTreeCursor cursor;
+        ts_tree_cursor_new_wasm(initial, &cursor);
+        _native = cursor;
     }
 
-    public void Reset(TSSyntaxNode newNode)
+    public void Reset(TSNode newNode)
     {
-        ts_tree_cursor_reset(ref _native, newNode.NativeTsNode);
+        ts_tree_cursor_reset(ref _native, newNode);
     }
 
     public bool GotoFirstChild()
@@ -39,22 +36,19 @@ public sealed class TSTreeCursor : IDisposable
         return ts_tree_cursor_goto_parent(ref _native);
     }
 
-    public TSSyntaxNode Current
+    public TSNode Current
     {
         get
         {
-            unsafe
-            {
-                TsNode node;
-                ts_tree_cursor_current_node_wasm(ref _native, &node);
-                return TSSyntaxNode.Create(node)!;
-            }
-        }   
+            TSNode node;
+            ts_tree_cursor_current_node_wasm(ref _native, &node);
+            return TSNode.Create(node)!.Value;
+        }
     }
-        
+
     public ushort FieldId => ts_tree_cursor_current_field_id(ref _native);
 
-    public string FieldName
+    public string? FieldName
     {
         get
         {
@@ -63,9 +57,6 @@ public sealed class TSTreeCursor : IDisposable
         }
     }
 
-    public void Dispose()
-    {
-        ts_tree_cursor_delete(ref _native);
-    }
+    public void Dispose() => ts_tree_cursor_delete(ref _native);
 }
 #endif

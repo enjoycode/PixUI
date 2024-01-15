@@ -50,7 +50,7 @@ public sealed class TSQuery : IDisposable
 
     public uint StartByteForPattern(uint patternIndex) => ts_query_start_byte_for_pattern(_handle, patternIndex);
 
-    internal IEnumerable<QueryCapture> Captures(TSSyntaxNode node,
+    internal IEnumerable<QueryCapture> Captures(TSNode node,
         TSPoint? startPosition = null, TSPoint? endPosition = null)
     {
         if (_scratchQueryCursor == IntPtr.Zero)
@@ -60,7 +60,7 @@ public sealed class TSQuery : IDisposable
         var start = startPosition ?? new TSPoint();
         var end = endPosition ?? new TSPoint();
         ts_query_cursor_set_point_range(_scratchQueryCursor, start, end);
-        ts_query_cursor_exec(_scratchQueryCursor, _handle, node.NativeTsNode);
+        ts_query_cursor_exec(_scratchQueryCursor, _handle, node);
 
         var match = new TsQueryMatch();
         uint captureIndex = 0;

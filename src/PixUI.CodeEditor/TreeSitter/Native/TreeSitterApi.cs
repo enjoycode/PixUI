@@ -17,16 +17,6 @@ internal enum TsSymbolType
     Auxiliary
 }
 
-[StructLayout(LayoutKind.Sequential)]
-internal unsafe struct TSInput
-{
-    public IntPtr payload;
-
-    //public delegate* unmanaged<void*, uint, long, uint*, void*> read;
-    public IntPtr read;
-    public TsInputEncoding encoding;
-}
-
 internal enum TsLogType
 {
     Parse,
@@ -44,38 +34,6 @@ internal struct TsLogger
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct TsNode
-{
-    public uint context1;
-    public uint context2;
-    public uint context3;
-    public uint context4;
-    public IntPtr id;
-    public IntPtr tree;
-        
-    /// <summary>
-    /// Get this node's start position in terms of rows and columns.
-    /// </summary>
-    public TSPoint StartPosition => new(context2, context3);
-        
-    /// <summary>
-    /// Get this node's end position in terms of rows and columns.
-    /// </summary>
-    public TSPoint EndPosition
-    {
-        get
-        {
-            unsafe
-            {
-                TSPoint endPoint;
-                TreeSitterApi.ts_node_end_point_wasm(this, &endPoint);
-                return endPoint;
-            }
-        }
-    }
-}
-
-[StructLayout(LayoutKind.Sequential)]
 internal struct TsTreeCursor
 {
     public IntPtr tree;
@@ -87,7 +45,7 @@ internal struct TsTreeCursor
 [StructLayout(LayoutKind.Sequential)]
 internal struct QueryCapture
 {
-    public TsNode node;
+    public TSNode node;
     public uint index;
 }
 
@@ -221,7 +179,7 @@ internal static unsafe partial class TreeSitterApi
     // internal static partial TsNode ts_tree_root_node(IntPtr self);
 
     [LibraryImport(LibTreeSitter)]
-    internal static unsafe partial void ts_tree_root_node_wasm(IntPtr self, TsNode* node);
+    internal static unsafe partial void ts_tree_root_node_wasm(IntPtr self, TSNode* node);
 
     [LibraryImport(LibTreeSitter)]
     internal static partial IntPtr ts_tree_language(IntPtr self);
@@ -238,76 +196,76 @@ internal static unsafe partial class TreeSitterApi
     #region ====Node====
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial IntPtr ts_node_type(TsNode node);
+    internal static partial IntPtr ts_node_type(TSNode node);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial ushort ts_node_symbol(TsNode node);
+    internal static partial ushort ts_node_symbol(TSNode node);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial uint ts_node_start_byte(TsNode node);
+    internal static partial uint ts_node_start_byte(TSNode node);
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TSPoint ts_node_start_point(TsNode node);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial uint ts_node_end_byte(TsNode node);
+    internal static partial uint ts_node_end_byte(TSNode node);
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TSPoint ts_node_end_point(TsNode node);
 
     [LibraryImport(LibTreeSitter)]
-    internal static unsafe partial void ts_node_end_point_wasm(TsNode node, TSPoint* point);
+    internal static unsafe partial void ts_node_end_point_wasm(TSNode node, TSPoint* point);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial IntPtr ts_node_string(TsNode node);
-
-    [LibraryImport(LibTreeSitter)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    internal static partial bool ts_node_is_null(TsNode node);
+    internal static partial IntPtr ts_node_string(TSNode node);
 
     [LibraryImport(LibTreeSitter)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static partial bool ts_node_is_named(TsNode node);
+    internal static partial bool ts_node_is_null(TSNode node);
 
     [LibraryImport(LibTreeSitter)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static partial bool ts_node_is_missing(TsNode node);
+    internal static partial bool ts_node_is_named(TSNode node);
 
     [LibraryImport(LibTreeSitter)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static partial bool ts_node_is_extra(TsNode node);
+    internal static partial bool ts_node_is_missing(TSNode node);
 
     [LibraryImport(LibTreeSitter)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static partial bool ts_node_has_changes(TsNode node);
+    internal static partial bool ts_node_is_extra(TSNode node);
 
     [LibraryImport(LibTreeSitter)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static partial bool ts_node_has_error(TsNode node);
+    internal static partial bool ts_node_has_changes(TSNode node);
+
+    [LibraryImport(LibTreeSitter)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static partial bool ts_node_has_error(TSNode node);
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TsNode ts_node_parent(TsNode node);
 
     [LibraryImport(LibTreeSitter)]
-    internal static unsafe partial void ts_node_parent_wasm(TsNode node, TsNode* parent);
+    internal static unsafe partial void ts_node_parent_wasm(TSNode node, TSNode* parent);
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TsNode ts_node_child(TsNode node, uint index);
 
     [LibraryImport(LibTreeSitter)]
-    internal static unsafe partial void ts_node_child_wasm(TsNode node, uint index, TsNode* child);
+    internal static unsafe partial void ts_node_child_wasm(TSNode node, uint index, TSNode* child);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial uint ts_node_child_count(TsNode node);
+    internal static partial uint ts_node_child_count(TSNode node);
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TsNode ts_node_named_child(TsNode node, uint index);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial void ts_node_named_child_wasm(TsNode node, uint index, TsNode* child);
+    internal static partial void ts_node_named_child_wasm(TSNode node, uint index, TSNode* child);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial uint ts_node_named_child_count(TsNode node);
+    internal static partial uint ts_node_named_child_count(TSNode node);
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TsNode ts_node_child_by_field_name(
@@ -318,88 +276,88 @@ internal static unsafe partial class TreeSitterApi
 
     [LibraryImport(LibTreeSitter)]
     internal static partial void ts_node_child_by_field_name_wasm(
-        TsNode node,
+        TSNode node,
         IntPtr fieldName,
         uint fieldNameLength,
-        TsNode* child
+        TSNode* child
     );
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TsNode ts_node_child_by_field_id(TsNode node, ushort fieldId);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial void ts_node_child_by_field_id_wasm(TsNode node, ushort fieldId, TsNode* child);
+    internal static partial void ts_node_child_by_field_id_wasm(TSNode node, ushort fieldId, TSNode* child);
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TsNode ts_node_next_sibling(TsNode node);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial void ts_node_next_sibling_wasm(TsNode node, TsNode* next);
+    internal static partial void ts_node_next_sibling_wasm(TSNode node, TSNode* next);
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TsNode ts_node_prev_sibling(TsNode node);
     [LibraryImport(LibTreeSitter)]
-    internal static partial void ts_node_prev_sibling_wasm(TsNode node, TsNode* prev);
+    internal static partial void ts_node_prev_sibling_wasm(TSNode node, TSNode* prev);
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TsNode ts_node_next_named_sibling(TsNode node);
 
     [LibraryImport(LibTreeSitter)]
-    internal static unsafe partial void ts_node_next_named_sibling_wasm(TsNode node, TsNode* result);
+    internal static unsafe partial void ts_node_next_named_sibling_wasm(TSNode node, TSNode* result);
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TsNode ts_node_prev_named_sibling(TsNode node);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial void ts_node_prev_named_sibling_wasm(TsNode node, TsNode* prev);
+    internal static partial void ts_node_prev_named_sibling_wasm(TSNode node, TSNode* prev);
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TsNode ts_node_first_child_for_byte(TsNode node, uint byteOffset);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial void ts_node_first_child_for_byte_wasm(TsNode node, uint byteOffset, TsNode* child);
+    internal static partial void ts_node_first_child_for_byte_wasm(TSNode node, uint byteOffset, TSNode* child);
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TsNode ts_node_first_named_child_for_byte(TsNode node, uint offset);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial void ts_node_first_named_child_for_byte_wasm(TsNode node, uint offset, TsNode* child);
+    internal static partial void ts_node_first_named_child_for_byte_wasm(TSNode node, uint offset, TSNode* child);
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TsNode ts_node_descendant_for_byte_range(TsNode node, uint start, uint end);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial void ts_node_descendant_for_byte_range_wasm(TsNode node, uint start, uint end,
-        TsNode* child);
+    internal static partial void ts_node_descendant_for_byte_range_wasm(TSNode node, uint start, uint end,
+        TSNode* child);
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TsNode ts_node_descendant_for_point_range(TsNode node, TSPoint start, TSPoint end);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial void ts_node_descendant_for_point_range_wasm(TsNode node, TSPoint start, TSPoint end,
-        TsNode* child);
+    internal static partial void ts_node_descendant_for_point_range_wasm(TSNode node, TSPoint start, TSPoint end,
+        TSNode* child);
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TsNode ts_node_named_descendant_for_byte_range(TsNode node, uint start, uint end);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial void ts_node_named_descendant_for_byte_range_wasm(TsNode node, uint start, uint end,
-        TsNode* child);
+    internal static partial void ts_node_named_descendant_for_byte_range_wasm(TSNode node, uint start, uint end,
+        TSNode* child);
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TsNode ts_node_named_descendant_for_point_range(TsNode node, TSPoint start, TSPoint end);
 
     [LibraryImport(LibTreeSitter)]
     internal static unsafe partial void ts_node_named_descendant_for_point_range_wasm(
-        TsNode node, TSPoint start, TSPoint end, TsNode* result);
+        TSNode node, TSPoint start, TSPoint end, TSNode* result);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial void ts_node_edit(TsNode node, ref TSEdit edit);
+    internal static partial void ts_node_edit(TSNode node, ref TSEdit edit);
 
 
     [LibraryImport(LibTreeSitter)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static partial bool ts_node_eq(TsNode node, TsNode other);
+    internal static partial bool ts_node_eq(TSNode node, TSNode other);
 
     #endregion
 
@@ -409,7 +367,7 @@ internal static unsafe partial class TreeSitterApi
     // internal static partial TsTreeCursor ts_tree_cursor_new(TsNode node);
 
     [LibraryImport(LibTreeSitter)]
-    internal static unsafe partial void ts_tree_cursor_new_wasm(TsNode node, TsTreeCursor* cursor);
+    internal static unsafe partial void ts_tree_cursor_new_wasm(TSNode node, TsTreeCursor* cursor);
 
     [LibraryImport(LibTreeSitter)]
     internal static partial void ts_tree_cursor_delete(ref TsTreeCursor cursor);
@@ -417,14 +375,14 @@ internal static unsafe partial class TreeSitterApi
     [LibraryImport(LibTreeSitter)]
     internal static partial TsTreeCursor ts_tree_cursor_reset(
         ref TsTreeCursor self,
-        TsNode node
+        TSNode node
     );
 
     // [LibraryImport(LibTreeSitter)]
     // internal static partial TsNode ts_tree_cursor_current_node(ref TsTreeCursor self);
 
     [LibraryImport(LibTreeSitter)]
-    internal static unsafe partial void ts_tree_cursor_current_node_wasm(ref TsTreeCursor self, TsNode* node);
+    internal static unsafe partial void ts_tree_cursor_current_node_wasm(ref TsTreeCursor self, TSNode* node);
 
     [LibraryImport(LibTreeSitter)]
     internal static partial IntPtr ts_tree_cursor_current_field_name(ref TsTreeCursor self);
@@ -494,7 +452,7 @@ internal static unsafe partial class TreeSitterApi
         TSPoint start, TSPoint end);
 
     [LibraryImport(LibTreeSitter)]
-    internal static partial void ts_query_cursor_exec(IntPtr queryCursor, IntPtr query, TsNode node);
+    internal static partial void ts_query_cursor_exec(IntPtr queryCursor, IntPtr query, TSNode node);
 
     [LibraryImport(LibTreeSitter)]
     [return: MarshalAs(UnmanagedType.Bool)]

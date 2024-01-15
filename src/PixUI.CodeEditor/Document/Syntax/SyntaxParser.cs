@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
 using PixUI;
 
@@ -29,8 +28,8 @@ public sealed class SyntaxParser : IDisposable
     internal ICodeLanguage Language { get; }
 
     private TSTree? _oldTree;
-    private TSEdit _edit = new TSEdit();
-    internal TSSyntaxNode? RootNode => _oldTree?.Root;
+    private TSEdit _edit;
+    internal TSNode? RootNode => _oldTree?.Root;
 
     //重新Parse后受影响的行范围(需要重新绘制)
     private int _startLineOfChanged;
@@ -90,16 +89,16 @@ public sealed class SyntaxParser : IDisposable
     {
         var startLocation = _document.OffsetToPosition(offset);
         var endLocation = _document.OffsetToPosition(offset + length);
-        _edit.startIndex = (uint)offset * ParserEncoding;
-        _edit.oldEndIndex = _edit.startIndex + (uint)length * ParserEncoding;
-        _edit.newEndIndex = _edit.startIndex + (uint)((textLenght - length) * ParserEncoding);
+        _edit.startIndex = (uint)(offset * ParserEncoding);
+        _edit.oldEndIndex = _edit.startIndex + (uint)(length * ParserEncoding);
+        _edit.newEndIndex = _edit.startIndex + (uint)(textLenght * ParserEncoding);
         _edit.startPosition = TSPoint.FromLocation(startLocation);
         _edit.oldEndPosition = TSPoint.FromLocation(endLocation);
     }
 
     internal void EndReplace(int offset, int length, int textLength)
     {
-        var endLocation = _document.OffsetToPosition(offset + (textLength - length));
+        var endLocation = _document.OffsetToPosition(offset + textLength);
         _edit.newEndPosition = TSPoint.FromLocation(endLocation);
 
 #if __WEB__
@@ -171,7 +170,7 @@ public sealed class SyntaxParser : IDisposable
                 newTree.Handle, ref rangeCount);
 
             _oldTree!.Dispose();
-            
+
             //rangeCount可能等于0, 每个range的startLine可能等于endLine
 
             _startLineOfChanged = (int)_edit.startPosition.row; //设为当前行
@@ -225,13 +224,13 @@ public sealed class SyntaxParser : IDisposable
         var lineStartPoint = new TSPoint(line, 0);
         var lineEndPoint = new TSPoint(line, lineLength * ParserEncoding);
         var lineNode = _oldTree!.Root.NamedDescendantForPosition(lineStartPoint, lineEndPoint);
-        // Console.WriteLine(lineNode);
+        if (lineNode == null) return;
 
         lineSegment.BeginTokenize();
 
-        if (ContainsFullLine(lineNode!, lineSegment))
+        if (ContainsFullLine(lineNode.Value, lineSegment))
         {
-            VisitNode(lineNode!, lineSegment);
+            VisitNode(lineNode.Value, lineSegment);
         }
         else
         {
@@ -244,7 +243,7 @@ public sealed class SyntaxParser : IDisposable
         //CodeToken.DumpLineTokens(lineSegment, _document);
     }
 
-    private void VisitChildren(TSSyntaxNode node, int count, LineSegment lineSegment)
+    private void VisitChildren(in TSNode node, int count, LineSegment lineSegment)
     {
         var cursor = new TSTreeCursor(node);
         cursor.GotoFirstChild();
@@ -265,7 +264,7 @@ public sealed class SyntaxParser : IDisposable
         cursor.Dispose();
     }
 
-    private void VisitNode(TSSyntaxNode node, LineSegment lineSegment)
+    private void VisitNode(in TSNode node, LineSegment lineSegment)
     {
         var childrenCount = node.ChildCount;
         if (childrenCount > 0 && !Language.IsLeafNode(node))
@@ -288,7 +287,7 @@ public sealed class SyntaxParser : IDisposable
         lineSegment.AddToken(tokenType, startOffset, length);
     }
 
-    private static bool ContainsFullLine(TSSyntaxNode node, LineSegment lineSegment)
+    private static bool ContainsFullLine(in TSNode node, LineSegment lineSegment)
     {
         var nodeStartOffset = node.StartIndex / ParserEncoding;
         var nodeEndOffset = node.EndIndex / ParserEncoding;
@@ -297,13 +296,13 @@ public sealed class SyntaxParser : IDisposable
                (lineSegment.Offset + lineSegment.Length) <= nodeEndOffset;
     }
 
-    private static bool BeforeLine(TSSyntaxNode node, LineSegment lineSegment)
+    private static bool BeforeLine(in TSNode node, LineSegment lineSegment)
     {
         var nodeEndOffset = node.EndIndex / ParserEncoding;
         return nodeEndOffset < lineSegment.Offset;
     }
 
-    private static bool AfterLine(TSSyntaxNode node, LineSegment lineSegment)
+    private static bool AfterLine(in TSNode node, LineSegment lineSegment)
     {
         var nodeStartOffset = node.StartIndex / ParserEncoding;
         return nodeStartOffset > (lineSegment.Offset + lineSegment.Length);

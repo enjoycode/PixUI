@@ -20,15 +20,15 @@ public sealed class TSTree : IDisposable
         return new TSTree(ts_tree_copy(Handle));
     }
 
-    public TSSyntaxNode Root
+    public TSNode Root
     {
         get
         {
             unsafe
             {
-                TsNode node;
+                TSNode node;
                 ts_tree_root_node_wasm(Handle, &node);
-                return TSSyntaxNode.Create(node)!;
+                return TSNode.Create(node)!.Value;
             }
         }
     }

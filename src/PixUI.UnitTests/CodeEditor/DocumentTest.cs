@@ -1,39 +1,38 @@
 using NUnit.Framework;
 using CodeEditor;
 
-namespace PixUI.UnitTests.CodeEditor
+namespace PixUI.UnitTests.CodeEditor;
+
+public class DocumentTest
 {
-    public class DocumentTest
-    {
-        private const string SrcCode = @"
-public class Person
+    private const string SrcCode = @"
+class Person
 {
-    void Test()
+    Person()
     {
-        System.Console.WriteLine('a');
+        IsMan = null;
     }
 }
 ";
         
-        [Test]
-        public void Test1()
-        {
-            var doc = new Document("Test.cs");
-            doc.TextContent = SrcCode;
-            doc.SyntaxParser.DumpTree();
+    [Test]
+    public void Test1()
+    {
+        var doc = new Document("Test.cs");
+        doc.TextContent = SrcCode;
+        doc.SyntaxParser.DumpTree();
             
-            doc.Insert(20, "\n{}/*");
-            doc.SyntaxParser.DumpTree();
-        }
+        doc.Insert(20, "\n{}/*");
+        doc.SyntaxParser.DumpTree();
+    }
 
-        [Test]
-        public void TokenizeTest()
-        {
-            var doc = new Document("Test.cs");
-            doc.TextContent = SrcCode;
-            // doc.SyntaxParser.Tokenize(2, 3);
-            var line = doc.GetLineSegment(5);
-            line.DumpTokens(doc);
-        }
+    [Test]
+    public void TokenizeTest()
+    {
+        var doc = new Document("Test.cs");
+        doc.TextContent = SrcCode;
+        // doc.SyntaxParser.Tokenize(2, 3);
+        var line = doc.GetLineSegment(5);
+        line.DumpTokens(doc);
     }
 }

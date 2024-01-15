@@ -61,11 +61,11 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>
     #region ====Event Handles====
 
     private Point _mouseDownPos;
-    private bool _gotMouseDown = false; //primary button is down
+    private bool _gotMouseDown; //primary button is down
     private bool _doDragDrop = false;
     private TextLocation _minSelection = TextLocation.Empty;
     private TextLocation _maxSelection = TextLocation.Empty;
-    private bool _caretChangedByTextInput = false; //是否由文本输入导致的光标位置变更
+    private bool _caretChangedByTextInput; //是否由文本输入导致的光标位置变更
 
     internal void OnPointerDown(PointerEvent e)
     {

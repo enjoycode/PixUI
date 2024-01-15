@@ -137,14 +137,17 @@ internal sealed class CSharpLanguage : ICodeLanguage
         { "Error", TokenType.Error }
     };
 
-    public bool IsLeafNode(TSSyntaxNode node)
+    public bool IsLeafNode(in TSNode node)
     {
         var typeId = node.TypeId;
         var type = TSCSharpLanguage.Instance.GetType(typeId);
-        return type == "modifier" || type == "string_literal" || type == "character_literal";
+        return type == "modifier" ||
+               type == "string_literal" ||
+               type == "character_literal" ||
+               type == "boolean_literal";
     }
 
-    public TokenType GetTokenType(TSSyntaxNode node)
+    public TokenType GetTokenType(in TSNode node)
     {
         var typeId = node.TypeId;
         var type = TSCSharpLanguage.Instance.GetType(typeId);
@@ -153,9 +156,9 @@ internal sealed class CSharpLanguage : ICodeLanguage
             : TokenMap.GetValueOrDefault(type, TokenType.Unknown);
     }
 
-    private static TokenType GetIdentifierTokenType(TSSyntaxNode node)
+    private static TokenType GetIdentifierTokenType(in TSNode node)
     {
-        var parentType = node.Parent!.Type;
+        var parentType = node.Parent!.Value.Type;
         if (parentType == "Error")
             return TokenType.Unknown;
 
@@ -176,12 +179,17 @@ internal sealed class CSharpLanguage : ICodeLanguage
             case "array_type":
             case "base_list":
             case "variable_declaration":
+            case "nullable_type":
                 return TokenType.Type;
 
             case "argument":
             case "variable_declarator":
-            case "property_declaration":
                 return TokenType.Variable;
+
+            case "property_declaration":
+                return node.PrevNamedSibling == null || node.PrevNamedSibling.Value.Type == "modifier"
+                    ? TokenType.Type
+                    : TokenType.Variable;
 
             case "parameter":
                 return node.NextNamedSibling == null ? TokenType.Variable : TokenType.Type;
@@ -200,12 +208,21 @@ internal sealed class CSharpLanguage : ICodeLanguage
         }
     }
 
-    private static TokenType GetIdentifierTypeFromQualifiedName(TSSyntaxNode node)
+    private static TokenType GetIdentifierTypeFromQualifiedName(in TSNode node)
     {
-        if (node.Parent!.Parent?.Type == "qualified_name")
-            return TokenType.Module;
-        if (node.Parent!.Parent?.Type == "assignment_expression")
-            return TokenType.Variable; //TODO:是否静态类型的成员
+        var parent = node.Parent;
+        if (parent.HasValue)
+        {
+            var parentParent = parent.Value.Parent;
+            if (parentParent.HasValue)
+            {
+                var parentParentType = parentParent.Value.Type;
+                if (parentParentType == "qualified_name")
+                    return TokenType.Module;
+                if (parentParentType == "assignment_expression")
+                    return TokenType.Variable; //TODO:是否静态类型的成员
+            }
+        }
 
         return node.NextNamedSibling == null ? TokenType.Type : TokenType.Module;
     }
@@ -214,7 +231,7 @@ internal sealed class CSharpLanguage : ICodeLanguage
     /// Get identifier token type from MemberAccess
     /// </summary>
     /// <param name="node">MemberAccessNode, eg: "some.identifier"</param>
-    private static TokenType GetIdentifierTypeFromMemberAccess(TSSyntaxNode node)
+    private static TokenType GetIdentifierTypeFromMemberAccess(in TSNode node)
     {
         if (node.Parent?.Parent?.Type == "invocation_expression" && node.NextNamedSibling == null)
             return TokenType.Function;
@@ -255,7 +272,7 @@ initializer: [
         if (rootNode == null) return null;
 
         _foldQuery ??= TSCSharpLanguage.Instance.Query(FoldQuery)!;
-        var captures = _foldQuery.Captures(rootNode);
+        var captures = _foldQuery.Captures(rootNode.Value);
 #if __WEB__
             var lastNodeId = 0;
 #else
@@ -268,9 +285,9 @@ initializer: [
             lastNodeId = capture.node.id;
 
 #if __WEB__
-                var node = capture.node;
+            var node = capture.node;
 #else
-            var node = TSSyntaxNode.Create(capture.node)!;
+            var node = TSNode.Create(capture.node)!.Value;
 #endif
 
             //暂跳过同一行的

@@ -116,6 +116,7 @@ public sealed class Document : IDisposable
 
     public void StartUndoGroup() => UndoStack.StartUndoGroup();
     public void EndUndoGroup() => UndoStack.EndUndoGroup();
+
     #endregion
 
     #region ====Position Methods====
@@ -206,8 +207,5 @@ public sealed class Document : IDisposable
 
     #endregion
 
-    public void Dispose()
-    {
-        SyntaxParser.Dispose();
-    }
+    public void Dispose() => SyntaxParser.Dispose();
 }

@@ -2,7 +2,7 @@ namespace CodeEditor;
 
 public interface ITokensProvider
 {
-    bool IsLeafNode(TSSyntaxNode node);
+    bool IsLeafNode(in TSNode node);
 
-    TokenType GetTokenType(TSSyntaxNode node);
+    TokenType GetTokenType(in TSNode node);
 }
