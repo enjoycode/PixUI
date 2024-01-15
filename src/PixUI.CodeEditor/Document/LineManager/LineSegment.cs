@@ -243,7 +243,6 @@ public sealed class LineSegment : ISegment
 
     public int GetLeadingWhiteSpaces()
     {
-        //TODO: 连续两次回车后，当前行的_lineTokes==null(尚未Tokenize)，需要获取行文本前的空格
         if (_lineTokens == null || _lineTokens.Count == 0) return 0;
         var firstTokenType = _lineTokens[0].Type;
         if (firstTokenType != TokenType.WhiteSpace) return 0;

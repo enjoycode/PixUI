@@ -183,6 +183,9 @@ internal sealed class CSharpLanguage : ICodeLanguage
             case "property_declaration":
                 return TokenType.Variable;
 
+            case "parameter":
+                return node.NextNamedSibling == null ? TokenType.Variable : TokenType.Type;
+
             case "invocation_expression":
             case "method_declaration":
                 return TokenType.Function;
