@@ -4,6 +4,8 @@ internal sealed class BackspaceCommand : IEditCommand
 {
     public void Execute(TextEditor editor)
     {
+        if (editor.Document.Readonly) return;
+
         if (editor.SelectionManager.HasSomethingSelected)
         {
             editor.DeleteSelection();
@@ -22,21 +24,43 @@ internal sealed class BackspaceCommand : IEditCommand
             var preLineEndOffset = preLine.Offset + preLine.Length;
             editor.Document.Remove(preLineEndOffset, curLineOffset - preLineEndOffset);
             editor.Caret.Position = new TextLocation(preLine.Length, curLineNr - 1);
+            return;
         }
-        else
-        {
-            //TODO:unicode like emoji
-            //先处理AutoClosingPairs
-            var ch = editor.Document.GetCharAt(caretOffset - 1);
-            var closingPair = editor.Document.SyntaxParser.Language.GetAutoColsingPairs(ch);
-            var len = closingPair != null &&
-                      closingPair.Value == editor.Document.GetCharAt(caretOffset)
-                ? 2
-                : 1;
 
-            editor.Document.Remove(caretOffset - 1, len);
-            editor.Caret.Position = editor.Document.OffsetToPosition(caretOffset - 1);
+        //TODO:unicode like emoji
+
+        //判断之前是否Tab缩进
+        if (caretOffset - curLineOffset >= 4)
+        {
+            var preTab = true;
+            var tabIndent = editor.Document.TextEditorOptions.TabIndent;
+            for (var i = 0; i < tabIndent; i++)
+            {
+                if (editor.Document.GetCharAt(caretOffset - 1 - i) != ' ')
+                {
+                    preTab = false;
+                    break;
+                }
+            }
+
+            if (preTab)
+            {
+                editor.Document.Remove(caretOffset - tabIndent, tabIndent);
+                editor.Caret.Position = editor.Document.OffsetToPosition(caretOffset - tabIndent);
+                return;
+            }
         }
+
+        //处理AutoClosingPairs
+        var ch = editor.Document.GetCharAt(caretOffset - 1);
+        var closingPair = editor.Document.SyntaxParser.Language.GetAutoColsingPairs(ch);
+        var len = closingPair != null &&
+                  closingPair.Value == editor.Document.GetCharAt(caretOffset)
+            ? 2
+            : 1;
+
+        editor.Document.Remove(caretOffset - 1, len);
+        editor.Caret.Position = editor.Document.OffsetToPosition(caretOffset - 1);
     }
 }
 
@@ -45,7 +69,7 @@ internal sealed class TabCommand : IEditCommand
     public void Execute(TextEditor editor)
     {
         //TODO: 暂简单实现
-        // if (editor.Document.ReadOnly) return;
+        if (editor.Document.Readonly) return;
 
         var tabIndent = editor.Document.TextEditorOptions.TabIndent;
         var convertToWhitespaces = new string(' ', tabIndent);
@@ -57,19 +81,29 @@ internal sealed class ReturnCommand : IEditCommand
 {
     public void Execute(TextEditor editor)
     {
-        // if (editor.Document.ReadOnly) return;
+        if (editor.Document.Readonly) return;
 
         editor.Document.UndoStack.StartUndoGroup();
         var curLine = editor.Caret.Line;
         var curLineSegment = editor.Document.GetLineSegment(curLine);
         var leadingWhiteSpaces = curLineSegment.GetLeadingWhiteSpaces();
-        if (leadingWhiteSpaces == 0)
-            editor.InsertOrReplaceString("\n");
-        else
-            editor.InsertOrReplaceString("\n" + new string(' ', leadingWhiteSpaces));
+        var caretOffset = editor.Caret.Offset;
+        var language = editor.Document.SyntaxParser.Language;
+        var isBlockBracket = caretOffset > 0 &&
+                             language.IsBlockStartBracket(editor.Document.GetCharAt(caretOffset - 1)) &&
+                             language.IsBlockEndBracket(editor.Document.GetCharAt(caretOffset));
+        var tabIndent = editor.Document.TextEditorOptions.TabIndent;
 
-        // editor.Document.FormattingStrategy.FormatLine(
-        //     editor, curLine, editor.Caret.Offset, '\n');
+        var insertText = "\n";
+        if (isBlockBracket)
+            insertText += new string(' ', leadingWhiteSpaces + tabIndent) + "\n";
+        if (leadingWhiteSpaces > 0)
+            insertText += new string(' ', leadingWhiteSpaces);
+
+        editor.InsertOrReplaceString(insertText);
+        if (isBlockBracket)
+            editor.Caret.Position = new TextLocation(leadingWhiteSpaces + tabIndent, curLine + 1);
+        // editor.Document.FormattingStrategy.FormatLine(editor, curLine, editor.Caret.Offset, '\n');
         editor.Document.UndoStack.EndUndoGroup();
     }
 }

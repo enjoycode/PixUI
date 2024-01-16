@@ -14,6 +14,10 @@ internal sealed class CSharpLanguage : ICodeLanguage
         _ => null
     };
 
+    public bool IsBlockStartBracket(char ch) => ch == '{';
+
+    public bool IsBlockEndBracket(char ch) => ch == '}';
+
     #region ====ITokensProvider====
 
     private static readonly Dictionary<string, TokenType> TokenMap = new()
@@ -205,6 +209,9 @@ internal sealed class CSharpLanguage : ICodeLanguage
                 return node.PrevNamedSibling == null || node.PrevNamedSibling.Value.Type == "parameter_modifier"
                     ? TokenType.Type
                     : TokenType.Variable;
+
+            case "catch_declaration":
+                return node.PrevNamedSibling == null ? TokenType.Type : TokenType.Variable;
 
             case "invocation_expression":
             case "method_declaration":

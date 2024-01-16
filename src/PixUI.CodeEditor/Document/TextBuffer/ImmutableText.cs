@@ -1,6 +1,4 @@
 using System;
-using System.Globalization;
-using System.IO;
 using PixUI;
 
 namespace CodeEditor;
@@ -212,7 +210,7 @@ public sealed class ImmutableText
     //     }
     // }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (this == obj)
             return true;
