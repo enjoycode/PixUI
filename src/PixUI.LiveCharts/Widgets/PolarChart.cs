@@ -11,6 +11,7 @@ using LiveChartsCore.Kernel;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.Measure;
 using LiveChartsCore.VisualElements;
+using PixUI;
 
 namespace LiveCharts;
 
@@ -19,7 +20,7 @@ public sealed class PolarChart : ChartView, IPolarChartView<SkiaDrawingContext>
     /// <summary>
     /// Initializes a new instance of the <see cref="PolarChart"/> class.
     /// </summary>
-    public PolarChart() : this(null, null) { }
+    public PolarChart() : this(null) { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PolarChart"/> class.
@@ -47,9 +48,13 @@ public sealed class PolarChart : ChartView, IPolarChartView<SkiaDrawingContext>
         };
         Series = new ObservableCollection<ISeries>();
         VisualElements = new ObservableCollection<ChartElement<SkiaDrawingContext>>();
+
+        //TODO: MouseWheel
+        MouseRegion.PointerDown += e => core?.InvokePointerDown(new(e.X, e.Y), e.Buttons == PointerButtons.Right);
+        MouseRegion.PointerUp += e => core?.InvokePointerUp(new(e.X, e.Y), e.Buttons == PointerButtons.Right);
     }
 
-    private bool _fitToBounds = false;
+    private bool _fitToBounds;
     private double _totalAngle = 360;
     private double _innerRadius;
     private double _initialRotation = LiveChartsCore.LiveCharts.DefaultSettings.PolarInitialRotation;

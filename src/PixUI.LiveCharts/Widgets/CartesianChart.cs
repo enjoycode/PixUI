@@ -46,9 +46,8 @@ public sealed class CartesianChart : ChartView, ICartesianChartView<SkiaDrawingC
         };
         Series = new ObservableCollection<ISeries>();
         VisualElements = new ObservableCollection<ChartElement<SkiaDrawingContext>>();
-
-        // var c = Controls[0].Controls[0];
-        // c.MouseWheel += OnMouseWheel;
+        
+        //TODO:  c.MouseWheel += OnMouseWheel;
         MouseRegion.PointerDown += e => core?.InvokePointerDown(new(e.X, e.Y), e.Buttons == PointerButtons.Right);
         MouseRegion.PointerUp += e => core?.InvokePointerUp(new(e.X, e.Y), e.Buttons == PointerButtons.Right);
     }

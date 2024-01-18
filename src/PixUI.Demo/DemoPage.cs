@@ -122,6 +122,7 @@ namespace PixUI.Demo
         private void OnButtonTap(PointerEvent e)
         {
             _firstName.Value = "Eric " + DateTime.Now.Second;
+            // _firstName.Value = _firstName.Value == "无锡" ? "江阴" : "无锡";
 
             Notification.Error("Click Done!");
         }
