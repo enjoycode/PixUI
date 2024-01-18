@@ -1,33 +1,32 @@
 using System;
 
-namespace PixUI.Demo
+namespace PixUI.Demo;
+
+public sealed class DemoDialog : Dialog
 {
-    public sealed class DemoDialog : Dialog
+    public DemoDialog()
     {
-        public DemoDialog()
-        {
-            Width = 400;
-            Height = 300;
-            Title.Value = "Demo Dialog";
-        }
+        Width = 400;
+        Height = 300;
+        Title.Value = "Demo Dialog";
+    }
 
-        private readonly State<string> _user = "";
-        private readonly State<string> _password = "";
+    private readonly State<string> _user = "";
+    private readonly State<string> _password = "";
 
-        protected override Widget BuildBody()
+    protected override Widget BuildBody()
+    {
+        return new Container()
         {
-            return new Container()
+            Padding = EdgeInsets.All(20),
+            Child = new Column(HorizontalAlignment.Center, 20)
             {
-                Padding = EdgeInsets.All(20),
-                Child = new Column(HorizontalAlignment.Center, 20)
+                Children =
                 {
-                    Children =
-                    {
-                        new TextInput(_user) { HintText = "User" },
-                        new TextInput(_password) { HintText = "Password", IsObscure = true }
-                    }
+                    new TextInput(_user) { HintText = "User" },
+                    new TextInput(_password) { HintText = "Password", IsObscure = true }
                 }
-            };
-        }
+            }
+        };
     }
 }

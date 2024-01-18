@@ -1,10 +1,9 @@
 using System;
 
-namespace PixUI
+namespace PixUI;
+
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Event)]
+public sealed class TSRawScriptAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Event)]
-    public sealed class TSRawScriptAttribute : Attribute
-    {
-        public TSRawScriptAttribute(string script) { }
-    }
+    public TSRawScriptAttribute(string script) { }
 }

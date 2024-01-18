@@ -1,74 +1,73 @@
 using System;
 using AppKit;
 
-namespace PixUI.Platform.Mac
-{
-    internal sealed class MacCursor : Cursor
-    {
-        internal readonly NSCursor NSCursor;
+namespace PixUI.Platform.Mac;
 
-        public MacCursor(NSCursor nsCursor)
+internal sealed class MacCursor : Cursor
+{
+    internal readonly NSCursor NSCursor;
+
+    public MacCursor(NSCursor nsCursor)
+    {
+        NSCursor = nsCursor;
+    }
+}
+
+internal sealed class MacCursors : IPlatformCursors
+{
+    private Cursor? _arrow;
+    private Cursor? _hand;
+    private Cursor? _ibeam;
+    private Cursor? _resizeLR;
+    private Cursor? _resizeUD;
+
+    public Cursor Arrow
+    {
+        get
         {
-            NSCursor = nsCursor;
+            _arrow ??= new MacCursor(NSCursor.ArrowCursor);
+            return _arrow;
         }
     }
 
-    internal sealed class MacCursors : IPlatformCursors
+    public Cursor Hand
     {
-        private Cursor? _arrow;
-        private Cursor? _hand;
-        private Cursor? _ibeam;
-        private Cursor? _resizeLR;
-        private Cursor? _resizeUD;
-
-        public Cursor Arrow
+        get
         {
-            get
-            {
-                _arrow ??= new MacCursor(NSCursor.ArrowCursor);
-                return _arrow;
-            }
+            _hand ??= new MacCursor(NSCursor.PointingHandCursor);
+            return _hand;
         }
+    }
 
-        public Cursor Hand
+    public Cursor IBeam
+    {
+        get
         {
-            get
-            {
-                _hand ??= new MacCursor(NSCursor.PointingHandCursor);
-                return _hand;
-            }
+            _ibeam ??= new MacCursor(NSCursor.IBeamCursor);
+            return _ibeam;
         }
+    }
 
-        public Cursor IBeam
+    public Cursor ResizeLR
+    {
+        get
         {
-            get
-            {
-                _ibeam ??= new MacCursor(NSCursor.IBeamCursor);
-                return _ibeam;
-            }
+            _resizeLR ??= new MacCursor(NSCursor.ResizeLeftRightCursor);
+            return _resizeLR;
         }
+    }
 
-        public Cursor ResizeLR
+    public Cursor ResizeUD
+    {
+        get
         {
-            get
-            {
-                _resizeLR ??= new MacCursor(NSCursor.ResizeLeftRightCursor);
-                return _resizeLR;
-            }
+            _resizeUD ??= new MacCursor(NSCursor.ResizeUpDownCursor);
+            return _resizeUD;
         }
+    }
 
-        public Cursor ResizeUD
-        {
-            get
-            {
-                _resizeUD ??= new MacCursor(NSCursor.ResizeUpDownCursor);
-                return _resizeUD;
-            }
-        }
-
-        public void SetCursor(Cursor cursor)
-        {
-            ((MacCursor)cursor).NSCursor.Set();
-        }
+    public void SetCursor(Cursor cursor)
+    {
+        ((MacCursor)cursor).NSCursor.Set();
     }
 }

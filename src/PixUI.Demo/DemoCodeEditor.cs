@@ -3,14 +3,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using CodeEditor;
 
-namespace PixUI.Demo.Mac
-{
-    public sealed class DemoCodeEditor : View
-    {
-        private readonly CodeEditorController _controller;
-        private readonly State<string> _scrollTo = "0";
+namespace PixUI.Demo.Mac;
 
-        private const string SrcCode = @"
+public sealed class DemoCodeEditor : View
+{
+    private readonly CodeEditorController _controller;
+    private readonly State<string> _scrollTo = "0";
+
+    private const string SrcCode = @"
 public sealed class Person
 {
     public string Name { get; set; }
@@ -22,73 +22,72 @@ public sealed class Person
 } //中国 */
 ";
 
-        public DemoCodeEditor()
-        {
-            _controller = new CodeEditorController("Demo.cs", SrcCode, new MockCompletionProvider());
+    public DemoCodeEditor()
+    {
+        _controller = new CodeEditorController("Demo.cs", SrcCode, new MockCompletionProvider());
 
-            Child = new Column
+        Child = new Column
+        {
+            Children =
             {
-                Children =
+                new Row(VerticalAlignment.Middle, 20)
                 {
-                    new Row(VerticalAlignment.Middle, 20)
+                    Children =
                     {
-                        Children =
+                        new TextInput(_scrollTo) { Width = 100 },
+                        new Button("ScrollTo")
                         {
-                            new TextInput(_scrollTo) { Width = 100 },
-                            new Button("ScrollTo")
-                            {
-                                OnTap = _ => _controller.ScrollTo(int.Parse(_scrollTo.Value))
-                            }
-                        }
-                    },
-                    new Expanded
-                    {
-                        Child = new Container
-                        {
-                            Padding = EdgeInsets.All(20),
-                            Child = new CodeEditorWidget(_controller),
+                            OnTap = _ => _controller.ScrollTo(int.Parse(_scrollTo.Value))
                         }
                     }
+                },
+                new Expanded
+                {
+                    Child = new Container
+                    {
+                        Padding = EdgeInsets.All(20),
+                        Child = new CodeEditorWidget(_controller),
+                    }
                 }
-            };
-        }
+            }
+        };
+    }
+}
+
+internal sealed class MockCompletionProvider : ICompletionProvider
+{
+    public IEnumerable<char> TriggerCharacters => new[] { '.' };
+
+    public Task<IList<ICompletionItem>?> ProvideCompletionItems(Document document,
+        int offset, string? completionWord)
+    {
+        var list = new List<ICompletionItem>
+        {
+            new CompletionItem(CompletionItemKind.Class, "Person"),
+            new CompletionItem(CompletionItemKind.Method, "SayHello"),
+            new CompletionItem(CompletionItemKind.Method, "SayHi"),
+            new CompletionItem(CompletionItemKind.Keyword, "where"),
+            new CompletionItem(CompletionItemKind.Interface, "IEquatable")
+        };
+        if (completionWord != null)
+            list = list.Where(t => t.Label.StartsWith(completionWord!)).ToList();
+        return Task.FromResult<IList<ICompletionItem>?>(list);
     }
 
-    internal sealed class MockCompletionProvider : ICompletionProvider
+    private sealed class CompletionItem : ICompletionItem
     {
-        public IEnumerable<char> TriggerCharacters => new[] { '.' };
+        public CompletionItemKind Kind { get; }
+        public string Label { get; }
+        public string? InsertText { get; }
+        public string? Detail { get; }
 
-        public Task<IList<ICompletionItem>?> ProvideCompletionItems(Document document,
-            int offset, string? completionWord)
+        public CompletionItem(CompletionItemKind kind, string label, string? insertText = null,
+            string? detail = null)
         {
-            var list = new List<ICompletionItem>
-            {
-                new CompletionItem(CompletionItemKind.Class, "Person"),
-                new CompletionItem(CompletionItemKind.Method, "SayHello"),
-                new CompletionItem(CompletionItemKind.Method, "SayHi"),
-                new CompletionItem(CompletionItemKind.Keyword, "where"),
-                new CompletionItem(CompletionItemKind.Interface, "IEquatable")
-            };
-            if (completionWord != null)
-                list = list.Where(t => t.Label.StartsWith(completionWord!)).ToList();
-            return Task.FromResult<IList<ICompletionItem>?>(list);
-        }
-
-        private sealed class CompletionItem : ICompletionItem
-        {
-            public CompletionItemKind Kind { get; }
-            public string Label { get; }
-            public string? InsertText { get; }
-            public string? Detail { get; }
-
-            public CompletionItem(CompletionItemKind kind, string label, string? insertText = null,
-                string? detail = null)
-            {
-                Kind = kind;
-                Label = label;
-                InsertText = insertText;
-                Detail = detail;
-            }
+            Kind = kind;
+            Label = label;
+            InsertText = insertText;
+            Detail = detail;
         }
     }
 }

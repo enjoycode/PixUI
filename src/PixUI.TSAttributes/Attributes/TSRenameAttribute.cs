@@ -1,12 +1,11 @@
 using System;
 
-namespace PixUI
+namespace PixUI;
+
+[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method |
+                AttributeTargets.Delegate | AttributeTargets.Class | AttributeTargets.Struct |
+                AttributeTargets.Interface)]
+public sealed class TSRenameAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method |
-                    AttributeTargets.Delegate | AttributeTargets.Class | AttributeTargets.Struct |
-                    AttributeTargets.Interface)]
-    public sealed class TSRenameAttribute : Attribute
-    {
-        public TSRenameAttribute(string newName) { }
-    }
+    public TSRenameAttribute(string newName) { }
 }
