@@ -12,10 +12,11 @@
 <!--        <BlazorWebAssemblyJiterpreter>false</BlazorWebAssemblyJiterpreter>-->
 <!--        <WasmEnableThreads>false</WasmEnableThreads>-->
 <!--        <WasmEnableExceptionHandling>false</WasmEnableExceptionHandling>-->
+        <WasmEnableSIMD>true</WasmEnableSIMD>
         <WasmAllowUndefinedSymbols>true</WasmAllowUndefinedSymbols>
 <!--        <WasmBuildNative>true</WasmBuildNative>-->
         <EmccInitialHeapSize>128MB</EmccInitialHeapSize>
-        <EmccExtraCFlags>-s USE_WEBGL2=1 -s MAX_WEBGL_VERSION=2 -sSUPPORT_LONGJMP=wasm</EmccExtraCFlags>
+        <EmccExtraCFlags>-s USE_WEBGL2=1 -s MAX_WEBGL_VERSION=2</EmccExtraCFlags>
         <!--        <EmccExtraCFlags>-s MAIN_MODULE=2 -sAUTOLOAD_DYLIBS=0</EmccExtraCFlags>-->
         <EmccExtraLDFlags>-lGL</EmccExtraLDFlags>
     </PropertyGroup>
