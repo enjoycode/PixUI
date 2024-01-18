@@ -1,11 +1,10 @@
-using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.JSInterop;
 using PixUI.Demo;
 
 namespace PixUI.Platform.Blazor;
 
-public class Program
+public static class Program
 {
     public static async Task Main(string[] args)
     {

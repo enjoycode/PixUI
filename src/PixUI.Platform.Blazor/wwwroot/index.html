@@ -237,7 +237,6 @@
 
     function PostInvalidateEvent() {
         requestAnimationFrame(() => {
-            //console.log(GL);
             DotNet.invokeMethod(_asmName, "OnInvalidate")
         });
     }

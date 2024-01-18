@@ -233,10 +233,10 @@ bin/gn args --list out/wasm 列出参数
 
 1. clone dotnet icu
 ```bash
-git clone -b dotnet/release/7.0 https://github.com/dotnet/icu.git
+git clone -b dotnet/release/8.0 https://github.com/dotnet/icu.git
 ```
 
-2. 修改icu-filters/icudt_browser.json
+2. 修改icu-filters/icudt_wasm.json
 TODO:其他如CJK等同样修改，暂只改默认的
 ```json
 {
@@ -381,8 +381,8 @@ mkdir artifacts
 cd artifacts
 git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
-./emsdk install 3.1.12
-./emsdk activate 3.1.12
+./emsdk install 3.1.34
+./emsdk activate 3.1.34
 source emsdk_env.sh
 export EMSDK_PATH=/Users/rick/Projects/dotnet_icu/icu/artifacts/emsdk(实际目录)
 ```
@@ -418,8 +418,9 @@ static bool check_name(const SkString& name) {
 } 
 ```
 
+// skia_enable_fontmgr_custom_empty=true skia_enable_fontmgr_custom_embedded=false
 ```bash
-bin/gn gen out/wasm --args='target_os="linux" target_cpu="wasm" is_official_build=true is_component_build=false skia_enable_tools=false skia_enable_gpu=true skia_use_webgl=true skia_use_webgpu=false skia_gl_standard="webgl" skia_enable_ganesh=true skia_use_angle=false skia_use_vulkan=false skia_use_metal=false skia_use_dng_sdk=false skia_use_lua=false skia_enable_pdf=false skia_pdf_subset_harfbuzz=false skia_use_xps=false skia_use_zlib=true skia_use_icu=true skia_use_harfbuzz=true skia_use_piex=false skia_use_sfntly=false skia_use_system_icu=false skia_use_system_harfbuzz=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=true skia_enable_fontmgr_custom_directory=false skia_enable_fontmgr_custom_empty=false skia_enable_fontmgr_custom_embedded=true skia_enable_fontmgr_empty=false extra_cflags=[ "-I/opt/homebrew/opt/zlib/include", "-DSKIA_C_DLL", "-DSK_SUPPORT_GPU=1", "-DSK_GL", "-DCK_ENABLE_WEBGL", "-DSK_GANESH", "-DSK_DISABLE_LEGACY_SHADERCONTEXT", "-DXML_POOR_ENTROPY", "-DSKNX_NO_SIMD", "-DSK_FORCE_8_BYTE_ALIGNMENT", "-DEMSCRIPTEN_HAS_UNBOUND_TYPE_NAMES=0", "-DSK_DISABLE_AAA", "-DGR_GL_CHECK_ALLOC_WITH_GET_ERROR=0", "-DFT_CONFIG_OPTION_SYSTEM_ZLIB" ] extra_ldflags=[ "-std=c++17", "--bind", "-fno-rtti", "--no-entry", "-sMODULARIZE", "-sNO_EXIT_RUNTIME=1", "-sWASM", "-sSTRICT=1", "-sUSE_WEBGL2=1", "-sMAX_WEBGL_VERSION=2", "-sALLOW_MEMORY_GROWTH", "-sDISABLE_EXCEPTION_CATCHING" ] cc="/usr/local/share/dotnet/packs/Microsoft.NET.Runtime.Emscripten.3.1.12.Sdk.osx-x64/7.0.5/tools/emscripten/emcc" cxx="/usr/local/share/dotnet/packs/Microsoft.NET.Runtime.Emscripten.3.1.12.Sdk.osx-x64/7.0.5/tools/emscripten/em++" ar="/usr/local/share/dotnet/packs/Microsoft.NET.Runtime.Emscripten.3.1.12.Sdk.osx-x64/7.0.5/tools/emscripten/emar"'
+bin/gn gen out/wasm --args='target_os="linux" target_cpu="wasm" is_official_build=true is_component_build=false skia_enable_tools=false skia_enable_gpu=true skia_use_webgl=true skia_use_webgpu=false skia_gl_standard="webgl" skia_enable_ganesh=true skia_use_angle=false skia_use_vulkan=false skia_use_metal=false skia_use_dng_sdk=false skia_use_lua=false skia_enable_pdf=false skia_pdf_subset_harfbuzz=false skia_use_xps=false skia_use_zlib=true skia_use_icu=true skia_use_harfbuzz=true skia_use_piex=false skia_use_sfntly=false skia_use_system_icu=false skia_use_system_harfbuzz=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=true skia_enable_fontmgr_custom_directory=false skia_enable_fontmgr_custom_empty=true skia_enable_fontmgr_custom_embedded=false skia_enable_fontmgr_empty=false extra_cflags=[ "-sSUPPORT_LONGJMP=wasm", "-fwasm-exceptions", "-I/opt/homebrew/opt/zlib/include", "-DSKIA_C_DLL", "-DSK_SUPPORT_GPU=1", "-DSK_GL", "-DCK_ENABLE_WEBGL", "-DSK_GANESH", "-DSK_DISABLE_LEGACY_SHADERCONTEXT", "-DXML_POOR_ENTROPY", "-DSKNX_NO_SIMD", "-DSK_FORCE_8_BYTE_ALIGNMENT", "-DEMSCRIPTEN_HAS_UNBOUND_TYPE_NAMES=0", "-DSK_DISABLE_AAA", "-DGR_GL_CHECK_ALLOC_WITH_GET_ERROR=0", "-DFT_CONFIG_OPTION_SYSTEM_ZLIB" ] extra_cflags_cc=[ "-fwasm-exceptions" ] extra_ldflags=[ "-fno-rtti", "-fwasm-exceptions", "-sSUPPORT_LONGJMP=wasm", "-sDISABLE_EXCEPTION_CATCHING", "-std=c++17", "--bind", "--no-entry", "-sMODULARIZE", "-sNO_EXIT_RUNTIME=1", "-sWASM", "-sSTRICT=1", "-sUSE_WEBGL2=1", "-sMAX_WEBGL_VERSION=2", "-sALLOW_MEMORY_GROWTH" ] cc="/usr/local/share/dotnet/packs/Microsoft.NET.Runtime.Emscripten.3.1.34.Sdk.osx-arm64/8.0.1/tools/emscripten/emcc" cxx="/usr/local/share/dotnet/packs/Microsoft.NET.Runtime.Emscripten.3.1.34.Sdk.osx-arm64/8.0.1/tools/emscripten/em++" ar="/usr/local/share/dotnet/packs/Microsoft.NET.Runtime.Emscripten.3.1.34.Sdk.osx-arm64/8.0.1/tools/emscripten/emar"'
 
 ninja -C out/wasm skia
 ```

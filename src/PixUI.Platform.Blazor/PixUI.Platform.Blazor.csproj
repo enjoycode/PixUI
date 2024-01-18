@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -9,19 +9,24 @@
         <WasmIncludeFullIcuData>true</WasmIncludeFullIcuData>
         <WasmIcuDataFileName>icudt.dat</WasmIcuDataFileName>
         <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
-        <!-- Used for dylink and webgl -->
+<!--        <BlazorWebAssemblyJiterpreter>false</BlazorWebAssemblyJiterpreter>-->
+<!--        <WasmEnableThreads>false</WasmEnableThreads>-->
+<!--        <WasmEnableExceptionHandling>false</WasmEnableExceptionHandling>-->
+        <WasmAllowUndefinedSymbols>true</WasmAllowUndefinedSymbols>
 <!--        <WasmBuildNative>true</WasmBuildNative>-->
-        <EmccExtraCFlags>-s USE_WEBGL2=1 -s MAX_WEBGL_VERSION=2</EmccExtraCFlags>
+        <EmccInitialHeapSize>128MB</EmccInitialHeapSize>
+        <EmccExtraCFlags>-s USE_WEBGL2=1 -s MAX_WEBGL_VERSION=2 -sSUPPORT_LONGJMP=wasm</EmccExtraCFlags>
         <!--        <EmccExtraCFlags>-s MAIN_MODULE=2 -sAUTOLOAD_DYLIBS=0</EmccExtraCFlags>-->
-        <EmccExtraLDFlags>-lGL -sEXPORTED_RUNTIME_METHODS=['GL','print','ccall','cwrap','setValue','getValue','UTF8ToString','UTF8ArrayToString']</EmccExtraLDFlags>
+        <EmccExtraLDFlags>-lGL</EmccExtraLDFlags>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.5" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.5" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.1" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>
+        <EmccExportedRuntimeMethod Include="GL" />
         <NativeFileReference Include="libs\skia.a" />
         <NativeFileReference Include="libs\tree-sitter.o" />
         <NativeFileReference Include="libs\tree-sitter-csharp.a" />

@@ -82,7 +82,7 @@ public sealed class BlazorWindow : UIWindow
         _onScreenSurface?.Dispose();
 
         CreateSurface(width, height, ratio);
-        RootWidget.Invalidate(InvalidAction.Relayout);
+        RootWidget.Relayout();
     }
 
     public override void StartTextInput() =>

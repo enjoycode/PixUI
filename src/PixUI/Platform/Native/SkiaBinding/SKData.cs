@@ -13,13 +13,6 @@ namespace PixUI
         // improvement in Copy performance.
         internal const int CopyBufferSize = 81920;
 
-        //private static readonly SKData empty;
-
-        static SKData()
-        {
-            //empty = new SKDataStatic(SkiaApi.sk_data_new_empty());
-        }
-
         internal static void EnsureStaticInstanceAreInitialized()
         {
             // IMPORTANT: do not remove to ensure that the static instances
@@ -146,8 +139,8 @@ namespace PixUI
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
 
-            using (var managed = new SKManagedStream(stream))
-                return Create(managed, length);
+            using var managed = new SKManagedStream(stream);
+            return Create(managed, length);
         }
 
         // public static SKData Create (SKStream stream)
