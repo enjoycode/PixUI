@@ -138,8 +138,20 @@ public abstract class TextBase : Widget
             BuildParagraph(Text.Value, width);
         }
 
+        //非EditableText超出范围(overflow)裁截绘制区域
+        var paragraphWidth = _cachedParagraph!.MaxIntrinsicWidth;
+        var paragraphHegith = _cachedParagraph.Height;
+        var overflow = this is not EditableText && (paragraphWidth > W || paragraphHegith > H);
+        if (overflow)
+        {
+            canvas.Save();
+            canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
+        }
+
         canvas.DrawParagraph(_cachedParagraph!, 0, 0);
-        //Console.WriteLine($"Paint Text Widget: {_value} at {Left},{Top},{Width},{Height}");
+
+        if (overflow)
+            canvas.Restore();
     }
 
     public override void Dispose()
