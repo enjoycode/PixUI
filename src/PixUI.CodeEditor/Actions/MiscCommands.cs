@@ -30,10 +30,10 @@ internal sealed class BackspaceCommand : IEditCommand
         //TODO:unicode like emoji
 
         //判断之前是否Tab缩进
-        if (caretOffset - curLineOffset >= 4)
+        var tabIndent = editor.Document.TextEditorOptions.TabIndent;
+        if (caretOffset - curLineOffset >= tabIndent)
         {
             var preTab = true;
-            var tabIndent = editor.Document.TextEditorOptions.TabIndent;
             for (var i = 0; i < tabIndent; i++)
             {
                 if (editor.Document.GetCharAt(caretOffset - 1 - i) != ' ')
@@ -54,8 +54,7 @@ internal sealed class BackspaceCommand : IEditCommand
         //处理AutoClosingPairs
         var ch = editor.Document.GetCharAt(caretOffset - 1);
         var closingPair = editor.Document.SyntaxParser.Language.GetAutoColsingPairs(ch);
-        var len = closingPair != null &&
-                  closingPair.Value == editor.Document.GetCharAt(caretOffset)
+        var len = closingPair != null && closingPair.Value == editor.Document.GetCharAt(caretOffset)
             ? 2
             : 1;
 
