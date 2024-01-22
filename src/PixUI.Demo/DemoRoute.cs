@@ -23,6 +23,7 @@ public sealed class DemoRoute : View
             new("codeEditor", s => new DemoCodeEditor(), false, BuildDefaultTransition),
             new("stack", s => new DemoStack()),
             new("designer", s => new DemoDesigner()),
+            new("splitter", s => new DemoSplitter()),
         };
         _navigator = new Navigator(routes);
 
@@ -75,6 +76,7 @@ public sealed class DemoRoute : View
                 }),
                 MenuItem.Item("Stack", null, () => _navigator.Push("stack")),
                 MenuItem.Item("Designer", null, () => _navigator.Push("designer")),
+                MenuItem.Item("Splitter", null, () => _navigator.Push("splitter")),
             }),
             // MenuItem.Item("Form", null, () => _navigator.Push("form")),
             MenuItem.Item("Charts", null, () => _navigator.Push("charts")),

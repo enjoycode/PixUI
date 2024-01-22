@@ -106,8 +106,7 @@ public abstract class TextBase : Widget
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
         if (string.IsNullOrEmpty(Text.Value) || Text.Value.Length == 0)
         {
@@ -115,15 +114,15 @@ public abstract class TextBase : Widget
             return;
         }
 
-        BuildParagraph(Text.Value, width);
+        BuildParagraph(Text.Value, maxSize.Width);
 
         //TODO:wait skia fix bug
         //https://groups.google.com/g/skia-discuss/c/WXUVWrcgiko?pli=1
         //https://bugs.chromium.org/p/skia/issues/list?q=Area=%22TextLayout%22
 
         //W = Math.Min(width, _cachedParagraph.LongestLine);
-        SetSize(Math.Min(width, _cachedParagraph!.MaxIntrinsicWidth),
-            Math.Min(height, _cachedParagraph.Height));
+        SetSize(Math.Min(maxSize.Width, _cachedParagraph!.MaxIntrinsicWidth),
+            Math.Min(maxSize.Height, _cachedParagraph.Height));
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
