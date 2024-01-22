@@ -189,18 +189,11 @@ public sealed class Splitter : Widget
             else if (Fixed == FixedPanel.Panel2)
                 distance = W - distance - SplitterSize;
 
-            if (oldW != 0)
+            if (oldW != 0 && Fixed == FixedPanel.None)
             {
-                if (Fixed == FixedPanel.None)
-                {
-                    distance += (W - oldW) / 2;
-                    if (!float.IsNaN(_barDistance))
-                        _barDistance += (W - oldW) / 2;
-                }
-                else if (Fixed == FixedPanel.Panel2)
-                {
-                    distance += W - oldW;
-                }
+                distance += (W - oldW) / 2;
+                if (!float.IsNaN(_barDistance))
+                    _barDistance += (W - oldW) / 2;
             }
 
             if (Panel1!.CachedAvailableWidth != distance || Panel1.CachedAvailableHeight != H)
@@ -222,18 +215,11 @@ public sealed class Splitter : Widget
             else if (Fixed == FixedPanel.Panel2)
                 distance = H - distance - SplitterSize;
 
-            if (oldH != 0)
+            if (oldH != 0 && Fixed == FixedPanel.None)
             {
-                if (Fixed == FixedPanel.None)
-                {
-                    distance += (H - oldH) / 2;
-                    if (!float.IsNaN(_barDistance))
-                        _barDistance += (H - oldH) / 2;
-                }
-                else if (Fixed == FixedPanel.Panel2)
-                {
-                    distance += H - oldH;
-                }
+                distance += (H - oldH) / 2;
+                if (!float.IsNaN(_barDistance))
+                    _barDistance += (H - oldH) / 2;
             }
 
             if (Panel1!.CachedAvailableWidth != W || Panel1.CachedAvailableHeight != distance)
