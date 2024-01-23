@@ -159,6 +159,7 @@ public sealed class TreeNode<T> : Widget
     private void OnTapExpander(PointerEvent e)
     {
         //TODO:先判断是否LazyLoad，是则异步加载后再处理
+        //TODO:展开或收缩更新滚动信息
 
         if (IsExpanded)
         {

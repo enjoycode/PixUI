@@ -40,13 +40,14 @@ public sealed class TreeView<T> : Widget, IScrollable
     public float ScrollOffsetX => _controller.ScrollController.OffsetX;
     public float ScrollOffsetY => _controller.ScrollController.OffsetY;
 
+    private float MaxScrollOffsetX => Math.Max(0, _controller.TotalWidth - W);
+    private float MaxScrollOffsetY => Math.Max(0, _controller.TotalHeight - H);
+
     public Offset OnScroll(float dx, float dy)
     {
         if (_controller.Nodes.Count == 0) return Offset.Empty;
 
-        var maxOffsetX = Math.Max(0, _controller.TotalWidth - W);
-        var maxOffsetY = Math.Max(0, _controller.TotalHeight - H);
-        var offset = _controller.ScrollController.OnScroll(dx, dy, maxOffsetX, maxOffsetY);
+        var offset = _controller.ScrollController.OnScroll(dx, dy, MaxScrollOffsetX, MaxScrollOffsetY);
         if (!offset.IsEmpty)
             Repaint();
 
@@ -85,6 +86,7 @@ public sealed class TreeView<T> : Widget, IScrollable
 
         _controller.TotalWidth = totalWidth;
         _controller.TotalHeight = totalHeight;
+        _controller.ScrollController.Adjust(MaxScrollOffsetX, MaxScrollOffsetY);
     }
 
     protected internal override void OnChildSizeChanged(Widget child, float dx, float dy,
@@ -154,14 +156,14 @@ public sealed class TreeView<T> : Widget, IScrollable
         var dirtyRect = area?.GetRect() ?? Rect.FromLTWH(0, 0, W, H);
         foreach (var node in _controller.Nodes)
         {
-            var vx = node.X - ScrollOffsetX;
+            //var vx = node.X - ScrollOffsetX;
             var vy = node.Y - ScrollOffsetY;
             if (vy >= dirtyRect.Bottom) break;
             var vb = vy + node.H;
             if (vb <= dirtyRect.Top) continue;
 
             canvas.Translate(node.X, node.Y);
-            node.Paint(canvas, null /*area?.ToChild(vx, vy)*/);
+            node.Paint(canvas /*area?.ToChild(vx, vy)*/);
             canvas.Translate(-node.X, -node.Y);
         }
     }

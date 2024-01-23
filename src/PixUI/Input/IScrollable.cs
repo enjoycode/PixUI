@@ -8,7 +8,7 @@ public interface IScrollable
     float ScrollOffsetX { get; }
 
     float ScrollOffsetY { get; }
-        
+
     /// <summary>
     /// 处理滚动事件的偏移量
     /// </summary>
@@ -47,16 +47,24 @@ public sealed class ScrollController
         var oldY = OffsetY;
 
         //暂滚动不允许超出范围
-        if (Direction == ScrollDirection.Both || Direction == ScrollDirection.Horizontal)
-        {
+        if (Direction is ScrollDirection.Both or ScrollDirection.Horizontal)
             OffsetX = Math.Clamp(OffsetX + dx, 0, maxOffsetX);
-        }
 
-        if (Direction == ScrollDirection.Both || Direction == ScrollDirection.Vertical)
-        {
+        if (Direction is ScrollDirection.Both or ScrollDirection.Vertical)
             OffsetY = Math.Clamp(OffsetY + dy, 0, maxOffsetY);
-        }
 
         return new Offset(OffsetX - oldX, OffsetY - oldY);
+    }
+
+    /// <summary>
+    /// 在IScrollable组件改变Size后确保滚动值在范围内
+    /// </summary>
+    public void Adjust(float maxOffsetX, float maxOffsetY)
+    {
+        if (Direction is ScrollDirection.Both or ScrollDirection.Horizontal)
+            OffsetX = Math.Clamp(OffsetX, 0, maxOffsetX);
+
+        if (Direction is ScrollDirection.Both or ScrollDirection.Vertical)
+            OffsetY = Math.Clamp(OffsetY, 0, maxOffsetY);
     }
 }

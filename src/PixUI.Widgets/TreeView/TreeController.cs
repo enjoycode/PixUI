@@ -15,7 +15,7 @@ public sealed class TreeController<T>
     internal readonly List<TreeNode<T>> Nodes = new();
     internal readonly ScrollController ScrollController = new(ScrollDirection.Both);
 
-    internal Color HoverColor = 0xFFAAAAAA; //TODO: use Theme.HoverColor
+    internal Color HoverColor = Theme.AccentColor; //0xFFAAAAAA;
     internal float NodeIndent = 20;
     internal float NodeHeight;
     internal float TotalWidth = 0;

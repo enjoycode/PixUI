@@ -66,8 +66,9 @@ internal sealed class TreeNodeRow<T> : Widget, IMouseRegion
     private void _OnHoverChanged(bool hover)
     {
         _isHover = hover;
-        Invalidate(InvalidAction.Repaint,
-            new RepaintArea(Rect.FromLTWH(0, 0, Controller.TreeView!.W, Controller.NodeHeight)));
+        var hoverRect = Rect.FromLTWH(Controller.TreeView!.ScrollOffsetX, 0,
+            Controller.TreeView!.W, Controller.NodeHeight);
+        Repaint(new RepaintArea(hoverRect));
     }
 
     private void _OnTap(PointerEvent e) => Controller.SelectNode(TreeNode);
@@ -153,9 +154,9 @@ internal sealed class TreeNodeRow<T> : Widget, IMouseRegion
         if (_isHover)
         {
             var paint = PixUI.Paint.Shared(Controller.HoverColor);
-            canvas.DrawRect(
-                Rect.FromLTWH(0, 0, Controller.TreeView!.W, Controller.NodeHeight),
-                paint);
+            var hoverRect = Rect.FromLTWH(Controller.TreeView!.ScrollOffsetX, 0,
+                Controller.TreeView!.W, Controller.NodeHeight);
+            canvas.DrawRect(hoverRect, paint);
         }
 
         PaintChild(_expander, canvas);
