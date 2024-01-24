@@ -9,7 +9,7 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
     public DataGridBody(DataGridController<T> controller)
     {
         _controller = controller;
-        ScrollBars = new ScrollBarDecorator<DataGridBody<T>>(this,
+        ScrollBars = new ScrollBarDecorator<DataGridBody<T>>(this, controller.DataGrid,
             () => new(MaxScrollOffsetX, MaxScrollOffsetY));
     }
 
@@ -68,18 +68,16 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
     protected override void OnUnmounted()
     {
         base.OnUnmounted();
-        ScrollBars.Hide();
+        ScrollBars.Hide(true);
     }
 
     protected internal override bool HitTest(float x, float y, HitTestResult result)
     {
-        Log.Debug($"Start HitTest: {x},{y}");
         if (y < 0 || y > H) return false;
 
         result.Add(this);
 
         var hitRow = _controller.HitTestInRows(x, y);
-        Log.Debug($"Hit Row: {hitRow?.RowIndex ?? -1}");
         //继续判断是否命中HostedCellWidget
         if (hitRow != null && !hitRow.Value.IsColumnResizer && hitRow.Value.RowIndex >= 0 &&
             hitRow.Value.Column is DataGridHostColumn<T> hostColumn)

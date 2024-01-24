@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace PixUI;
 
@@ -71,7 +69,7 @@ public sealed class DataGrid<T> : Widget, IMouseRegion
         if (hover)
             Body.ScrollBars.Show();
         else
-            Body.ScrollBars.Hide();
+            Body.ScrollBars.Hide(false);
     }
 
     #region ====Overrides====

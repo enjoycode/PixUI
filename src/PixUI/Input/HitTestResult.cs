@@ -67,7 +67,8 @@ public sealed class HitTestResult
     {
         if (dx != 0 || dy != 0)
             _transform.Translate(-dx, -dy);
-        _transform.PreConcat(transform);
+        if (!transform.IsIdentity)
+            _transform.PreConcat(transform);
         if (ReferenceEquals(LastHitWidget, LastWidgetWithMouseRegion))
         {
             _path[_path.Count - 1] = new HitTestEntry(LastEntry!.Value.Widget, _transform);

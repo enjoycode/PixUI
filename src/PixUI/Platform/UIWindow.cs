@@ -50,12 +50,15 @@ public abstract class UIWindow
     protected internal float LastMouseY { get; private set; } = -1;
 
     // Pointer.Move时检测命中的结果
-    private HitTestResult _oldHitResult = new HitTestResult();
+    private HitTestResult _oldHitResult = new();
 
-    private HitTestResult _newHitResult = new HitTestResult();
+    private HitTestResult _newHitResult = new();
 
     // Pointer.Down时捕获的结果
     private HitTestEntry? _hitResultOnPointDown;
+
+    // 临时方案用于解决退出A进入B之前无法知道新的命中的节点是否B
+    public Widget? LastHitWidget { get; private set; }
 
     #endregion
 
@@ -151,13 +154,9 @@ public abstract class UIWindow
         if (e.Buttons == PointerButtons.None) //无按键开始HitTest
         {
             if (_oldHitResult.StillInLastRegion(e.X, e.Y))
-            {
                 OldHitTest(e.X, e.Y); //仍在旧的命中范围内
-            }
             else
-            {
                 NewHitTest(e.X, e.Y); //重新开始检测
-            }
 
             //开始比较新旧命中结果，激发相应的HoverChanged事件
             CompareAndSwapHitTestResult();
@@ -296,6 +295,7 @@ public abstract class UIWindow
 
     private void CompareAndSwapHitTestResult()
     {
+        LastHitWidget = _newHitResult.LastHitWidget;
         _oldHitResult.ExitOldRegion(_newHitResult);
         _newHitResult.EnterNewRegion(_oldHitResult);
 
