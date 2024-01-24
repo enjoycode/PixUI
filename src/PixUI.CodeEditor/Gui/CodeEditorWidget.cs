@@ -32,6 +32,7 @@ public sealed class CodeEditorWidget : Widget, IMouseRegion, IFocusable, IScroll
     public float ScrollOffsetX => Controller.TextEditor.VirtualTop.X;
     public float ScrollOffsetY => Controller.TextEditor.VirtualTop.Y;
     public ScrollDirection ScrollDirection => ScrollDirection.Both;
+    public ScrollBarVisibility ShowScrollBar => ScrollBarVisibility.Never;
     public Offset OnScroll(float dx, float dy) => Controller.OnScroll(dx, dy);
 
     #endregion

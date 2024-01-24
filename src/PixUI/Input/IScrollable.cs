@@ -7,6 +7,8 @@ public interface IScrollable
 {
     ScrollDirection ScrollDirection { get; }
 
+    ScrollBarVisibility ShowScrollBar { get; }
+
     float ScrollOffsetX { get; }
 
     float ScrollOffsetY { get; }
@@ -23,6 +25,22 @@ public enum ScrollDirection
     Horizontal = 1,
     Vertical = 2,
     Both = Horizontal | Vertical,
+}
+
+public enum ScrollBarVisibility
+{
+    /// <summary>
+    /// 不显示
+    /// </summary>
+    Never,
+    /// <summary>
+    /// Hover时显示
+    /// </summary>
+    Hover,
+    /// <summary>
+    /// 始终显示
+    /// </summary>
+    Always,
 }
 
 public sealed class ScrollController

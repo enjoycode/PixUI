@@ -40,6 +40,7 @@ public sealed class TreeView<T> : Widget, IScrollable
     public float ScrollOffsetX => _controller.ScrollController.OffsetX;
     public float ScrollOffsetY => _controller.ScrollController.OffsetY;
     public ScrollDirection ScrollDirection => _controller.ScrollController.Direction;
+    public ScrollBarVisibility ShowScrollBar => ScrollBarVisibility.Never;
 
     private float MaxScrollOffsetX => Math.Max(0, _controller.TotalWidth - W);
     private float MaxScrollOffsetY => Math.Max(0, _controller.TotalHeight - H);

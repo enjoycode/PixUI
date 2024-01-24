@@ -22,6 +22,7 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
     public float ScrollOffsetX => _controller.ScrollController.OffsetX;
     public float ScrollOffsetY => _controller.ScrollController.OffsetY;
     public ScrollDirection ScrollDirection => _controller.ScrollController.Direction;
+    public ScrollBarVisibility ShowScrollBar => ScrollBarVisibility.Hover;
     private float MaxScrollOffsetX => Math.Max(0, _controller.TotalColumnsWidth - W);
     private float MaxScrollOffsetY => Math.Max(0, _controller.TotalRowsHeight - H);
 

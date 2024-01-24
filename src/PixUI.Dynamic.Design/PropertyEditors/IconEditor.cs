@@ -103,6 +103,7 @@ internal sealed class IconList : Widget, IScrollable
     public float ScrollOffsetX => _scrollController.OffsetX;
     public float ScrollOffsetY => _scrollController.OffsetY;
     public ScrollDirection ScrollDirection => _scrollController.Direction;
+    public ScrollBarVisibility ShowScrollBar => ScrollBarVisibility.Never;
 
     public Offset OnScroll(float dx, float dy)
     {

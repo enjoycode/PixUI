@@ -55,6 +55,7 @@ public sealed class ScrollBarDecorator<T> : FlowDecorator<T> where T : Widget, I
     private void OnBarHoverChanged(bool isHover)
     {
         if (isHover) return;
+        if (_target.ShowScrollBar != ScrollBarVisibility.Hover) return;
 
         var newHit = _overlay?.Window.LastHitWidget;
         if (newHit == null)
@@ -151,7 +152,7 @@ public sealed class ScrollBar : Widget, IMouseRegion
     {
         _axis = axis;
         MouseRegion = new MouseRegion();
-        MouseRegion.HoverChanged += isHover => IsHover = isHover;
+        // MouseRegion.HoverChanged += isHover => IsHover = isHover;
         MouseRegion.PointerDown += OnPointerDown;
         MouseRegion.PointerMove += OnPointerMove;
     }
@@ -169,7 +170,7 @@ public sealed class ScrollBar : Widget, IMouseRegion
 
     public MouseRegion MouseRegion { get; }
 
-    public bool IsHover { get; private set; }
+    // public bool IsHover { get; private set; }
 
     public void Update(float offset, float maxOffset)
     {
