@@ -157,6 +157,7 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
 
     public float ScrollOffsetX => Controller.ScrollController.OffsetX;
     public float ScrollOffsetY => Controller.ScrollController.OffsetY;
+    public ScrollDirection ScrollDirection => Controller.ScrollController.Direction;
 
     public Offset OnScroll(float dx, float dy)
     {

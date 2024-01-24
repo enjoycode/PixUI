@@ -5,6 +5,8 @@ namespace PixUI;
 [TSInterfaceOf]
 public interface IScrollable
 {
+    ScrollDirection ScrollDirection { get; }
+
     float ScrollOffsetX { get; }
 
     float ScrollOffsetY { get; }

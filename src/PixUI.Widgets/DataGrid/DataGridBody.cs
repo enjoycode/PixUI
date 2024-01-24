@@ -9,29 +9,31 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
     public DataGridBody(DataGridController<T> controller)
     {
         _controller = controller;
+        ScrollBars = new ScrollBarDecorator<DataGridBody<T>>(this,
+            () => new(MaxScrollOffsetX, MaxScrollOffsetY));
     }
 
     private readonly DataGridController<T> _controller;
+    internal readonly ScrollBarDecorator<DataGridBody<T>> ScrollBars;
     private DataGridTheme Theme => _controller.Theme;
 
     #region ====IScrollable====
 
     public float ScrollOffsetX => _controller.ScrollController.OffsetX;
     public float ScrollOffsetY => _controller.ScrollController.OffsetY;
+    public ScrollDirection ScrollDirection => _controller.ScrollController.Direction;
+    private float MaxScrollOffsetX => Math.Max(0, _controller.TotalColumnsWidth - W);
+    private float MaxScrollOffsetY => Math.Max(0, _controller.TotalRowsHeight - H);
 
     public Offset OnScroll(float dx, float dy)
     {
         if (_controller.DataView == null || _controller.DataView.Count == 0)
             return Offset.Empty;
 
-        var totalRowsHeight = _controller.TotalRowsHeight;
-        var maxOffsetX = Math.Max(0, _controller.TotalColumnsWidth - W);
-        var maxOffsetY = Math.Max(0, totalRowsHeight - H);
-
         var oldVisibleRowStart = _controller.VisibleStartRowIndex;
         var visibleRows = _controller.VisibleRows;
 
-        var offset = _controller.ScrollController.OnScroll(dx, dy, maxOffsetX, maxOffsetY);
+        var offset = _controller.ScrollController.OnScroll(dx, dy, MaxScrollOffsetX, MaxScrollOffsetY);
         if (!offset.IsEmpty)
         {
             //根据向上或向下滚动计算需要清除缓存的边界, TODO:考虑多一部分范围，现暂超出范围即清除
@@ -63,13 +65,21 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
 
     #endregion
 
+    protected override void OnUnmounted()
+    {
+        base.OnUnmounted();
+        ScrollBars.Hide();
+    }
+
     protected internal override bool HitTest(float x, float y, HitTestResult result)
     {
+        Log.Debug($"Start HitTest: {x},{y}");
         if (y < 0 || y > H) return false;
 
         result.Add(this);
 
         var hitRow = _controller.HitTestInRows(x, y);
+        Log.Debug($"Hit Row: {hitRow?.RowIndex ?? -1}");
         //继续判断是否命中HostedCellWidget
         if (hitRow != null && !hitRow.Value.IsColumnResizer && hitRow.Value.RowIndex >= 0 &&
             hitRow.Value.Column is DataGridHostColumn<T> hostColumn)
@@ -183,7 +193,7 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
                     continue; //继续下一个循环
                 }
 
-                lastMergeBeginRow = lastMergeEndRow = j;
+                lastMergeBeginRow = /*lastMergeEndRow =*/ j;
                 if (j == startRow)
                 {
                     var mergeUpCount = col.TryMergeUp(_controller, j);

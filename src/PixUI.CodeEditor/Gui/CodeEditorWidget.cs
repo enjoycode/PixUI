@@ -30,9 +30,8 @@ public sealed class CodeEditorWidget : Widget, IMouseRegion, IFocusable, IScroll
     #region ====IScrollable====
 
     public float ScrollOffsetX => Controller.TextEditor.VirtualTop.X;
-
     public float ScrollOffsetY => Controller.TextEditor.VirtualTop.Y;
-
+    public ScrollDirection ScrollDirection => ScrollDirection.Both;
     public Offset OnScroll(float dx, float dy) => Controller.OnScroll(dx, dy);
 
     #endregion
@@ -77,12 +76,11 @@ public sealed class CodeEditorWidget : Widget, IMouseRegion, IFocusable, IScroll
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
-        SetSize(width, height);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
+        SetSize(maxSize.Width, maxSize.Height);
 
         //布局各个EditorArea
-        Controller.TextEditor.Layout(width, height);
+        Controller.TextEditor.Layout(maxSize.Width, maxSize.Height);
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)

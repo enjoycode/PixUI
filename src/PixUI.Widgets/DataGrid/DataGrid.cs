@@ -17,6 +17,7 @@ public sealed class DataGrid<T> : Widget, IMouseRegion
         MouseRegion = new MouseRegion(null, false);
         MouseRegion.PointerMove += _controller.OnPointerMove;
         MouseRegion.PointerDown += _controller.OnPointerDown;
+        MouseRegion.HoverChanged += OnHoverChanged;
     }
 
     private readonly DataGridController<T> _controller;
@@ -65,6 +66,14 @@ public sealed class DataGrid<T> : Widget, IMouseRegion
 
     public MouseRegion MouseRegion { get; }
 
+    private void OnHoverChanged(bool hover)
+    {
+        if (hover)
+            Body.ScrollBars.Show();
+        else
+            Body.ScrollBars.Hide();
+    }
+
     #region ====Overrides====
 
     public override void VisitChildren(Func<Widget, bool> action)
@@ -76,12 +85,11 @@ public sealed class DataGrid<T> : Widget, IMouseRegion
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
-        SetSize(width, height);
+        SetSize(maxSize.Width, maxSize.Height);
 
-        var bodyHeight = height;
+        var bodyHeight = maxSize.Height;
 
         if (ShowHeader)
         {
@@ -91,22 +99,22 @@ public sealed class DataGrid<T> : Widget, IMouseRegion
                 Header.Parent = this;
             }
 
-            Header.Layout(width, height);
+            Header.Layout(maxSize.Width, maxSize.Height);
             Header.SetPosition(0, 0);
             bodyHeight -= Header.H;
         }
 
         if (ShowFooter)
         {
-            Footer!.Layout(width, bodyHeight);
+            Footer!.Layout(maxSize.Width, bodyHeight);
             Footer.SetPosition(0, H - Footer.H);
             bodyHeight -= Footer.H;
         }
 
-        Body.Layout(width, bodyHeight);
+        Body.Layout(maxSize.Width, bodyHeight);
         Body.SetPosition(0, Header?.H ?? 0);
 
-        _controller.CalcColumnsWidth(new Size(width, height));
+        _controller.CalcColumnsWidth(maxSize);
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
