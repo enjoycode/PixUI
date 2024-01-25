@@ -4,13 +4,13 @@ namespace PixUI;
 
 public sealed class Form : MultiChildWidget<FormItem>
 {
-    public Form() { }
-
     private int _columns = 1;
     private float _labelWidth = 120;
     private EdgeInsets _padding = EdgeInsets.All(5);
     private float _horizontalSpacing = 5f;
     private float _verticalSpacing = 5f;
+    private Color? _textColor;
+    private float? _fontSize;
 
     public int Columns
     {
@@ -42,6 +42,40 @@ public sealed class Form : MultiChildWidget<FormItem>
             if (_labelWidth == value) return;
             _labelWidth = value;
             Relayout();
+        }
+    }
+
+    public Color? TextColor
+    {
+        get => _textColor;
+        set
+        {
+            _textColor = value;
+            foreach (var child in _children)
+            {
+                if (!child.TextColor.HasValue)
+                {
+                    child.ClearCache();
+                    child.Repaint();
+                }
+            }
+        }
+    }
+
+    public float? FontSize
+    {
+        get => _fontSize;
+        set
+        {
+            _fontSize = value;
+            foreach (var child in _children)
+            {
+                if (!child.FontSize.HasValue)
+                {
+                    child.ClearCache();
+                    child.Repaint();
+                }
+            }
         }
     }
 

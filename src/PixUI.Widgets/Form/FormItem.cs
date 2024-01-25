@@ -44,7 +44,33 @@ public sealed class FormItem : Widget
     internal readonly int ColumnSpan;
     //TODO: tooltip property to show some tips
 
+    private Color? _textColor;
+    private float? _fontSize;
     private Paragraph? _cachedLabelParagraph;
+
+    public Color? TextColor
+    {
+        get => _textColor;
+        set
+        {
+            _textColor = value;
+            ClearCache();
+            Repaint();
+        }
+    }
+
+    public float? FontSize
+    {
+        get => _fontSize;
+        set
+        {
+            _fontSize = value;
+            ClearCache();
+            Repaint();
+        }
+    }
+
+    internal void ClearCache() => _cachedLabelParagraph = null;
 
     #region ====Widget Overrides====
 
@@ -55,19 +81,30 @@ public sealed class FormItem : Widget
         CachedAvailableWidth = availableWidth;
         CachedAvailableHeight = availableHeight;
 
-        _cachedLabelParagraph ??= TextPainter.BuildParagraph(_label, float.PositiveInfinity,
-            Theme.DefaultFontSize, Colors.Black, null, 1 /*TODO*/);
+        EnsureBuildLabelParagraph();
 
         var lableWidth = ((Form)Parent!).LabelWidth + 5;
         _widget.Layout(availableWidth - lableWidth, availableHeight);
         _widget.SetPosition(lableWidth, 0);
 
-        SetSize(availableWidth, Math.Max(_cachedLabelParagraph.Height, _widget.H));
+        SetSize(availableWidth, Math.Max(_cachedLabelParagraph!.Height, _widget.H));
+    }
+
+    private void EnsureBuildLabelParagraph()
+    {
+        if (_cachedLabelParagraph != null) return;
+
+        var form = Parent as Form;
+        var textColor = (TextColor ?? form?.TextColor) ?? Colors.Black;
+        var fontSize = (FontSize ?? form?.FontSize) ?? Theme.DefaultFontSize;
+        _cachedLabelParagraph = TextPainter.BuildParagraph(_label, float.PositiveInfinity, fontSize, textColor);
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
         //TODO: 考虑画边框
+
+        EnsureBuildLabelParagraph();
 
         var parent = (Form)Parent!;
         var lableWidth = parent.LabelWidth;
