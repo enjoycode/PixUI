@@ -6,7 +6,7 @@ namespace PixUI;
 
 public sealed class HitTestResult
 {
-    private readonly List<HitTestEntry> _path = new List<HitTestEntry>();
+    private readonly List<HitTestEntry> _path = new();
 
     /// <summary>
     /// 仅用于缓存最后命中的Widget相对于窗体的变换,用于将窗体坐标映射为本地坐标

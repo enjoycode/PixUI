@@ -2,7 +2,7 @@ using System;
 
 namespace PixUI;
 
-internal sealed class TreeNodeRow<T> : Widget, IMouseRegion
+internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
 {
     internal TreeNodeRow()
     {
@@ -17,7 +17,7 @@ internal sealed class TreeNodeRow<T> : Widget, IMouseRegion
     private Text? _label;
     private bool _isHover;
 
-    public MouseRegion MouseRegion { get; private set; }
+    public MouseRegion MouseRegion { get; }
 
     internal ExpandIcon ExpandIcon
     {
@@ -60,6 +60,37 @@ internal sealed class TreeNodeRow<T> : Widget, IMouseRegion
     private TreeNode<T> TreeNode => (TreeNode<T>)Parent!;
 
     private TreeController<T> Controller => TreeNode.Controller;
+
+    #region ====DragDrop====
+
+    public bool AllowDrag() => Controller.AllowDragDrop;
+
+    public bool AllowDrop(IDataTransferItem item)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnDragStart(DragEvent dragEvent)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnDragEnd(DragEvent dragEvent)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnDragOver(DragEvent dragEvent, Point local)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnDrop(IDataTransferItem item)
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
 
     #region ====Event Handlers====
 

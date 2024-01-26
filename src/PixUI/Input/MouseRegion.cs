@@ -11,6 +11,24 @@ public interface IMouseRegion
     public MouseRegion MouseRegion { get; }
 }
 
+public interface IDraggable : IMouseRegion
+{
+    bool AllowDrag();
+
+    void OnDragStart(DragEvent dragEvent);
+
+    void OnDragEnd(DragEvent dragEvent);
+}
+
+public interface IDroppable : IMouseRegion
+{
+    bool AllowDrop(IDataTransferItem item);
+
+    void OnDragOver(DragEvent dragEvent, Point local);
+
+    void OnDrop(IDataTransferItem item);
+}
+
 public sealed class MouseRegion
 {
     /// <summary>
@@ -28,18 +46,12 @@ public sealed class MouseRegion
     public event Action<PointerEvent>? PointerMove;
     public event Action<PointerEvent>? PointerTap;
     public event Action<bool>? HoverChanged;
-    public event Action<IDataTransferItem>? Drop;
 
-    private readonly Func<IDataTransferItem, bool>? _allowDrop;
-
-    public MouseRegion(Func<Cursor>? cursor = null, bool opaque = true, Func<IDataTransferItem, bool>? allowDrop = null)
+    public MouseRegion(Func<Cursor>? cursor = null, bool opaque = true)
     {
         Cursor = cursor;
         Opaque = opaque;
-        _allowDrop = allowDrop;
     }
-
-    public bool AllowDrop(IDataTransferItem item) => _allowDrop != null && _allowDrop(item);
 
     internal void RaisePointerMove(PointerEvent theEvent) => PointerMove?.Invoke(theEvent);
 
@@ -48,8 +60,6 @@ public sealed class MouseRegion
     internal void RaisePointerUp(PointerEvent theEvent) => PointerUp?.Invoke(theEvent);
 
     internal void RaisePointerTap(PointerEvent theEvent) => PointerTap?.Invoke(theEvent);
-
-    internal void RaiseDrop(IDataTransferItem item) => Drop?.Invoke(item);
 
     internal void RaiseHoverChanged(bool hover)
     {

@@ -21,6 +21,8 @@ public sealed class TreeController<T>
     internal float TotalWidth = 0;
     internal float TotalHeight = 0;
 
+    public bool AllowDragDrop { get; set; }
+
     /// <summary>
     /// 获取根节点只读列表
     /// </summary>

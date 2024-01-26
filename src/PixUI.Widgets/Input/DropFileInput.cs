@@ -2,13 +2,13 @@ using System;
 
 namespace PixUI;
 
-public sealed class DropFileInput : SingleChildWidget, IMouseRegion
+public sealed class DropFileInput : SingleChildWidget, IDroppable
 {
     public DropFileInput()
     {
         Width = 150;
         Height = 60;
-        MouseRegion = new MouseRegion(opaque: true, allowDrop: AllowDrop);
+        MouseRegion = new MouseRegion(opaque: true);
 
         State<Color> color = Colors.Gray;
         Child = new Center
@@ -25,17 +25,22 @@ public sealed class DropFileInput : SingleChildWidget, IMouseRegion
     }
 
     public MouseRegion MouseRegion { get; }
+    private readonly Action<IDataTransferItem>? _onDrop;
 
     public Action<IDataTransferItem> OnDrop
     {
-        set => MouseRegion.Drop += value;
+        init => _onDrop = value;
     }
 
-    private bool AllowDrop(IDataTransferItem item)
+    bool IDroppable.AllowDrop(IDataTransferItem item)
     {
         //TODO: 检查类型及大小限制
         return item is FileDataTransferItem;
     }
+
+    void IDroppable.OnDragOver(DragEvent dragEvent, Point local) { }
+
+    void IDroppable.OnDrop(IDataTransferItem item) => _onDrop?.Invoke(item);
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {

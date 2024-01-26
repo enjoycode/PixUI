@@ -19,7 +19,7 @@ public sealed class TreeView<T> : Widget, IScrollable
     }
 
     private readonly TreeController<T> _controller;
-    private State<Color>? _fillColor;
+    private readonly State<Color>? _fillColor;
 
     /// <summary>
     /// 背景色
@@ -27,7 +27,13 @@ public sealed class TreeView<T> : Widget, IScrollable
     public State<Color>? FillColor
     {
         get => _fillColor;
-        set => Bind(ref _fillColor, value, RepaintOnStateChanged);
+        init => Bind(ref _fillColor, value, RepaintOnStateChanged);
+    }
+
+    public bool AllowDragDrop
+    {
+        get => _controller.AllowDragDrop;
+        set => _controller.AllowDragDrop = value;
     }
 
     public Action<TreeNode<T>> OnCheckChanged

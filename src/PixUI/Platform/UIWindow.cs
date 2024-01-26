@@ -15,7 +15,7 @@ public abstract class UIWindow
         Overlay = new Overlay(this);
         RootWidget = new Root(this, child);
 
-        PaintDebugger.EnableChanged += () => RootWidget.Invalidate(InvalidAction.Repaint);
+        PaintDebugger.EnableChanged += () => RootWidget.Repaint();
 
         Current = this; //TODO:暂单窗体
     }
@@ -53,6 +53,8 @@ public abstract class UIWindow
     private HitTestResult _oldHitResult = new();
 
     private HitTestResult _newHitResult = new();
+
+    internal HitTestResult NewHitResult => _newHitResult;
 
     // Pointer.Down时捕获的结果
     private HitTestEntry? _hitResultOnPointDown;
@@ -161,6 +163,11 @@ public abstract class UIWindow
             //开始比较新旧命中结果，激发相应的HoverChanged事件
             CompareAndSwapHitTestResult();
         }
+        else if (e.Buttons == PointerButtons.Left)
+        {
+            if (DragDropManager.MaybeDrag(this, ref _hitResultOnPointDown, e))
+                return;
+        }
 
         //如果命中MouseRegion，则向上传播事件(TODO: 考虑不传播)
         if (_oldHitResult.IsHitAnyMouseRegion)
@@ -236,16 +243,17 @@ public abstract class UIWindow
     {
         //HitTest for drop area, TODO: maybe use temp HitTestResult
         NewHitTest(x, y);
-        var lastMouseRegion = _newHitResult.LastWidgetWithMouseRegion as IMouseRegion;
-        //TODO: maybe map point to local coordinate and pass to event args
+        var lastHitEntry = _newHitResult.LastEntry;
         _newHitResult.Reset();
-        if (lastMouseRegion == null) return;
+        if (lastHitEntry == null || lastHitEntry.Value.Widget is not IDroppable droppable)
+            return;
 
         //暂在这里判断一下是否允许Drop
-        var arg = new FileDataTransferItem(name, size, type, stream);
-        if (!lastMouseRegion.MouseRegion.AllowDrop(arg)) return;
+        var dropItem = new FileDataTransferItem(name, size, type, stream);
+        //var localPt = lastHitEntry.Value.ToLocalPoint(x, y);
+        if (!droppable.AllowDrop(dropItem)) return;
 
-        lastMouseRegion.MouseRegion.RaiseDrop(arg);
+        droppable.OnDrop(dropItem);
     }
 
     public void OnKeyDown(KeyEvent keyEvent)
@@ -283,7 +291,7 @@ public abstract class UIWindow
         }
     }
 
-    private void NewHitTest(float winX, float winY)
+    internal void NewHitTest(float winX, float winY)
     {
         Log.Debug($"========NewHitTest:({winX},{winY})========");
         //先检测Overlay，没有命中再从RootWidget开始
