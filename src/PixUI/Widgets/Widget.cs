@@ -524,27 +524,24 @@ public abstract class Widget : IDisposable
     {
         if (area is RepaintChild repaintChild)
         {
-            var child = repaintChild.Child;
-            child.BeforePaint(canvas, true);
-            child.Paint(canvas, repaintChild.ToChild(child));
+            repaintChild.Repaint(canvas);
+            return;
         }
-        else
+
+        VisitChildren(child =>
         {
-            VisitChildren(child =>
-            {
-                if (child.W <= 0 || child.H <= 0)
-                    return false;
-                if (area != null && !area.IntersectsWith(child))
-                    return false; //脏区域与子组件没有相交部分，不用绘制
-
-                child.BeforePaint(canvas);
-                child.Paint(canvas, area?.ToChild(child));
-                child.AfterPaint(canvas);
-
-                PaintDebugger.PaintWidgetBorder(child, canvas);
+            if (child.W <= 0 || child.H <= 0)
                 return false;
-            });
-        }
+            if (area != null && !area.IntersectsWith(child))
+                return false; //脏区域与子组件没有相交部分，不用绘制
+
+            child.BeforePaint(canvas);
+            child.Paint(canvas, area?.ToChild(child));
+            child.AfterPaint(canvas);
+
+            PaintDebugger.PaintWidgetBorder(child, canvas);
+            return false;
+        });
     }
 
     #endregion

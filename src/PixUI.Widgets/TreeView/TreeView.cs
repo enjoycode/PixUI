@@ -159,6 +159,12 @@ public sealed class TreeView<T> : Widget, IScrollable
         // draw background color if has
         if (_fillColor != null)
             canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(_fillColor.Value));
+        
+        if (area is RepaintChild repaintChild)
+        {
+            repaintChild.Repaint(canvas);
+            return;
+        }
 
         // draw nodes in visual region
         var dirtyRect = area?.GetRect() ?? Rect.FromLTWH(0, 0, W, H);

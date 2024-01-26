@@ -142,6 +142,14 @@ internal sealed class RepaintChild : IDirtyArea
         //do nothing now
     }
 
+    public Widget Repaint(Canvas canvas)
+    {
+        var child = Child;
+        child.BeforePaint(canvas, true);
+        child.Paint(canvas, ToChild(child));
+        return child;
+    }
+
     public override string? ToString()
     {
         if (_current < 0)

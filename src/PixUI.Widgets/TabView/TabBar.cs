@@ -154,18 +154,15 @@ public sealed class TabBar<T> : Widget, ITabBar
         
         if (area is RepaintChild repaintChild)
         {
-            var child = repaintChild.Child;
-            child.BeforePaint(canvas, true);
-            child.Paint(canvas, repaintChild.ToChild(child));
+            repaintChild.Repaint(canvas);
+            return;
         }
-        else
+
+        foreach (var tab in _tabs) //TODO: check visible
         {
-            foreach (var tab in _tabs) //TODO: check visible
-            {
-                canvas.Translate(tab.X, tab.Y);
-                tab.Paint(canvas, area?.ToChild(tab));
-                canvas.Translate(-tab.X, -tab.Y);
-            }
+            canvas.Translate(tab.X, tab.Y);
+            tab.Paint(canvas, area?.ToChild(tab));
+            canvas.Translate(-tab.X, -tab.Y);
         }
 
         //TODO: paint indicator(因为动画移动需要)

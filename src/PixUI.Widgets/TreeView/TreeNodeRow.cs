@@ -179,9 +179,6 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
-        //TODO: only paint expand icon when dirty area is not null
-        //Console.WriteLine($"重绘TreeNodeRow[{_label?.Text.Value}]: isHover = {_isHover}");
-
         if (_isHover)
         {
             var paint = PixUI.Paint.Shared(Controller.HoverColor);
@@ -190,6 +187,14 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
             canvas.DrawRect(hoverRect, paint);
         }
 
+        if (area is RepaintChild repaintChild)
+        {
+            repaintChild.Repaint(canvas);
+            return;
+        }
+        
+        // Log.Debug($"重绘TreeNodeRow[{_label?.Text.Value}]: isHover = {_isHover}");
+        
         PaintChild(_expander, canvas);
         if (Controller.ShowCheckbox)
             PaintChild(_checkbox, canvas);

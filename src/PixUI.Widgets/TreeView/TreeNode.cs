@@ -16,7 +16,7 @@ public sealed class TreeNode<T> : Widget
 
         _color = IsSelected.ToComputed(s => s ? Theme.FocusedColor : Colors.Black); //TODO: fix color
 
-        IsSelected.AddListener(RepaintOnStateChanged);
+        // IsSelected.AddListener(_ => _row.Repaint()); //暂不需要重画整行，只影响标题及图标颜色
     }
 
     #region ====Fields & Properties====
@@ -313,6 +313,12 @@ public sealed class TreeNode<T> : Widget
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
+        if (area is RepaintChild repaintChild)
+        {
+            repaintChild.Repaint(canvas);
+            return;
+        }
+        
         if (IsExpanding || IsCollapsing) //need clip expanding area
         {
             canvas.Save();
