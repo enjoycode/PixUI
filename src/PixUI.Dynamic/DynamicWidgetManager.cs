@@ -75,10 +75,31 @@ public static partial class DynamicWidgetManager
         var name = string.IsNullOrEmpty(attr.Name) ? widgetType.Name : attr.Name;
         var icon = string.IsNullOrEmpty(attr.Icon) ? MaterialIcons.Widgets : GetIconByName(attr.Icon);
 
-        //TODO: properties
+        // properties
+        var props = widgetType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+        var list = new List<DynamicPropertyMeta>();
+        foreach (var prop in props)
+        {
+            var propAttr = prop.GetCustomAttribute<DynamicPropertyAttribute>();
+            if (propAttr == null) continue;
+
+            var propName = prop.Name;
+            var propType = prop.PropertyType;
+            var allowNull = propType.IsValueType
+                ? propType.GetGenericTypeDefinition() == typeof(Nullable<>)
+                : propAttr.AllowNull;
+            DynamicValue? initValue = null;
+            if (propAttr.InitValue != null)
+                initValue = new DynamicValue() { Value = propAttr.InitValue };
+
+            var propMeta = new DynamicPropertyMeta(propName, propType,
+                allowNull, propAttr.InitSetter, initValue, propAttr.Editor);
+            list.Add(propMeta);
+        }
 
         var meta = new DynamicWidgetMeta(catalog, name, widgetType, icon,
-            () => (Widget)Activator.CreateInstance(widgetType)!);
+            () => (Widget)Activator.CreateInstance(widgetType)!,
+            list.Count == 0 ? null : list.ToArray());
         try
         {
             Register(meta, replaceExists);
