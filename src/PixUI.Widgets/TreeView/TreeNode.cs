@@ -159,7 +159,6 @@ public sealed class TreeNode<T> : Widget
     private void OnTapExpander(PointerEvent e)
     {
         //TODO:先判断是否LazyLoad，是则异步加载后再处理
-        //TODO:展开或收缩更新滚动信息
 
         if (IsExpanded)
         {
@@ -287,23 +286,9 @@ public sealed class TreeNode<T> : Widget
         if (dy != 0 && _children != null)
             TreeView<T>.UpdatePositionAfter(child, _children, dy);
 
-        //更新自身的宽高
-        var newWidth = oldWidth;
+        //更新自身的宽高, 因节点展开时提前设置了新的宽度,所以展开时dx == 0
+        var newWidth = _children == null ? child.W : Math.Max(TreeView<T>.CalcMaxChildWidth(_children), W);
         var newHeight = oldHeight + dy;
-        if (dx > 0)
-        {
-            //宽度增加，总宽取现值及当前的大者
-            newWidth = Math.Max(child.W, W);
-        }
-        else if (dx < 0 && child.W - dx == _controller.TotalWidth)
-        {
-            //宽度减小，且原本是最宽的那个, 重新计算最宽的子节点
-            if (_children == null)
-                newWidth = child.W;
-            else
-                newWidth = Math.Max(TreeView<T>.CalcMaxChildWidth(_children), W);
-        }
-
         SetSize(newWidth, newHeight);
 
         //继续通知上级节点尺寸变更

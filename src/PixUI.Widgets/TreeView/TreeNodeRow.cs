@@ -195,7 +195,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
             return;
         }
 
-        Log.Debug($"重绘TreeNodeRow[{_label?.Text.Value}]: isHover = {_isHover} clip={canvas.ClipBounds}");
+        //Log.Debug($"重绘TreeNodeRow[{_label?.Text.Value}]: isHover = {_isHover} clip={canvas.ClipBounds}");
 
         PaintChild(_expander, canvas);
         if (Controller.ShowCheckbox)

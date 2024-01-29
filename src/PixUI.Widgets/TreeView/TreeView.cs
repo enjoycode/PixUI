@@ -107,18 +107,7 @@ public sealed class TreeView<T> : Widget, IScrollable
         UpdatePositionAfter(child, _controller.Nodes, dy);
 
         //更新TreeController总宽及总高
-        if (dx > 0)
-        {
-            //宽度增加，总宽取现值及当前的大者
-            _controller.TotalWidth = Math.Max(child.W, _controller.TotalWidth);
-        }
-        // ReSharper disable once CompareOfFloatsByEqualityOperator
-        else if (dx < 0 && child.W - dx == _controller.TotalWidth)
-        {
-            //宽度减小，且原本是最宽的那个, 重新计算最宽的子节点
-            _controller.TotalWidth = CalcMaxChildWidth(_controller.Nodes);
-        }
-
+        _controller.TotalWidth = CalcMaxChildWidth(_controller.Nodes);
         _controller.TotalHeight += dy;
         _controller.ScrollController.Adjust(MaxScrollOffsetX, MaxScrollOffsetY);
     }
