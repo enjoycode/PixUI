@@ -65,29 +65,57 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
 
     public bool AllowDrag() => Controller.AllowDragDrop;
 
-    public bool AllowDrop(IDataTransferItem item)
-    {
-        throw new NotImplementedException();
-    }
+    public bool AllowDrop(IDataTransferItem item) => Controller.AllowDragDrop;
 
     public void OnDragStart(DragEvent dragEvent)
     {
-        throw new NotImplementedException();
+        dragEvent.DragHintImage = BuidDragHintImage();
     }
 
-    public void OnDragEnd(DragEvent dragEvent)
-    {
-        throw new NotImplementedException();
-    }
+    public void OnDragEnd(DragEvent dragEvent) { }
 
-    public void OnDragOver(DragEvent dragEvent, Point local)
-    {
-        throw new NotImplementedException();
-    }
+    public void OnDragOver(DragEvent dragEvent, Point local) { }
 
-    public void OnDrop(IDataTransferItem item)
+    public void OnDrop(IDataTransferItem item) { }
+
+    private Image BuidDragHintImage()
     {
-        throw new NotImplementedException();
+        const float padding = 5f;
+        var width = padding;
+        if (_icon != null)
+            width += _icon.W;
+        if (_label != null)
+            width += _label.W + padding * 2;
+
+        var scale = Root!.Window.ScaleFactor;
+        var rect = Rect.FromLTWH(0, 0, width * scale, H * scale);
+        using var recorder = new PictureRecorder();
+        using var canvas = recorder.BeginRecording(rect);
+        canvas.Scale(scale, scale);
+        var paint = PixUI.Paint.Shared(Colors.Gray.WithAlpha(128));
+        canvas.DrawRect(rect, paint);
+        var iconWidth = 0f;
+        if (_icon != null)
+        {
+            var x = padding;
+            var y = (H - _icon.H) / 2f;
+            canvas.Translate(x, y);
+            _icon.Paint(canvas);
+            canvas.Translate(-x, -y);
+            iconWidth = _icon.W + padding;
+        }
+
+        if (_label != null)
+        {
+            var x = padding + iconWidth;
+            var y = (H - _label.H) / 2f;
+            canvas.Translate(x, y);
+            _label.Paint(canvas);
+            canvas.Translate(-x, -y);
+        }
+
+        var image = recorder.EndRecording();
+        return Image.FromPicture(image, new SizeI((int)(width * scale), (int)(H * scale)));
     }
 
     #endregion
@@ -111,7 +139,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
     public override bool IsOpaque => _isHover && Controller.HoverColor.IsOpaque;
 
     public override bool ContainsPoint(float x, float y) =>
-        y >= 0 && y < H && 
+        y >= 0 && y < H &&
         x >= Controller.TreeView!.ScrollOffsetX &&
         x < Controller.TreeView!.W + Controller.TreeView!.ScrollOffsetX;
 

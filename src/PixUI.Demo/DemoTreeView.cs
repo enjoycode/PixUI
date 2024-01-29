@@ -47,7 +47,7 @@ public sealed class DemoTreeView : View
             Padding = EdgeInsets.All(20),
             Child = new Column()
             {
-                Spacing = 20,
+                Spacing = 10,
                 Children =
                 {
                     new Row(VerticalAlignment.Middle, 20)
@@ -70,6 +70,7 @@ public sealed class DemoTreeView : View
                                 Child = new TreeView<TreeData>(_treeController1, BuildTreeNode,
                                     d => d.Children!)
                                 {
+                                    AllowDragDrop = true,
                                     FillColor = new Color(0xFFDCDCDC),
                                 }
                             },

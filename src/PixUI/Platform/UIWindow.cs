@@ -165,7 +165,8 @@ public abstract class UIWindow
         }
         else if (e.Buttons == PointerButtons.Left)
         {
-            if (DragDropManager.MaybeDrag(this, ref _hitResultOnPointDown, e))
+            //判断是否可以启动Drag或已在Drag过程中
+            if (DragDropManager.MaybeStart(this, ref _hitResultOnPointDown, e))
                 return;
         }
 
@@ -210,14 +211,17 @@ public abstract class UIWindow
         //先尝试激发PointerTap事件
         if (pointerEvent.Buttons == PointerButtons.Left && _hitResultOnPointDown != null)
         {
-            var winX = pointerEvent.X;
-            var winY = pointerEvent.Y;
-            var local = _hitResultOnPointDown.Value.ToLocalPoint(winX, winY);
-            if (((Widget)_hitResultOnPointDown.Value.Widget).ContainsPoint(local.Dx, local.Dy))
+            if (!DragDropManager.MaybeStop(pointerEvent))
             {
-                pointerEvent.SetPoint(local.Dx, local.Dy);
-                _hitResultOnPointDown.Value.Widget.MouseRegion.RaisePointerTap(pointerEvent);
-                pointerEvent.SetPoint(winX, winY);
+                var winX = pointerEvent.X;
+                var winY = pointerEvent.Y;
+                var local = _hitResultOnPointDown.Value.ToLocalPoint(winX, winY);
+                if (((Widget)_hitResultOnPointDown.Value.Widget).ContainsPoint(local.Dx, local.Dy))
+                {
+                    pointerEvent.SetPoint(local.Dx, local.Dy);
+                    _hitResultOnPointDown.Value.Widget.MouseRegion.RaisePointerTap(pointerEvent);
+                    pointerEvent.SetPoint(winX, winY);
+                }
             }
 
             _hitResultOnPointDown = null;

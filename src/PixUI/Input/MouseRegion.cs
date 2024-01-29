@@ -11,7 +11,7 @@ public interface IMouseRegion
     public MouseRegion MouseRegion { get; }
 }
 
-public interface IDraggable : IMouseRegion
+public interface IDraggable : IMouseRegion, IDataTransferItem
 {
     bool AllowDrag();
 
