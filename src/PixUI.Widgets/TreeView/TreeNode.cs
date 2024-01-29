@@ -287,7 +287,9 @@ public sealed class TreeNode<T> : Widget
             TreeView<T>.UpdatePositionAfter(child, _children, dy);
 
         //更新自身的宽高, 因节点展开时提前设置了新的宽度,所以展开时dx == 0
-        var newWidth = _children == null ? child.W : Math.Max(TreeView<T>.CalcMaxChildWidth(_children), W);
+        var newWidth = IsExpanded && _children != null
+            ? Math.Max(TreeView<T>.CalcMaxChildWidth(_children), _row.W)
+            : _row.W;
         var newHeight = oldHeight + dy;
         SetSize(newWidth, newHeight);
 

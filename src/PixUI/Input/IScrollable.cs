@@ -79,12 +79,17 @@ public sealed class ScrollController
     /// <summary>
     /// 在IScrollable组件改变Size后确保滚动值在范围内
     /// </summary>
-    public void Adjust(float maxOffsetX, float maxOffsetY)
+    public bool Clamp(float maxOffsetX, float maxOffsetY)
     {
+        if (OffsetX <= maxOffsetX && OffsetY <= maxOffsetY)
+            return false;
+        
         if (Direction is ScrollDirection.Both or ScrollDirection.Horizontal)
             OffsetX = Math.Clamp(OffsetX, 0, maxOffsetX);
 
         if (Direction is ScrollDirection.Both or ScrollDirection.Vertical)
             OffsetY = Math.Clamp(OffsetY, 0, maxOffsetY);
+
+        return true;
     }
 }

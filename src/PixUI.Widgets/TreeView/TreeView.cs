@@ -94,7 +94,7 @@ public sealed class TreeView<T> : Widget, IScrollable
 
         _controller.TotalWidth = totalWidth;
         _controller.TotalHeight = totalHeight;
-        _controller.ScrollController.Adjust(MaxScrollOffsetX, MaxScrollOffsetY);
+        _controller.ScrollController.Clamp(MaxScrollOffsetX, MaxScrollOffsetY);
     }
 
     protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
@@ -109,7 +109,13 @@ public sealed class TreeView<T> : Widget, IScrollable
         //更新TreeController总宽及总高
         _controller.TotalWidth = CalcMaxChildWidth(_controller.Nodes);
         _controller.TotalHeight += dy;
-        _controller.ScrollController.Adjust(MaxScrollOffsetX, MaxScrollOffsetY);
+
+        if (_controller.ScrollController.Clamp(MaxScrollOffsetX, MaxScrollOffsetY))
+        {
+            affects.OldX = 0;
+            affects.OldY = 0;
+            affects.OldH = H;
+        }
     }
 
     protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
@@ -186,8 +192,7 @@ public sealed class TreeView<T> : Widget, IScrollable
     /// <summary>
     /// 更新指定子节点之后的子节点的Y坐标
     /// </summary>
-    internal static void UpdatePositionAfter<Tn>(Widget child, IList<TreeNode<Tn>> nodes,
-        float dy)
+    internal static void UpdatePositionAfter<Tn>(Widget child, IList<TreeNode<Tn>> nodes, float dy)
     {
         var indexOfChild = -1;
         for (var i = 0; i < nodes.Count; i++)
