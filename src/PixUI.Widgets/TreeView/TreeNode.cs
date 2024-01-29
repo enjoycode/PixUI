@@ -270,8 +270,7 @@ public sealed class TreeNode<T> : Widget
         if (!IsLeaf && IsExpanded)
         {
             var maxChildWidth = TryBuildAndLayoutChildren();
-            SetSize(Math.Max(_row.W, maxChildWidth),
-                _controller.NodeHeight + _children!.Sum(t => t.H));
+            SetSize(Math.Max(_row.W, maxChildWidth), _controller.NodeHeight + _children!.Sum(t => t.H));
             HasLayout = true;
         }
     }
@@ -318,7 +317,7 @@ public sealed class TreeNode<T> : Widget
             repaintChild.Repaint(canvas);
             return;
         }
-        
+
         if (IsExpanding || IsCollapsing) //need clip expanding area
         {
             canvas.Save();
@@ -467,7 +466,7 @@ public sealed class TreeNode<T> : Widget
             return _children.IndexOf(child);
         return -1;
     }
-    
+
     internal TreeNode<T>? FindNode(Predicate<T> predicate)
     {
         if (predicate(Data)) return this;

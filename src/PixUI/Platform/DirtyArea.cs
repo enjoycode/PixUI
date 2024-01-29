@@ -99,7 +99,7 @@ internal sealed class RepaintChild : IDirtyArea
         _current = _path.Count - 1;
     }
 
-    public Widget Child
+    private Widget Child
     {
         get
         {

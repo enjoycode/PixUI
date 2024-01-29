@@ -111,7 +111,9 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
     public override bool IsOpaque => _isHover && Controller.HoverColor.IsOpaque;
 
     public override bool ContainsPoint(float x, float y) =>
-        y >= 0 && y < H && x >= 0 && x < Controller.TreeView!.W;
+        y >= 0 && y < H && 
+        x >= Controller.TreeView!.ScrollOffsetX &&
+        x < Controller.TreeView!.W + Controller.TreeView!.ScrollOffsetX;
 
     public override void VisitChildren(Func<Widget, bool> action)
     {
@@ -192,9 +194,9 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
             repaintChild.Repaint(canvas);
             return;
         }
-        
-        // Log.Debug($"重绘TreeNodeRow[{_label?.Text.Value}]: isHover = {_isHover}");
-        
+
+        Log.Debug($"重绘TreeNodeRow[{_label?.Text.Value}]: isHover = {_isHover} clip={canvas.ClipBounds}");
+
         PaintChild(_expander, canvas);
         if (Controller.ShowCheckbox)
             PaintChild(_checkbox, canvas);

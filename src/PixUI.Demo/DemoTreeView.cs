@@ -23,11 +23,11 @@ public sealed class DemoTreeView : View
                 {
                     Icon = MaterialIcons.Cake, Text = "Cake", Children = new List<TreeData>
                     {
-                        new() { Icon = MaterialIcons.Apple, Text = "Apple" },
+                        new() { Icon = MaterialIcons.Apple, Text = "Apple Long Long" },
                         new() { Icon = MaterialIcons.Adobe, Text = "Adobe" },
                     }
                 },
-                new() { Icon = MaterialIcons.Camera, Text = "Camera" },
+                new() { Icon = MaterialIcons.Camera, Text = "Camera Long" },
             }
         },
         new TreeData { Icon = MaterialIcons.Sunny, Text = "Sunny" }
@@ -47,6 +47,7 @@ public sealed class DemoTreeView : View
             Padding = EdgeInsets.All(20),
             Child = new Column()
             {
+                Spacing = 20,
                 Children =
                 {
                     new Row(VerticalAlignment.Middle, 20)
@@ -61,28 +62,24 @@ public sealed class DemoTreeView : View
                     },
                     new Expanded()
                     {
-                        Child = new Row(VerticalAlignment.Middle, 20)
+                        Child = new Splitter
                         {
-                            Children =
+                            Panel1 = new Container()
                             {
-                                new Expanded()
+                                // Padding = EdgeInsets.All(10),
+                                Child = new TreeView<TreeData>(_treeController1, BuildTreeNode,
+                                    d => d.Children!)
                                 {
-                                    Child = new TreeView<TreeData>(_treeController1, BuildTreeNode,
-                                        d => d.Children!)
-                                    {
-                                        FillColor = new Color(0xFFDCDCDC),
-                                    }
-                                },
-                                new Expanded()
-                                {
-                                    Child = new TreeView<TreeData>(_treeController2, BuildTreeNode,
-                                        d => d.Children!, true)
-                                    {
-                                        FillColor = new Color(0xFFDCDCDC),
-                                    }
+                                    FillColor = new Color(0xFFDCDCDC),
                                 }
-                            }
-                        }
+                            },
+                            Panel2 = new Center() {Child = new Text("Placeholder")}
+                            // Panel2 = new TreeView<TreeData>(_treeController2, BuildTreeNode,
+                            //     d => d.Children!, true)
+                            // {
+                            //     FillColor = new Color(0xFFDCDCDC),
+                            // }
+                        },
                     }
                 }
             }

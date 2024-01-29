@@ -97,8 +97,7 @@ public sealed class TreeView<T> : Widget, IScrollable
         _controller.ScrollController.Adjust(MaxScrollOffsetX, MaxScrollOffsetY);
     }
 
-    protected internal override void OnChildSizeChanged(Widget child, float dx, float dy,
-        AffectsByRelayout affects)
+    protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
     {
         //修改子节点受影响的区域
         affects.OldW = W;
@@ -121,6 +120,7 @@ public sealed class TreeView<T> : Widget, IScrollable
         }
 
         _controller.TotalHeight += dy;
+        _controller.ScrollController.Adjust(MaxScrollOffsetX, MaxScrollOffsetY);
     }
 
     protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
@@ -131,7 +131,6 @@ public sealed class TreeView<T> : Widget, IScrollable
             canvas.Save();
             canvas.Translate(X, Y);
             canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
-
             dirtyArea?.ApplyClip(canvas);
             canvas.Translate(-ScrollOffsetX, -ScrollOffsetY);
         }
@@ -141,25 +140,20 @@ public sealed class TreeView<T> : Widget, IScrollable
         }
     }
 
-    protected internal override void AfterPaint(Canvas canvas)
-    {
-        canvas.Restore();
-    }
+    protected internal override void AfterPaint(Canvas canvas) => canvas.Restore();
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
+        // draw background color if has
+        if (_fillColor != null)
+            canvas.DrawRect(Rect.FromLTWH(ScrollOffsetX, ScrollOffsetY, W, H), PixUI.Paint.Shared(_fillColor.Value));
+
         if (_controller.IsLoading)
         {
-            if (_fillColor != null)
-                canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(_fillColor.Value));
             _controller.LoadingPainter!.PaintToWidget(this, canvas);
             return;
         }
 
-        // draw background color if has
-        if (_fillColor != null)
-            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(_fillColor.Value));
-        
         if (area is RepaintChild repaintChild)
         {
             repaintChild.Repaint(canvas);
