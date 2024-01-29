@@ -91,6 +91,11 @@ public static partial class DynamicWidgetManager
             DynamicValue? initValue = null;
             if (propAttr.InitValue != null)
                 initValue = new DynamicValue() { Value = propAttr.InitValue };
+            
+            //TODO: 使用以下示例确认是否init-only属性，不再需要手工指定DynamicProperty.InitSetter属性
+            //参考: https://www.meziantou.net/csharp9-init-only-properties-are-not-read-only.htm
+            //prop.SetMethod!.ReturnParameter.GetRequiredCustomModifiers(),
+            //check is System.Runtime.CompilerServices.IsExternalInit
 
             var propMeta = new DynamicPropertyMeta(propName, propType,
                 allowNull, propAttr.InitSetter, initValue, propAttr.Editor);
@@ -110,6 +115,16 @@ public static partial class DynamicWidgetManager
             return false;
         }
     }
+    
+    // public static bool IsInitOnly(this PropertyInfo propertyInfo)
+    // {
+    //     var setMethod = propertyInfo.SetMethod;
+    //     if (setMethod == null)
+    //         return false;
+    //
+    //     var isExternalInitType = typeof(System.Runtime.CompilerServices.IsExternalInit);
+    //     return setMethod.ReturnParameter.GetRequiredCustomModifiers().Contains(isExternalInitType);
+    // }
 
     private static IconData GetIconByName(string iconName)
     {
