@@ -22,11 +22,13 @@ public interface IDraggable : IMouseRegion, IDataTransferItem
 
 public interface IDroppable : IMouseRegion
 {
-    bool AllowDrop(IDataTransferItem item);
+    bool AllowDrop(DragEvent dragEvent);
 
     void OnDragOver(DragEvent dragEvent, Point local);
 
-    void OnDrop(IDataTransferItem item);
+    void OnDragLeave(DragEvent dragEvent);
+
+    void OnDrop(DragEvent dragEvent);
 }
 
 public sealed class MouseRegion

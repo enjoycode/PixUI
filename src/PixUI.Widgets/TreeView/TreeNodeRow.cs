@@ -65,7 +65,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
 
     public bool AllowDrag() => Controller.AllowDragDrop;
 
-    public bool AllowDrop(IDataTransferItem item) => Controller.AllowDragDrop;
+    public bool AllowDrop(DragEvent dragEvent) => Controller.AllowDragDrop;
 
     public void OnDragStart(DragEvent dragEvent)
     {
@@ -88,7 +88,9 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         dragEvent.DropHintImage = BuildDropHintImage(dragEvent.DropPosition);
     }
 
-    public void OnDrop(IDataTransferItem item) { }
+    public void OnDragLeave(DragEvent dragEvent) { }
+
+    public void OnDrop(DragEvent dragEvent) { }
 
     private Image BuildDragHintImage()
     {

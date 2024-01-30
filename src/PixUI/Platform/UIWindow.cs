@@ -254,10 +254,11 @@ public abstract class UIWindow
 
         //暂在这里判断一下是否允许Drop
         var dropItem = new FileDataTransferItem(name, size, type, stream);
+        var dragEvent = new DragEvent() { TransferItem = dropItem };
         //var localPt = lastHitEntry.Value.ToLocalPoint(x, y);
-        if (!droppable.AllowDrop(dropItem)) return;
+        if (!droppable.AllowDrop(dragEvent)) return;
 
-        droppable.OnDrop(dropItem);
+        droppable.OnDrop(dragEvent);
     }
 
     public void OnKeyDown(KeyEvent keyEvent)

@@ -32,15 +32,17 @@ public sealed class DropFileInput : SingleChildWidget, IDroppable
         init => _onDrop = value;
     }
 
-    bool IDroppable.AllowDrop(IDataTransferItem item)
+    bool IDroppable.AllowDrop(DragEvent dragEvent)
     {
         //TODO: 检查类型及大小限制
-        return item is FileDataTransferItem;
+        return dragEvent.TransferItem is FileDataTransferItem;
     }
 
     void IDroppable.OnDragOver(DragEvent dragEvent, Point local) { }
 
-    void IDroppable.OnDrop(IDataTransferItem item) => _onDrop?.Invoke(item);
+    void IDroppable.OnDragLeave(DragEvent dragEvent) { }
+
+    void IDroppable.OnDrop(DragEvent dragEvent) => _onDrop?.Invoke(dragEvent.TransferItem);
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {

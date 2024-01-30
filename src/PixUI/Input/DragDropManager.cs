@@ -9,7 +9,7 @@ public static class DragDropManager
     private static IDroppable? _dropping;
     private static DragEvent? _dragEvent;
     private static HitTestEntry? _dropHitEntry;
-    
+
     private static Overlay? _overlay;
     private static readonly DraggingDecorator _decorator = new();
 
@@ -33,7 +33,7 @@ public static class DragDropManager
                 _dragEvent.TransferItem = _dragging;
             if (_dragEvent.DragHintImage == null!)
                 throw new NotImplementedException(); //TODO: build default hit image
-            
+
             ShowDecorator();
             Log.Debug($"[{_dragging}] start drag...");
             return true;
@@ -68,7 +68,7 @@ public static class DragDropManager
 
         if (_dropHitEntry == null || ReferenceEquals(_dropHitEntry.Value.Widget, _dragging))
         {
-            _dropping = null;
+            LeaveOldDropping();
         }
         else if (ReferenceEquals(_dropHitEntry.Value.Widget, _dropping))
         {
@@ -78,6 +78,7 @@ public static class DragDropManager
         }
         else if (_dropHitEntry.Value.Widget is IDroppable droppable)
         {
+            LeaveOldDropping();
             _dropping = droppable;
             var localPt = _dropHitEntry.Value.ToLocalPoint(e.X, e.Y);
             _dropping.OnDragOver(_dragEvent!, new(localPt.Dx, localPt.Dy));
@@ -89,11 +90,23 @@ public static class DragDropManager
         return true;
     }
 
+    private static void LeaveOldDropping()
+    {
+        _dropping?.OnDragLeave(_dragEvent!);
+        _dragEvent!.DropEffect = DropEffect.None;
+        _dropping = null;
+    }
+
     internal static bool MaybeStop(PointerEvent e)
     {
         if (_dragging == null) return false;
 
         HideDecorator();
+
+        _dragging.OnDragEnd(_dragEvent!);
+        // if (_dragEvent!.DropEffect != DropEffect.None)
+        //     _dropping?.OnDrop();
+
         _dragging = null;
         _dropping = null;
         _dragEvent = null;
