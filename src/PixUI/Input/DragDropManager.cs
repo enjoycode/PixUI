@@ -79,10 +79,13 @@ public static class DragDropManager
         else if (_dropHitEntry.Value.Widget is IDroppable droppable)
         {
             LeaveOldDropping();
-            _dropping = droppable;
-            var localPt = _dropHitEntry.Value.ToLocalPoint(e.X, e.Y);
-            _dropping.OnDragOver(_dragEvent!, new(localPt.Dx, localPt.Dy));
-            Log.Debug($"Drag over 1 [{_dropping}]");
+            if (droppable.AllowDrop(_dragEvent!))
+            {
+                _dropping = droppable;
+                var localPt = _dropHitEntry.Value.ToLocalPoint(e.X, e.Y);
+                _dropping.OnDragOver(_dragEvent!, new(localPt.Dx, localPt.Dy));
+                Log.Debug($"Drag over 1 [{_dropping}]");
+            }
         }
 
         _decorator.Repaint();
@@ -104,8 +107,8 @@ public static class DragDropManager
         HideDecorator();
 
         _dragging.OnDragEnd(_dragEvent!);
-        // if (_dragEvent!.DropEffect != DropEffect.None)
-        //     _dropping?.OnDrop();
+        if (_dragEvent!.DropEffect != DropEffect.None)
+            _dropping?.OnDrop(_dragEvent);
 
         _dragging = null;
         _dropping = null;

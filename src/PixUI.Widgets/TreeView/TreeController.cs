@@ -21,7 +21,19 @@ public sealed class TreeController<T>
     internal float TotalWidth = 0;
     internal float TotalHeight = 0;
 
-    public bool AllowDragDrop { get; set; }
+    #region ----DragDrop----
+
+    public bool AllowDrag { get; set; }
+    
+    public bool AllowDrop { get; set; }
+
+    public Func<TreeNode<T>, bool>? OnAllowDrag { get; set; }
+
+    public Func<TreeNode<T>, DragEvent, bool>? OnAllowDrop { get; set; }
+
+    public Action<TreeNode<T>, DragEvent>? OnDrop { get; set; }
+
+    #endregion
 
     /// <summary>
     /// 获取根节点只读列表
@@ -220,7 +232,10 @@ public sealed class TreeController<T>
             node.Parent = null;
             //强制重新布局
             if (parentNode.IsExpanded)
+            {
                 parentNode.Relayout();
+                TreeView!.Repaint(); //暂需要，如果node.IsHover会有残留
+            }
         }
 
         //如果是选择的，则清除

@@ -63,12 +63,17 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
 
     #region ====DragDrop====
 
-    public bool AllowDrag() => Controller.AllowDragDrop;
+    public bool AllowDrag()
+    {
+        if (!Controller.AllowDrag) return false;
+        return Controller.OnAllowDrag == null || Controller.OnAllowDrag(TreeNode);
+    }
 
-    public bool AllowDrop(DragEvent dragEvent) => Controller.AllowDragDrop;
+    public bool AllowDrop(DragEvent dragEvent) => Controller.AllowDrop;
 
     public void OnDragStart(DragEvent dragEvent)
     {
+        dragEvent.TransferItem = TreeNode;
         dragEvent.DragHintImage = BuildDragHintImage();
     }
 
@@ -80,17 +85,28 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         dragEvent.DropPosition = DropPosition.In;
         var posOffset = Controller.NodeHeight / 4;
         if (local.Y < posOffset)
-            dragEvent.DropPosition = DropPosition.Up;
+            dragEvent.DropPosition = DropPosition.Upper;
         else if (local.Y > H - posOffset)
-            dragEvent.DropPosition = DropPosition.Down;
+            dragEvent.DropPosition = DropPosition.Under;
 
-        //TODO:考虑缓存dropHintImage
-        dragEvent.DropHintImage = BuildDropHintImage(dragEvent.DropPosition);
+        var allowDrop = true;
+        if (Controller.OnAllowDrop != null)
+            allowDrop = Controller.OnAllowDrop(TreeNode, dragEvent);
+        if (!allowDrop)
+        {
+            dragEvent.DropEffect = DropEffect.None;
+            dragEvent.DropHintImage = null;
+        }
+        else
+        {
+            //TODO:考虑缓存dropHintImage
+            dragEvent.DropHintImage = BuildDropHintImage(dragEvent.DropPosition);
+        }
     }
 
     public void OnDragLeave(DragEvent dragEvent) { }
 
-    public void OnDrop(DragEvent dragEvent) { }
+    public void OnDrop(DragEvent dragEvent) => Controller.OnDrop?.Invoke(TreeNode, dragEvent);
 
     private Image BuildDragHintImage()
     {
@@ -147,12 +163,12 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         canvas.DrawRect(Rect.FromLTWH(1 + scrollX, 1, width - scrollX - 2, height - 2), paint);
 
         const float indent = 4f;
-        if (position == DropPosition.Up)
+        if (position == DropPosition.Upper)
         {
             paint = PixUI.Paint.Shared(Theme.FocusedColor);
             canvas.DrawRect(Rect.FromLTWH(1 + scrollX, 1, width - scrollX - 2, indent), paint);
         }
-        else if (position == DropPosition.Down)
+        else if (position == DropPosition.Under)
         {
             paint = PixUI.Paint.Shared(Theme.FocusedColor);
             canvas.DrawRect(Rect.FromLTWH(1 + scrollX, height - indent - 1, width - scrollX - 2, indent), paint);

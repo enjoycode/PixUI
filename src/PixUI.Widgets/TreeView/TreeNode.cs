@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace PixUI;
 
-public sealed class TreeNode<T> : Widget
+public sealed class TreeNode<T> : Widget, IDataTransferItem
 {
     internal TreeNode(T data, TreeController<T> controller)
     {
@@ -49,6 +49,7 @@ public sealed class TreeNode<T> : Widget
 
     public Text Label
     {
+        get => _row.Label!;
         set
         {
             _row.Label = value;
@@ -84,7 +85,11 @@ public sealed class TreeNode<T> : Widget
         }
     }
 
+    public TreeView<T> TreeView => Controller.TreeView!;
+
     public TreeNode<T>? ParentNode => Parent as TreeNode<T>;
+
+    public int Index => ParentNode?.IndexOf(this) ?? Controller.Nodes.IndexOf(this);
 
     #endregion
 

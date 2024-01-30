@@ -70,11 +70,15 @@ public sealed class DemoTreeView : View
                                 Child = new TreeView<TreeData>(_treeController1, BuildTreeNode,
                                     d => d.Children!)
                                 {
-                                    AllowDragDrop = true,
+                                    AllowDrag = true,
+                                    AllowDrop = true,
+                                    OnAllowDrag = OnAllowDrag,
+                                    OnAllowDrop = OnAllowDrop,
+                                    OnDrop = OnDrop,
                                     FillColor = new Color(0xFFDCDCDC),
                                 }
                             },
-                            Panel2 = new Center() {Child = new Text("Placeholder")}
+                            Panel2 = new Center() { Child = new Text("Placeholder") }
                             // Panel2 = new TreeView<TreeData>(_treeController2, BuildTreeNode,
                             //     d => d.Children!, true)
                             // {
@@ -94,6 +98,55 @@ public sealed class DemoTreeView : View
         node.Label = new Text(data.Text);
         node.IsLeaf = data.Children == null;
         node.IsExpanded = data.Text == "Cloud";
+    }
+
+    private static bool OnAllowDrag(TreeNode<TreeData> source)
+    {
+        if (source.Data.Text == "Sunny") return false;
+        return true;
+    }
+
+    private static bool OnAllowDrop(TreeNode<TreeData> target, DragEvent e)
+    {
+        var source = e.TransferItem as TreeNode<TreeData>;
+        if (source == null) return false;
+        if (source.TreeView != target.TreeView) return false;
+
+        if (target.ParentNode != null && target.ParentNode.Data.Text == "Cake")
+        {
+            if (e.DropPosition == DropPosition.In)
+                return false;
+        }
+
+        return true;
+    }
+
+    private void OnDrop(TreeNode<TreeData> target, DragEvent e)
+    {
+        var source = (TreeNode<TreeData>)e.TransferItem;
+        switch (e.DropPosition)
+        {
+            case DropPosition.In:
+                _treeController1.RemoveNode(source);
+                ToNoneLeafNode(target);
+                _treeController1.InsertNode(source.Data, target);
+                break;
+            case DropPosition.Upper:
+                _treeController1.RemoveNode(source);
+                var parent = target.ParentNode;
+                var index = target.Index;
+                _treeController1.InsertNode(source.Data, parent, index);
+                break;
+            default: break;
+        }
+    }
+
+    private static void ToNoneLeafNode(TreeNode<TreeData> node)
+    {
+        if (!node.IsLeaf) return;
+        node.IsLeaf = false;
+        node.Data.Children = new List<TreeData>();
+        node.EnsureBuildChildren();
     }
 
     private void OnInsert(PointerEvent e)
@@ -125,7 +178,7 @@ public sealed class DemoTreeView : View
     }
 }
 
-internal struct TreeData
+internal sealed class TreeData
 {
     public IconData Icon;
     public string Text;

@@ -13,8 +13,8 @@ public enum DropEffect
 public enum DropPosition
 {
     In,
-    Up,
-    Down,
+    Upper,
+    Under,
     Left,
     Right
 }

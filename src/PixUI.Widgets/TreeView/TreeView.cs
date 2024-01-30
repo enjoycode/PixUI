@@ -30,10 +30,34 @@ public sealed class TreeView<T> : Widget, IScrollable
         init => Bind(ref _fillColor, value, RepaintOnStateChanged);
     }
 
-    public bool AllowDragDrop
+    public bool AllowDrag
     {
-        get => _controller.AllowDragDrop;
-        set => _controller.AllowDragDrop = value;
+        get => _controller.AllowDrag;
+        set => _controller.AllowDrag = value;
+    }
+    
+    public bool AllowDrop
+    {
+        get => _controller.AllowDrop;
+        set => _controller.AllowDrop = value;
+    }
+
+    public Func<TreeNode<T>, bool>? OnAllowDrag
+    {
+        get => _controller.OnAllowDrag;
+        set => _controller.OnAllowDrag = value;
+    }
+
+    public Func<TreeNode<T>, DragEvent, bool>? OnAllowDrop
+    {
+        get => _controller.OnAllowDrop;
+        set => _controller.OnAllowDrop = value;
+    }
+
+    public Action<TreeNode<T>, DragEvent>? OnDrop
+    {
+        get => _controller.OnDrop;
+        set => _controller.OnDrop = value;
     }
 
     public Action<TreeNode<T>> OnCheckChanged

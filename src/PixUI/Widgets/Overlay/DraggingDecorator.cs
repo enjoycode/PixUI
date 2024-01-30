@@ -9,14 +9,16 @@ internal sealed class DraggingDecorator : Widget
         if (DragDropManager.DragEvent == null) return;
 
         var e = DragDropManager.DragEvent;
+        // draw drag hint image
         var winX = Root!.Window.LastMouseX;
         var winY = Root!.Window.LastMouseY;
         var scale = Root!.Window.ScaleFactor;
         var dest = Rect.FromLTWH(winX, winY, e.DragHintImage.Width / scale, e.DragHintImage.Height / scale);
         canvas.DrawImage(e.DragHintImage, dest);
-        
-        if (DragDropManager.Dropping == null) return;
 
+        if (e.DropEffect == DropEffect.None || DragDropManager.Dropping == null) return;
+
+        // draw drop hint image
         canvas.Save();
         var m = Matrix4.TryInvert(DragDropManager.HitTransform);
         canvas.Concat(m!.Value);
@@ -33,7 +35,7 @@ internal sealed class DraggingDecorator : Widget
             dest = Rect.FromLTWH(0, 0, e.DropHintImage.Width / scale, e.DropHintImage.Height / scale);
             canvas.DrawImage(e.DropHintImage, dest);
         }
-        
+
         canvas.Restore();
     }
 }
