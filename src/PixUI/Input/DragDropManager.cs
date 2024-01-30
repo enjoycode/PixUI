@@ -8,10 +8,14 @@ public static class DragDropManager
     private static IDraggable? _dragging;
     private static IDroppable? _dropping;
     private static DragEvent? _dragEvent;
+    private static HitTestEntry? _dropHitEntry;
+    
     private static Overlay? _overlay;
     private static readonly DraggingDecorator _decorator = new();
 
     internal static DragEvent? DragEvent => _dragEvent;
+    internal static IDroppable? Dropping => _dropping;
+    internal static Matrix4 HitTransform => _dropHitEntry!.Value.Transform;
 
     internal static bool MaybeStart(UIWindow window, ref HitTestEntry? pointDownEntry, PointerEvent e)
     {
@@ -59,23 +63,23 @@ public static class DragDropManager
 
         // HitTest for IDroppable
         window.NewHitTest(e.X, e.Y);
-        var hitEntry = window.NewHitResult.LastEntry;
+        _dropHitEntry = window.NewHitResult.LastEntry;
         window.NewHitResult.Reset();
 
-        if (hitEntry == null || ReferenceEquals(hitEntry.Value.Widget, _dragging))
+        if (_dropHitEntry == null || ReferenceEquals(_dropHitEntry.Value.Widget, _dragging))
         {
             _dropping = null;
         }
-        else if (ReferenceEquals(hitEntry.Value.Widget, _dropping))
+        else if (ReferenceEquals(_dropHitEntry.Value.Widget, _dropping))
         {
-            var localPt = hitEntry.Value.ToLocalPoint(e.X, e.Y);
+            var localPt = _dropHitEntry.Value.ToLocalPoint(e.X, e.Y);
             _dropping.OnDragOver(_dragEvent!, new(localPt.Dx, localPt.Dy));
             Log.Debug($"Drag over 2 [{_dropping}]");
         }
-        else if (hitEntry.Value.Widget is IDroppable droppable)
+        else if (_dropHitEntry.Value.Widget is IDroppable droppable)
         {
             _dropping = droppable;
-            var localPt = hitEntry.Value.ToLocalPoint(e.X, e.Y);
+            var localPt = _dropHitEntry.Value.ToLocalPoint(e.X, e.Y);
             _dropping.OnDragOver(_dragEvent!, new(localPt.Dx, localPt.Dy));
             Log.Debug($"Drag over 1 [{_dropping}]");
         }

@@ -69,16 +69,28 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
 
     public void OnDragStart(DragEvent dragEvent)
     {
-        dragEvent.DragHintImage = BuidDragHintImage();
+        dragEvent.DragHintImage = BuildDragHintImage();
     }
 
     public void OnDragEnd(DragEvent dragEvent) { }
 
-    public void OnDragOver(DragEvent dragEvent, Point local) { }
+    public void OnDragOver(DragEvent dragEvent, Point local)
+    {
+        dragEvent.DropEffect = DropEffect.Move;
+        dragEvent.DropPosition = DropPosition.In;
+        var posOffset = Controller.NodeHeight / 4;
+        if (local.Y < posOffset)
+            dragEvent.DropPosition = DropPosition.Up;
+        else if (local.Y > H - posOffset)
+            dragEvent.DropPosition = DropPosition.Down;
+
+        //TODO:考虑缓存dropHintImage
+        dragEvent.DropHintImage = BuildDropHintImage(dragEvent.DropPosition);
+    }
 
     public void OnDrop(IDataTransferItem item) { }
 
-    private Image BuidDragHintImage()
+    private Image BuildDragHintImage()
     {
         const float padding = 5f;
         var width = padding;
@@ -116,6 +128,36 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
 
         var image = recorder.EndRecording();
         return Image.FromPicture(image, new SizeI((int)(width * scale), (int)(H * scale)));
+    }
+
+    private Image BuildDropHintImage(DropPosition position)
+    {
+        var scrollX = Controller.TreeView!.ScrollOffsetX;
+        var width = Controller.TreeView!.W + scrollX;
+        var height = Controller.NodeHeight;
+
+        var scale = Root!.Window.ScaleFactor;
+        var rect = Rect.FromLTWH(0, 0, width * scale, height * scale);
+        using var recorder = new PictureRecorder();
+        using var canvas = recorder.BeginRecording(rect);
+        canvas.Scale(scale, scale);
+        var paint = PixUI.Paint.Shared(Colors.Gray, PaintStyle.Stroke, 2);
+        canvas.DrawRect(Rect.FromLTWH(1 + scrollX, 1, width - scrollX - 2, height - 2), paint);
+
+        const float indent = 4f;
+        if (position == DropPosition.Up)
+        {
+            paint = PixUI.Paint.Shared(Theme.FocusedColor);
+            canvas.DrawRect(Rect.FromLTWH(1 + scrollX, 1, width - scrollX - 2, indent), paint);
+        }
+        else if (position == DropPosition.Down)
+        {
+            paint = PixUI.Paint.Shared(Theme.FocusedColor);
+            canvas.DrawRect(Rect.FromLTWH(1 + scrollX, height - indent - 1, width - scrollX - 2, indent), paint);
+        }
+
+        var image = recorder.EndRecording();
+        return Image.FromPicture(image, new SizeI((int)(width * scale), (int)(height * scale)));
     }
 
     #endregion

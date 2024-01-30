@@ -14,5 +14,26 @@ internal sealed class DraggingDecorator : Widget
         var scale = Root!.Window.ScaleFactor;
         var dest = Rect.FromLTWH(winX, winY, e.DragHintImage.Width / scale, e.DragHintImage.Height / scale);
         canvas.DrawImage(e.DragHintImage, dest);
+        
+        if (DragDropManager.Dropping == null) return;
+
+        canvas.Save();
+        var m = Matrix4.TryInvert(DragDropManager.HitTransform);
+        canvas.Concat(m!.Value);
+        if (e.DropHintImage == null)
+        {
+            //TODO:
+            var target = (Widget)DragDropManager.Dropping;
+            var rect = Rect.FromLTWH(0, 0, target.W, target.H);
+            var paint = PixUI.Paint.Shared(Colors.Red, PaintStyle.Stroke);
+            canvas.DrawRect(rect, paint);
+        }
+        else
+        {
+            dest = Rect.FromLTWH(0, 0, e.DropHintImage.Width / scale, e.DropHintImage.Height / scale);
+            canvas.DrawImage(e.DropHintImage, dest);
+        }
+        
+        canvas.Restore();
     }
 }
