@@ -25,11 +25,11 @@ public abstract class Widget : IDisposable
     {
         set => value.SetWidget(this);
     }
-    
+
     /// <summary>
     /// 设置当前Widget的引用
     /// </summary>
-    public T RefBy<T>(ref T by) where T: Widget
+    public T RefBy<T>(ref T by) where T : Widget
     {
         by = (T)this;
         return by;
@@ -530,18 +530,23 @@ public abstract class Widget : IDisposable
 
         VisitChildren(child =>
         {
-            if (child.W <= 0 || child.H <= 0)
-                return false;
-            if (area != null && !area.IntersectsWith(child))
-                return false; //脏区域与子组件没有相交部分，不用绘制
-
-            child.BeforePaint(canvas);
-            child.Paint(canvas, area?.ToChild(child));
-            child.AfterPaint(canvas);
-
-            PaintDebugger.PaintWidgetBorder(child, canvas);
+            PaintChild(child, canvas, area);
             return false;
         });
+    }
+
+    protected static void PaintChild(Widget child, Canvas canvas, IDirtyArea? area = null)
+    {
+        if (child.W <= 0 || child.H <= 0)
+            return;
+        if (area != null && !area.IntersectsWith(child))
+            return; //脏区域与子组件没有相交部分，不用绘制
+
+        child.BeforePaint(canvas);
+        child.Paint(canvas, area?.ToChild(child));
+        child.AfterPaint(canvas);
+
+        PaintDebugger.PaintWidgetBorder(child, canvas);
     }
 
     #endregion

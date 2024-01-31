@@ -152,9 +152,9 @@ public sealed class Splitter : Widget
 
     public override void VisitChildren(Func<Widget, bool> action)
     {
-        if (Panel1 != null && !IsPanel1Collapsed && action(Panel1)) return;
-        if (Panel2 != null && !IsPanel2Collapsed && action(Panel2)) return;
-        if (!IsPanel1Collapsed && !IsPanel2Collapsed) action(_bar);
+        if (Panel1 != null && action(Panel1)) return;
+        if (Panel2 != null && action(Panel2)) return;
+        action(_bar);
     }
 
     public override void Layout(float availableWidth, float availableHeight)
@@ -233,5 +233,25 @@ public sealed class Splitter : Widget
             _bar.SetPosition(0, distance);
             Panel2.SetPosition(0, distance + SplitterSize);
         }
+    }
+
+    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    {
+        if (IsPanel1Collapsed && IsPanel2Collapsed) return;
+
+        if (area is RepaintChild repaintChild)
+        {
+            repaintChild.Repaint(canvas);
+            return;
+        }
+
+        if (Panel1 != null && !IsPanel1Collapsed)
+            PaintChild(Panel1, canvas, area);
+
+        if (Panel2 != null && !IsPanel2Collapsed)
+            PaintChild(Panel2, canvas, area);
+
+        if (!IsPanel1Collapsed && !IsPanel2Collapsed)
+            PaintChild(_bar, canvas, area);
     }
 }
