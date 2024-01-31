@@ -273,7 +273,7 @@ internal sealed class InvalidQueue
     /// <summary>
     /// Only for Widgets Tree
     /// </summary>
-    internal void RenderFrame(PaintContext context)
+    internal bool RenderFrame(PaintContext context)
     {
         var hasRelayout = false;
         IsSuspended = true;
@@ -311,9 +311,7 @@ internal sealed class InvalidQueue
         _queue.Clear();
         IsSuspended = false;
 
-        // 通知重新进行HitTest TODO:确认布局影响，eg:Input重布局没有改变大小，则不需要重新HitTest
-        if (hasRelayout)
-            context.Window.NewHitTestForLayoutChanged();
+        return hasRelayout;
     }
 
     /// <summary>

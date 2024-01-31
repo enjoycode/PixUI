@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace PixUI;
@@ -6,7 +7,7 @@ namespace PixUI;
 public abstract class UIApplication
 {
     public readonly Thread UIThread = Thread.CurrentThread;
-    
+
     protected UIWindow MainWindow = null!; //目前仅支持单一Window
 
     public static UIApplication Current { get; protected set; } = null!;
@@ -16,12 +17,12 @@ public abstract class UIApplication
     /// <summary>
     /// 仅Blazor应用
     /// </summary>
-    protected internal virtual void PushWebHistory(string fullPath, int index) {}
-    
+    protected internal virtual void PushWebHistory(string fullPath, int index) { }
+
     /// <summary>
     /// 仅Blazor应用
     /// </summary>
-    protected internal virtual void ReplaceWebHistory(string fullPath, int index) {}
+    protected internal virtual void ReplaceWebHistory(string fullPath, int index) { }
 
     /// <summary>
     /// Post invalidate event to main loop, maybe called by none UI thread
@@ -46,14 +47,15 @@ public abstract class UIApplication
         ctx.Window = window;
 
 #if DEBUG
-        var start = DateTime.UtcNow;
+        var ts = Stopwatch.GetTimestamp();
 #endif
 
+        var hasRelayout = false;
         //先绘制WidgetsCanvas
         if (!window.WidgetsInvalidQueue.IsEmpty)
         {
             ctx.Canvas = widgetsCanvas;
-            window.WidgetsInvalidQueue.RenderFrame(ctx);
+            hasRelayout = window.WidgetsInvalidQueue.RenderFrame(ctx);
             if (OperatingSystem.IsBrowser())
                 widgetsCanvas.Surface!.Flush();
 #if __WEB__
@@ -88,11 +90,13 @@ public abstract class UIApplication
 #endif
 
         window.HasPostInvalidateEvent = false;
-
+        // 通知重新进行HitTest, must after reset HasPostInvalidateEvent
+        // TODO:确认布局影响，eg:Input重布局没有改变大小，则不需要重新HitTest
+        if (hasRelayout)
+            ctx.Window.NewHitTestForLayoutChanged();
 
 #if DEBUG
-        var duration = DateTime.UtcNow - start;
-        Log.Debug($"DrawFrame: {duration.TotalMilliseconds}ms");
+        Log.Debug($"DrawFrame: {Stopwatch.GetElapsedTime(ts).TotalMilliseconds}ms");
 #endif
 
         window.Present();
