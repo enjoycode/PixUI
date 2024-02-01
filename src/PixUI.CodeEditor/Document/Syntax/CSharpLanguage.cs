@@ -127,6 +127,7 @@ internal sealed class CSharpLanguage : ICodeLanguage
         { "real_literal", TokenType.LiteralNumber },
         { "integer_literal", TokenType.LiteralNumber },
 
+        { "interpolated_string_text", TokenType.LiteralString },
         { "string_literal", TokenType.LiteralString },
         { "character_literal", TokenType.LiteralString },
 

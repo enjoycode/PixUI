@@ -7,8 +7,25 @@ namespace CodeEditor;
 /// </summary>
 internal sealed class EditorDecorator : FlowDecorator<CodeEditorWidget>
 {
-    internal EditorDecorator(CodeEditorWidget codeEditor) : base(codeEditor, false) { }
+    internal EditorDecorator(CodeEditorWidget codeEditor) : base(codeEditor, false)
+    {
+        codeEditor.Controller.TextEditor.Caret.PositionChanged += OnCaretPosChanged;
+    }
 
+    private void OnCaretPosChanged()
+    {
+        var textEditor = Target.Controller.TextEditor;
+        var rootNode = Target.Controller.Document.SyntaxParser.RootNode;
+        if (!rootNode.HasValue) return;
+
+        var caretPos = textEditor.Caret.Position;
+        var startPoint = new TSPoint(caretPos.Line, caretPos.Column * SyntaxParser.ParserEncoding);
+        // var endPoint = new TSPoint(caretPos.Line, (caretPos.Column + 1) * SyntaxParser.ParserEncoding);
+        var nodeAtCaret = rootNode.Value.DescendantForPosition(startPoint /*, endPoint*/);
+        if (!nodeAtCaret.HasValue) return;
+
+        //Log.Debug($"Type: {nodeAtCaret.Value.Type} IsNamed: {nodeAtCaret.Value.IsNamed()}");
+    }
 
     protected override void PaintCore(Canvas canvas)
     {
