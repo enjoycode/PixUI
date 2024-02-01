@@ -124,7 +124,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
     protected override void OnTextChanged(State state)
     {
         if (!_changeByTextInput)
-            _caretPosition = Text.Value.Length;
+            _caretPosition = Text.Value == null! ? 0 : Text.Value.Length;
 
         base.OnTextChanged(state);
     }

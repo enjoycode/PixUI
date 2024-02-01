@@ -44,7 +44,7 @@ internal sealed class MotionCanvas
         var ts = TimeSpan.FromSeconds(1 / MaxFps);
         while (!CanvasCore.IsValid)
         {
-            _chartView.Invalidate(InvalidAction.Repaint);
+            _chartView.Repaint();
             await Task.Delay((int)ts.TotalMilliseconds);
         }
 
