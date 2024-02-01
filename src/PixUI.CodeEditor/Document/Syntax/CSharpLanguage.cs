@@ -183,6 +183,7 @@ internal sealed class CSharpLanguage : ICodeLanguage
             case "base_list":
             case "variable_declaration":
             case "nullable_type":
+            case "attribute":
 
             case "generic_name":
             case "type_parameter":
@@ -214,9 +215,9 @@ internal sealed class CSharpLanguage : ICodeLanguage
                 return node.PrevNamedSibling == null ? TokenType.Type : TokenType.Variable;
 
             case "invocation_expression":
-            case "method_declaration":
                 return TokenType.Function;
-
+            case "method_declaration":
+                return GetIdentifierTypeFromMethodDeclaration(node);
             case "member_binding_expression":
                 return GetIdentifierTypeFromMemberBinding(node);
             case "qualified_name":
@@ -227,6 +228,13 @@ internal sealed class CSharpLanguage : ICodeLanguage
             default:
                 return TokenType.Unknown;
         }
+    }
+
+    private static TokenType GetIdentifierTypeFromMethodDeclaration(in TSNode node)
+    {
+        return node.NextSibling is { Type: "identifier" }
+            ? TokenType.Type
+            : TokenType.Function;
     }
 
     private static TokenType GetIdentifierTypeFromMemberBinding(in TSNode node)
