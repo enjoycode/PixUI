@@ -103,7 +103,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         if (IsReadonly) return;
 
         var insertPos = _caretPosition;
-        var oldText = Text.Value;
+        var oldText = Text.Value == null! ? string.Empty : Text.Value;
         if (_selectionStart != _selectionEnd)
         {
             oldText = oldText.Remove(_selectionStart, _selectionEnd - _selectionStart);
