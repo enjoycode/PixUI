@@ -44,4 +44,10 @@ public sealed class CellStyle
     public static CellStyle AlignCenter() => new() { HorizontalAlignment = HorizontalAlignment.Center };
 
     public static CellStyle AlignMiddleRight() => new() { HorizontalAlignment = HorizontalAlignment.Right };
+
+    public CellStyle Clone() => new()
+    {
+        TextColor = TextColor, FillColor = FillColor, FontSize = FontSize, FontWeight = FontWeight,
+        HorizontalAlignment = HorizontalAlignment, VerticalAlignment = VerticalAlignment
+    };
 }

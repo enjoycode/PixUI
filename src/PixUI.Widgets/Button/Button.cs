@@ -23,7 +23,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         Icon = icon;
     }
 
-    internal const float DefaultHeight = 30;
+    public const float DefaultHeight = 30;
     internal const float StandardRadius = 4;
 
     private readonly State<string>? _text;
