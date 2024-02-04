@@ -108,7 +108,10 @@ public static class DragDropManager
 
         _dragging.OnDragEnd(_dragEvent!);
         if (_dragEvent!.DropEffect != DropEffect.None)
-            _dropping?.OnDrop(_dragEvent);
+        {
+            var localPt = _dropHitEntry!.Value.ToLocalPoint(e.X, e.Y);
+            _dropping?.OnDrop(_dragEvent, new(localPt.Dx, localPt.Dy));
+        }
 
         _dragging = null;
         _dropping = null;

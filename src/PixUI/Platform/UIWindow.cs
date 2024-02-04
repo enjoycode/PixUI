@@ -258,7 +258,7 @@ public abstract class UIWindow
         //var localPt = lastHitEntry.Value.ToLocalPoint(x, y);
         if (!droppable.AllowDrop(dragEvent)) return;
 
-        droppable.OnDrop(dragEvent);
+        droppable.OnDrop(dragEvent, Point.Empty);
     }
 
     public void OnKeyDown(KeyEvent keyEvent)

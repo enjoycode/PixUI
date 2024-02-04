@@ -42,7 +42,7 @@ public sealed class DropFileInput : SingleChildWidget, IDroppable
 
     void IDroppable.OnDragLeave(DragEvent dragEvent) { }
 
-    void IDroppable.OnDrop(DragEvent dragEvent) => _onDrop?.Invoke(dragEvent.TransferItem);
+    void IDroppable.OnDrop(DragEvent dragEvent, Point local) => _onDrop?.Invoke(dragEvent.TransferItem);
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {

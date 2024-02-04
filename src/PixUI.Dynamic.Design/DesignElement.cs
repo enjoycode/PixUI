@@ -7,7 +7,7 @@ namespace PixUI.Dynamic.Design;
 /// <summary>
 /// 设计时包装目标Widget
 /// </summary>
-public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
+public sealed class DesignElement : Widget, IDroppable, IDesignElement
 {
     /// <summary>
     /// Ctor for Root DesignElement or Deserialize
@@ -30,7 +30,7 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
     }
 
     /// <summary>
-    /// Ctor for designtime
+    /// Ctor for design time
     /// </summary>
     internal DesignElement(DesignController controller, DynamicWidgetMeta meta, string slotName)
         : this(controller, slotName)
@@ -576,6 +576,30 @@ public sealed class DesignElement : Widget, IMouseRegion, IDesignElement
         Parent?.Parent?.Relayout(); //暂强制重布局上级的上级
         Controller.Select(newChild);
         Controller.OnSelectionChanged();
+    }
+
+    #endregion
+
+    #region ====DragDrop====
+
+    public bool AllowDrop(DragEvent dragEvent)
+    {
+        return false;
+    }
+
+    public void OnDragOver(DragEvent dragEvent, Point local)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnDragLeave(DragEvent dragEvent)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnDrop(DragEvent dragEvent, Point local)
+    {
+        throw new NotImplementedException();
     }
 
     #endregion

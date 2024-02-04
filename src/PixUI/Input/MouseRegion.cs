@@ -28,7 +28,7 @@ public interface IDroppable : IMouseRegion
 
     void OnDragLeave(DragEvent dragEvent);
 
-    void OnDrop(DragEvent dragEvent);
+    void OnDrop(DragEvent dragEvent, Point local);
 }
 
 public sealed class MouseRegion

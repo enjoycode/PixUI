@@ -17,14 +17,11 @@ public sealed class Toolbox : View
             Children =
             {
                 new TextInput(_searchKey) { Suffix = new Icon(MaterialIcons.Search) },
-                new TreeView<ToolboxNode>(_treeController, (node) =>
+                new TreeView<ToolboxNode>(_treeController, BuildTreeNode, data => data.Children!)
                 {
-                    var data = node.Data;
-                    node.Label = new Text(data.IsCatelog ? data.CatelogName! : data.DynamicWidgetMeta!.Name);
-                    node.Icon = data.IsCatelog ? new(MaterialIcons.Folder) : new(data.DynamicWidgetMeta!.Icon);
-                    node.IsLeaf = !data.IsCatelog;
-                    node.IsExpanded = true;
-                }, data => data.Children!)
+                    AllowDrag = true,
+                    OnAllowDrag = OnAllowDrag,
+                }
             }
         };
     }
@@ -32,6 +29,15 @@ public sealed class Toolbox : View
     private readonly DesignController _designController;
     private readonly State<string> _searchKey = string.Empty;
     private readonly TreeController<ToolboxNode> _treeController = new();
+
+    private static void BuildTreeNode(TreeNode<ToolboxNode> node)
+    {
+        var data = node.Data;
+        node.Label = new Text(data.IsCatelog ? data.CatelogName! : data.DynamicWidgetMeta!.Name);
+        node.Icon = data.IsCatelog ? new(MaterialIcons.Folder) : new(data.DynamicWidgetMeta!.Icon);
+        node.IsLeaf = !data.IsCatelog;
+        node.IsExpanded = true;
+    }
 
     private void BuildTreeDataSource()
     {
@@ -59,6 +65,8 @@ public sealed class Toolbox : View
     }
 
     public void Rebuild() => BuildTreeDataSource();
+
+    private static bool OnAllowDrag(TreeNode<ToolboxNode> node) => !node.Data.IsCatelog;
 
     private void OnSelectionChanged()
     {

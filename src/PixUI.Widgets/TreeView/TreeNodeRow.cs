@@ -106,7 +106,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
 
     public void OnDragLeave(DragEvent dragEvent) { }
 
-    public void OnDrop(DragEvent dragEvent) => Controller.OnDrop?.Invoke(TreeNode, dragEvent);
+    public void OnDrop(DragEvent dragEvent, Point local) => Controller.OnDrop?.Invoke(TreeNode, dragEvent);
 
     private Image BuildDragHintImage()
     {
