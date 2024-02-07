@@ -12,7 +12,7 @@ public abstract class RouteBase
 {
     protected RouteBase(string name, bool isDynamic = false,
         TransitionBuilder? enteringBuilder = null, TransitionBuilder? existingBuilder = null,
-        int duration = 200, int reverseDuration = 200)
+        int duration = 200, int reverseDuration = 200, Func<ValueTask<bool>>? allowAccess = null)
     {
         //TODO:检查名称有效性
         Name = name.ToLower();
@@ -20,6 +20,8 @@ public abstract class RouteBase
         Duration = duration;
         ReverseDuration = reverseDuration;
         EnteringBuilder = enteringBuilder;
+        ExistingBuilder = existingBuilder;
+        AllowAccess = allowAccess;
     }
 
     internal readonly string Name;
@@ -28,6 +30,8 @@ public abstract class RouteBase
     /// 是否有动态参数 eg: /user/:id
     /// </summary>
     internal readonly bool Dynamic;
+
+    internal readonly Func<ValueTask<bool>>? AllowAccess;
 
     internal readonly int Duration;
 
@@ -53,8 +57,8 @@ public class Route : RouteBase
 {
     public Route(string name, RouteWidgetBuilder builder, bool isDynamic = false,
         TransitionBuilder? enteringBuilder = null, TransitionBuilder? existingBuilder = null,
-        int duration = 200, int reverseDuration = 200)
-        : base(name, isDynamic, enteringBuilder, existingBuilder, duration, reverseDuration)
+        int duration = 200, int reverseDuration = 200, Func<ValueTask<bool>>? allowAccess = null)
+        : base(name, isDynamic, enteringBuilder, existingBuilder, duration, reverseDuration, allowAccess)
     {
         _builder = builder;
     }
@@ -75,6 +79,7 @@ internal sealed class NotFoundRoute : RouteBase
         {
             Child = new Card
             {
+                Padding = EdgeInsets.Only(10, 5, 10, 5),
                 Child = new Text("404 Not Found.") { FontSize = 20 }
             }
         });

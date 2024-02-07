@@ -64,8 +64,23 @@ public class RouteView : DynamicView //Don't sealed this class
             return;
         }
 
-        var widget = await route.BuildWidgetAsync(Navigator.ActiveArgument);
+        // check allow access
+        if (route.AllowAccess != null && !(await route.AllowAccess()))
+        {
+            var forbidden = Navigator.DenyAccessBuilder?.Invoke() ??
+                            new Center
+                            {
+                                Child = new Card
+                                {
+                                    Padding = EdgeInsets.Only(10, 5, 10, 5),
+                                    Child = new Text("403 Forbidden.") { FontSize = 20 }
+                                }
+                            };
+            ReplaceTo(forbidden);
+            return;
+        }
 
+        var widget = await route.BuildWidgetAsync(Navigator.ActiveArgument);
         if (action == RouteChangeAction.Init || route.EnteringBuilder == null)
         {
             ReplaceTo(widget);
