@@ -64,3 +64,19 @@ public class Route : RouteBase
     [TSRawScript("public BuildWidgetAsync(arg: string | null): Promise<PixUI.Widget> { return this._builder(arg); }")]
     public override ValueTask<Widget> BuildWidgetAsync(string? args) => new(_builder(args));
 }
+
+internal sealed class NotFoundRoute : RouteBase
+{
+    public NotFoundRoute(string name) : base(name, false, null, null, 0, 0) { }
+
+    public override ValueTask<Widget> BuildWidgetAsync(string? args)
+    {
+        return new ValueTask<Widget>(new Center
+        {
+            Child = new Card
+            {
+                Child = new Text("404 Not Found.") { FontSize = 20 }
+            }
+        });
+    }
+}

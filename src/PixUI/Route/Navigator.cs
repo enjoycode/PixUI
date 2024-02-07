@@ -39,6 +39,16 @@ public sealed class Navigator
 
     internal RouteBase ActiveRoute { get; private set; } = null!;
     internal string? ActiveArgument { get; private set; }
+    
+    /// <summary>
+    /// 未找到时的自定义组件
+    /// </summary>
+    public Func<Widget>? NotFoundBuilder { get; set; }
+    
+    /// <summary>
+    /// 拒绝访问时的自定义组件
+    /// </summary>
+    public Func<Widget>? DenyAccessBuilder { get; set; }
 
     public void AddRoute(RouteBase route)
     {
@@ -84,7 +94,7 @@ public sealed class Navigator
         }
     }
 
-    internal string ParentPath
+    private string ParentPath
     {
         get
         {
@@ -138,10 +148,8 @@ public sealed class Navigator
 
     internal void InitRouteWidget()
     {
-        if (_routes.Count == 0) return; //TODO: 404
-
         //默认指向第一个
-        ActiveRoute = _routes[0];
+        ActiveRoute = _routes.Count == 0 ? new NotFoundRoute("404") : _routes[0];
         //处理指定的路由路径
         var asnPath = HistoryManager!.AssignedPath;
         if (!string.IsNullOrEmpty(asnPath))
@@ -171,15 +179,12 @@ public sealed class Navigator
                     }
 
                     var matchRoute = _routes.Find(r => r.Name == thisName);
-                    if (matchRoute == null) //TODO: 404
-                        throw new Exception("Can't find route: " + thisName);
-                    ActiveRoute = matchRoute;
+                    ActiveRoute = matchRoute ?? new NotFoundRoute(thisName);
                     if (ActiveRoute.Dynamic)
                         ActiveArgument = thisArg;
                 }
             }
         }
-
 
         OnRouteChanged?.Invoke(RouteChangeAction.Init);
     }
@@ -187,18 +192,16 @@ public sealed class Navigator
     public void Push(string name, string? arg = null)
     {
         name = name.ToLower();
-        if (arg != null) arg = arg.ToLower();
+        arg = arg?.ToLower();
         //判断当前路由一致（包括动态参数）,是则忽略
         if (name == ActiveRoute.Name && arg == ActiveArgument)
             return;
 
         //查找静态路由表
         var matchRoute = _routes.Find(r => r.Name == name);
-        if (matchRoute == null) //TODO: 404 not found route
-            throw new ArgumentException($"Can't find route: {name}");
-        ActiveRoute = matchRoute;
+        ActiveRoute = matchRoute ?? new NotFoundRoute(name);
         ActiveArgument = arg;
-
+        
         //添加至历史记录(考虑以下移至OnRouteChanged之后，eg: 当前页面在二级路由内，跳转至一级路由会出问题)
         var fullPath = HistoryManager!.GetFullPath();
         HistoryManager.AssignedPath = fullPath;
@@ -219,9 +222,7 @@ public sealed class Navigator
     internal void Goto(string name, string? arg, RouteChangeAction action)
     {
         var matchRoute = _routes.Find(r => r.Name == name);
-        if (matchRoute == null)
-            throw new Exception("Can't find route: " + name);
-        ActiveRoute = matchRoute;
+        ActiveRoute = matchRoute ?? new NotFoundRoute(name);
         ActiveArgument = arg;
 
         OnRouteChanged?.Invoke(action);

@@ -52,9 +52,18 @@ public class RouteView : DynamicView //Don't sealed this class
 
     private async void OnRouteChanged(RouteChangeAction action)
     {
-        //TODO: stop running transition and check is 404.
+        //TODO: stop running transition.
         //TODO: if action is Goto, and route is keepalive, try get widget instance from cache
+
+        // check not found first
         var route = Navigator.ActiveRoute;
+        if (route is NotFoundRoute)
+        {
+            var notFound = Navigator.NotFoundBuilder?.Invoke() ?? await route.BuildWidgetAsync(null);
+            ReplaceTo(notFound);
+            return;
+        }
+
         var widget = await route.BuildWidgetAsync(Navigator.ActiveArgument);
 
         if (action == RouteChangeAction.Init || route.EnteringBuilder == null)
