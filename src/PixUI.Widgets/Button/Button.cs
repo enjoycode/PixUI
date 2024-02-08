@@ -32,7 +32,10 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     private State<Color>? _textColor;
     private State<Color>? _fillColor;
     private State<float>? _fontSize;
-
+    private Text? _textWidget;
+    private Icon? _iconWidget;
+    private readonly HoverDecoration _hoverDecoration;
+    
     private bool _drawMask;
 
     public State<string>? Text
@@ -49,9 +52,6 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
 
     public ButtonStyle Style { get; set; } = ButtonStyle.Solid;
     public ButtonShape Shape { get; set; } = ButtonShape.Standard;
-
-    private Text? _textWidget;
-    private Icon? _iconWidget;
 
     public State<Color>? TextColor
     {
@@ -80,9 +80,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
             if (_iconWidget != null) _iconWidget.Size = value;
         }
     }
-
-    private readonly HoverDecoration _hoverDecoration;
-
+    
     public MouseRegion MouseRegion { get; }
     public FocusNode FocusNode { get; }
 
@@ -140,6 +138,12 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
 
     #region ====Overrides====
 
+    public override void VisitChildren(Func<Widget, bool> action)
+    {
+        if (_textWidget != null && action(_textWidget)) return;
+        if (_iconWidget != null) action(_iconWidget);
+    }
+
     /// <summary>
     /// 没有指定宽高充满可用空间, 仅指定高则使用Icon+Text的宽度
     /// </summary>
@@ -167,10 +171,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     {
         if (Text == null && Icon == null) return;
 
-        if (_textColor == null)
-        {
-            _textColor = Style == ButtonStyle.Solid ? Colors.White : Colors.Black;
-        }
+        _textColor ??= Style == ButtonStyle.Solid ? Colors.White : Colors.Black;
 
         if (Text != null && _textWidget == null)
         {
@@ -274,17 +275,17 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         }
     }
 
+    protected override void OnUnmounted()
+    {
+        base.OnUnmounted();
+        _hoverDecoration.Hide();
+    }
+
     public override string ToString()
     {
         if (DebugLabel != null || Text == null)
             return base.ToString();
         return $"{nameof(Button)}[\"{Text.Value}\"]";
-    }
-
-    protected override void OnUnmounted()
-    {
-        base.OnUnmounted();
-        _hoverDecoration.Hide();
     }
 
     public override void Dispose()
