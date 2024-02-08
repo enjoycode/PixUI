@@ -8,7 +8,11 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     {
         Height = DefaultHeight; //TODO: 默认字体高+padding
 
+        _enabled = true;
+        _enabled.AddListener(OnEnabledChangd);
+
         MouseRegion = new MouseRegion(() => Cursors.Hand);
+        MouseRegion.PointerTap += OnPointerTap;
         MouseRegion.PointerDown += OnPointerDown;
         MouseRegion.PointerUp += OnPointerUp;
 
@@ -28,14 +32,16 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
 
     private readonly State<string>? _text;
     private readonly State<IconData>? _icon;
+    private readonly State<bool> _enabled;
     private State<float>? _borderWidth;
     private State<Color>? _textColor;
     private State<Color>? _fillColor;
     private State<float>? _fontSize;
     private Text? _textWidget;
     private Icon? _iconWidget;
+    private Action<PointerEvent>? _tapAction;
     private readonly HoverDecoration _hoverDecoration;
-    
+
     private bool _drawMask;
 
     public State<string>? Text
@@ -48,6 +54,12 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     {
         get => _icon;
         init => Bind(ref _icon, value, RelayoutOnStateChanged);
+    }
+
+    public State<bool> Enabled
+    {
+        get => _enabled;
+        init => Bind(ref _enabled!, value, OnEnabledChangd);
     }
 
     public ButtonStyle Style { get; set; } = ButtonStyle.Solid;
@@ -80,16 +92,29 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
             if (_iconWidget != null) _iconWidget.Size = value;
         }
     }
-    
+
     public MouseRegion MouseRegion { get; }
     public FocusNode FocusNode { get; }
 
     public Action<PointerEvent> OnTap
     {
-        set => MouseRegion.PointerTap += value;
+        set => _tapAction = value;
     }
 
     #region ====EventHandlers====
+
+    private void OnEnabledChangd(State state)
+    {
+        //考虑修改MouseRegion的光标，并且禁止Hover装饰
+        Repaint();
+    }
+
+    private void OnPointerTap(PointerEvent e)
+    {
+        if (!_enabled.Value) return;
+
+        _tapAction?.Invoke(e);
+    }
 
     private void OnPointerDown(PointerEvent e)
     {
@@ -204,7 +229,10 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
             canvas.Translate(-_textWidget.X, -_textWidget.Y);
         }
 
-        PaintMask(canvas);
+        if (!_enabled.Value)
+            PaintMask(canvas, Colors.Gray.WithAlpha(128));
+        else if (_drawMask)
+            PaintMask(canvas, Colors.Gray.WithAlpha(128));
     }
 
     private void PaintShape(Canvas canvas)
@@ -234,11 +262,9 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         }
     }
 
-    private void PaintMask(Canvas canvas)
+    private void PaintMask(Canvas canvas, Color color)
     {
-        if (!_drawMask) return;
-
-        var paint = PixUI.Paint.Shared(Colors.Gray.WithAlpha(128));
+        var paint = PixUI.Paint.Shared(color);
         paint.AntiAlias = Shape != ButtonShape.Square;
 
         var x = 0f;
