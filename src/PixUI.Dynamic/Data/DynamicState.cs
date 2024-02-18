@@ -42,6 +42,8 @@ public enum DynamicStateType
     Int,
     String,
     DateTime,
+    Float,
+    Double,
 }
 
 public sealed class DynamicState
@@ -64,6 +66,8 @@ public sealed class DynamicState
             DynamicStateType.Int => typeof(int),
             DynamicStateType.String => typeof(string),
             DynamicStateType.DateTime => typeof(DateTime),
+            DynamicStateType.Float => typeof(float),
+            DynamicStateType.Double => typeof(double),
             _ => throw new NotImplementedException()
         };
         if (AllowNull && Type != DynamicStateType.String)
@@ -96,6 +100,10 @@ public sealed class DynamicState
             stateType = DynamicStateType.Int;
         else if (noneNullableValueType == typeof(DateTime))
             stateType = DynamicStateType.DateTime;
+        else if (noneNullableValueType == typeof(float))
+            stateType = DynamicStateType.Float;
+        else if (noneNullableValueType == typeof(double))
+            stateType = DynamicStateType.Double;
         else
             throw new NotImplementedException($"ValueType: {noneNullableValueType} to DynamicStateType");
 
