@@ -9,12 +9,19 @@
         <WasmIncludeFullIcuData>true</WasmIncludeFullIcuData>
         <WasmIcuDataFileName>icudt.dat</WasmIcuDataFileName>
         <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
+        
 <!--        <BlazorWebAssemblyJiterpreter>false</BlazorWebAssemblyJiterpreter>-->
 <!--        <WasmEnableThreads>false</WasmEnableThreads>-->
 <!--        <WasmEnableExceptionHandling>false</WasmEnableExceptionHandling>-->
+        
+<!--        <RunAOTCompilation>true</RunAOTCompilation>-->
+<!--        <RunAOTCompilationAfterBuild>true</RunAOTCompilationAfterBuild>-->
+<!--        <WasmNativeStrip>false</WasmNativeStrip>-->
+<!--        <WasmProfilers>browser;</WasmProfilers>-->
+<!--        <WasmBuildNative>true</WasmBuildNative>-->
+        
         <WasmEnableSIMD>true</WasmEnableSIMD>
         <WasmAllowUndefinedSymbols>true</WasmAllowUndefinedSymbols>
-<!--        <WasmBuildNative>true</WasmBuildNative>-->
         <EmccInitialHeapSize>128MB</EmccInitialHeapSize>
         <EmccExtraCFlags>-s USE_WEBGL2=1 -s MAX_WEBGL_VERSION=2</EmccExtraCFlags>
         <!--        <EmccExtraCFlags>-s MAIN_MODULE=2 -sAUTOLOAD_DYLIBS=0</EmccExtraCFlags>-->

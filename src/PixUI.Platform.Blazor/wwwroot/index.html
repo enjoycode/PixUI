@@ -251,6 +251,13 @@
 
     window.onload = async function () {
         await Blazor.start()
+        // await Blazor.start({
+        //     configureRuntime: function (builder) {
+        //         builder.withConfig({
+        //             browserProfilerOptions: {}
+        //         })
+        //     }
+        // })
 
         let loadingEl = document.getElementById("loading")
         loadingEl.remove()
