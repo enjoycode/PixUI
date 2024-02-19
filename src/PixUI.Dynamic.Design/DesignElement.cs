@@ -465,12 +465,12 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
         }
     }
 
-    public void OnDrop(DynamicWidgetMeta meta /*TODO: args for x, y*/)
+    public void AddElement(DynamicWidgetMeta meta, Point local)
     {
         //是否根节点或用于占位的Slot
         if (Meta == null)
         {
-            DropToPlaceholder(meta);
+            AddToPlaceholder(meta);
             return;
         }
 
@@ -482,18 +482,18 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
         switch (defaultSlot.ContainerType)
         {
             case ContainerType.MultiChild:
-                DropToMultiSlot(defaultSlot, meta);
+                AddToMultiSlot(defaultSlot, meta, local);
                 break;
             case ContainerType.SingleChild:
-                DropToSingleSlot(defaultSlot, meta);
+                AddToSingleSlot(defaultSlot, meta);
                 break;
             default:
-                DropToReversedSlot(defaultSlot, meta);
+                AddToReversedSlot(defaultSlot, meta);
                 break;
         }
     }
 
-    private void DropToPlaceholder(DynamicWidgetMeta meta)
+    private void AddToPlaceholder(DynamicWidgetMeta meta)
     {
         if (meta.IsReversedWrapElement) //eg: drop Expanded to Row's placeholder
         {
@@ -523,7 +523,7 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
         Controller.RaiseOutlineChanged();
     }
 
-    private void DropToMultiSlot(ContainerSlot defaultSlot, DynamicWidgetMeta meta)
+    private void AddToMultiSlot(ContainerSlot defaultSlot, DynamicWidgetMeta meta, Point local)
     {
         Widget childToBeAdded;
         DesignElement childElement;
@@ -535,7 +535,7 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
             var positionedMeta = DynamicWidgetManager.GetByName(nameof(Positioned));
             var positionedElement = new DesignElement(Controller, positionedMeta, defaultSlot.PropertyName)
                 { Child = childElement };
-            childToBeAdded = new Positioned { Child = positionedElement };
+            childToBeAdded = new Positioned { Child = positionedElement, Left = local.X, Top = local.Y };
         }
         else if (meta.IsReversedWrapElement)
         {
@@ -557,7 +557,7 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
         }
     }
 
-    private void DropToSingleSlot(ContainerSlot defaultSlot, DynamicWidgetMeta meta)
+    private void AddToSingleSlot(ContainerSlot defaultSlot, DynamicWidgetMeta meta)
     {
         var newChild = new DesignElement(Controller, meta, defaultSlot.PropertyName);
         if (defaultSlot.TrySetChild(Target!, newChild))
@@ -568,7 +568,7 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
         }
     }
 
-    private void DropToReversedSlot(ContainerSlot defaultSlot, DynamicWidgetMeta meta)
+    private void AddToReversedSlot(ContainerSlot defaultSlot, DynamicWidgetMeta meta)
     {
         //eg: drop widget to Expanded
         var newChild = new DesignElement(Controller, meta, defaultSlot.PropertyName);
@@ -584,22 +584,44 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
 
     public bool AllowDrop(DragEvent dragEvent)
     {
+        if (Meta == null) // is a placeholder
+        {
+            dragEvent.DropEffect = DropEffect.Copy;
+            dragEvent.DropPosition = DropPosition.In;
+            return true;
+        }
+        
+        if (Meta is { IsContainer: true })
+        {
+            dragEvent.DropEffect = DropEffect.Copy;
+            return true;
+        }
+
         return false;
     }
 
     public void OnDragOver(DragEvent dragEvent, Point local)
     {
-        throw new NotImplementedException();
+        if (Meta is { IsContainer: true })
+        {
+            var layoutAxis = Meta.DefaultSlot.LayoutAxis;
+            if (layoutAxis is ChildrenLayoutAxis.None or ChildrenLayoutAxis.Positioned)
+            {
+                dragEvent.DropPosition = DropPosition.In;
+            }
+        }
     }
 
-    public void OnDragLeave(DragEvent dragEvent)
-    {
-        throw new NotImplementedException();
-    }
+    public void OnDragLeave(DragEvent dragEvent) { }
 
     public void OnDrop(DragEvent dragEvent, Point local)
     {
-        throw new NotImplementedException();
+        if (dragEvent.TransferItem is not TreeNode<ToolboxNode> toolboxItem)
+            return;
+
+        var widgetMeta = toolboxItem.Data.DynamicWidgetMeta!;
+        if (dragEvent.DropPosition == DropPosition.In)
+            AddElement(widgetMeta, local);
     }
 
     #endregion

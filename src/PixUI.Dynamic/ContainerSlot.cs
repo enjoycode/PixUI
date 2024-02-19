@@ -16,16 +16,27 @@ public enum ContainerType
     MultiChild,
 }
 
+public enum ChildrenLayoutAxis
+{
+    None,
+    Horizontal,
+    Vertical,
+    Positioned,
+}
+
 public sealed class ContainerSlot
 {
-    public ContainerSlot(string propertyName, ContainerType type)
+    public ContainerSlot(string propertyName, ContainerType type,
+        ChildrenLayoutAxis layoutAxis = ChildrenLayoutAxis.None)
     {
         PropertyName = propertyName;
         ContainerType = type;
+        LayoutAxis = layoutAxis;
     }
 
     public readonly string PropertyName;
     public readonly ContainerType ContainerType;
+    public readonly ChildrenLayoutAxis LayoutAxis;
     private Action<Widget, Widget>? _addChildAction;
     private Action<Widget, Widget>? _removeChildAction;
     private Action<Widget, Widget, Widget>? _replaceChildAction;

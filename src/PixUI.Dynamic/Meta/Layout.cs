@@ -74,7 +74,7 @@ partial class DynamicWidgetManager
         catalog: CatalogLayout,
         slots: new ContainerSlot[]
         {
-            new(nameof(Stack.Children), ContainerType.MultiChild)
+            new(nameof(Stack.Children), ContainerType.MultiChild, ChildrenLayoutAxis.Positioned)
         }
     );
 
