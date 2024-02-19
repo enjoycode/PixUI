@@ -86,15 +86,15 @@ public sealed class ScrollBarDecorator<T> : FlowDecorator<T> where T : Widget, I
         //注意只处理ScrollBar，忽略本身
         if (_vBarVisible && _vBar!.ContainsPoint(localPt.X - _vBar.X, localPt.Y - _vBar.Y))
         {
+            result.TranslateTransform(-mp.X, -mp.Y);
             result.Add(_vBar);
-            result.ConcatLastTransform(Matrix4.CreateIdentity(), -mp.X, -mp.Y);
             return true;
         }
 
         if (_hBarVisible && _hBar!.ContainsPoint(localPt.X - _hBar.X, localPt.Y - _hBar.Y))
         {
+            result.TranslateTransform(-mp.X, -mp.Y);
             result.Add(_hBar);
-            result.ConcatLastTransform(Matrix4.CreateIdentity(), -mp.X, -mp.Y);
             return true;
         }
 

@@ -60,20 +60,28 @@ public sealed class HitTestResult
         return isOpaqueMouseRegion;
     }
 
-    /// <summary>
-    /// 仅用于[Transform] Widget命中子级后转换
-    /// </summary>
-    internal void ConcatLastTransform(in Matrix4 transform, float dx, float dy)
+    internal void TranslateTransform(float dx, float dy)
     {
+        if (dx == 0 && dy == 0) return;
+        _transform.Translate(-dx, -dy);
+    }
+
+    /// <summary>
+    /// 仅用于Transform组件命中子级转换
+    /// </summary>
+    internal Matrix4 ConcatTransform(in Matrix4 transform, float dx, float dy)
+    {
+        var old = _transform;
+
         if (dx != 0 || dy != 0)
             _transform.Translate(-dx, -dy);
         if (!transform.IsIdentity)
             _transform.PreConcat(transform);
-        if (ReferenceEquals(LastHitWidget, LastWidgetWithMouseRegion))
-        {
-            _path[_path.Count - 1] = new HitTestEntry(LastEntry!.Value.Widget, _transform);
-        }
+
+        return old;
     }
+
+    internal void RestoreTransform(in Matrix4 transform) => _transform = transform;
 
     internal void ConcatRestrictedBounds(Widget parent)
     {

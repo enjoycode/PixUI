@@ -56,4 +56,22 @@ public static class MatrixUtils
 
         return rw == 1.0 ? new Offset(rx, ry) : new Offset(rx / rw, ry / rw);
     }
+    
+    /// <summary>
+    /// Removes the "perspective" component from `transform`.
+    /// </summary>
+    /// <remarks>
+    /// When applying the resulting transform matrix to a point with a
+    /// z-coordinate of zero (which is generally assumed for all points
+    /// represented by an [Offset]), the other coordinates will get transformed as
+    /// before, but the new z-coordinate is going to be zero again. This is
+    /// achieved by setting the third column and third row of the matrix to "0, 0, 1, 0".
+    /// </remarks>
+    public static Matrix4 RemovePerspectiveTransform(Matrix4 transform)
+    {
+        var vector = new Vector4(0, 0, 1, 0);
+        transform.SetColumn(2, vector);
+        transform.SetRow(2, vector);
+        return transform;
+    }
 }

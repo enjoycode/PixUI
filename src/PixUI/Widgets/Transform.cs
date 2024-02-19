@@ -83,21 +83,25 @@ public class Transform : SingleChildWidget
 
         // The provided paint `transform` (which describes the transform from the
         // child to the parent in 3D) is processed by
-        // [PointerEvent.removePerspectiveTransform] to remove the
+        // [RemovePerspectiveTransform] to remove the
         // perspective component and inverted before it is used to transform
         // `position` from the coordinate system of the parent to the system of the child.
-        var transform = Matrix4.TryInvert(PointerEvent.RemovePerspectiveTransform(effectiveTransform));
+        var transform = Matrix4.TryInvert(MatrixUtils.RemovePerspectiveTransform(effectiveTransform));
         if (transform == null)
             return false; // Objects are not visible on screen and cannot be hit-tested.
 
         var transformed = MatrixUtils.TransformPoint(transform.Value, x, y);
         //不要加入 result.Add(this, effectiveTransform);
+        var oldTransform = result.ConcatTransform(transform.Value, X, Y);
         var hitChild = Child.HitTest(transformed.Dx, transformed.Dy, result);
         if (hitChild)
         {
-            result.ConcatLastTransform(transform.Value, X, Y);
             if (_clipBounds)
                 result.ConcatRestrictedBounds(this);
+        }
+        else
+        {
+            result.RestoreTransform(oldTransform);
         }
 
         return hitChild;
@@ -109,8 +113,7 @@ public class Transform : SingleChildWidget
         if (Child == null) return;
 
         canvas.Save();
-        if (X != 0 || Y != 0)
-            canvas.Translate(X, Y);
+        canvas.Translate(X, Y);
         if (_clipBounds)
             canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
 

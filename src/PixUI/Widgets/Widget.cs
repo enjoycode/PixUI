@@ -469,8 +469,7 @@ public abstract class Widget : IDisposable
             //判断上级是否Transform,是则变换坐标
             else if (temp.Parent is Transform transform)
             {
-                var transformed =
-                    MatrixUtils.TransformPoint(transform.EffectiveTransform, x, y);
+                var transformed = MatrixUtils.TransformPoint(transform.EffectiveTransform, x, y);
                 x = transformed.Dx;
                 y = transformed.Dy;
             }
