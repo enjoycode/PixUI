@@ -15,7 +15,6 @@ public sealed class PropertyPanel : SingleChildWidget
         _layoutGroup = new PropertyGroup(_layoutGroupTitle);
         _listView = ListView<Widget>.From(new Widget[]
         {
-            new StateGroup(controller),
             _widgetGroup,
             new IfConditional(_layoutGroupVisible, () => _layoutGroup),
             new IfConditional(_propGroupVisible, () => _propGroup),
@@ -25,7 +24,14 @@ public sealed class PropertyPanel : SingleChildWidget
         Child = new Container
         {
             FillColor = new Color(0xFFF3F3F3),
-            Child = _listView
+            Child = new Column
+            {
+                Children =
+                {
+                    new StateGroup(controller),
+                    _listView,
+                }
+            }
         };
     }
 

@@ -9,43 +9,46 @@ internal sealed class StateGroup : View
     {
         _designController = designController;
 
-        Child = new Collapse
+        Child = new Column(HorizontalAlignment.Left)
         {
-            Title = new Text("State") { FontWeight = FontWeight.Bold },
-            Body = new Column(HorizontalAlignment.Left)
+            Children =
             {
-                Children =
+                new Container
                 {
-                    new Container
+                    Padding = EdgeInsets.Only(5, 0, 0, 0),
+                    IsLayoutTight = true,
+                    Child = new Row(spacing: 5)
                     {
-                        Padding = EdgeInsets.Only(4, 0, 0, 0),
-                        IsLayoutTight = true,
-                        Child = new ButtonGroup
+                        Children =
                         {
-                            Children =
+                            new Text("State") { FontWeight = FontWeight.Bold },
+                            new ButtonGroup
                             {
-                                new Button(icon: MaterialIcons.Add) { OnTap = OnAddState },
-                                new Button(icon: MaterialIcons.Remove) { OnTap = OnRemoveState },
+                                Children =
+                                {
+                                    new Button(icon: MaterialIcons.Add) { OnTap = OnAddState },
+                                    new Button(icon: MaterialIcons.Remove) { OnTap = OnRemoveState },
+                                }
                             }
                         }
-                    },
-                    new Card
+                    }
+                },
+                new Card
+                {
+                    Child = new DataGrid<DynamicState>(_designController.StatesController)
                     {
-                        Child = new DataGrid<DynamicState>(_designController.StatesController)
+                        Height = 119,
+                        Columns =
                         {
-                            Height = 119,
-                            Columns =
-                            {
-                                new DataGridTextColumn<DynamicState>("Name", s => s.Name),
-                                new DataGridTextColumn<DynamicState>("Type", s => s.Type.ToString()),
-                                new DataGridButtonColumn<DynamicState>("Value",
-                                    (s, i) => new Button(icon: MaterialIcons.Edit)
-                                    {
-                                        Style = ButtonStyle.Transparent,
-                                        Shape = ButtonShape.Pills,
-                                        OnTap = _ => OnEditState(s),
-                                    }) { Width = ColumnWidth.Fixed(50) }
-                            }
+                            new DataGridTextColumn<DynamicState>("Name", s => s.Name),
+                            new DataGridTextColumn<DynamicState>("Type", s => s.Type.ToString()),
+                            new DataGridButtonColumn<DynamicState>("Value",
+                                (s, i) => new Button(icon: MaterialIcons.Edit)
+                                {
+                                    Style = ButtonStyle.Transparent,
+                                    Shape = ButtonShape.Pills,
+                                    OnTap = _ => OnEditState(s),
+                                }) { Width = ColumnWidth.Fixed(50) }
                         }
                     }
                 }
