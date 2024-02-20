@@ -18,13 +18,17 @@ public sealed class FutureBuilder<T> : DynamicView
 
     private readonly Task<T> _future;
     private readonly Func<T?, Exception?, Widget?> _doneBuilder;
+    private bool _hasRun;
 
     protected override void OnMounted()
     {
         base.OnMounted();
 
-        if (!HasLayout)
+        if (!_hasRun)
+        {
+            _hasRun = true;
             Run();
+        }
     }
 
     private async void Run()
@@ -41,5 +45,4 @@ public sealed class FutureBuilder<T> : DynamicView
             ReplaceTo(_doneBuilder((T?)nullValue, ex));
         }
     }
-
 }
