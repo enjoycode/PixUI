@@ -109,6 +109,17 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
 
     public bool IsContainer => Meta == null /*Root*/ || Meta.IsContainer;
 
+    private DesignElement? ParentElement
+    {
+        get
+        {
+            if (Parent == null) return null;
+            if (Parent is DesignElement parentElement)
+                return parentElement;
+            return Parent.Parent as DesignElement;
+        }
+    }
+
     #region ====Meta & Property Value====
 
     /// <summary>
@@ -523,7 +534,7 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
         Controller.RaiseOutlineChanged();
     }
 
-    private void AddToMultiSlot(ContainerSlot defaultSlot, DynamicWidgetMeta meta, Point local)
+    private void AddToMultiSlot(ContainerSlot defaultSlot, DynamicWidgetMeta meta, Point local, int? insertIndex = null)
     {
         Widget childToBeAdded;
         DesignElement childElement;
@@ -549,7 +560,11 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
             childToBeAdded = childElement = new DesignElement(Controller, meta, defaultSlot.PropertyName);
         }
 
-        if (defaultSlot.TryAddChild(Target!, childToBeAdded))
+        var ok = insertIndex.HasValue
+            ? defaultSlot.TryInsertChild(Target!, childToBeAdded, insertIndex.Value)
+            : defaultSlot.TryAddChild(Target!, childToBeAdded);
+
+        if (ok)
         {
             Relayout();
             Controller.Select(childElement);
@@ -586,12 +601,18 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
     {
         if (Meta == null) // is a placeholder
         {
-            dragEvent.DropEffect = DropEffect.Copy;
             dragEvent.DropPosition = DropPosition.In;
             return true;
         }
-        
+
         if (Meta is { IsContainer: true })
+        {
+            dragEvent.DropEffect = DropEffect.Copy;
+            return true;
+        }
+
+        var parentElement = ParentElement;
+        if (parentElement != null && parentElement.Meta!.DefaultSlot.ContainerType == ContainerType.MultiChild)
         {
             dragEvent.DropEffect = DropEffect.Copy;
             return true;
@@ -602,12 +623,50 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
 
     public void OnDragOver(DragEvent dragEvent, Point local)
     {
-        if (Meta is { IsContainer: true })
+        dragEvent.DropEffect = DropEffect.Copy;
+
+        if (Meta == null)
         {
-            var layoutAxis = Meta.DefaultSlot.LayoutAxis;
-            if (layoutAxis is ChildrenLayoutAxis.None or ChildrenLayoutAxis.Positioned)
+            dragEvent.DropPosition = DropPosition.In;
+            return;
+        }
+
+        if (Meta.IsContainer)
+        {
+            dragEvent.DropPosition = DropPosition.In;
+            // var layoutAxis = Meta.DefaultSlot.LayoutAxis;
+            // if (layoutAxis is ChildrenLayoutAxis.None or ChildrenLayoutAxis.Positioned)
+            // {
+            //     dragEvent.DropPosition = DropPosition.In;
+            // }
+        }
+        else
+        {
+            var parentMeta = ParentElement!.Meta!;
+            var layoutAxis = parentMeta.DefaultSlot.LayoutAxis;
+            if (layoutAxis == ChildrenLayoutAxis.Horizontal)
             {
-                dragEvent.DropPosition = DropPosition.In;
+                var posOffset = W / 4;
+                if (local.X < posOffset)
+                    dragEvent.DropPosition = DropPosition.Left;
+                else if (local.X > W - posOffset)
+                    dragEvent.DropPosition = DropPosition.Right;
+                else
+                    dragEvent.DropEffect = DropEffect.None;
+            }
+            else if (layoutAxis == ChildrenLayoutAxis.Vertical)
+            {
+                var posOffset = H / 4;
+                if (local.Y < posOffset)
+                    dragEvent.DropPosition = DropPosition.Upper;
+                else if (local.Y > H - posOffset)
+                    dragEvent.DropPosition = DropPosition.Under;
+                else
+                    dragEvent.DropEffect = DropEffect.None;
+            }
+            else
+            {
+                dragEvent.DropEffect = DropEffect.None;
             }
         }
     }
@@ -616,12 +675,26 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
 
     public void OnDrop(DragEvent dragEvent, Point local)
     {
+        if (dragEvent.DropEffect == DropEffect.None)
+            return;
         if (dragEvent.TransferItem is not TreeNode<ToolboxNode> toolboxItem)
             return;
 
         var widgetMeta = toolboxItem.Data.DynamicWidgetMeta!;
         if (dragEvent.DropPosition == DropPosition.In)
+        {
             AddElement(widgetMeta, local);
+        }
+        else if (dragEvent.DropPosition is DropPosition.Left or DropPosition.Upper)
+        {
+            var insertIndex = Parent!.IndexOfChild(this);
+            ParentElement!.AddToMultiSlot(ParentElement.Meta!.DefaultSlot!, widgetMeta, local, insertIndex);
+        }
+        else if (dragEvent.DropPosition is DropPosition.Right or DropPosition.Under)
+        {
+            var insertIndex = Parent!.IndexOfChild(this) + 1;
+            ParentElement!.AddToMultiSlot(ParentElement.Meta!.DefaultSlot!, widgetMeta, local, insertIndex);
+        }
     }
 
     #endregion

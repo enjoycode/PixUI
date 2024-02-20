@@ -24,11 +24,7 @@ internal sealed class DraggingDecorator : Widget
         canvas.Concat(m!.Value);
         if (e.DropHintImage == null)
         {
-            //TODO:
-            var target = (Widget)DragDropManager.Dropping;
-            var rect = Rect.FromLTWH(0, 0, target.W, target.H);
-            var paint = PixUI.Paint.Shared(Colors.Red, PaintStyle.Stroke);
-            canvas.DrawRect(rect, paint);
+            DrawDefaultDropHint(canvas, e);
         }
         else
         {
@@ -37,5 +33,42 @@ internal sealed class DraggingDecorator : Widget
         }
 
         canvas.Restore();
+    }
+
+    private static void DrawDefaultDropHint(Canvas canvas, DragEvent e)
+    {
+        //TODO: 暂简单实现
+        const float ident = 2f;
+        var target = (Widget)DragDropManager.Dropping!;
+        if (e.DropPosition == DropPosition.In)
+        {
+            var rect = Rect.FromLTWH(0, 0, target.W, target.H);
+            var paint = PixUI.Paint.Shared(Colors.Red, PaintStyle.Stroke, 2f);
+            canvas.DrawRect(rect, paint);
+        }
+        else if (e.DropPosition == DropPosition.Left)
+        {
+            var rect = Rect.FromLTWH(0 - ident, 0, ident * 2, target.H);
+            var paint = PixUI.Paint.Shared(Colors.Red);
+            canvas.DrawRect(rect, paint);
+        }
+        else if (e.DropPosition == DropPosition.Right)
+        {
+            var rect = Rect.FromLTWH(target.W - ident, 0, ident * 2, target.H);
+            var paint = PixUI.Paint.Shared(Colors.Red);
+            canvas.DrawRect(rect, paint);
+        }
+        else if (e.DropPosition == DropPosition.Upper)
+        {
+            var rect = Rect.FromLTWH(0, 0 - ident, target.W, ident * 2);
+            var paint = PixUI.Paint.Shared(Colors.Red);
+            canvas.DrawRect(rect, paint);
+        }
+        else if (e.DropPosition == DropPosition.Under)
+        {
+            var rect = Rect.FromLTWH(0, target.H - ident, target.W, ident * 2);
+            var paint = PixUI.Paint.Shared(Colors.Red);
+            canvas.DrawRect(rect, paint);
+        }
     }
 }

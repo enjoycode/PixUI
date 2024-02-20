@@ -38,6 +38,7 @@ public sealed class ContainerSlot
     public readonly ContainerType ContainerType;
     public readonly ChildrenLayoutAxis LayoutAxis;
     private Action<Widget, Widget>? _addChildAction;
+    private Action<Widget, Widget, int>? _insertChildAction;
     private Action<Widget, Widget>? _removeChildAction;
     private Action<Widget, Widget, Widget>? _replaceChildAction;
     private Func<Widget, Widget, MoveChildAction, bool>? _moveChildAction;
@@ -79,6 +80,52 @@ public sealed class ContainerSlot
         try
         {
             AddChild(parent, child);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Notification.Error(ex.Message);
+            return false;
+        }
+    }
+
+    public void InsertChild(Widget parent, Widget child, int index)
+    {
+        if (ContainerType != ContainerType.MultiChild)
+            throw new NotSupportedException();
+
+        if (_insertChildAction == null)
+        {
+            var parentType = parent.GetType();
+            var childrenPropInfo = parentType.GetProperty(PropertyName);
+            if (childrenPropInfo == null)
+                throw new Exception($"Can't find property[{PropertyName}] for [{parentType.Name}]");
+            var listType = childrenPropInfo.PropertyType;
+            var childType = typeof(Widget);
+            if (listType.IsGenericType)
+                childType = listType.GenericTypeArguments[0];
+            var insertMethodInfo = typeof(IList<>).MakeGenericType(childType).GetMethod("Insert");
+
+            var parentArg = Expression.Parameter(typeof(Widget));
+            var childArg = Expression.Parameter(typeof(Widget));
+            var indexArg = Expression.Parameter(typeof(int));
+            var convertedParent = Expression.Convert(parentArg, parentType);
+            var convertedChild = Expression.Convert(childArg, childType);
+            var childrenMember = Expression.MakeMemberAccess(convertedParent, childrenPropInfo);
+            _insertChildAction = Expression.Lambda<Action<Widget, Widget, int>>(
+                Expression.Call(childrenMember, insertMethodInfo!, indexArg, convertedChild),
+                parentArg, childArg, indexArg
+            ).Compile();
+        }
+
+        _insertChildAction(parent, child, index);
+    }
+
+    public bool TryInsertChild(Widget parent, Widget child, int index)
+    {
+        try
+        {
+            InsertChild(parent, child, index);
             return true;
         }
         catch (Exception ex)

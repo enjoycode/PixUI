@@ -14,7 +14,7 @@ partial class DynamicWidgetManager
         },
         slots: new ContainerSlot[]
         {
-            new(nameof(Row.Children), ContainerType.MultiChild)
+            new(nameof(Row.Children), ContainerType.MultiChild, ChildrenLayoutAxis.Horizontal)
         }
     );
 
@@ -28,7 +28,7 @@ partial class DynamicWidgetManager
         },
         slots: new ContainerSlot[]
         {
-            new(nameof(Column.Children), ContainerType.MultiChild)
+            new(nameof(Column.Children), ContainerType.MultiChild, ChildrenLayoutAxis.Vertical)
         }
     );
 
