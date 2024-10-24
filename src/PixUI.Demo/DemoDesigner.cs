@@ -85,8 +85,8 @@ public sealed class DemoDesigner : View
         var meta = _designController.CurrentToolboxItem;
         if (meta == null) return;
 
-        var active = _designController.FirstSelected!;
-        active.OnDrop(meta);
+        // var active = _designController.FirstSelected!;
+        // active.OnDrop(meta);
 
         //active.OnDrop(DynamicWidgetManager.GetByName("Center"));
         //active.AddChild(new DesignElement(_designController, DynamicWidgetManager.GetByName("Button")));

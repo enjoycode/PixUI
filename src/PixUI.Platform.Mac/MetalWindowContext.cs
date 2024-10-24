@@ -96,7 +96,7 @@ public abstract class MetalWindowContext : NativeWindowContext
 
         //clear back buffer resources
         _onscreenCanvas?.Dispose();
-        _onscreenCanvas?.Surface.Dispose();
+        _onscreenCanvas?.Surface?.Dispose();
         _onscreenCanvas = null;
         DrawableHandler!.Dispose();
         DrawableHandler = null;
@@ -107,7 +107,7 @@ public abstract class MetalWindowContext : NativeWindowContext
         if (disposing)
         {
             OffscreenCanvas?.Dispose();
-            OffscreenCanvas?.Surface.Dispose();
+            OffscreenCanvas?.Surface?.Dispose();
             OffscreenCanvas = null;
 
             GrContext?.AbandonContext(true);

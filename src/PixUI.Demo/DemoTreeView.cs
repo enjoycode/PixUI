@@ -174,7 +174,8 @@ public sealed class DemoTreeView : View
     private void OnCheck(PointerEvent e)
     {
         var node = _treeController2.FindNode(t => t.Text == "Cake");
-        _treeController2.SetChecked(node!.Data, true);
+        if (node != null)
+            _treeController2.SetChecked(node.Data, true);
     }
 }
 
