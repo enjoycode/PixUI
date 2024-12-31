@@ -79,7 +79,7 @@ public sealed class TSParser : IDisposable
         }
     }
 
-    internal TSTree Parse(TSInput input, TSTree? oldTree = null)
+    public TSTree Parse(TSInput input, TSTree? oldTree = null)
     {
         var treeHandle = ts_parser_parse(_handle, oldTree?.Handle ?? IntPtr.Zero, input);
         return new TSTree(treeHandle);

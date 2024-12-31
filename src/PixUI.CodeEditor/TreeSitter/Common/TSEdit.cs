@@ -3,14 +3,14 @@ using System.Runtime.InteropServices;
 namespace CodeEditor;
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct TSEdit
+public struct TSEdit
 {
-    internal uint startIndex;
-    internal uint oldEndIndex;
-    internal uint newEndIndex;
-    internal TSPoint startPosition;
-    internal TSPoint oldEndPosition;
-    internal TSPoint newEndPosition;
+    public uint startIndex;
+    public uint oldEndIndex;
+    public uint newEndIndex;
+    public TSPoint startPosition;
+    public TSPoint oldEndPosition;
+    public TSPoint newEndPosition;
 
 #if __WEB__
     public TSEdit Clone()

@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace CodeEditor;
 
-internal enum TsInputEncoding
+public enum TsInputEncoding
 {
     Utf8,
     Utf16
@@ -84,7 +84,7 @@ internal enum TsQueryError
     Capture,
 }
 
-internal static unsafe partial class TreeSitterApi
+public static unsafe partial class TreeSitterApi
 {
     private const string LibTreeSitter = "tree-sitter";
 
@@ -188,7 +188,7 @@ internal static unsafe partial class TreeSitterApi
     internal static partial void ts_tree_edit(IntPtr self, ref TSEdit edit);
 
     [LibraryImport(LibTreeSitter)]
-    internal static unsafe partial TSRange* ts_tree_get_changed_ranges(IntPtr oldTree, IntPtr newTree,
+    public static unsafe partial TSRange* ts_tree_get_changed_ranges(IntPtr oldTree, IntPtr newTree,
         ref uint length);
 
     #endregion
@@ -487,7 +487,7 @@ internal static unsafe partial class TreeSitterApi
     public static partial ushort ts_language_field_id_for_name(IntPtr language, IntPtr name, uint length);
 
     [LibraryImport(LibTreeSitter)]
-    public static partial TsSymbolType ts_language_symbol_type(IntPtr language, ushort symbol);
+    internal static partial TsSymbolType ts_language_symbol_type(IntPtr language, ushort symbol);
 
     [LibraryImport(LibTreeSitter)]
     public static partial uint ts_language_version(IntPtr language);

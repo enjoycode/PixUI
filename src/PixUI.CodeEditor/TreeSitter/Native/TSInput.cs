@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace CodeEditor;
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct TSInput
+public struct TSInput
 {
     public IntPtr payload;
 

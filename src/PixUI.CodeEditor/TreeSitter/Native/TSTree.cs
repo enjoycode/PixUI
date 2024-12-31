@@ -7,7 +7,7 @@ namespace CodeEditor;
 
 public sealed class TSTree : IDisposable
 {
-    internal IntPtr Handle { get; }
+    public IntPtr Handle { get; }
 
     internal TSTree(IntPtr handle)
     {
@@ -33,7 +33,7 @@ public sealed class TSTree : IDisposable
         }
     }
 
-    internal void Edit(ref TSEdit edit) => ts_tree_edit(Handle, ref edit);
+    public void Edit(ref TSEdit edit) => ts_tree_edit(Handle, ref edit);
 
     public void Dispose() => ts_tree_delete(Handle);
 }

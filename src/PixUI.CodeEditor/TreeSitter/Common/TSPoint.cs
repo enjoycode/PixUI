@@ -27,7 +27,7 @@ public readonly struct TSPoint
     public TSPoint Clone() => new TSPoint((int)row, (int)column);
 #endif
 
-    internal static TSPoint FromLocation(TextLocation location)
+    public static TSPoint FromLocation(TextLocation location)
         => new TSPoint(location.Line, location.Column * SyntaxParser.ParserEncoding);
 
     public override string ToString() => $"({row}, {column})";

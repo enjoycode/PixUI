@@ -6,13 +6,13 @@ using PixUI;
 
 namespace CodeEditor;
 
-internal sealed class ParserInput : IDisposable
+public sealed class ParserInput : IDisposable
 {
     private readonly ITextBuffer _textBuffer;
     private readonly IntPtr _nativeBuffer;
     private const int NativeInputSize = 2048;
 
-    internal ParserInput(ITextBuffer textBuffer)
+    public ParserInput(ITextBuffer textBuffer)
     {
         _textBuffer = textBuffer;
         _nativeBuffer = Marshal.AllocHGlobal(NativeInputSize);
@@ -22,7 +22,7 @@ internal sealed class ParserInput : IDisposable
     /// TreeSitter回调读取代码
     /// </summary>
     [UnmanagedCallersOnly]
-    internal static unsafe void* Read(void* payload, uint byteIndex, TSPoint* position, uint* bytesRead)
+    public static unsafe void* Read(void* payload, uint byteIndex, TSPoint* position, uint* bytesRead)
     {
         Log.Debug($"ParserInput.Read: index={byteIndex}");
 

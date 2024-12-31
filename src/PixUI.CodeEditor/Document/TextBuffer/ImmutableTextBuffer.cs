@@ -4,7 +4,7 @@ namespace CodeEditor;
 
 public sealed class ImmutableTextBuffer : ITextBuffer
 {
-    internal ImmutableTextBuffer(ImmutableText? buffer = null)
+    public ImmutableTextBuffer(ImmutableText? buffer = null)
     {
         _buffer = buffer ?? ImmutableText.Empty;
     }
