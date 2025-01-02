@@ -5,7 +5,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-        <Platforms>AnyCPU;ARM64</Platforms>
+        <Platforms>AnyCPU</Platforms>
+        <Configurations>Debug;Release</Configurations>
     </PropertyGroup>
 
     <ItemGroup>

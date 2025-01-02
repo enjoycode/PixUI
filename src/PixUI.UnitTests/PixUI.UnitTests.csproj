@@ -5,7 +5,7 @@
         <IsPackable>false</IsPackable>
         <LangVersion>11</LangVersion>
         <Nullable>enable</Nullable>
-        <Configurations>Debug;Release;DebugWeb</Configurations>
+        <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <OutputType>Library</OutputType>
     </PropertyGroup>

@@ -1,56 +1,55 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net8.0-macos</TargetFramework>
-    <OutputType>Exe</OutputType>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>true</ImplicitUsings>
-    <SupportedOSPlatformVersion>10.15</SupportedOSPlatformVersion>
-    <Configurations>Debug;Release</Configurations>
-    <Platforms>AnyCPU;ARM64</Platforms>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Platform)' == 'ARM64' ">
-    <RuntimeIdentifier>osx-arm64</RuntimeIdentifier>
-    <PlatformTarget>ARM64</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|ARM64' ">
-    <OutputPath>bin\Debug/</OutputPath>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PixUI.CodeEditor\PixUI.CodeEditor.csproj" />
-    <ProjectReference Include="..\PixUI.Demo\PixUI.Demo.csproj" />
-    <ProjectReference Include="..\PixUI.Platform.Mac\PixUI.Platform.Mac.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Resources\Cat.webp" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0-macos</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>true</ImplicitUsings>
+        <SupportedOSPlatformVersion>10.15</SupportedOSPlatformVersion>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <IsArm64 Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">true</IsArm64>
+    </PropertyGroup>
+  
+    <PropertyGroup Condition="'$(IsArm64)'=='true'">
+        <DefineConstants>$(DefineConstants);ARM64</DefineConstants>
+    </PropertyGroup>
 
-  <ItemGroup Condition=" '$(Platform)' == 'AnyCPU' ">
-    <NativeReference Include="..\PixUI.Platform.Mac\libs\osx-x64\libskia.dylib">
-      <Kind>Dynamic</Kind>
-      <SmartLink>False</SmartLink>
-    </NativeReference>
-    <NativeReference Include="..\PixUI.CodeEditor\libs\osx-x64\libtree-sitter.dylib">
-      <Kind>Dynamic</Kind>
-      <SmartLink>False</SmartLink>
-    </NativeReference>
-    <NativeReference Include="..\PixUI.CodeEditor\libs\osx-x64\libtree-sitter-csharp.dylib">
-      <Kind>Dynamic</Kind>
-      <SmartLink>False</SmartLink>
-    </NativeReference>
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\PixUI.CodeEditor\PixUI.CodeEditor.csproj"/>
+        <ProjectReference Include="..\PixUI.Demo\PixUI.Demo.csproj"/>
+        <ProjectReference Include="..\PixUI.Platform.Mac\PixUI.Platform.Mac.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <None Remove="Resources\Cat.webp"/>
+    </ItemGroup>
 
-  <ItemGroup Condition=" '$(Platform)' == 'ARM64' ">
-    <NativeReference Include="..\PixUI.Platform.Mac\libs\osx-arm64\libskia.dylib">
-      <Kind>Dynamic</Kind>
-      <SmartLink>False</SmartLink>
-    </NativeReference>
-    <NativeReference Include="..\PixUI.CodeEditor\libs\osx-arm64\libtree-sitter.dylib">
-      <Kind>Dynamic</Kind>
-      <SmartLink>False</SmartLink>
-    </NativeReference>
-    <NativeReference Include="..\PixUI.CodeEditor\libs\osx-arm64\libtree-sitter-csharp.dylib">
-      <Kind>Dynamic</Kind>
-      <SmartLink>False</SmartLink>
-    </NativeReference>
-  </ItemGroup>
+    <ItemGroup Condition="'$(IsArm64)'!='true'">
+        <NativeReference Include="..\PixUI.Platform.Mac\libs\osx-x64\libskia.dylib">
+            <Kind>Dynamic</Kind>
+            <SmartLink>False</SmartLink>
+        </NativeReference>
+        <NativeReference Include="..\PixUI.CodeEditor\libs\osx-x64\libtree-sitter.dylib">
+            <Kind>Dynamic</Kind>
+            <SmartLink>False</SmartLink>
+        </NativeReference>
+        <NativeReference Include="..\PixUI.CodeEditor\libs\osx-x64\libtree-sitter-csharp.dylib">
+            <Kind>Dynamic</Kind>
+            <SmartLink>False</SmartLink>
+        </NativeReference>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(IsArm64)'=='true'">
+        <NativeReference Include="..\PixUI.Platform.Mac\libs\osx-arm64\libskia.dylib">
+            <Kind>Dynamic</Kind>
+            <SmartLink>False</SmartLink>
+        </NativeReference>
+        <NativeReference Include="..\PixUI.CodeEditor\libs\osx-arm64\libtree-sitter.dylib">
+            <Kind>Dynamic</Kind>
+            <SmartLink>False</SmartLink>
+        </NativeReference>
+        <NativeReference Include="..\PixUI.CodeEditor\libs\osx-arm64\libtree-sitter-csharp.dylib">
+            <Kind>Dynamic</Kind>
+            <SmartLink>False</SmartLink>
+        </NativeReference>
+    </ItemGroup>
 </Project>

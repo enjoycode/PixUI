@@ -6,7 +6,7 @@
         <ImplicitUsings>true</ImplicitUsings>
         <SupportedOSPlatformVersion>10.15</SupportedOSPlatformVersion>
         <Configurations>Debug;Release</Configurations>
-        <Platforms>AnyCPU;ARM64</Platforms>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
   
     <ItemGroup>

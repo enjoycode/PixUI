@@ -5,7 +5,9 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Platforms>AnyCPU;ARM64</Platforms>
+		<Platforms>AnyCPU</Platforms>
+		<Configurations>Debug;Release</Configurations>
+		<IsArm64 Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">true</IsArm64>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -23,7 +25,7 @@
 	</ItemGroup>
 
 	<Choose>
-		<When Condition=" '$(Platform)'=='ARM64' ">
+		<When Condition="'$(IsArm64)'=='true'">
 			<ItemGroup>
 				<Content Include="..\PixUI.Platform.Win\libs\arm64\skia.dll">
 					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

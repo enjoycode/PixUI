@@ -4,12 +4,8 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <LangVersion>10</LangVersion>
-        <Configurations>Debug;Release;DebugWeb</Configurations>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)' == 'DebugWeb' ">
-        <DefineConstants>TRACE;__WEB__</DefineConstants>
-        <DocumentationFile />
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
