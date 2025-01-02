@@ -20,7 +20,7 @@ class Person
     [Test]
     public void Test1()
     {
-        var doc = new Document("Test.cs");
+        var doc = new Document("Test.cs", new ImmutableTextBuffer());
         doc.TextContent = SrcCode;
         doc.SyntaxParser.DumpTree();
 
@@ -40,7 +40,7 @@ class Person
     [Test]
     public void TokenizeTest()
     {
-        var doc = new Document("Test.cs");
+        var doc = new Document("Test.cs", new ImmutableTextBuffer());
         doc.TextContent = SrcCode;
         // doc.SyntaxParser.Tokenize(2, 3);
         var line = doc.GetLineSegment(5);

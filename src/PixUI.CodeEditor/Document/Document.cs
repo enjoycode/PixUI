@@ -5,12 +5,12 @@ namespace CodeEditor;
 
 public sealed class Document : IDisposable
 {
-    public Document(string fileName, string? tag = null)
+    public Document(string fileName, ITextBuffer textBuffer, string? tag = null)
     {
         _fileName = fileName;
         Tag = tag;
 
-        TextBuffer = new ImmutableTextBuffer();
+        TextBuffer = textBuffer;
         _lineManager = new LineManager(this);
         SyntaxParser = new SyntaxParser(this);
         FoldingManager = new FoldingManager(this);

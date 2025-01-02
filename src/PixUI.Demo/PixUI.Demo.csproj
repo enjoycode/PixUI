@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\PixUI.CodeEditor.Text\PixUI.CodeEditor.Text.csproj" />
       <ProjectReference Include="..\PixUI.CodeEditor\PixUI.CodeEditor.csproj" />
       <ProjectReference Include="..\PixUI.Dynamic.Design\PixUI.Dynamic.Design.csproj" />
       <ProjectReference Include="..\PixUI.LiveCharts\PixUI.LiveCharts.csproj" />

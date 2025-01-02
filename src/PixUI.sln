@@ -49,6 +49,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.Dynamic.Design", "Pix
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.Misc", "PixUI.Misc\PixUI.Misc.csproj", "{98655897-23E7-4434-ABCE-AF90B37D7C8B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.CodeEditor.Text", "PixUI.CodeEditor.Text\PixUI.CodeEditor.Text.csproj", "{55255785-0E09-4738-972E-0112A67086BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,6 +137,10 @@ Global
 		{98655897-23E7-4434-ABCE-AF90B37D7C8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98655897-23E7-4434-ABCE-AF90B37D7C8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98655897-23E7-4434-ABCE-AF90B37D7C8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55255785-0E09-4738-972E-0112A67086BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55255785-0E09-4738-972E-0112A67086BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55255785-0E09-4738-972E-0112A67086BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55255785-0E09-4738-972E-0112A67086BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

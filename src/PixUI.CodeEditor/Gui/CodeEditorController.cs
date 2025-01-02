@@ -6,16 +6,14 @@ namespace CodeEditor;
 
 public sealed class CodeEditorController : WidgetController<CodeEditorWidget>
 {
-    public CodeEditorController(string fileName, string content,
+    public CodeEditorController(string fileName, ITextBuffer textBuffer,
         ICompletionProvider? completionProvider = null, string? tag = null)
     {
         _editActions = MakeShortcuts();
         Theme = new TextEditorTheme();
-        Document = new Document(fileName, tag);
+        Document = new Document(fileName, textBuffer, tag);
         TextEditor = new TextEditor(this);
         _completionContext = new CompletionContext(this, completionProvider);
-
-        Document.TextContent = content;
 
         Document.DocumentChanged += _OnDocumentChanged;
         TextEditor.Caret.PositionChanged += _OnCaretPositionChanged;
@@ -250,7 +248,8 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>
     {
         //TODO: 进一步合并LineManager改变的行数
         //var dirtyLines = Document.SyntaxParser.GetDirtyLines(this);
-        Widget.RequestInvalidate(true, null /*dirtyLines*/);
+        if (Widget != null!)
+            Widget.RequestInvalidate(true, null /*dirtyLines*/);
     }
 
     private void _OnCaretPositionChanged()
