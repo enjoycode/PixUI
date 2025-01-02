@@ -5,16 +5,21 @@ namespace PixUI;
 
 public static class DragDropManager
 {
+    /// <summary>
+    /// 开始拖动的阀值
+    /// </summary>
+    private const int DRAG_SIZE = 4;
+
     private static IDraggable? _dragging;
-    private static IDroppable? _dropping;
-    private static DragEvent? _dragEvent;
     private static HitTestEntry? _dropHitEntry;
 
     private static Overlay? _overlay;
     private static readonly DraggingDecorator _decorator = new();
 
-    internal static DragEvent? DragEvent => _dragEvent;
-    internal static IDroppable? Dropping => _dropping;
+    internal static DragEvent? DragEvent { get; private set; }
+
+    internal static IDroppable? Dropping { get; private set; }
+
     internal static Matrix4 HitTransform => _dropHitEntry!.Value.Transform;
 
     internal static bool MaybeStart(UIWindow window, ref HitTestEntry? pointDownEntry, PointerEvent e)
@@ -24,14 +29,17 @@ public static class DragDropManager
         if (_dragging == null)
         {
             if (!draggable.AllowDrag()) return false;
+            if (Math.Abs(e.X - window.LastPointerDown.X) < DRAG_SIZE &&
+                Math.Abs(e.Y - window.LastPointerDown.Y) < DRAG_SIZE)
+                return false;
 
             _dragging = draggable;
-            _dragEvent = new DragEvent();
-            _dragging.OnDragStart(_dragEvent);
+            DragEvent = new DragEvent();
+            _dragging.OnDragStart(DragEvent);
             //check TransferItem is null, if null set to draggable
-            if (_dragEvent.TransferItem == null!)
-                _dragEvent.TransferItem = _dragging;
-            if (_dragEvent.DragHintImage == null!)
+            if (DragEvent.TransferItem == null!)
+                DragEvent.TransferItem = _dragging;
+            if (DragEvent.DragHintImage == null!)
                 throw new NotImplementedException(); //TODO: build default hit image
 
             ShowDecorator();
@@ -70,21 +78,21 @@ public static class DragDropManager
         {
             LeaveOldDropping();
         }
-        else if (ReferenceEquals(_dropHitEntry.Value.Widget, _dropping))
+        else if (ReferenceEquals(_dropHitEntry.Value.Widget, Dropping))
         {
             var localPt = _dropHitEntry.Value.ToLocalPoint(e.X, e.Y);
-            _dropping.OnDragOver(_dragEvent!, new(localPt.Dx, localPt.Dy));
-            Log.Debug($"Drag over 2 [{_dropping}]");
+            Dropping.OnDragOver(DragEvent!, new(localPt.Dx, localPt.Dy));
+            Log.Debug($"Drag over 2 [{Dropping}]");
         }
         else if (_dropHitEntry.Value.Widget is IDroppable droppable)
         {
             LeaveOldDropping();
-            if (droppable.AllowDrop(_dragEvent!))
+            if (droppable.AllowDrop(DragEvent!))
             {
-                _dropping = droppable;
+                Dropping = droppable;
                 var localPt = _dropHitEntry.Value.ToLocalPoint(e.X, e.Y);
-                _dropping.OnDragOver(_dragEvent!, new(localPt.Dx, localPt.Dy));
-                Log.Debug($"Drag over 1 [{_dropping}]");
+                Dropping.OnDragOver(DragEvent!, new(localPt.Dx, localPt.Dy));
+                Log.Debug($"Drag over 1 [{Dropping}]");
             }
         }
 
@@ -95,9 +103,9 @@ public static class DragDropManager
 
     private static void LeaveOldDropping()
     {
-        _dropping?.OnDragLeave(_dragEvent!);
-        _dragEvent!.DropEffect = DropEffect.None;
-        _dropping = null;
+        Dropping?.OnDragLeave(DragEvent!);
+        DragEvent!.DropEffect = DropEffect.None;
+        Dropping = null;
     }
 
     internal static bool MaybeStop(PointerEvent e)
@@ -106,16 +114,16 @@ public static class DragDropManager
 
         HideDecorator();
 
-        _dragging.OnDragEnd(_dragEvent!);
-        if (_dragEvent!.DropEffect != DropEffect.None)
+        _dragging.OnDragEnd(DragEvent!);
+        if (DragEvent!.DropEffect != DropEffect.None)
         {
             var localPt = _dropHitEntry!.Value.ToLocalPoint(e.X, e.Y);
-            _dropping?.OnDrop(_dragEvent, new(localPt.Dx, localPt.Dy));
+            Dropping?.OnDrop(DragEvent, new(localPt.Dx, localPt.Dy));
         }
 
         _dragging = null;
-        _dropping = null;
-        _dragEvent = null;
+        Dropping = null;
+        DragEvent = null;
         return true;
     }
 

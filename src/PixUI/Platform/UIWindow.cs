@@ -49,6 +49,8 @@ public abstract class UIWindow
 
     protected internal float LastMouseY { get; private set; } = -1;
 
+    protected internal Point LastPointerDown { get; private set; }
+
     // Pointer.Move时检测命中的结果
     private HitTestResult _oldHitResult = new();
 
@@ -184,6 +186,8 @@ public abstract class UIWindow
 
     public void OnPointerDown(PointerEvent pointerEvent)
     {
+        LastPointerDown = new Point(pointerEvent.X, pointerEvent.Y);
+
         if (EventHookManager.HookEvent(EventType.PointerDown, pointerEvent))
             return;
 
