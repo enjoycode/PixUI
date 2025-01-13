@@ -53,7 +53,7 @@ internal sealed class BackspaceCommand : IEditCommand
 
         //处理AutoClosingPairs
         var ch = editor.Document.GetCharAt(caretOffset - 1);
-        var closingPair = editor.Document.SyntaxParser.Language.GetAutoColsingPairs(ch);
+        var closingPair = editor.Document.SyntaxParser.Language.GetAutoClosingPairs(ch);
         var len = closingPair != null && closingPair.Value == editor.Document.GetCharAt(caretOffset)
             ? 2
             : 1;

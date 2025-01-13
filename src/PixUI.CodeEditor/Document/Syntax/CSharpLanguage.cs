@@ -5,7 +5,7 @@ namespace CodeEditor;
 
 internal sealed class CSharpLanguage : ICodeLanguage
 {
-    public char? GetAutoColsingPairs(char ch) => ch switch
+    public char? GetAutoClosingPairs(char ch) => ch switch
     {
         '{' => '}',
         '[' => ']',

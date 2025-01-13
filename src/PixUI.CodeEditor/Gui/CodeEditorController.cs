@@ -149,7 +149,7 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>
 
         //先判断处理AutoClosingPairs
         var closingPair = text.Length == 1
-            ? Document.SyntaxParser.Language.GetAutoColsingPairs(text[0])
+            ? Document.SyntaxParser.Language.GetAutoClosingPairs(text[0])
             : null;
         if (closingPair == null)
         {
