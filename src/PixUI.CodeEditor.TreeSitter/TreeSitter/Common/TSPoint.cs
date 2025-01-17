@@ -28,7 +28,7 @@ public readonly struct TSPoint
 #endif
 
     public static TSPoint FromLocation(TextLocation location)
-        => new TSPoint(location.Line, location.Column * SyntaxParser.ParserEncoding);
+        => new TSPoint(location.Line, location.Column * TreeSitterSyntaxParser.ParserEncoding);
 
     public override string ToString() => $"({row}, {column})";
 }

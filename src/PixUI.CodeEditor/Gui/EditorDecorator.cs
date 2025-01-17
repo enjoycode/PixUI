@@ -15,14 +15,14 @@ internal sealed class EditorDecorator : FlowDecorator<CodeEditorWidget>
     private void OnCaretPosChanged()
     {
         var textEditor = Target.Controller.TextEditor;
-        var rootNode = Target.Controller.Document.SyntaxParser.RootNode;
-        if (!rootNode.HasValue) return;
-
-        var caretPos = textEditor.Caret.Position;
-        var startPoint = new TSPoint(caretPos.Line, caretPos.Column * SyntaxParser.ParserEncoding);
-        // var endPoint = new TSPoint(caretPos.Line, (caretPos.Column + 1) * SyntaxParser.ParserEncoding);
-        var nodeAtCaret = rootNode.Value.DescendantForPosition(startPoint /*, endPoint*/);
-        if (!nodeAtCaret.HasValue) return;
+        // var rootNode = Target.Controller.Document.SyntaxParser.RootNode;
+        // if (!rootNode.HasValue) return;
+        //
+        // var caretPos = textEditor.Caret.Position;
+        // var startPoint = new TSPoint(caretPos.Line, caretPos.Column * SyntaxParser.ParserEncoding);
+        // // var endPoint = new TSPoint(caretPos.Line, (caretPos.Column + 1) * SyntaxParser.ParserEncoding);
+        // var nodeAtCaret = rootNode.Value.DescendantForPosition(startPoint /*, endPoint*/);
+        // if (!nodeAtCaret.HasValue) return;
 
         //Log.Debug($"Type: {nodeAtCaret.Value.Type} IsNamed: {nodeAtCaret.Value.IsNamed()}");
     }

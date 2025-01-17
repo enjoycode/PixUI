@@ -28,11 +28,11 @@
             <Kind>Dynamic</Kind>
             <SmartLink>False</SmartLink>
         </NativeReference>
-        <NativeReference Include="..\PixUI.CodeEditor\libs\osx-x64\libtree-sitter.dylib">
+        <NativeReference Include="..\PixUI.CodeEditor.TreeSitter\libs\osx-x64\libtree-sitter.dylib">
             <Kind>Dynamic</Kind>
             <SmartLink>False</SmartLink>
         </NativeReference>
-        <NativeReference Include="..\PixUI.CodeEditor\libs\osx-x64\libtree-sitter-csharp.dylib">
+        <NativeReference Include="..\PixUI.CodeEditor.TreeSitter\libs\osx-x64\libtree-sitter-csharp.dylib">
             <Kind>Dynamic</Kind>
             <SmartLink>False</SmartLink>
         </NativeReference>
@@ -43,11 +43,11 @@
             <Kind>Dynamic</Kind>
             <SmartLink>False</SmartLink>
         </NativeReference>
-        <NativeReference Include="..\PixUI.CodeEditor\libs\osx-arm64\libtree-sitter.dylib">
+        <NativeReference Include="..\PixUI.CodeEditor.TreeSitter\libs\osx-arm64\libtree-sitter.dylib">
             <Kind>Dynamic</Kind>
             <SmartLink>False</SmartLink>
         </NativeReference>
-        <NativeReference Include="..\PixUI.CodeEditor\libs\osx-arm64\libtree-sitter-csharp.dylib">
+        <NativeReference Include="..\PixUI.CodeEditor.TreeSitter\libs\osx-arm64\libtree-sitter-csharp.dylib">
             <Kind>Dynamic</Kind>
             <SmartLink>False</SmartLink>
         </NativeReference>

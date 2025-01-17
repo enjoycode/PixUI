@@ -5,24 +5,23 @@ using PixUI;
 
 namespace CodeEditor;
 
-public sealed class SyntaxParser : IDisposable
+public sealed class TreeSitterSyntaxParser : ISyntaxParser
 {
 #if __WEB__
     internal const int ParserEncoding = 1;
 #else
-    internal const int ParserEncoding = 2;
+    public const int ParserEncoding = 2;
 #endif
 
-    public SyntaxParser(Document document)
+    public TreeSitterSyntaxParser()
     {
-        _document = document;
         // @ts-ignore for new TSParser();
         _parser = new TSParser(); //Don't use Initializer
         _parser.Language = TSCSharpLanguage.Instance;
         Language = new CSharpLanguage();
     }
 
-    private readonly Document _document;
+    public Document Document { get; set; } = null!;
 
     private readonly TSParser _parser;
     internal ICodeLanguage Language { get; }
@@ -35,11 +34,23 @@ public sealed class SyntaxParser : IDisposable
     private int _startLineOfChanged;
     private int _endLineOfChanged;
 
+    #region ====Language Methods====
+
+    public bool HasSyntaxError => RootNode?.HasError() ?? false;
+
+    public char? GetAutoClosingPairs(char ch) => Language.GetAutoClosingPairs(ch);
+
+    public bool IsBlockStartBracket(char ch) => Language.IsBlockStartBracket(ch);
+
+    public bool IsBlockEndBracket(char ch) => Language.IsBlockEndBracket(ch);
+
+    #endregion
+
     #region ====Edit Methods====
 
-    internal void BeginInsert(int offset, int length)
+    public void BeginInsert(int offset, int length)
     {
-        var startLocation = _document.OffsetToPosition(offset);
+        var startLocation = Document.OffsetToPosition(offset);
         _edit.startIndex = (uint)offset * ParserEncoding;
         _edit.oldEndIndex = _edit.startIndex;
         _edit.newEndIndex = _edit.startIndex + (uint)length * ParserEncoding;
@@ -47,13 +58,13 @@ public sealed class SyntaxParser : IDisposable
         _edit.oldEndPosition = _edit.startPosition;
     }
 
-    internal void EndInsert(int offset, int length)
+    public void EndInsert(int offset, int length)
     {
-        var endLocation = _document.OffsetToPosition(offset + length);
+        var endLocation = Document.OffsetToPosition(offset + length);
         _edit.newEndPosition = TSPoint.FromLocation(endLocation);
 
 #if __WEB__
-            _oldTree!.Edit(_edit);
+        _oldTree!.Edit(_edit);
 #else
         _oldTree!.Edit(ref _edit);
 #endif
@@ -62,10 +73,10 @@ public sealed class SyntaxParser : IDisposable
         Tokenize(_startLineOfChanged, _endLineOfChanged);
     }
 
-    internal void BeginRemove(int offset, int length)
+    public void BeginRemove(int offset, int length)
     {
-        var startLocation = _document.OffsetToPosition(offset);
-        var endLocation = _document.OffsetToPosition(offset + length);
+        var startLocation = Document.OffsetToPosition(offset);
+        var endLocation = Document.OffsetToPosition(offset + length);
         _edit.startIndex = (uint)offset * ParserEncoding;
         _edit.oldEndIndex = _edit.startIndex + (uint)length * ParserEncoding;
         _edit.newEndIndex = _edit.startIndex;
@@ -74,10 +85,10 @@ public sealed class SyntaxParser : IDisposable
         _edit.newEndPosition = _edit.startPosition;
     }
 
-    internal void EndRemove()
+    public void EndRemove()
     {
 #if __WEB__
-            _oldTree!.Edit(_edit);
+        _oldTree!.Edit(_edit);
 #else
         _oldTree!.Edit(ref _edit);
 #endif
@@ -85,24 +96,24 @@ public sealed class SyntaxParser : IDisposable
         Tokenize(_startLineOfChanged, _endLineOfChanged);
     }
 
-    internal void BeginReplace(int offset, int length, int textLenght)
+    public void BeginReplace(int offset, int length, int textLength)
     {
-        var startLocation = _document.OffsetToPosition(offset);
-        var endLocation = _document.OffsetToPosition(offset + length);
+        var startLocation = Document.OffsetToPosition(offset);
+        var endLocation = Document.OffsetToPosition(offset + length);
         _edit.startIndex = (uint)(offset * ParserEncoding);
         _edit.oldEndIndex = _edit.startIndex + (uint)(length * ParserEncoding);
-        _edit.newEndIndex = _edit.startIndex + (uint)(textLenght * ParserEncoding);
+        _edit.newEndIndex = _edit.startIndex + (uint)(textLength * ParserEncoding);
         _edit.startPosition = TSPoint.FromLocation(startLocation);
         _edit.oldEndPosition = TSPoint.FromLocation(endLocation);
     }
 
-    internal void EndReplace(int offset, int length, int textLength)
+    public void EndReplace(int offset, int length, int textLength)
     {
-        var endLocation = _document.OffsetToPosition(offset + textLength);
+        var endLocation = Document.OffsetToPosition(offset + textLength);
         _edit.newEndPosition = TSPoint.FromLocation(endLocation);
 
 #if __WEB__
-            _oldTree!.Edit(_edit);
+        _oldTree!.Edit(_edit);
 #else
         _oldTree!.Edit(ref _edit);
 #endif
@@ -143,7 +154,7 @@ public sealed class SyntaxParser : IDisposable
     public unsafe void Parse(bool reset)
     {
 #if !__WEB__
-        using var input = new ParserInput(_document.TextBuffer);
+        using var input = new ParserInput(Document.TextBuffer);
         var gcHandle = GCHandle.Alloc(input);
         var tsInput = new TSInput
         {
@@ -191,15 +202,15 @@ public sealed class SyntaxParser : IDisposable
         _oldTree = newTree;
 
         //生成FoldMarkers
-        var foldMarkers = Language.GenerateFoldMarkers(_document);
-        _document.FoldingManager.UpdateFoldings(foldMarkers);
+        var foldMarkers = Language.GenerateFoldMarkers(Document);
+        Document.FoldingManager.UpdateFoldings(foldMarkers);
 #endif
     }
 
     /// <summary>
     /// Tokenize lines range [startLine, endLine)
     /// </summary>
-    internal void Tokenize(int startLine, int endLine)
+    public void Tokenize(int startLine, int endLine)
     {
 #if DEBUG
         var ts = Stopwatch.GetTimestamp();
@@ -217,7 +228,7 @@ public sealed class SyntaxParser : IDisposable
 
     private void TokenizeLine(int line)
     {
-        var lineSegment = _document.GetLineSegment(line);
+        var lineSegment = Document.GetLineSegment(line);
         var lineLength = lineSegment.Length;
         if (lineLength == 0) return;
 

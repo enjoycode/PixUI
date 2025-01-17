@@ -18,6 +18,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\PixUI.CodeEditor.Text\PixUI.CodeEditor.Text.csproj" />
+      <ProjectReference Include="..\PixUI.CodeEditor.TreeSitter\PixUI.CodeEditor.TreeSitter.csproj" />
       <ProjectReference Include="..\PixUI.CodeEditor\PixUI.CodeEditor.csproj" />
       <ProjectReference Include="..\PixUI.CS2TS\PixUI.CS2TS.csproj" />
       <ProjectReference Include="..\PixUI.Dynamic.Design\PixUI.Dynamic.Design.csproj" />

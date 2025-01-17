@@ -29,7 +29,7 @@ public sealed class ParserInput : IDisposable
         var gcHandle = GCHandle.FromIntPtr(new IntPtr(payload));
         var input = (ParserInput)gcHandle.Target!;
 
-        var offset = (int)(byteIndex / SyntaxParser.ParserEncoding); //utf16
+        var offset = (int)(byteIndex / TreeSitterSyntaxParser.ParserEncoding); //utf16
         if (offset >= input._textBuffer.Length)
         {
             *bytesRead = 0;
@@ -41,7 +41,7 @@ public sealed class ParserInput : IDisposable
         var dest = new Span<char>(input._nativeBuffer.ToPointer(), NativeInputSize / 2);
         input._textBuffer.CopyTo(dest, offset, count);
 
-        *bytesRead = (uint)count * SyntaxParser.ParserEncoding;
+        *bytesRead = (uint)count * TreeSitterSyntaxParser.ParserEncoding;
         return input._nativeBuffer.ToPointer();
     }
 

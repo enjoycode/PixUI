@@ -310,7 +310,7 @@ initializer: [
 
     public List<FoldMarker>? GenerateFoldMarkers(Document document)
     {
-        var syntaxParser = document.SyntaxParser;
+        var syntaxParser = (TreeSitterSyntaxParser) document.SyntaxParser;
         var rootNode = syntaxParser.RootNode;
         if (rootNode == null) return null;
 
@@ -336,8 +336,8 @@ initializer: [
             //暂跳过同一行的
             if (node.StartPosition.row == node.EndPosition.row) continue;
 
-            var startIndex = node.StartIndex / SyntaxParser.ParserEncoding;
-            var endIndex = node.EndIndex / SyntaxParser.ParserEncoding;
+            var startIndex = node.StartIndex / TreeSitterSyntaxParser.ParserEncoding;
+            var endIndex = node.EndIndex / TreeSitterSyntaxParser.ParserEncoding;
 
             var mark = new FoldMarker(document, 0, 0, 0, 0, FoldType.TypeBody, "{...}");
             mark.Offset = startIndex;

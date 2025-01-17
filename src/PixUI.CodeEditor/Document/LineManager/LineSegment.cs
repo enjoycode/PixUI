@@ -191,14 +191,14 @@ public sealed class LineSegment : ISegment
 
     #region ====Tokenize Methods====
 
-    internal void BeginTokenize()
+    public void BeginTokenize()
     {
         ClearCachedParagraph();
         _lineTokens = new List<CodeToken>();
         _tokenColumnIndex = 0;
     }
 
-    internal void AddToken(TokenType type, int offset, int length)
+    public void AddToken(TokenType type, int offset, int length)
     {
         var column = offset - Offset;
         //处理行首或间隙空格
@@ -212,7 +212,7 @@ public sealed class LineSegment : ISegment
         _tokenColumnIndex += length;
     }
 
-    internal void EndTokenize()
+    public void EndTokenize()
     {
         // 处理行尾空格
         if (_tokenColumnIndex < Length)

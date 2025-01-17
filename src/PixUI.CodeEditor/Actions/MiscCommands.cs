@@ -53,7 +53,7 @@ internal sealed class BackspaceCommand : IEditCommand
 
         //处理AutoClosingPairs
         var ch = editor.Document.GetCharAt(caretOffset - 1);
-        var closingPair = editor.Document.SyntaxParser.Language.GetAutoClosingPairs(ch);
+        var closingPair = editor.Document.SyntaxParser.GetAutoClosingPairs(ch);
         var len = closingPair != null && closingPair.Value == editor.Document.GetCharAt(caretOffset)
             ? 2
             : 1;
@@ -87,10 +87,10 @@ internal sealed class ReturnCommand : IEditCommand
         var curLineSegment = editor.Document.GetLineSegment(curLine);
         var leadingWhiteSpaces = curLineSegment.GetLeadingWhiteSpaces();
         var caretOffset = editor.Caret.Offset;
-        var language = editor.Document.SyntaxParser.Language;
+        var syntaxParser = editor.Document.SyntaxParser;
         var isBlockBracket = caretOffset > 0 &&
-                             language.IsBlockStartBracket(editor.Document.GetCharAt(caretOffset - 1)) &&
-                             language.IsBlockEndBracket(editor.Document.GetCharAt(caretOffset));
+                             syntaxParser.IsBlockStartBracket(editor.Document.GetCharAt(caretOffset - 1)) &&
+                             syntaxParser.IsBlockEndBracket(editor.Document.GetCharAt(caretOffset));
         var tabIndent = editor.Document.TextEditorOptions.TabIndent;
 
         var insertText = "\n";

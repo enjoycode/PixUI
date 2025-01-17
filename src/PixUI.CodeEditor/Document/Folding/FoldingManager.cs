@@ -140,7 +140,7 @@ public sealed class FoldingManager
         return foldings;
     }
 
-    internal void UpdateFoldings(List<FoldMarker>? newFoldings)
+    public void UpdateFoldings(List<FoldMarker>? newFoldings)
     {
         // final int oldFoldingCount = foldMarker.length;
         if (newFoldings != null && newFoldings.Count != 0)

@@ -51,6 +51,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.Misc", "PixUI.Misc\Pi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.CodeEditor.Text", "PixUI.CodeEditor.Text\PixUI.CodeEditor.Text.csproj", "{55255785-0E09-4738-972E-0112A67086BE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.CodeEditor.TreeSitter", "PixUI.CodeEditor.TreeSitter\PixUI.CodeEditor.TreeSitter.csproj", "{6A814547-A95A-40E7-A6A9-860D43B0120F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -141,6 +143,10 @@ Global
 		{55255785-0E09-4738-972E-0112A67086BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55255785-0E09-4738-972E-0112A67086BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55255785-0E09-4738-972E-0112A67086BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A814547-A95A-40E7-A6A9-860D43B0120F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A814547-A95A-40E7-A6A9-860D43B0120F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A814547-A95A-40E7-A6A9-860D43B0120F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A814547-A95A-40E7-A6A9-860D43B0120F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

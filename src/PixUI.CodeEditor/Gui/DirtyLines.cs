@@ -6,16 +6,16 @@ namespace CodeEditor;
 /// <summary>
 /// 需要重新绘制的行范围[StartLine, EndLine)
 /// </summary>
-internal sealed class DirtyLines : IDirtyArea
+public sealed class DirtyLines : IDirtyArea
 {
-    internal DirtyLines(CodeEditorController controller)
+    public DirtyLines(CodeEditorController controller)
     {
         _controller = controller;
     }
 
     private readonly CodeEditorController _controller;
-    internal int StartLine;
-    internal int EndLine;
+    public int StartLine;
+    public int EndLine;
 
     public void Merge(IDirtyArea? newArea)
     {

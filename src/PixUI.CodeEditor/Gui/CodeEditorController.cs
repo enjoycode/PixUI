@@ -6,12 +6,12 @@ namespace CodeEditor;
 
 public sealed class CodeEditorController : WidgetController<CodeEditorWidget>
 {
-    public CodeEditorController(string fileName, ITextBuffer textBuffer,
+    public CodeEditorController(string fileName, ITextBuffer textBuffer, ISyntaxParser syntaxParser,
         ICompletionProvider? completionProvider = null, string? tag = null)
     {
         _editActions = MakeShortcuts();
         Theme = new TextEditorTheme();
-        Document = new Document(fileName, textBuffer, tag);
+        Document = new Document(fileName, textBuffer, syntaxParser, tag);
         TextEditor = new TextEditor(this);
         _completionContext = new CompletionContext(this, completionProvider);
 
@@ -149,7 +149,7 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>
 
         //先判断处理AutoClosingPairs
         var closingPair = text.Length == 1
-            ? Document.SyntaxParser.Language.GetAutoClosingPairs(text[0])
+            ? Document.SyntaxParser.GetAutoClosingPairs(text[0])
             : null;
         if (closingPair == null)
         {

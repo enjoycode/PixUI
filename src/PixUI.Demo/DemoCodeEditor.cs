@@ -24,7 +24,10 @@ public sealed class Person
 
     public DemoCodeEditor()
     {
-        _controller = new CodeEditorController("Demo.cs", new ImmutableTextBuffer(), new MockCompletionProvider());
+        _controller = new CodeEditorController("Demo.cs", 
+            new ImmutableTextBuffer(), 
+            new TreeSitterSyntaxParser(),
+            new MockCompletionProvider());
         _controller.Document.TextContent = SrcCode;
 
         Child = new Column

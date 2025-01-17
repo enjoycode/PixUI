@@ -5,14 +5,18 @@ namespace CodeEditor;
 
 public sealed class Document : IDisposable
 {
-    public Document(string fileName, ITextBuffer textBuffer, string? tag = null)
+    public Document(string fileName, ITextBuffer textBuffer, ISyntaxParser syntaxParser, string? tag = null)
     {
         _fileName = fileName;
         Tag = tag;
 
         TextBuffer = textBuffer;
+        SyntaxParser = syntaxParser;
+        if (SyntaxParser.Document != null!)
+            throw new Exception("Document has already been initialized.");
+        SyntaxParser.Document = this;
+        
         _lineManager = new LineManager(this);
-        SyntaxParser = new SyntaxParser(this);
         FoldingManager = new FoldingManager(this);
         TextEditorOptions = new TextEditorOptions();
         UndoStack = new UndoStack();
@@ -22,10 +26,10 @@ public sealed class Document : IDisposable
 
     private string _fileName;
     public readonly string? Tag;
+    public readonly ITextBuffer TextBuffer;
+    public readonly ISyntaxParser SyntaxParser;
     private readonly LineManager _lineManager;
-    internal readonly ITextBuffer TextBuffer;
-    internal readonly SyntaxParser SyntaxParser;
-    internal readonly FoldingManager FoldingManager;
+    public readonly FoldingManager FoldingManager;
     internal readonly TextEditorOptions TextEditorOptions;
     internal readonly UndoStack UndoStack;
 
@@ -34,7 +38,7 @@ public sealed class Document : IDisposable
     /// <summary>
     /// 是否有语法错误
     /// </summary>
-    public bool HasSyntaxError => SyntaxParser.RootNode?.HasError() ?? false;
+    public bool HasSyntaxError => SyntaxParser.HasSyntaxError;
 
     public int TextLength => TextBuffer.Length;
 
