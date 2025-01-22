@@ -41,7 +41,7 @@ public abstract class SelectBase<T> : InputBase<Widget>
         init
         {
             _selectedValue = value;
-            ((TextBase)Editor).Text = value.ToStateOfString();
+            BindEditorTextState();
         }
     }
 
@@ -54,7 +54,11 @@ public abstract class SelectBase<T> : InputBase<Widget>
 
     public Func<T, string> LabelGetter
     {
-        set => _labelGetter = value;
+        set
+        {
+            _labelGetter = value;
+            BindEditorTextState();
+        }
     }
 
     public State<Color>? TextColor
@@ -79,6 +83,16 @@ public abstract class SelectBase<T> : InputBase<Widget>
             if (Editor is EditableText editableText) editableText.Readonly = value;
             else ((SelectText)Editor).Readonly = value;
         }
+    }
+
+    private void BindEditorTextState()
+    {
+        if (_selectedValue == null!) return;
+
+        var editor = (TextBase)Editor;
+        editor.Text = _labelGetter == null
+            ? _selectedValue.ToStateOfString()
+            : _selectedValue.ToComputed(v => v == null ? string.Empty : _labelGetter(v));
     }
 
     private void OnFocusChanged(FocusChangedEvent e)
