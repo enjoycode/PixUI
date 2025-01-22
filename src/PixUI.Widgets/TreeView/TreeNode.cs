@@ -492,9 +492,9 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     }
 
     /// <summary>
-    /// 插入子节点，并且同步数据源
+    /// 插入子节点，并且根据需要同步数据源
     /// </summary>
-    internal void InsertChild(int index, TreeNode<T> child)
+    internal void InsertChild(int index, TreeNode<T> child, bool syncDataSource = true)
     {
         if (IsLeaf) return;
 
@@ -503,21 +503,27 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         var insertIndex = index < 0 ? _children!.Count : index;
         _children!.Insert(insertIndex, child);
         //同步数据
-        var dataChildren = _controller.ChildrenGetter(Data); //TODO: maybe null
-        dataChildren.Insert(insertIndex, child.Data);
+        if (syncDataSource)
+        {
+            var dataChildren = _controller.ChildrenGetter(Data); //TODO: maybe null
+            dataChildren.Insert(insertIndex, child.Data);
+        }
         //Reset HasLayout
         HasLayout = false;
     }
 
     /// <summary>
-    /// 移除子节点，并且同步数据源
+    /// 移除子节点，并且根据需要同步数据源
     /// </summary>
-    internal void RemoveChild(TreeNode<T> child)
+    internal void RemoveChild(TreeNode<T> child, bool syncDataSource = true)
     {
         _children!.Remove(child);
         //同步数据
-        var dataChildren = _controller.ChildrenGetter(Data);
-        dataChildren.Remove(child.Data);
+        if (syncDataSource)
+        {
+            var dataChildren = _controller.ChildrenGetter(Data);
+            dataChildren.Remove(child.Data);
+        }
         //Reset HasLayout
         HasLayout = false;
     }

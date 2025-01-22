@@ -24,7 +24,7 @@ public sealed class TreeController<T>
     #region ----DragDrop----
 
     public bool AllowDrag { get; set; }
-    
+
     public bool AllowDrop { get; set; }
 
     public Func<TreeNode<T>, bool>? OnAllowDrag { get; set; }
@@ -190,7 +190,15 @@ public sealed class TreeController<T>
         //TODO: scroll to
     }
 
-    public TreeNode<T> InsertNode(T child, TreeNode<T>? parentNode = null, int insertIndex = -1)
+    /// <summary>
+    /// 添加节点
+    /// </summary>
+    /// <param name="child">节点对应的数据</param>
+    /// <param name="parentNode">上级节点</param>
+    /// <param name="insertIndex"></param>
+    /// <param name="syncDataSource">是否同步数据源</param>
+    /// <returns></returns>
+    public TreeNode<T> InsertNode(T child, TreeNode<T>? parentNode = null, int insertIndex = -1, bool syncDataSource = true)
     {
         var node = new TreeNode<T>(child, this);
         NodeBuilder(node);
@@ -199,14 +207,15 @@ public sealed class TreeController<T>
             node.Parent = TreeView;
             var index = insertIndex < 0 ? Nodes.Count : insertIndex;
             Nodes.Insert(index, node);
-            DataSource!.Insert(index, child);
+            if (syncDataSource)
+                DataSource!.Insert(index, child);
             //强制重新布局
             TreeView!.Relayout();
         }
         else
         {
             node.Parent = parentNode;
-            parentNode.InsertChild(insertIndex, node);
+            parentNode.InsertChild(insertIndex, node, syncDataSource);
             //强制重新布局
             if (parentNode.IsExpanded)
                 parentNode.Relayout();
@@ -215,12 +224,18 @@ public sealed class TreeController<T>
         return node;
     }
 
-    public void RemoveNode(TreeNode<T> node)
+    /// <summary>
+    /// 移除节点
+    /// </summary>
+    /// <param name="node">待移除的节点</param>
+    /// <param name="syncDataSource">是否同步数据源</param>
+    public void RemoveNode(TreeNode<T> node, bool syncDataSource = true)
     {
         if (ReferenceEquals(node.Parent, TreeView))
         {
             Nodes.Remove(node);
-            DataSource!.Remove(node.Data);
+            if (syncDataSource)
+                DataSource!.Remove(node.Data);
             node.Parent = null;
             //强制重新布局
             TreeView!.Relayout();
@@ -228,7 +243,7 @@ public sealed class TreeController<T>
         else
         {
             var parentNode = (TreeNode<T>)node.Parent!;
-            parentNode.RemoveChild(node);
+            parentNode.RemoveChild(node, syncDataSource);
             node.Parent = null;
             //强制重新布局
             if (parentNode.IsExpanded)
