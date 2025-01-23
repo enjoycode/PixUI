@@ -14,9 +14,13 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         _row = new TreeNodeRow<T>();
         _row.Parent = this;
 
-        _color = IsSelected.ToComputed(s => s ? Theme.FocusedColor : Colors.Black); //TODO: fix color
-
-        // IsSelected.AddListener(_ => _row.Repaint()); //暂不需要重画整行，只影响标题及图标颜色
+        _color = IsSelected.ToComputed(s => s ? Theme.FocusedColor : Colors.Black
+            , null,() => IsVisible); //TODO: fix color
+        IsSelected.AddListener(_ =>
+        {
+            //_row.Repaint(); //暂不需要重画整行，只影响标题及图标颜色
+            _row.Label?.ClearCachedParagraph(); //临时解决不可见选中的节点改为没选中时没有改变颜色
+        });
     }
 
     #region ====Fields & Properties====
@@ -90,6 +94,25 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     public TreeNode<T>? ParentNode => Parent as TreeNode<T>;
 
     public int Index => ParentNode?.IndexOf(this) ?? Controller.Nodes.IndexOf(this);
+
+    /// <summary>
+    /// 是否可见(被收缩后不可见)
+    /// </summary>
+    private bool IsVisible
+    {
+        get
+        {
+            var parent = ParentNode;
+            while (parent != null)
+            {
+                if (!parent.IsExpanded)
+                    return false;
+                parent = parent.ParentNode;
+            }
+
+            return true;
+        }
+    }
 
     #endregion
 
@@ -508,6 +531,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
             var dataChildren = _controller.ChildrenGetter(Data); //TODO: maybe null
             dataChildren.Insert(insertIndex, child.Data);
         }
+
         //Reset HasLayout
         HasLayout = false;
     }
@@ -524,6 +548,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
             var dataChildren = _controller.ChildrenGetter(Data);
             dataChildren.Remove(child.Data);
         }
+
         //Reset HasLayout
         HasLayout = false;
     }

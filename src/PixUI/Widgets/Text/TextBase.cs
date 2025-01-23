@@ -18,7 +18,13 @@ public abstract class TextBase : Widget
     public State<string> Text
     {
         get => _text;
-        set => Bind(ref _text!, value, OnTextChanged);
+        set
+        {
+            Bind(ref _text!, value, OnTextChanged);
+#if DEBUG
+            DebugLabel = _text.Value;
+#endif
+        }
     }
 
     protected virtual bool ForceHeight { get; } = false;
@@ -67,7 +73,7 @@ public abstract class TextBase : Widget
             RelayoutOnStateChanged(state);
     }
 
-    private void ClearCachedParagraph()
+    public void ClearCachedParagraph()
     {
         //TODO: fast update font size or color use skia paragraph
         _cachedParagraph?.Dispose();

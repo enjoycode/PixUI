@@ -72,8 +72,8 @@ public abstract class State<T> : State
     /// </summary>
     public State<bool> ToStateOfBool(Func<T, bool> getter) => RxComputed<bool>.Make<T, bool>(this, getter);
 
-    public State<TR> ToComputed<TR>(Func<T, TR> getter, Action<TR>? setter = null) =>
-        RxComputed<TR>.Make(this, getter, setter);
+    public State<TR> ToComputed<TR>(Func<T, TR> getter, Action<TR>? setter = null, Func<bool>? notifier = null) =>
+        RxComputed<TR>.Make(this, getter, setter, notifier);
 
     public State<TR> ToComputed<T1, TR>(State<T1> other, Func<T, T1, TR> getter, Action<TR>? setter = null) =>
         RxComputed<TR>.Make(this, other, getter, setter);
