@@ -6,7 +6,7 @@ namespace PixUI.Platform.Blazor;
 public static class JSApi
 {
     [JSInvokable]
-    public static void OnInvalidate() => ((BlazorApplication)UIApplication.Current).RunInvaldateRequest();
+    public static void OnInvalidate() => ((BlazorApplication)UIApplication.Current).RunInvalidateRequest();
 
     [JSInvokable]
     public static void OnMouseMove(int buttons, int x, int y, int dx, int dy)

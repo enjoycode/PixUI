@@ -44,7 +44,7 @@ public sealed class BlazorApplication : UIApplication
     public override void PostInvalidateEvent()
         => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("PostInvalidateEvent");
 
-    internal void RunInvaldateRequest() => OnInvalidateRequest();
+    internal void RunInvalidateRequest() => OnInvalidateRequest();
 
     public override void BeginInvoke(Action action)
     {
