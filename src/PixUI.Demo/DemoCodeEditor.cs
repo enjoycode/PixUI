@@ -28,7 +28,7 @@ public sealed class Person
             new ImmutableTextBuffer(), 
             new TreeSitterSyntaxParser(),
             new MockCompletionProvider());
-        _controller.Document.TextContent = SrcCode;
+        _controller.Document.Open(SrcCode);
 
         Child = new Column
         {

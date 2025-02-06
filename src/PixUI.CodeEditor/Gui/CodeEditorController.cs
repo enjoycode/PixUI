@@ -244,10 +244,11 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>
 
     #region ====重绘事件====
 
-    private void _OnDocumentChanged(DocumentEventArgs e)
+    private async void _OnDocumentChanged(DocumentEventArgs e)
     {
-        //TODO: 进一步合并LineManager改变的行数
-        //var dirtyLines = Document.SyntaxParser.GetDirtyLines(this);
+        //TODO: 顺序或合并
+        var dirtyLines = await Document.SyntaxParser.ParseAndTokenize();
+        //暂全部刷新
         if (Widget != null!)
             Widget.RequestInvalidate(true, null /*dirtyLines*/);
     }

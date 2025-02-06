@@ -172,8 +172,7 @@ public sealed class LineManager
         }
     }
 
-    private void RemoveInternal(
-        DeferredEventList deferredEventList, int offset, int length)
+    private void RemoveInternal(DeferredEventList deferredEventList, int offset, int length)
     {
         // Debug.Assert(length >= 0);
         if (length == 0) return;

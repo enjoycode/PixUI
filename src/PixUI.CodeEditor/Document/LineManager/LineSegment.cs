@@ -200,6 +200,11 @@ public sealed class LineSegment : ISegment
 
     public void AddToken(TokenType type, int offset, int length)
     {
+#if DEBUG
+        if (offset < Offset)
+            throw new IndexOutOfRangeException("offset is less than Line.Offset");
+#endif
+
         var column = offset - Offset;
         //处理行首或间隙空格
         if (column > _tokenColumnIndex)

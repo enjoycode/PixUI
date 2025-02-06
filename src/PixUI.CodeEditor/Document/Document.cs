@@ -15,7 +15,7 @@ public sealed class Document : IDisposable
         if (SyntaxParser.Document != null!)
             throw new Exception("Document has already been initialized.");
         SyntaxParser.Document = this;
-        
+
         _lineManager = new LineManager(this);
         FoldingManager = new FoldingManager(this);
         TextEditorOptions = new TextEditorOptions();
@@ -54,20 +54,23 @@ public sealed class Document : IDisposable
 
     #region ====Text Methods====
 
-    public string TextContent
+    public void Open(string? srcCode = null)
     {
-        get => GetText(0, TextBuffer.Length);
-        set
-        {
-            TextBuffer.SetContent(value);
-            _lineManager.SetContent(value);
-            UndoStack.ClearAll();
-            SyntaxParser.Parse(true);
-            SyntaxParser.Tokenize(0, TotalNumberOfLines);
-
-            DocumentChanged?.Invoke(new DocumentEventArgs(this, 0, 0, value));
-        }
+        if (!string.IsNullOrEmpty(srcCode))
+            TextBuffer.SetContent(srcCode);
+        
+        if (TextBuffer.Length == 0) return;
+        //TODO:
+        var text = TextBuffer.GetText(0, TextBuffer.Length);
+        SyntaxParser.BeginEdit(0, 0, text.Length);
+        _lineManager.SetContent(text);
+        UndoStack.ClearAll();
+        SyntaxParser.EndEdit(0, 0, text.Length);
+        
+        DocumentChanged?.Invoke(new DocumentEventArgs(this, 0, 0, text));
     }
+
+    public string TextContent => GetText(0, TextBuffer.Length);
 
     public char GetCharAt(int offset) => TextBuffer.GetCharAt(offset);
 
@@ -77,13 +80,13 @@ public sealed class Document : IDisposable
     {
         if (Readonly) return;
 
-        SyntaxParser.BeginInsert(offset, text.Length);
+        SyntaxParser.BeginEdit(offset, 0, text.Length);
 
         TextBuffer.Insert(offset, text);
         _lineManager.Insert(offset, text);
         UndoStack.Push(new UndoableInsert(this, offset, text));
 
-        SyntaxParser.EndInsert(offset, text.Length);
+        SyntaxParser.EndEdit(offset, 0, text.Length);
 
         DocumentChanged?.Invoke(new DocumentEventArgs(this, offset, 0, text));
     }
@@ -92,13 +95,13 @@ public sealed class Document : IDisposable
     {
         if (Readonly) return;
 
-        SyntaxParser.BeginRemove(offset, length);
+        SyntaxParser.BeginEdit(offset, length, 0);
 
         UndoStack.Push(new UndoableDelete(this, offset, GetText(offset, length)));
         TextBuffer.Remove(offset, length);
         _lineManager.Remove(offset, length);
 
-        SyntaxParser.EndRemove();
+        SyntaxParser.EndEdit(offset, length, 0);
 
         DocumentChanged?.Invoke(new DocumentEventArgs(this, offset, length, ""));
     }
@@ -107,13 +110,13 @@ public sealed class Document : IDisposable
     {
         if (Readonly) return;
 
-        SyntaxParser.BeginReplace(offset, length, text.Length);
+        SyntaxParser.BeginEdit(offset, length, text.Length);
 
         UndoStack.Push(new UndoableReplace(this, offset, GetText(offset, length), text));
         TextBuffer.Replace(offset, length, text);
         _lineManager.Replace(offset, length, text);
 
-        SyntaxParser.EndReplace(offset, length, text.Length);
+        SyntaxParser.EndEdit(offset, length, text.Length);
 
         DocumentChanged?.Invoke(new DocumentEventArgs(this, offset, length, text));
     }

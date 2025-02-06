@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace CodeEditor;
 
@@ -8,17 +9,9 @@ public interface ISyntaxParser : IDisposable
 
     Document Document { get; set; }
 
-    void BeginInsert(int offset, int length);
+    void BeginEdit(int offset, int length, int textLength);
 
-    void EndInsert(int offset, int length);
-
-    void BeginRemove(int offset, int length);
-
-    void EndRemove();
-
-    void BeginReplace(int offset, int length, int textLength);
-
-    void EndReplace(int offset, int length, int textLength);
+    void EndEdit(int offset, int length, int textLength);
 
     char? GetAutoClosingPairs(char ch);
 
@@ -26,10 +19,5 @@ public interface ISyntaxParser : IDisposable
 
     bool IsBlockEndBracket(char ch);
 
-    void Parse(bool reset);
-
-    /// <summary>
-    /// Tokenize lines range [startLine, endLine)
-    /// </summary>
-    void Tokenize(int startLine, int endLine);
+    ValueTask<ValueTuple<int,int>> ParseAndTokenize();
 }

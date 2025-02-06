@@ -48,58 +48,10 @@ public sealed class TreeSitterSyntaxParser : ISyntaxParser
 
     #region ====Edit Methods====
 
-    public void BeginInsert(int offset, int length)
+    public void BeginEdit(int offset, int length, int textLength)
     {
         var startLocation = Document.OffsetToPosition(offset);
-        _edit.startIndex = (uint)offset * ParserEncoding;
-        _edit.oldEndIndex = _edit.startIndex;
-        _edit.newEndIndex = _edit.startIndex + (uint)length * ParserEncoding;
-        _edit.startPosition = TSPoint.FromLocation(startLocation);
-        _edit.oldEndPosition = _edit.startPosition;
-    }
-
-    public void EndInsert(int offset, int length)
-    {
-        var endLocation = Document.OffsetToPosition(offset + length);
-        _edit.newEndPosition = TSPoint.FromLocation(endLocation);
-
-#if __WEB__
-        _oldTree!.Edit(_edit);
-#else
-        _oldTree!.Edit(ref _edit);
-#endif
-
-        Parse(false);
-        Tokenize(_startLineOfChanged, _endLineOfChanged);
-    }
-
-    public void BeginRemove(int offset, int length)
-    {
-        var startLocation = Document.OffsetToPosition(offset);
-        var endLocation = Document.OffsetToPosition(offset + length);
-        _edit.startIndex = (uint)offset * ParserEncoding;
-        _edit.oldEndIndex = _edit.startIndex + (uint)length * ParserEncoding;
-        _edit.newEndIndex = _edit.startIndex;
-        _edit.startPosition = TSPoint.FromLocation(startLocation);
-        _edit.oldEndPosition = TSPoint.FromLocation(endLocation);
-        _edit.newEndPosition = _edit.startPosition;
-    }
-
-    public void EndRemove()
-    {
-#if __WEB__
-        _oldTree!.Edit(_edit);
-#else
-        _oldTree!.Edit(ref _edit);
-#endif
-        Parse(false);
-        Tokenize(_startLineOfChanged, _endLineOfChanged);
-    }
-
-    public void BeginReplace(int offset, int length, int textLength)
-    {
-        var startLocation = Document.OffsetToPosition(offset);
-        var endLocation = Document.OffsetToPosition(offset + length);
+        var endLocation = length == 0 ? startLocation : Document.OffsetToPosition(offset + length);
         _edit.startIndex = (uint)(offset * ParserEncoding);
         _edit.oldEndIndex = _edit.startIndex + (uint)(length * ParserEncoding);
         _edit.newEndIndex = _edit.startIndex + (uint)(textLength * ParserEncoding);
@@ -107,23 +59,26 @@ public sealed class TreeSitterSyntaxParser : ISyntaxParser
         _edit.oldEndPosition = TSPoint.FromLocation(endLocation);
     }
 
-    public void EndReplace(int offset, int length, int textLength)
+    public void EndEdit(int offset, int length, int textLength)
     {
-        var endLocation = Document.OffsetToPosition(offset + textLength);
-        _edit.newEndPosition = TSPoint.FromLocation(endLocation);
+        _edit.newEndPosition = length > 0 && textLength == 0
+            ? _edit.startPosition
+            : TSPoint.FromLocation(Document.OffsetToPosition(offset + textLength));
 
 #if __WEB__
-        _oldTree!.Edit(_edit);
+        _oldTree?.Edit(_edit);
 #else
-        _oldTree!.Edit(ref _edit);
+        _oldTree?.Edit(ref _edit);
 #endif
-        Parse(false);
+        Parse();
         Tokenize(_startLineOfChanged, _endLineOfChanged);
     }
 
     #endregion
 
     #region ====Parse & Tokenize====
+
+    public ValueTask<ValueTuple<int, int>> ParseAndTokenize() => new((_startLineOfChanged, _endLineOfChanged));
 
     [TSRawScript(@"
         public Parse(reset: boolean) {
@@ -151,7 +106,7 @@ public sealed class TreeSitterSyntaxParser : ISyntaxParser
             this._document.FoldingManager.UpdateFoldings(foldMarkers);
         }
 ")]
-    public unsafe void Parse(bool reset)
+    private unsafe void Parse()
     {
 #if !__WEB__
         using var input = new ParserInput(Document.TextBuffer);
@@ -166,7 +121,7 @@ public sealed class TreeSitterSyntaxParser : ISyntaxParser
 #if DEBUG
         var ts = Stopwatch.GetTimestamp();
 #endif
-        var newTree = _parser.Parse(tsInput, reset ? null : _oldTree);
+        var newTree = _parser.Parse(tsInput, _oldTree);
         gcHandle.Free();
 
 #if DEBUG
@@ -174,7 +129,7 @@ public sealed class TreeSitterSyntaxParser : ISyntaxParser
 #endif
 
         //获取变动范围
-        if (_oldTree != null && !reset)
+        if (_oldTree != null)
         {
             uint rangeCount = 0;
             var rangesPtr = TreeSitterApi.ts_tree_get_changed_ranges(_oldTree.Handle,
@@ -198,6 +153,11 @@ public sealed class TreeSitterSyntaxParser : ISyntaxParser
 
             NativeMemory.Free(rangesPtr); //TreeSitterApi.ts_util_free(new IntPtr(rangesPtr));
         }
+        else
+        {
+            _startLineOfChanged = 0;
+            _endLineOfChanged = Document.TotalNumberOfLines;
+        }
 
         _oldTree = newTree;
 
@@ -210,7 +170,7 @@ public sealed class TreeSitterSyntaxParser : ISyntaxParser
     /// <summary>
     /// Tokenize lines range [startLine, endLine)
     /// </summary>
-    public void Tokenize(int startLine, int endLine)
+    private void Tokenize(int startLine, int endLine)
     {
 #if DEBUG
         var ts = Stopwatch.GetTimestamp();
@@ -320,15 +280,6 @@ public sealed class TreeSitterSyntaxParser : ISyntaxParser
     }
 
     #endregion
-
-    internal DirtyLines GetDirtyLines(CodeEditorController controller)
-    {
-        return new DirtyLines(controller)
-        {
-            StartLine = _startLineOfChanged,
-            EndLine = _endLineOfChanged
-        };
-    }
 
     internal void DumpTree()
     {
