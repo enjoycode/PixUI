@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -146,7 +147,7 @@ internal sealed class CompletionContext
     {
         var filter = _controller.Document.GetText(_completionStartOffset,
             _controller.TextEditor.Caret.Offset - _completionStartOffset);
-        _completionWindow?.UpdateFilter(t => t.Label.StartsWith(filter));
+        _completionWindow?.UpdateFilter(t => t.Label.StartsWith(filter, StringComparison.OrdinalIgnoreCase));
         _completionWindow?.TrySelectFirst();
     }
 

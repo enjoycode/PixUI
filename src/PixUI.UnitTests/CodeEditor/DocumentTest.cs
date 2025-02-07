@@ -41,7 +41,7 @@ class Person
     public void TokenizeTest()
     {
         var doc = new Document("Test.cs", new ImmutableTextBuffer(), new TreeSitterSyntaxParser());
-        doc.TextContent = SrcCode;
+        doc.Open(SrcCode);
         // doc.SyntaxParser.Tokenize(2, 3);
         var line = doc.GetLineSegment(5);
         line.DumpTokens(doc);
