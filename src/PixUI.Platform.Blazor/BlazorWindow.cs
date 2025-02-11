@@ -86,13 +86,13 @@ public sealed class BlazorWindow : UIWindow
     }
 
     public override void StartTextInput() =>
-        ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("StartTextInput");
+        ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("PixUI.StartTextInput");
 
     public override void StopTextInput() =>
-        ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("StopTextInput");
+        ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("PixUI.StopTextInput");
 
     public override void SetTextInputRect(Rect rect) =>
-        ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("SetInputRect",
+        ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("PixUI.SetInputRect",
             rect.X, rect.Y, rect.Width, rect.Height);
 
     internal void RouteGoto(int historyId) => RouteHistoryManager.Goto(historyId);

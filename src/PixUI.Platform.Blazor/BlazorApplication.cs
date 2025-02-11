@@ -18,10 +18,10 @@ public sealed class BlazorApplication : UIApplication
     public override bool IsMacOS() => _isMacOS;
 
     protected override void PushWebHistory(string fullPath, int index)
-        => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("PushWebHistory", fullPath, index);
+        => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("PixUI.PushWebHistory", fullPath, index);
 
     protected override void ReplaceWebHistory(string fullPath, int index)
-        => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("ReplaceWebHistory", fullPath, index);
+        => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("PixUI.ReplaceWebHistory", fullPath, index);
 
     public static void Run(Func<Widget> rootBuilder, int glHandle, 
         int width, int height, float ratio,
@@ -42,7 +42,7 @@ public sealed class BlazorApplication : UIApplication
     }
 
     public override void PostInvalidateEvent()
-        => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("PostInvalidateEvent");
+        => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("PixUI.PostInvalidateEvent");
 
     internal void RunInvalidateRequest() => OnInvalidateRequest();
 

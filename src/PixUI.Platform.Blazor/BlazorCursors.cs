@@ -27,5 +27,5 @@ public sealed class BlazorCursors : IPlatformCursors
     public Cursor ResizeUD => _resizeUD;
 
     public void SetCursor(Cursor cursor) =>
-        ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("SetCursor", ((BlazorCursor)cursor).Name);
+        ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("PixUI.SetCursor", ((BlazorCursor)cursor).Name);
 }

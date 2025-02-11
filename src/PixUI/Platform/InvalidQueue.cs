@@ -430,7 +430,7 @@ internal sealed class InvalidQueue
 #if !DEBUG
         catch (Exception ex)
         {
-            Log.Error($"重绘组件{widget}异常: {ex.Message}");
+            Log.Error($"重绘组件{widget}异常: {ex.Message}\n{ex.StackTrace}");
         }
 #endif
         finally
