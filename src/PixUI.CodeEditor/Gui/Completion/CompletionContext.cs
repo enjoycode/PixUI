@@ -68,24 +68,24 @@ internal sealed class CompletionContext
         }
     }
 
-#if __WEB__
-        public async Task RunInternal(string filter)
-#else
     private void RunInternal(string filter)
-#endif
     {
-#if __WEB__
-                var items = await _provider!.ProvideCompletionItems(_controller.Document,
-                        _controller.TextEditor.Caret.Offset, filter);
-                ShowCompletionWindow(items, "");
-#else
         Task.Run(async () =>
         {
-            var items = await _provider!.ProvideCompletionItems(_controller.Document,
-                _controller.TextEditor.Caret.Offset, filter);
-            UIApplication.Current.BeginInvoke(() => ShowCompletionWindow(items, filter));
+            IList<ICompletionItem>? list = null;
+            try
+            {
+                list = await _provider!.ProvideCompletionItems(_controller.Document,
+                    _controller.TextEditor.Caret.Offset, filter);
+            }
+            catch (Exception e)
+            {
+                Log.Warn($"Can't get completion: {e.Message}");
+            }
+
+            if (list != null)
+                UIApplication.Current.BeginInvoke(() => ShowCompletionWindow(list, filter));
         });
-#endif
     }
 
     private CompletionWord? GetWordAtPosition(in TextLocation pos)
