@@ -198,7 +198,7 @@ partial class DesignController
             switch (propName)
             {
                 case "Background":
-                    ReadBackgournd(ref reader);
+                    ReadBackground(ref reader);
                     break;
                 case "State":
                     ReadStates(ref reader);
@@ -223,7 +223,7 @@ partial class DesignController
 #endif
     }
 
-    private void ReadBackgournd(ref Utf8JsonReader reader)
+    private void ReadBackground(ref Utf8JsonReader reader)
     {
         Background = JsonSerializer.Deserialize<DynamicBackground>(ref reader);
     }
