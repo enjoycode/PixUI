@@ -274,19 +274,12 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         IDirtyArea? dirtyArea = null)
     {
         canvas.Translate(X, Y);
-        if (dirtyArea is RepaintChild)
+        if (!onlyTransform)
         {
-            Debug.Assert(onlyTransform == false);
-            //这里不需要保存画布状态,InvalidQueue会恢复
-            dirtyArea.ApplyClip(canvas);
-        }
-        else
-        {
-            if (!onlyTransform)
-            {
-                //始终clip整行
-                canvas.ClipRect(GetRowRect(), ClipOp.Intersect, false);
-            }
+            if (dirtyArea is RepaintChild)
+                dirtyArea.ApplyClip(canvas);
+            else
+                canvas.ClipRect(GetRowRect(), ClipOp.Intersect, false); //始终clip整行
         }
     }
 
