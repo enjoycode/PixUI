@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 namespace PixUI;
 
@@ -185,12 +186,14 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
     private void _OnHoverChanged(bool hover)
     {
         _isHover = hover;
-        var hoverRect = Rect.FromLTWH(Controller.TreeView!.ScrollOffsetX, 0,
-            Controller.TreeView!.W, Controller.NodeHeight);
-        Repaint(new RepaintArea(hoverRect));
+        Repaint(); //因BeforePaint已clip整行，不再需要如下hoverRect
+        // Repaint(new RepaintArea(GetRowRect()));
     }
 
     private void _OnTap(PointerEvent e) => Controller.SelectNode(TreeNode);
+
+    private Rect GetRowRect() => Rect.FromLTWH(Controller.TreeView!.ScrollOffsetX, 0,
+        Controller.TreeView!.W, Controller.NodeHeight);
 
     #endregion
 
@@ -267,14 +270,32 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         SetSize(indentation, Controller.NodeHeight);
     }
 
+    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
+        IDirtyArea? dirtyArea = null)
+    {
+        canvas.Translate(X, Y);
+        if (dirtyArea is RepaintChild)
+        {
+            Debug.Assert(onlyTransform == false);
+            //这里不需要保存画布状态,InvalidQueue会恢复
+            dirtyArea.ApplyClip(canvas);
+        }
+        else
+        {
+            if (!onlyTransform)
+            {
+                //始终clip整行
+                canvas.ClipRect(GetRowRect(), ClipOp.Intersect, false);
+            }
+        }
+    }
+
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
         if (_isHover)
         {
             var paint = PixUI.Paint.Shared(Controller.HoverColor);
-            var hoverRect = Rect.FromLTWH(Controller.TreeView!.ScrollOffsetX, 0,
-                Controller.TreeView!.W, Controller.NodeHeight);
-            canvas.DrawRect(hoverRect, paint);
+            canvas.DrawRect(GetRowRect(), paint);
         }
 
         if (area is RepaintChild repaintChild)
