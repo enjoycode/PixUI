@@ -9,12 +9,12 @@ internal sealed class FoldArea : EditorArea
 
     private int _selectedFoldLine = -1;
 
-    private Paint GetNormalPaint()
+    private static Paint GetNormalPaint()
     {
         return PixUI.Paint.Shared(new Color(200, 200, 200, 255), PaintStyle.Stroke, 1f);
     }
 
-    private Paint GetSelectedPaint()
+    private static Paint GetSelectedPaint()
     {
         return PixUI.Paint.Shared(new Color(200, 200, 200, 255), PaintStyle.Stroke, 1.5f);
     }
@@ -35,8 +35,7 @@ internal sealed class FoldArea : EditorArea
 
     internal override void HandlePointerDown(float x, float y, PointerButtons buttons)
     {
-        var physicalLine =
-            (int)((y + TextEditor.VirtualTop.Y) / TextEditor.TextView.FontHeight);
+        var physicalLine = (int)((y + TextEditor.VirtualTop.Y) / TextEditor.TextView.FontHeight);
         var realLine = Document.GetFirstLogicalLine(physicalLine);
         if (realLine < 0 || realLine + 1 >= Document.TotalNumberOfLines)
             return;
@@ -115,8 +114,7 @@ internal sealed class FoldArea : EditorArea
         var foldMarkerSize = TextEditor.TextView.FontHeight * 0.57f;
         foldMarkerSize -= foldMarkerSize % 2;
         var foldMarkerYPos = rect.Top + (rect.Height - foldMarkerSize) / 2;
-        var xPos =
-            rect.Left + (rect.Width - foldMarkerSize) / 2 + foldMarkerSize / 2;
+        var xPos = rect.Left + (rect.Width - foldMarkerSize) / 2 + foldMarkerSize / 2;
 
         if (isFoldStart)
         {

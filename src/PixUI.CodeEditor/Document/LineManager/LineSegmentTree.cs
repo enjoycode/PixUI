@@ -1,178 +1,9 @@
 using System;
 using System.Diagnostics;
-using PixUI;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace CodeEditor;
-
-internal struct RBNode
-{
-    internal readonly LineSegment LineSegment;
-    internal int Count;
-    internal int TotalLength;
-
-    public RBNode(LineSegment lineSegment)
-    {
-        LineSegment = lineSegment;
-        Count = 1;
-        TotalLength = lineSegment.TotalLength;
-    }
-
-    public override string ToString()
-    {
-        return "[RBNode count=" + Count + " totalLength=" + TotalLength
-               + " lineSegment.LineNumber=" + LineSegment.LineNumber
-               + " lineSegment.Offset=" + LineSegment.Offset
-               + " lineSegment.TotalLength=" + LineSegment.TotalLength
-               + " lineSegment.DelimiterLength=" + LineSegment.DelimiterLength + "]";
-    }
-}
-
-internal struct RBHost : IRedBlackTreeHost<RBNode>
-{
-    public int Compare(RBNode x, RBNode y)
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool Equals(RBNode a, RBNode b)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void UpdateAfterChildrenChange(RedBlackTreeNode<RBNode> node)
-    {
-        int count = 1;
-        int totalLength = node.Value.LineSegment.TotalLength;
-        if (node.Left != null)
-        {
-            count += node.Left.Value.Count;
-            totalLength += node.Left.Value.TotalLength;
-        }
-
-        if (node.Right != null)
-        {
-            count += node.Right.Value.Count;
-            totalLength += node.Right.Value.TotalLength;
-        }
-
-        if (count != node.Value.Count || totalLength != node.Value.TotalLength)
-        {
-            node.Value.Count = count;
-            node.Value.TotalLength = totalLength;
-            if (node.Parent != null) UpdateAfterChildrenChange(node.Parent);
-        }
-    }
-
-    public void UpdateAfterRotateLeft(RedBlackTreeNode<RBNode> node)
-    {
-        UpdateAfterChildrenChange(node);
-        UpdateAfterChildrenChange(node.Parent!);
-    }
-
-    public void UpdateAfterRotateRight(RedBlackTreeNode<RBNode> node)
-    {
-        UpdateAfterChildrenChange(node);
-        UpdateAfterChildrenChange(node.Parent!);
-    }
-}
-
-public struct LinesEnumerator
-{
-    /// <summary>
-    /// An invalid enumerator value. Calling MoveNext on the invalid enumerator
-    /// will always return false, accessing Current will throw an exception.
-    /// </summary>
-    public static readonly LinesEnumerator Invalid =
-        new LinesEnumerator(new RedBlackTreeIterator<RBNode>(null));
-
-    internal RedBlackTreeIterator<RBNode> Iterator;
-
-    internal LinesEnumerator(RedBlackTreeIterator<RBNode> it)
-    {
-        Iterator = it;
-    }
-
-    public LinesEnumerator Clone() => new LinesEnumerator(Iterator);
-
-    /// <summary>
-    /// Gets the current value. Runs in O(1).
-    /// </summary>
-    public LineSegment Current => Iterator.Current.LineSegment;
-
-    public bool IsValid => Iterator.IsValid;
-
-    /// <summary>
-    /// Gets the index of the current value. Runs in O(lg n).
-    /// </summary>
-    public int CurrentIndex
-    {
-        get
-        {
-            if (Iterator.Node == null)
-                throw new InvalidOperationException();
-            return GetIndexFromNode(Iterator.Node);
-        }
-    }
-
-    /// <summary>
-    /// Gets the offset of the current value. Runs in O(lg n).
-    /// </summary>
-    public int CurrentOffset
-    {
-        get
-        {
-            if (Iterator.Node == null)
-                throw new InvalidOperationException();
-            return GetOffsetFromNode(Iterator.Node);
-        }
-    }
-
-    /// <summary>
-    /// Moves to the next index. Runs in O(lg n), but for k calls, the combined time is only O(k+lg n).
-    /// </summary>
-    public bool MoveNext() => Iterator.MoveNext();
-
-    /// <summary>
-    /// Moves to the previous index. Runs in O(lg n), but for k calls, the combined time is only O(k+lg n).
-    /// </summary>
-    public bool MoveBack() => Iterator.MoveBack();
-
-    private static int GetIndexFromNode(RedBlackTreeNode<RBNode> node)
-    {
-        var index = (node.Left != null) ? node.Left.Value.Count : 0;
-        while (node.Parent != null)
-        {
-            if (node == node.Parent.Right)
-            {
-                if (node.Parent.Left != null)
-                    index += node.Parent.Left.Value.Count;
-                index++;
-            }
-
-            node = node.Parent;
-        }
-
-        return index;
-    }
-
-    private static int GetOffsetFromNode(RedBlackTreeNode<RBNode> node)
-    {
-        var offset = (node.Left != null) ? node.Left.Value.TotalLength : 0;
-        while (node.Parent != null)
-        {
-            if (node == node.Parent.Right)
-            {
-                if (node.Parent.Left != null)
-                    offset += node.Parent.Left.Value.TotalLength;
-                offset += node.Parent.Value.LineSegment.TotalLength;
-            }
-
-            node = node.Parent;
-        }
-
-        return offset;
-    }
-}
 
 /// <summary>
 /// Data structure for efficient management of the line segments (most operations are O(lg n)).
@@ -180,28 +11,31 @@ public struct LinesEnumerator
 /// nodes in its subtree (like an order statistics tree) for access by index(=line number).
 /// Additionally, each node knows the total length of all segments in its subtree.
 /// This means we can find nodes by offset in O(lg n) time. Since the offset itself is not stored in
-/// the line segment but computed from the lengths stored in the tree, we adjusting the offsets when
+/// the line segment but computed from the lengths stored in the tree, we're adjusting the offsets when
 /// text is inserted in one line means we just have to increment the totalLength of the affected line and
 /// its parent nodes - an O(lg n) operation.
-/// However this means getting the line number or offset from a LineSegment is not a constant time
+/// However, this means getting the line number or offset from a LineSegment is not a constant time
 /// operation, but takes O(lg n).
 /// 
 /// NOTE: The tree is never empty, Clear() causes it to contain an empty segment.
 /// </summary>
-internal sealed class LineSegmentTree
+internal sealed class LineSegmentTree : RedBlackTree<LineSegment>
 {
-    private readonly RedBlackTree<RBNode, RBHost> _tree =
-        new RedBlackTree<RBNode, RBHost>(new RBHost());
-
-    internal RedBlackTreeNode<RBNode> GetNode(int index)
+    public LineSegmentTree()
     {
-        if (index < 0 || index >= _tree.Count)
-            throw new ArgumentOutOfRangeException(nameof(index),
-                "index should be between 0 and " + (_tree.Count - 1));
-        RedBlackTreeNode<RBNode> node = _tree.Root;
+        var empty = new LineSegment();
+        Root = empty.InitLineNode();
+    }
+
+    #region ====GetNodeByXXX / GetXXXFromNode====
+
+    internal LineSegment GetNodeByIndex(int index)
+    {
+        Debug.Assert(index >= 0 && index < Root!.NodeTotalCount);
+        var node = Root;
         while (true)
         {
-            if (node.Left != null && index < node.Left.Value.Count)
+            if (node!.Left != null && index < node.Left.NodeTotalCount)
             {
                 node = node.Left;
             }
@@ -209,7 +43,7 @@ internal sealed class LineSegmentTree
             {
                 if (node.Left != null)
                 {
-                    index -= node.Left.Value.Count;
+                    index -= node.Left.NodeTotalCount;
                 }
 
                 if (index == 0)
@@ -220,23 +54,36 @@ internal sealed class LineSegmentTree
         }
     }
 
-    private RedBlackTreeNode<RBNode> GetNodeByOffset(int offset)
+    internal static int GetIndexFromNode(LineSegment node)
     {
-        if (offset < 0 || offset > this.TotalLength)
-            throw new ArgumentOutOfRangeException(nameof(offset),
-                "offset should be between 0 and " + TotalLength);
-        if (offset == this.TotalLength)
+        var index = node.Left?.NodeTotalCount ?? 0;
+        while (node.Parent != null)
         {
-            if (_tree.Root == null)
-                throw new InvalidOperationException(
-                    "Cannot call GetNodeByOffset while tree is empty.");
-            return _tree.Root.RightMost;
+            if (node == node.Parent.Right)
+            {
+                if (node.Parent.Left != null)
+                    index += node.Parent.Left.NodeTotalCount;
+                index++;
+            }
+
+            node = node.Parent;
         }
 
-        var node = _tree.Root;
+        return index;
+    }
+
+    internal LineSegment GetNodeByOffset(int offset)
+    {
+        Debug.Assert(offset >= 0 && offset <= Root!.NodeTotalLength);
+        if (offset == Root.NodeTotalLength)
+        {
+            return Root.RightMost();
+        }
+
+        var node = Root;
         while (true)
         {
-            if (node.Left != null && offset < node.Left.Value.TotalLength)
+            if (node!.Left != null && offset < node.Left.NodeTotalLength)
             {
                 node = node.Left;
             }
@@ -244,10 +91,10 @@ internal sealed class LineSegmentTree
             {
                 if (node.Left != null)
                 {
-                    offset -= node.Left.Value.TotalLength;
+                    offset -= node.Left.NodeTotalLength;
                 }
 
-                offset -= node.Value.LineSegment.TotalLength;
+                offset -= node.TotalLength;
                 if (offset < 0)
                     return node;
                 node = node.Right;
@@ -255,15 +102,169 @@ internal sealed class LineSegmentTree
         }
     }
 
-    public LineSegment GetByOffset(int offset)
+    internal static int GetOffsetFromNode(LineSegment node)
     {
-        return GetNodeByOffset(offset).Value.LineSegment;
+        var offset = node.Left?.NodeTotalLength ?? 0;
+        while (node.Parent != null)
+        {
+            if (node == node.Parent.Right)
+            {
+                if (node.Parent.Left != null)
+                    offset += node.Parent.Left.NodeTotalLength;
+                offset += node.Parent.TotalLength;
+            }
+
+            node = node.Parent;
+        }
+
+        return offset;
     }
 
-    /// <summary>
-    /// Gets the total length of all line segments. Runs in O(1).
-    /// </summary>
-    public int TotalLength => _tree.Root == null ? 0 : _tree.Root.Value.TotalLength;
+    #endregion
+
+    #region ====RedBlackTree Update====
+
+    protected override void UpdateAfterChildrenChange(LineSegment node)
+    {
+        var totalCount = 1;
+        var totalLength = node.TotalLength;
+        if (node.Left != null)
+        {
+            totalCount += node.Left.NodeTotalCount;
+            totalLength += node.Left.NodeTotalLength;
+        }
+
+        if (node.Right != null)
+        {
+            totalCount += node.Right.NodeTotalCount;
+            totalLength += node.Right.NodeTotalLength;
+        }
+
+        if (totalCount != node.NodeTotalCount
+            || totalLength != node.NodeTotalLength)
+        {
+            node.NodeTotalCount = totalCount;
+            node.NodeTotalLength = totalLength;
+            if (node.Parent != null)
+                UpdateAfterChildrenChange(node.Parent);
+        }
+    }
+
+    protected override void UpdateAfterRotate(LineSegment node)
+    {
+        UpdateAfterChildrenChange(node);
+
+        // not required: rotations only happen on insertions/deletions
+        // -> totalCount changes -> the parent is always updated
+        //UpdateAfterChildrenChange(node.parent);
+    }
+
+    #endregion
+
+    #region ====CheckProperties====
+
+#if DEBUG
+    [Conditional("RED_BLACK_CHECK")]
+    internal void CheckProperties()
+    {
+        CheckProperties(Root!);
+
+        // check red-black property:
+        var blackCount = -1;
+        CheckNodeProperties(Root, null, Red, 0, ref blackCount);
+    }
+
+    private static void CheckProperties(LineSegment node)
+    {
+        var totalCount = 1;
+        var totalLength = node.TotalLength;
+        if (node.Left != null)
+        {
+            CheckProperties(node.Left);
+            totalCount += node.Left.NodeTotalCount;
+            totalLength += node.Left.NodeTotalLength;
+        }
+
+        if (node.Right != null)
+        {
+            CheckProperties(node.Right);
+            totalCount += node.Right.NodeTotalCount;
+            totalLength += node.Right.NodeTotalLength;
+        }
+
+        Debug.Assert(node.NodeTotalCount == totalCount);
+        Debug.Assert(node.NodeTotalLength == totalLength);
+    }
+
+    /*
+    1. A node is either red or black.
+    2. The root is black.
+    3. All leaves are black. (The leaves are the NIL children.)
+    4. Both children of every red node are black. (So every red node must have a black parent.)
+    5. Every simple path from a node to a descendant leaf contains the same number of black nodes. (Not counting the leaf node.)
+     */
+    [SuppressMessage("ReSharper", "UnusedParameter.Local")]
+    private static void CheckNodeProperties(LineSegment? node, LineSegment? parentNode, bool parentColor,
+        int blackCount,
+        ref int expectedBlackCount)
+    {
+        if (node == null) return;
+
+        Debug.Assert(node.Parent == parentNode);
+
+        if (parentColor == Red)
+        {
+            Debug.Assert(node.Color == Black);
+        }
+
+        if (node.Color == Black)
+        {
+            blackCount++;
+        }
+
+        if (node.Left == null && node.Right == null)
+        {
+            // node is a leaf node:
+            if (expectedBlackCount == -1)
+                expectedBlackCount = blackCount;
+            else
+                Debug.Assert(expectedBlackCount == blackCount);
+        }
+
+        CheckNodeProperties(node.Left, node, node.Color, blackCount, ref expectedBlackCount);
+        CheckNodeProperties(node.Right, node, node.Color, blackCount, ref expectedBlackCount);
+    }
+
+    [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+    public string GetTreeAsString()
+    {
+        var b = new StringBuilder();
+        AppendTreeToString(Root!, b, 0);
+        return b.ToString();
+    }
+
+    private static void AppendTreeToString(LineSegment node, StringBuilder b, int indent)
+    {
+        b.Append(node.Color == Red ? "RED   " : "BLACK ");
+        b.AppendLine(node.ToString());
+        indent += 2;
+        if (node.Left != null)
+        {
+            b.Append(' ', indent);
+            b.Append("L: ");
+            AppendTreeToString(node.Left, b, indent);
+        }
+
+        if (node.Right != null)
+        {
+            b.Append(' ', indent);
+            b.Append("R: ");
+            AppendTreeToString(node.Right, b, indent);
+        }
+    }
+#endif
+
+    #endregion
 
     /// <summary>
     /// Updates the length of a line segment. Runs in O(lg n).
@@ -272,18 +273,17 @@ internal sealed class LineSegmentTree
     {
         if (segment == null)
             throw new ArgumentNullException(nameof(segment));
-        RedBlackTreeNode<RBNode> node = segment.TreeEntry.Iterator.Node!;
         segment.TotalLength = newTotalLength;
-        new RBHost().UpdateAfterChildrenChange(node);
-#if DEBUG && !__WEB__
+        UpdateAfterChildrenChange(segment);
+#if DEBUG
         CheckProperties();
 #endif
     }
 
     public void RemoveSegment(LineSegment segment)
     {
-        _tree.RemoveAt(segment.TreeEntry.Iterator);
-#if DEBUG && !__WEB__
+        RemoveNode(segment);
+#if DEBUG
         CheckProperties();
 #endif
     }
@@ -293,97 +293,37 @@ internal sealed class LineSegmentTree
         var newSegment = new LineSegment();
         newSegment.TotalLength = length;
         newSegment.DelimiterLength = segment.DelimiterLength;
-
-        newSegment.TreeEntry = InsertAfter(segment.TreeEntry.Iterator.Node!, newSegment);
+        InsertAfter(segment, newSegment);
         return newSegment;
     }
 
-    LinesEnumerator InsertAfter(RedBlackTreeNode<RBNode> node, LineSegment newSegment)
+    private void InsertAfter(LineSegment node, LineSegment newSegment)
     {
-        RedBlackTreeNode<RBNode> newNode = new RedBlackTreeNode<RBNode>(new RBNode(newSegment));
+        newSegment.InitLineNode();
         if (node.Right == null)
         {
-            _tree.InsertAsRight(node, newNode);
+            InsertAsRight(node, newSegment);
         }
         else
         {
-            _tree.InsertAsLeft(node.Right.LeftMost, newNode);
+            InsertAsLeft(node.Right.LeftMost(), newSegment);
         }
-#if DEBUG && !__WEB__
+#if DEBUG
         CheckProperties();
 #endif
-        return new LinesEnumerator(new RedBlackTreeIterator<RBNode>(newNode));
     }
 
     /// <summary>
     /// Gets the number of items in the collections. Runs in O(1).
     /// </summary>
-    public int Count => _tree.Count;
-
-    /// <summary>
-    /// Gets  an item by index. Runs in O(lg n).
-    /// </summary>
-    public LineSegment GetAt(int index) => GetNode(index).Value.LineSegment;
-
-    /// <summary>
-    /// Gets the index of an item. Runs in O(lg n).
-    /// </summary>
-    public int IndexOf(LineSegment item)
+    public int Count
     {
-        var index = item.LineNumber;
-        if (index < 0 || index >= this.Count)
-            return -1;
-        if (item != GetAt(index))
-            return -1;
-        return index;
-    }
-
-#if DEBUG && !__WEB__
-    [Conditional("DATACONSISTENCYTEST")]
-    void CheckProperties()
-    {
-        if (_tree.Root == null)
+        get
         {
-            Debug.Assert(this.Count == 0);
+            if (Root!.NodeTotalCount == 1 && Root.NodeTotalLength == 0)
+                return 0;
+            return Root.NodeTotalCount;
         }
-        else
-        {
-            Debug.Assert(_tree.Root.Value.Count == this.Count);
-            CheckProperties(_tree.Root);
-        }
-    }
-
-    void CheckProperties(RedBlackTreeNode<RBNode> node)
-    {
-        int count = 1;
-        int totalLength = node.Value.LineSegment.TotalLength;
-        if (node.Left != null)
-        {
-            CheckProperties(node.Left);
-            count += node.Left.Value.Count;
-            totalLength += node.Left.Value.TotalLength;
-        }
-
-        if (node.Right != null)
-        {
-            CheckProperties(node.Right);
-            count += node.Right.Value.Count;
-            totalLength += node.Right.Value.TotalLength;
-        }
-
-        Debug.Assert(node.Value.Count == count);
-        Debug.Assert(node.Value.TotalLength == totalLength);
-    }
-
-    public string GetTreeAsString()
-    {
-        return _tree.GetTreeAsString();
-    }
-#endif
-
-    public LineSegmentTree()
-    {
-        Clear();
     }
 
     /// <summary>
@@ -391,37 +331,41 @@ internal sealed class LineSegmentTree
     /// </summary>
     public void Clear()
     {
-        _tree.Clear();
-        LineSegment emptySegment = new LineSegment();
-        emptySegment.TotalLength = 0;
-        emptySegment.DelimiterLength = 0;
-        _tree.Add(new RBNode(emptySegment));
-        emptySegment.TreeEntry = GetEnumeratorForIndex(0);
-#if DEBUG && !__WEB__
+        var empty = new LineSegment();
+        Root = empty.InitLineNode();
+#if DEBUG
         CheckProperties();
 #endif
     }
 
-    /// <summary>
-    /// Tests whether an item is in the list. Runs in O(n).
-    /// </summary>
-    public bool Contains(LineSegment item)
-    {
-        return IndexOf(item) >= 0;
-    }
+    // /// <summary>
+    // /// Gets the total length of all line segments. Runs in O(1).
+    // /// </summary>
+    // public int TotalLength => Root?.TotalLength ?? 0;
 
-    // public Enumerator GetEnumerator()
+    // /// <summary>
+    // /// Gets an item by index. Runs in O(lg n).
+    // /// </summary>
+    // public LineSegment GetAt(int index) => GetNodeByIndex(index);
+
+    // /// <summary>
+    // /// Gets the index of an item. Runs in O(lg n).
+    // /// </summary>
+    // public int IndexOf(LineSegment item)
     // {
-    //     return new LinesEnumerator(tree.GetEnumerator());
+    //     var index = item.LineNumber;
+    //     if (index < 0 || index >= Count)
+    //         return -1;
+    //     if (item != GetAt(index))
+    //         return -1;
+    //     return index;
     // }
 
-    public LinesEnumerator GetEnumeratorForIndex(int index)
-    {
-        return new LinesEnumerator(new RedBlackTreeIterator<RBNode>(GetNode(index)));
-    }
-
-    public LinesEnumerator GetEnumeratorForOffset(int offset)
-    {
-        return new LinesEnumerator(new RedBlackTreeIterator<RBNode>(GetNodeByOffset(offset)));
-    }
+    // /// <summary>
+    // /// Tests whether an item is in the list. Runs in O(n).
+    // /// </summary>
+    // public bool Contains(LineSegment item)
+    // {
+    //     return IndexOf(item) >= 0;
+    // }
 }

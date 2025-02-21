@@ -4,32 +4,97 @@ using PixUI;
 
 namespace CodeEditor;
 
-public sealed class LineSegment : ISegment
+public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
 {
-    internal LinesEnumerator TreeEntry = LinesEnumerator.Invalid;
+    #region ====IRedBlackTreeNode====
 
-    public bool IsDeleted => !TreeEntry.IsValid;
+    public LineSegment? Left { get; set; }
+    public LineSegment? Right { get; set; }
+    public LineSegment? Parent { get; set; }
+    public bool Color { get; set; }
 
-    public int LineNumber => TreeEntry.CurrentIndex;
+    /// <summary>
+    /// The number of lines in this node and its child nodes.
+    /// Invariant:
+    ///   nodeTotalCount = 1 + left.nodeTotalCount + right.nodeTotalCount
+    /// </summary>
+    internal int NodeTotalCount { get; set; }
 
+    /// <summary>
+    /// The total text length of this node and its child nodes.
+    /// Invariant:
+    ///   nodeTotalLength = left.nodeTotalLength + documentLine.TotalLength + right.nodeTotalLength
+    /// </summary>
+    internal int NodeTotalLength { get; set; }
+    
+    internal LineSegment InitLineNode()
+    {
+        NodeTotalCount = 1;
+        NodeTotalLength = TotalLength;
+        return this;
+    }
+
+    #endregion
+
+    public bool IsDeleted { get; private set; }
+
+    /// <summary>
+    /// Gets the number of this line.
+    /// Runtime: O(log n)
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The line was deleted.</exception>
+    public int LineNumber
+    {
+        get
+        {
+            if (IsDeleted)
+                throw new InvalidOperationException();
+            return LineSegmentTree.GetIndexFromNode(this) /*+ 1*/;
+        }
+    }
+
+    /// <summary>
+    /// Gets the starting offset of the line in the document's text.
+    /// Runtime: O(log n)
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The line was deleted.</exception>
     public int Offset
     {
-        get => TreeEntry.CurrentOffset;
+        get
+        {
+            if (IsDeleted)
+                throw new InvalidOperationException();
+            return LineSegmentTree.GetOffsetFromNode(this);
+        }
         set => throw new NotSupportedException();
     }
 
     /// <summary>
-    /// 不包含换行符的长度
+    /// Gets the length of this line. The length does not include the line delimiter. O(1)
     /// </summary>
+    /// <remarks>This property is still available even if the line was deleted;
+    /// in that case, it contains the line's length before the deletion.</remarks>
     public int Length
     {
         get => TotalLength - DelimiterLength;
         set => throw new NotSupportedException();
     }
 
-    public int TotalLength { get; internal set; }
-
+    /// <summary>
+    /// <para>Gets the length of the line delimiter.</para>
+    /// <para>The value is 1 for single <c>"\r"</c> or <c>"\n"</c>, 2 for the <c>"\r\n"</c> sequence;
+    /// and 0 for the last line in the document.</para>
+    /// </summary>
+    /// <remarks>This property is still available even if the line was deleted;
+    /// in that case, it contains the line delimiter's length before the deletion.</remarks>
     public int DelimiterLength { get; internal set; }
+
+    /// <summary>
+    /// Gets the length of this line, including the line delimiter. O(1)
+    /// </summary>
+    /// <remarks>This property is still available even if the line was deleted;
+    /// in that case, it contains the line's length before the deletion.</remarks>
+    public int TotalLength { get; internal set; }
 
     private IList<CodeToken>? _lineTokens;
     private int _tokenColumnIndex; //仅用于Tokenize时缓存
@@ -126,7 +191,7 @@ public sealed class LineSegment : ISegment
     /// </summary>
     internal void Deleted(DeferredEventList deferredEventList)
     {
-        TreeEntry = LinesEnumerator.Invalid;
+        IsDeleted = true;
 
         // TODO: anchors
         // if (anchors != null) {

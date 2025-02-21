@@ -58,7 +58,7 @@ public sealed class Document : IDisposable
     {
         if (!string.IsNullOrEmpty(srcCode))
             TextBuffer.SetContent(srcCode);
-        
+
         if (TextBuffer.Length == 0) return;
         //TODO:
         var text = TextBuffer.GetText(0, TextBuffer.Length);
@@ -66,7 +66,7 @@ public sealed class Document : IDisposable
         _lineManager.SetContent(text);
         UndoStack.ClearAll();
         SyntaxParser.EndEdit(0, 0, text.Length);
-        
+
         DocumentChanged?.Invoke(new DocumentEventArgs(this, 0, 0, text));
     }
 
@@ -129,29 +129,24 @@ public sealed class Document : IDisposable
     #region ====Position Methods====
 
     /// Returns a valid line number for the given offset.
-    public int GetLineNumberForOffset(int offset)
-        => _lineManager.GetLineNumberForOffset(offset);
+    public int GetLineNumberForOffset(int offset) => _lineManager.GetLineNumberByOffset(offset);
 
     /// Returns a [LineSegment] for the given offset.
-    public LineSegment GetLineSegmentForOffset(int offset)
-        => _lineManager.GetLineSegmentForOffset(offset);
+    public LineSegment GetLineSegmentForOffset(int offset) => _lineManager.GetLineSegmentByOffset(offset);
 
-    public LineSegment GetLineSegment(int lineNumber)
-        => _lineManager.GetLineSegment(lineNumber);
+    public LineSegment GetLineSegment(int lineNumber) => _lineManager.GetLineSegment(lineNumber);
 
     /// Get the first logical line for a given visible line.
     /// example : lineNumber == 100 foldings are in the linetracker
     /// between 0..1 (2 folded, invisible lines) this method returns 102
     /// the 'logical' line number
-    public int GetFirstLogicalLine(int lineNumber)
-        => _lineManager.GetFirstLogicalLine(lineNumber);
+    public int GetFirstLogicalLine(int lineNumber) => _lineManager.GetFirstLogicalLine(lineNumber);
 
     /// Get the visible line for a given logical line.
     /// example : lineNumber == 100 foldings are in the linetracker
     /// between 0..1 (2 folded, invisible lines) this method returns 98
     /// the 'visible' line number
-    public int GetVisibleLine(int lineNumber)
-        => _lineManager.GetVisibleLine(lineNumber);
+    public int GetVisibleLine(int lineNumber) => _lineManager.GetVisibleLine(lineNumber);
 
     /// returns the logical line/column position from an offset
     public TextLocation OffsetToPosition(int offset)

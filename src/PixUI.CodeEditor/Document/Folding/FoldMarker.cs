@@ -38,9 +38,9 @@ public sealed class FoldMarker : ISegment, IComparable<FoldMarker>
     internal string FoldText { get; }
 
     private int _startLine = -1;
-    private int _startColumn = 0;
+    private int _startColumn;
     private int _endLine = -1;
-    private int _endColumn = 0;
+    private int _endColumn;
 
     private int _offset;
     private int _length;
@@ -137,8 +137,10 @@ public sealed class FoldMarker : ISegment, IComparable<FoldMarker>
         }
     }
 
-    public int CompareTo(FoldMarker other)
+    public int CompareTo(FoldMarker? other)
     {
+        if (other == null) return 1;
+
         return Offset != other.Offset
             ? Offset.CompareTo(other.Offset)
             : Length.CompareTo(other.Length);

@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 
 namespace CodeEditor;
 
@@ -20,18 +19,15 @@ public sealed class LineManager
 
     public event Action<LineLengthChangeEventArgs>? LineLengthChanged;
     public event Action<LineCountChangeEventArgs>? LineCountChanged;
-    public event Action<LineEventArgs>? LineDeleted;
+    // public event Action<LineEventArgs>? LineDeleted;
 
     #endregion
 
-    public int GetLineNumberForOffset(int offset)
-        => GetLineSegmentForOffset(offset).LineNumber;
+    public int GetLineNumberByOffset(int offset) => GetLineSegmentByOffset(offset).LineNumber;
 
-    public LineSegment GetLineSegmentForOffset(int offset)
-        => _lineCollection.GetByOffset(offset);
+    public LineSegment GetLineSegmentByOffset(int offset) => _lineCollection.GetNodeByOffset(offset);
 
-    public LineSegment GetLineSegment(int lineNumber)
-        => _lineCollection.GetNode(lineNumber).Value.LineSegment;
+    public LineSegment GetLineSegment(int lineNumber) => _lineCollection.GetNodeByIndex(lineNumber);
 
     public int GetFirstLogicalLine(int visibleLineNumber)
     {
@@ -103,7 +99,7 @@ public sealed class LineManager
 
     public void Replace(int offset, int length, string text)
     {
-        var lineStart = GetLineNumberForOffset(offset);
+        var lineStart = GetLineNumberByOffset(offset);
         var oldNumberOfLines = TotalNumberOfLines;
         var deferredEventList = new DeferredEventList();
         RemoveInternal(deferredEventList, offset, length);
@@ -131,7 +127,7 @@ public sealed class LineManager
 
     private void InsertInternal(int offset, string text)
     {
-        var segment = _lineCollection.GetByOffset(offset);
+        var segment = _lineCollection.GetNodeByOffset(offset);
         var ds = NextDelimiter(text, 0);
         if (ds == null)
         {
@@ -149,11 +145,9 @@ public sealed class LineManager
             // split line segment at line delimiter
             var lineBreakOffset = offset + ds.Value.Offset + ds.Value.Length;
             var segmentOffset = segment.Offset;
-            var lengthAfterInsertionPos =
-                segmentOffset + segment.TotalLength - (offset + lastDelimiterEnd);
+            var lengthAfterInsertionPos = segmentOffset + segment.TotalLength - (offset + lastDelimiterEnd);
             _lineCollection.SetSegmentLength(segment, lineBreakOffset - segmentOffset);
-            var newSegment =
-                _lineCollection.InsertSegmentAfter(segment, lengthAfterInsertionPos);
+            var newSegment = _lineCollection.InsertSegmentAfter(segment, lengthAfterInsertionPos);
             segment.DelimiterLength = ds.Value.Length;
 
             segment = newSegment;
@@ -167,8 +161,7 @@ public sealed class LineManager
         if (lastDelimiterEnd != text.Length)
         {
             segment.InsertedLinePart(this, 0, text.Length - lastDelimiterEnd);
-            SetSegmentLength(
-                segment, segment.TotalLength + text.Length - lastDelimiterEnd);
+            SetSegmentLength(segment, segment.TotalLength + text.Length - lastDelimiterEnd);
         }
     }
 
@@ -177,27 +170,24 @@ public sealed class LineManager
         // Debug.Assert(length >= 0);
         if (length == 0) return;
 
-        var it = _lineCollection.GetEnumeratorForOffset(offset);
-        LineSegment startSegment = it.Current;
+        var startSegment = _lineCollection.GetNodeByOffset(offset);
         int startSegmentOffset = startSegment.Offset;
         if (offset + length < startSegmentOffset + startSegment.TotalLength)
         {
             // just removing a part of this line segment
-            startSegment.RemovedLinePart(
-                this, deferredEventList, offset - startSegmentOffset, length);
+            startSegment.RemovedLinePart(this, deferredEventList, offset - startSegmentOffset, length);
             SetSegmentLength(startSegment, startSegment.TotalLength - length);
             return;
         }
 
         // merge startSegment with another line segment because startSegment's delimiter was deleted
         // possibly remove lines in between if multiple delimiters were deleted
-        int charactersRemovedInStartLine =
-            startSegmentOffset + startSegment.TotalLength - offset;
+        int charactersRemovedInStartLine = startSegmentOffset + startSegment.TotalLength - offset;
         //Debug.Assert(charactersRemovedInStartLine > 0);
         startSegment.RemovedLinePart(this, deferredEventList,
             offset - startSegmentOffset, charactersRemovedInStartLine);
 
-        LineSegment endSegment = _lineCollection.GetByOffset(offset + length);
+        var endSegment = _lineCollection.GetNodeByOffset(offset + length);
         if (endSegment == startSegment)
         {
             // special case: we are removing a part of the last line up to the
@@ -207,24 +197,20 @@ public sealed class LineManager
         }
 
         var endSegmentOffset = endSegment.Offset;
-        var charactersLeftInEndLine =
-            endSegmentOffset + endSegment.TotalLength - (offset + length);
+        var charactersLeftInEndLine = endSegmentOffset + endSegment.TotalLength - (offset + length);
         endSegment.RemovedLinePart(this, deferredEventList, 0,
             endSegment.TotalLength - charactersLeftInEndLine);
         startSegment.MergedWith(endSegment, offset - startSegmentOffset);
-        SetSegmentLength(
-            startSegment,
-            startSegment.TotalLength -
-            charactersRemovedInStartLine +
-            charactersLeftInEndLine);
+        SetSegmentLength(startSegment,
+            startSegment.TotalLength - charactersRemovedInStartLine + charactersLeftInEndLine);
         startSegment.DelimiterLength = endSegment.DelimiterLength;
         // remove all segments between startSegment (excl.) and endSegment (incl.)
-        it.MoveNext();
+        var tmp = startSegment.Successor();
         LineSegment segmentToRemove;
         do
         {
-            segmentToRemove = it.Current;
-            it.MoveNext();
+            segmentToRemove = tmp!;
+            tmp = tmp!.Successor();
             _lineCollection.RemoveSegment(segmentToRemove);
             segmentToRemove.Deleted(deferredEventList);
         } while (segmentToRemove != endSegment);

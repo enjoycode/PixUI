@@ -79,8 +79,7 @@ public sealed class FoldingManager
         return GetFoldingsByEndAfterColumn(lineNumber, 0 /*-1*/, false);
     }
 
-    internal List<FoldMarker> GetFoldedFoldingsWithStartAfterColumn(
-        int lineNumber, int column)
+    internal List<FoldMarker> GetFoldedFoldingsWithStartAfterColumn(int lineNumber, int column)
     {
         return GetFoldingsByStartAfterColumn(lineNumber, column, true);
     }
@@ -95,8 +94,7 @@ public sealed class FoldingManager
         return GetFoldingsByEndAfterColumn(lineNumber, 0 /*-1*/, true);
     }
 
-    private List<FoldMarker> GetFoldingsByStartAfterColumn(
-        int lineNumber, int column, bool forceFolded)
+    private List<FoldMarker> GetFoldingsByStartAfterColumn(int lineNumber, int column, bool forceFolded)
     {
         var foldings = new List<FoldMarker>();
 
@@ -118,8 +116,7 @@ public sealed class FoldingManager
         return foldings;
     }
 
-    internal List<FoldMarker> GetFoldingsByEndAfterColumn(int lineNumber, int column,
-        bool forceFolded)
+    private List<FoldMarker> GetFoldingsByEndAfterColumn(int lineNumber, int column, bool forceFolded)
     {
         var foldings = new List<FoldMarker>();
 

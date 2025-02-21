@@ -1,256 +1,128 @@
-using System;
-using System.Text;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace CodeEditor;
 
-internal sealed class RedBlackTreeNode<T>
+internal interface IRedBlackTreeNode<TSelf> where TSelf : class, IRedBlackTreeNode<TSelf>
 {
-    internal RedBlackTreeNode<T>? Left;
-    internal RedBlackTreeNode<T>? Right;
-    internal RedBlackTreeNode<T>? Parent;
-    internal T Value;
-    internal bool Color;
-
-    internal RedBlackTreeNode(T val)
-    {
-        Value = val;
-    }
-
-    internal RedBlackTreeNode<T> LeftMost
-    {
-        get
-        {
-            RedBlackTreeNode<T> node = this;
-            while (node.Left != null)
-                node = node.Left;
-            return node;
-        }
-    }
-
-    internal RedBlackTreeNode<T> RightMost
-    {
-        get
-        {
-            RedBlackTreeNode<T> node = this;
-            while (node.Right != null)
-                node = node.Right;
-            return node;
-        }
-    }
+    TSelf? Left { get; set; }
+    TSelf? Right { get; set; }
+    TSelf? Parent { get; set; }
+    bool Color { get; set; }
 }
 
-internal interface IRedBlackTreeHost<T> : IComparer<T>
+internal static class RedBlackTreeExtensions
 {
-    bool Equals(T a, T b);
-
-    void UpdateAfterChildrenChange(RedBlackTreeNode<T> node);
-    void UpdateAfterRotateLeft(RedBlackTreeNode<T> node);
-    void UpdateAfterRotateRight(RedBlackTreeNode<T> node);
-}
-
-/// <summary>
-/// Description of RedBlackTree.
-/// </summary>
-internal sealed class RedBlackTree<T, Host> where Host : IRedBlackTreeHost<T>
-{
-    public RedBlackTree(Host host)
+    public static T LeftMost<T>(this T node) where T : class, IRedBlackTreeNode<T>
     {
-        if (host == null) throw new ArgumentNullException(nameof(host));
-        _host = host;
+        var temp = node;
+        while (temp.Left != null)
+            temp = temp.Left;
+        return temp;
     }
 
-    private readonly Host _host;
-    internal RedBlackTreeNode<T>? Root { get; private set; }
-
-    public int Count { get; private set; }
-
-    public void Clear()
+    public static T RightMost<T>(this T node) where T : class, IRedBlackTreeNode<T>
     {
-        Root = null;
-        Count = 0;
+        var temp = node;
+        while (temp.Right != null)
+            temp = temp.Right;
+        return temp;
     }
 
-    #region ====Debugging code====
-
-#if !__WEB__ && DEBUG
     /// <summary>
-    /// Check tree for consistency and being balanced.
+    /// Gets the inorder successor of the node.
     /// </summary>
-    [Conditional("DATACONSISTENCYTEST")]
-    void CheckProperties()
+    /// <returns>The node following this node, or null if this is the last node.</returns>
+    public static T? Successor<T>(this T node) where T : class, IRedBlackTreeNode<T>
     {
-        int blackCount = -1;
-        CheckNodeProperties(Root, null, RED, 0, ref blackCount);
-
-        int nodeCount = 0;
-        foreach (T val in this)
-        {
-            nodeCount++;
-        }
-
-        Debug.Assert(Count == nodeCount);
-    }
-
-    /*
-    1. A node is either red or black.
-    2. The root is black.
-    3. All leaves are black. (The leaves are the NIL children.)
-    4. Both children of every red node are black. (So every red node must have a black parent.)
-    5. Every simple path from a node to a descendant leaf contains the same number of black nodes. (Not counting the leaf node.)
-     */
-    private static void CheckNodeProperties(RedBlackTreeNode<T>? node,
-        RedBlackTreeNode<T>? parentNode,
-        bool parentColor, int blackCount, ref int expectedBlackCount)
-    {
-        if (node == null) return;
-
-        Debug.Assert(node.Parent == parentNode);
-
-        if (parentColor == RED)
-        {
-            Debug.Assert(node.Color == BLACK);
-        }
-
-        if (node.Color == BLACK)
-        {
-            blackCount++;
-        }
-
-        if (node.Left == null && node.Right == null)
-        {
-            // node is a leaf node:
-            if (expectedBlackCount == -1)
-                expectedBlackCount = blackCount;
-            else
-                Debug.Assert(expectedBlackCount == blackCount);
-        }
-
-        CheckNodeProperties(node.Left, node, node.Color, blackCount, ref expectedBlackCount);
-        CheckNodeProperties(node.Right, node, node.Color, blackCount, ref expectedBlackCount);
-    }
-
-    public string GetTreeAsString()
-    {
-        var b = new StringBuilder();
-        AppendTreeToString(Root, b, 0);
-        return b.ToString();
-    }
-
-    static void AppendTreeToString(RedBlackTreeNode<T> node, StringBuilder b, int indent)
-    {
-        if (node.Color == RED)
-            b.Append("RED   ");
-        else
-            b.Append("BLACK ");
-        b.AppendLine(node.Value.ToString());
-        indent += 2;
-        if (node.Left != null)
-        {
-            b.Append(' ', indent);
-            b.Append("L: ");
-            AppendTreeToString(node.Left, b, indent);
-        }
-
         if (node.Right != null)
         {
-            b.Append(' ', indent);
-            b.Append("R: ");
-            AppendTreeToString(node.Right, b, indent);
+            return node.Right.LeftMost();
         }
-    }
-#endif
 
-    #endregion
-
-    #region ====Add Methods====
-
-    public void Add(T item)
-    {
-        AddInternal(new RedBlackTreeNode<T>(item));
-#if !__WEB__ && DEBUG
-        CheckProperties();
-#endif
-    }
-
-    private void AddInternal(RedBlackTreeNode<T> newNode)
-    {
-        Debug.Assert(newNode.Color == BLACK);
-        if (Root == null)
+        T? temp = node;
+        T oldNode;
+        do
         {
-            Count = 1;
-            Root = newNode;
-            return;
-        }
+            oldNode = temp;
+            temp = temp.Parent;
+            // we are on the way up from the right part, don't output node again
+        } while (temp != null && temp.Right == oldNode);
 
-        // Insert into the tree
-        RedBlackTreeNode<T> parentNode = Root;
-        while (true)
-        {
-            if (_host.Compare(newNode.Value, parentNode.Value) <= 0)
-            {
-                if (parentNode.Left == null)
-                {
-                    InsertAsLeft(parentNode, newNode);
-                    return;
-                }
-
-                parentNode = parentNode.Left;
-            }
-            else
-            {
-                if (parentNode.Right == null)
-                {
-                    InsertAsRight(parentNode, newNode);
-                    return;
-                }
-
-                parentNode = parentNode.Right;
-            }
-        }
+        return temp;
     }
 
-    internal void InsertAsLeft(RedBlackTreeNode<T> parentNode, RedBlackTreeNode<T> newNode)
+    /// <summary>
+    /// Gets the inorder predecessor of the node.
+    /// </summary>
+    /// <returns>The node before this node, or null if this is the first node.</returns>
+    public static T? Predecessor<T>(this T node) where T : class, IRedBlackTreeNode<T>
+    {
+        if (node.Left != null)
+        {
+            return node.Left.RightMost();
+        }
+
+        T? temp = node;
+        T oldNode;
+        do
+        {
+            oldNode = temp;
+            temp = temp.Parent;
+            // we are on the way up from the left part, don't output node again
+        } while (temp != null && temp.Left == oldNode);
+
+        return temp;
+    }
+}
+
+internal abstract class RedBlackTree<T> where T : class, IRedBlackTreeNode<T>
+{
+    protected const bool Red = true;
+    protected const bool Black = false;
+
+    protected T? Root { get; set; }
+
+    #region ====Insert & Remove====
+
+    protected void InsertAsLeft(T parentNode, T newNode)
     {
         Debug.Assert(parentNode.Left == null);
         parentNode.Left = newNode;
         newNode.Parent = parentNode;
-        newNode.Color = RED;
-        _host.UpdateAfterChildrenChange(parentNode);
+        newNode.Color = Red;
+        UpdateAfterChildrenChange(parentNode);
         FixTreeOnInsert(newNode);
-        Count++;
     }
 
-    internal void InsertAsRight(RedBlackTreeNode<T> parentNode, RedBlackTreeNode<T> newNode)
+    protected void InsertAsRight(T parentNode, T newNode)
     {
         Debug.Assert(parentNode.Right == null);
         parentNode.Right = newNode;
         newNode.Parent = parentNode;
-        newNode.Color = RED;
-        _host.UpdateAfterChildrenChange(parentNode);
+        newNode.Color = Red;
+        UpdateAfterChildrenChange(parentNode);
         FixTreeOnInsert(newNode);
-        Count++;
     }
 
-    private void FixTreeOnInsert(RedBlackTreeNode<T> node)
+    private void FixTreeOnInsert(T node)
     {
         Debug.Assert(node != null);
-        Debug.Assert(node.Color == RED);
-        Debug.Assert(node.Left == null || node.Left.Color == BLACK);
-        Debug.Assert(node.Right == null || node.Right.Color == BLACK);
+        Debug.Assert(node.Color == Red);
+        Debug.Assert(node.Left == null || node.Left.Color == Black);
+        Debug.Assert(node.Right == null || node.Right.Color == Black);
 
-        RedBlackTreeNode<T> parentNode = node.Parent;
+        var parentNode = node.Parent;
         if (parentNode == null)
         {
             // we inserted in the root -> the node must be black
             // since this is a root node, making the node black increments the number of black nodes
             // on all paths by one, so it is still the same for all paths.
-            node.Color = BLACK;
+            node.Color = Black;
             return;
         }
 
-        if (parentNode.Color == BLACK)
+        if (parentNode.Color == Black)
         {
             // if the parent node where we inserted was black, our red node is placed correctly.
             // since we inserted a red node, the number of black nodes on each path is unchanged
@@ -260,13 +132,13 @@ internal sealed class RedBlackTree<T, Host> where Host : IRedBlackTreeHost<T>
         // parentNode is red, so there is a conflict here!
 
         // because the root is black, parentNode is not the root -> there is a grandparent node
-        RedBlackTreeNode<T> grandparentNode = parentNode.Parent;
-        RedBlackTreeNode<T> uncleNode = Sibling(parentNode);
-        if (uncleNode != null && uncleNode.Color == RED)
+        var grandparentNode = parentNode.Parent!;
+        var uncleNode = Sibling(parentNode);
+        if (uncleNode != null && uncleNode.Color == Red)
         {
-            parentNode.Color = BLACK;
-            uncleNode.Color = BLACK;
-            grandparentNode.Color = RED;
+            parentNode.Color = Black;
+            uncleNode.Color = Black;
+            grandparentNode.Color = Red;
             FixTreeOnInsert(grandparentNode);
             return;
         }
@@ -276,21 +148,22 @@ internal sealed class RedBlackTree<T, Host> where Host : IRedBlackTreeHost<T>
         if (node == parentNode.Right && parentNode == grandparentNode.Left)
         {
             RotateLeft(parentNode);
-            node = node.Left;
+            node = node.Left!;
         }
         else if (node == parentNode.Left && parentNode == grandparentNode.Right)
         {
             RotateRight(parentNode);
-            node = node.Right;
+            node = node.Right!;
         }
 
         // because node might have changed, reassign variables:
+        // ReSharper disable once PossibleNullReferenceException
         parentNode = node.Parent;
-        grandparentNode = parentNode.Parent;
+        grandparentNode = parentNode!.Parent!;
 
         // Now recolor a bit:
-        parentNode.Color = BLACK;
-        grandparentNode.Color = RED;
+        parentNode.Color = Black;
+        grandparentNode.Color = Red;
         // Second rotation:
         if (node == parentNode.Left && parentNode == grandparentNode.Left)
         {
@@ -304,7 +177,137 @@ internal sealed class RedBlackTree<T, Host> where Host : IRedBlackTreeHost<T>
         }
     }
 
-    private void ReplaceNode(RedBlackTreeNode<T> replacedNode, RedBlackTreeNode<T> newNode)
+    protected void RemoveNode(T removedNode)
+    {
+        if (removedNode.Left != null && removedNode.Right != null)
+        {
+            // replace removedNode with it's in-order successor
+
+            var leftMost = removedNode.Right.LeftMost();
+            RemoveNode(leftMost); // remove leftMost from its current location
+
+            // and overwrite the removedNode with it
+            ReplaceNode(removedNode, leftMost);
+            leftMost.Left = removedNode.Left;
+            if (leftMost.Left != null) leftMost.Left.Parent = leftMost;
+            leftMost.Right = removedNode.Right;
+            if (leftMost.Right != null) leftMost.Right.Parent = leftMost;
+            leftMost.Color = removedNode.Color;
+
+            UpdateAfterChildrenChange(leftMost);
+            if (leftMost.Parent != null) UpdateAfterChildrenChange(leftMost.Parent);
+            return;
+        }
+
+        // now either removedNode.left or removedNode.right is null
+        // get the remaining child
+        var parentNode = removedNode.Parent;
+        var childNode = removedNode.Left ?? removedNode.Right;
+        ReplaceNode(removedNode, childNode);
+        if (parentNode != null) UpdateAfterChildrenChange(parentNode);
+        if (removedNode.Color == Black)
+        {
+            if (childNode != null && childNode.Color == Red)
+            {
+                childNode.Color = Black;
+            }
+            else
+            {
+                FixTreeOnDelete(childNode, parentNode);
+            }
+        }
+    }
+
+    private void FixTreeOnDelete(T? node, T? parentNode)
+    {
+        Debug.Assert(node == null || node.Parent == parentNode);
+        if (parentNode == null)
+            return;
+
+        // warning: node may be null
+        var sibling = Sibling(node, parentNode)!;
+        if (sibling.Color == Red)
+        {
+            parentNode.Color = Red;
+            sibling.Color = Black;
+            if (node == parentNode.Left)
+            {
+                RotateLeft(parentNode);
+            }
+            else
+            {
+                RotateRight(parentNode);
+            }
+
+            sibling = Sibling(node, parentNode)!; // update value of sibling after rotation
+        }
+
+        if (parentNode.Color == Black
+            && sibling.Color == Black
+            && GetColor(sibling.Left) == Black
+            && GetColor(sibling.Right) == Black)
+        {
+            sibling.Color = Red;
+            FixTreeOnDelete(parentNode, parentNode.Parent);
+            return;
+        }
+
+        if (parentNode.Color == Red
+            && sibling.Color == Black
+            && GetColor(sibling.Left) == Black
+            && GetColor(sibling.Right) == Black)
+        {
+            sibling.Color = Red;
+            parentNode.Color = Black;
+            return;
+        }
+
+        if (node == parentNode.Left &&
+            sibling.Color == Black &&
+            GetColor(sibling.Left) == Red &&
+            GetColor(sibling.Right) == Black)
+        {
+            sibling.Color = Red;
+            sibling.Left!.Color = Black;
+            RotateRight(sibling);
+        }
+        else if (node == parentNode.Right &&
+                 sibling.Color == Black &&
+                 GetColor(sibling.Right) == Red &&
+                 GetColor(sibling.Left) == Black)
+        {
+            sibling.Color = Red;
+            sibling.Right!.Color = Black;
+            RotateLeft(sibling);
+        }
+
+        sibling = Sibling(node, parentNode)!; // update value of sibling after rotation
+
+        sibling.Color = parentNode.Color;
+        parentNode.Color = Black;
+        if (node == parentNode.Left)
+        {
+            if (sibling.Right != null)
+            {
+                Debug.Assert(sibling.Right.Color == Red);
+                sibling.Right.Color = Black;
+            }
+
+            RotateLeft(parentNode);
+        }
+        else
+        {
+            if (sibling.Left != null)
+            {
+                Debug.Assert(sibling.Left.Color == Red);
+                sibling.Left.Color = Black;
+            }
+
+            RotateRight(parentNode);
+        }
+    }
+
+    private void ReplaceNode(T replacedNode, T? newNode)
     {
         if (replacedNode.Parent == null)
         {
@@ -327,10 +330,10 @@ internal sealed class RedBlackTree<T, Host> where Host : IRedBlackTreeHost<T>
         replacedNode.Parent = null;
     }
 
-    private void RotateLeft(RedBlackTreeNode<T> p)
+    private void RotateLeft(T p)
     {
         // let q be p's right child
-        RedBlackTreeNode<T> q = p.Right;
+        var q = p.Right;
         Debug.Assert(q != null);
         Debug.Assert(q.Parent == p);
         // set q to be the new root
@@ -342,13 +345,14 @@ internal sealed class RedBlackTree<T, Host> where Host : IRedBlackTreeHost<T>
         // set q's left child to be p
         q.Left = p;
         p.Parent = q;
-        _host.UpdateAfterRotateLeft(p);
+
+        UpdateAfterRotate(p);
     }
 
-    private void RotateRight(RedBlackTreeNode<T> p)
+    private void RotateRight(T p)
     {
         // let q be p's left child
-        RedBlackTreeNode<T> q = p.Left;
+        var q = p.Left;
         Debug.Assert(q != null);
         Debug.Assert(q.Parent == p);
         // set q to be the new root
@@ -360,359 +364,52 @@ internal sealed class RedBlackTree<T, Host> where Host : IRedBlackTreeHost<T>
         // set q's right child to be p
         q.Right = p;
         p.Parent = q;
-        _host.UpdateAfterRotateRight(p);
+
+        UpdateAfterRotate(p);
     }
 
-    private RedBlackTreeNode<T> Sibling(RedBlackTreeNode<T> node)
+    private static T? Sibling(T node)
     {
-        return node == node.Parent.Left ? node.Parent.Right : node.Parent.Left;
+        return node == node.Parent!.Left ? node.Parent.Right : node.Parent.Left;
+    }
+
+    private static T? Sibling(T? node, T parentNode)
+    {
+        Debug.Assert(node == null || node.Parent == parentNode);
+        return node == parentNode.Left ? parentNode.Right : parentNode.Left;
+    }
+
+    private static bool GetColor(T? node)
+    {
+        return node != null && node.Color;
+    }
+
+    protected virtual void UpdateAfterChildrenChange(T node) { }
+
+    protected virtual void UpdateAfterRotate(T node)
+    {
+        UpdateAfterChildrenChange(node);
+        UpdateAfterChildrenChange(node.Parent!);
     }
 
     #endregion
 
-    #region ====Remove Methods====
+    #region ====ICollection====
 
-    public void RemoveAt(RedBlackTreeIterator<T> iterator)
+    public IEnumerator<T> GetEnumerator()
     {
-        RedBlackTreeNode<T> node = iterator.Node;
-        if (node == null)
-            throw new ArgumentException("Invalid iterator");
-        while (node.Parent != null)
-            node = node.Parent;
-        if (node != Root)
-            throw new ArgumentException("Iterator does not belong to this tree");
-        RemoveNode(iterator.Node);
-#if DEBUG
-        CheckProperties();
-#endif
+        return Enumerate();
     }
 
-    internal void RemoveNode(RedBlackTreeNode<T> removedNode)
+    private IEnumerator<T> Enumerate()
     {
-        if (removedNode.Left != null && removedNode.Right != null)
-        {
-            // replace removedNode with it's in-order successor
-
-            RedBlackTreeNode<T> leftMost = removedNode.Right.LeftMost;
-            RemoveNode(leftMost); // remove leftMost from its current location
-
-            // and overwrite the removedNode with it
-            ReplaceNode(removedNode, leftMost);
-            leftMost.Left = removedNode.Left;
-            if (leftMost.Left != null) leftMost.Left.Parent = leftMost;
-            leftMost.Right = removedNode.Right;
-            if (leftMost.Right != null) leftMost.Right.Parent = leftMost;
-            leftMost.Color = removedNode.Color;
-
-            _host.UpdateAfterChildrenChange(leftMost);
-            if (leftMost.Parent != null) _host.UpdateAfterChildrenChange(leftMost.Parent);
-            return;
-        }
-
-        Count--;
-
-        // now either removedNode.left or removedNode.right is null
-        // get the remaining child
-        RedBlackTreeNode<T> parentNode = removedNode.Parent;
-        RedBlackTreeNode<T> childNode = removedNode.Left ?? removedNode.Right;
-        ReplaceNode(removedNode, childNode);
-        if (parentNode != null) _host.UpdateAfterChildrenChange(parentNode);
-        if (removedNode.Color == BLACK)
-        {
-            if (childNode != null && childNode.Color == RED)
-            {
-                childNode.Color = BLACK;
-            }
-            else
-            {
-                FixTreeOnDelete(childNode, parentNode);
-            }
-        }
-    }
-
-    [PixUI.TSRename("Sibling2")]
-    static RedBlackTreeNode<T> Sibling<T>(RedBlackTreeNode<T> node, RedBlackTreeNode<T> parentNode)
-    {
-        Debug.Assert(node == null || node.Parent == parentNode);
-        if (node == parentNode.Left)
-            return parentNode.Right;
-        else
-            return parentNode.Left;
-    }
-
-    const bool RED = true;
-    const bool BLACK = false;
-
-    static bool GetColor<T>(RedBlackTreeNode<T>? node)
-    {
-        return node != null ? node.Color : BLACK;
-    }
-
-    void FixTreeOnDelete(RedBlackTreeNode<T> node, RedBlackTreeNode<T>? parentNode)
-    {
-        Debug.Assert(node == null || node.Parent == parentNode);
-        if (parentNode == null)
-            return;
-
-        // warning: node may be null
-        RedBlackTreeNode<T> sibling = Sibling(node, parentNode);
-        if (sibling.Color == RED)
-        {
-            parentNode.Color = RED;
-            sibling.Color = BLACK;
-            if (node == parentNode.Left)
-                RotateLeft(parentNode);
-            else
-                RotateRight(parentNode);
-
-            sibling = Sibling(node, parentNode); // update value of sibling after rotation
-        }
-
-        if (parentNode.Color == BLACK
-            && sibling.Color == BLACK
-            && GetColor(sibling.Left) == BLACK
-            && GetColor(sibling.Right) == BLACK)
-        {
-            sibling.Color = RED;
-            FixTreeOnDelete(parentNode, parentNode.Parent);
-            return;
-        }
-
-        if (parentNode.Color == RED
-            && sibling.Color == BLACK
-            && GetColor(sibling.Left) == BLACK
-            && GetColor(sibling.Right) == BLACK)
-        {
-            sibling.Color = RED;
-            parentNode.Color = BLACK;
-            return;
-        }
-
-        if (node == parentNode.Left &&
-            sibling.Color == BLACK &&
-            GetColor(sibling.Left) == RED &&
-            GetColor(sibling.Right) == BLACK)
-        {
-            sibling.Color = RED;
-            sibling.Left.Color = BLACK;
-            RotateRight(sibling);
-        }
-        else if (node == parentNode.Right &&
-                 sibling.Color == BLACK &&
-                 GetColor(sibling.Right) == RED &&
-                 GetColor(sibling.Left) == BLACK)
-        {
-            sibling.Color = RED;
-            sibling.Right.Color = BLACK;
-            RotateLeft(sibling);
-        }
-
-        sibling = Sibling(node, parentNode); // update value of sibling after rotation
-
-        sibling.Color = parentNode.Color;
-        parentNode.Color = BLACK;
-        if (node == parentNode.Left)
-        {
-            if (sibling.Right != null)
-            {
-                Debug.Assert(sibling.Right.Color == RED);
-                sibling.Right.Color = BLACK;
-            }
-
-            RotateLeft(parentNode);
-        }
-        else
-        {
-            if (sibling.Left != null)
-            {
-                Debug.Assert(sibling.Left.Color == RED);
-                sibling.Left.Color = BLACK;
-            }
-
-            RotateRight(parentNode);
-        }
-    }
-
-    #endregion
-
-    #region Find/LowerBound/UpperBound/GetEnumerator
-
-    /// <summary>
-    /// Returns the iterator pointing to the specified item, or an iterator in End state if the item is not found.
-    /// </summary>
-    public RedBlackTreeIterator<T> Find(T item)
-    {
-        RedBlackTreeIterator<T> it = LowerBound(item);
-        while (it.IsValid && _host.Compare(it.Current, item) == 0)
-        {
-            if (_host.Equals(it.Current, item))
-                return it;
-            it.MoveNext();
-        }
-
-        return new RedBlackTreeIterator<T>(null);
-    }
-
-    /// <summary>
-    /// Returns the iterator pointing to the first item greater or equal to <paramref name="item"/>.
-    /// </summary>
-    public RedBlackTreeIterator<T> LowerBound(T item)
-    {
-        RedBlackTreeNode<T>? node = Root;
-        RedBlackTreeNode<T>? resultNode = null;
+        var node = Root!.LeftMost();
         while (node != null)
         {
-            if (_host.Compare(node.Value, item) < 0)
-            {
-                node = node.Right;
-            }
-            else
-            {
-                resultNode = node;
-                node = node.Left;
-            }
+            yield return node;
+            node = node.Successor();
         }
-
-        return new RedBlackTreeIterator<T>(resultNode);
-    }
-
-    /// <summary>
-    /// Returns the iterator pointing to the first item greater than <paramref name="item"/>.
-    /// </summary>
-    public RedBlackTreeIterator<T> UpperBound(T item)
-    {
-        RedBlackTreeIterator<T> it = LowerBound(item);
-        while (it.IsValid && _host.Compare(it.Current, item) == 0)
-        {
-            it.MoveNext();
-        }
-
-        return it;
-    }
-
-    /// <summary>
-    /// Gets a tree iterator that starts on the first node.
-    /// </summary>
-    public RedBlackTreeIterator<T> Begin()
-    {
-        return Root == null
-            ? new RedBlackTreeIterator<T>(null)
-            : new RedBlackTreeIterator<T>(Root.LeftMost);
-    }
-
-#if !__WEB__
-    /// <summary>
-    /// Gets a tree iterator that starts one node before the first node.
-    /// </summary>
-    public RedBlackTreeIterator<T> GetEnumerator()
-    {
-        if (Root == null) return new RedBlackTreeIterator<T>(null);
-        RedBlackTreeNode<T> dummyNode = new RedBlackTreeNode<T>(default);
-        dummyNode.Right = Root;
-        return new RedBlackTreeIterator<T>(dummyNode);
-    }
-#endif
-
-    #endregion
-
-    #region ICollection members
-
-    public bool Contains(T item)
-    {
-        return Find(item).IsValid;
-    }
-
-    public bool Remove(T item)
-    {
-        var it = Find(item);
-        if (!it.IsValid)
-            return false;
-
-        RemoveAt(it);
-        return true;
     }
 
     #endregion
-}
-
-internal struct RedBlackTreeIterator<T>
-#if !__WEB__
-    : IEnumerator<T>
-#endif
-{
-    internal RedBlackTreeNode<T>? Node { get; private set; }
-
-    internal RedBlackTreeIterator(RedBlackTreeNode<T>? node)
-    {
-        Node = node;
-    }
-
-
-#if __WEB__
-        public RedBlackTreeIterator<T> Clone() => new RedBlackTreeIterator<T>(Node);
-#endif
-
-    public bool IsValid => Node != null;
-
-    public T Current
-    {
-        get
-        {
-            if (Node != null)
-                return Node.Value;
-            throw new InvalidOperationException();
-        }
-    }
-
-#if !__WEB__
-    object System.Collections.IEnumerator.Current => Current;
-
-    public void Dispose() { }
-
-    public void Reset() => throw new NotSupportedException();
-#endif
-
-    public bool MoveNext()
-    {
-        if (Node == null)
-            return false;
-        if (Node.Right != null)
-        {
-            Node = Node.Right.LeftMost;
-        }
-        else
-        {
-            RedBlackTreeNode<T> oldNode;
-            do
-            {
-                oldNode = Node;
-                Node = Node.Parent;
-                // we are on the way up from the right part, don't output node again
-            } while (Node != null && Node.Right == oldNode);
-        }
-
-        return Node != null;
-    }
-
-    public bool MoveBack()
-    {
-        if (Node == null)
-            return false;
-        if (Node.Left != null)
-        {
-            Node = Node.Left.RightMost;
-        }
-        else
-        {
-            RedBlackTreeNode<T> oldNode;
-            do
-            {
-                oldNode = Node;
-                Node = Node.Parent;
-                // we are on the way up from the left part, don't output node again
-            } while (Node != null && Node.Left == oldNode);
-        }
-
-        return Node != null;
-    }
 }
