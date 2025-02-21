@@ -308,7 +308,7 @@ initializer: [
 
     private TSQuery? _foldQuery;
 
-    public List<FoldMarker>? GenerateFoldMarkers(Document document)
+    public List<FoldingSegment>? GenerateFoldMarkers(Document document)
     {
         var syntaxParser = (TreeSitterSyntaxParser) document.SyntaxParser;
         var rootNode = syntaxParser.RootNode;
@@ -321,7 +321,7 @@ initializer: [
 #else
         var lastNodeId = IntPtr.Zero;
 #endif
-        var result = new List<FoldMarker>();
+        var result = new List<FoldingSegment>();
         foreach (var capture in captures)
         {
             if (lastNodeId == capture.node.id) continue;
@@ -339,7 +339,7 @@ initializer: [
             var startIndex = node.StartIndex / TreeSitterSyntaxParser.ParserEncoding;
             var endIndex = node.EndIndex / TreeSitterSyntaxParser.ParserEncoding;
 
-            var mark = new FoldMarker(document, 0, 0, 0, 0, FoldType.TypeBody, "{...}");
+            var mark = new FoldingSegment(document, 0, 0, 0, 0, FoldType.TypeBody, "{...}");
             mark.Offset = startIndex;
             mark.Length = endIndex - startIndex;
             result.Add(mark);

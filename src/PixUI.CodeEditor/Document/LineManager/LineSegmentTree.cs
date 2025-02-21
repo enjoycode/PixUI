@@ -164,7 +164,7 @@ internal sealed class LineSegmentTree : RedBlackTree<LineSegment>
     #region ====CheckProperties====
 
 #if DEBUG
-    [Conditional("RED_BLACK_CHECK")]
+    [Conditional("DATACONSISTENCYTEST")]
     internal void CheckProperties()
     {
         CheckProperties(Root!);

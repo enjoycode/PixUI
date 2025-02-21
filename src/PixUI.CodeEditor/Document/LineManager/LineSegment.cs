@@ -410,7 +410,7 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
         var line = LineNumber;
         var column = -1;
         var lineChars = 0; //used for calc fold offset in line
-        FoldMarker? preFold = null;
+        FoldingSegment? preFold = null;
 
         while (true)
         {
@@ -503,9 +503,9 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
         var offsetInLine = -1;
         foreach (var fold in CachedFolds!)
         {
-            if (line == fold.FoldMarker.EndLine)
+            if (line == fold.FoldingSegment.EndLine)
             {
-                offsetInLine = fold.LineEnd + column - fold.FoldMarker.EndColumn;
+                offsetInLine = fold.LineEnd + column - fold.FoldingSegment.EndColumn;
                 break;
             }
         }
@@ -552,14 +552,14 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
 
 internal readonly struct CachedFoldInfo
 {
-    public CachedFoldInfo(int lineStart, FoldMarker foldMarker)
+    public CachedFoldInfo(int lineStart, FoldingSegment foldingSegment)
     {
         LineStart = lineStart;
-        FoldMarker = foldMarker;
+        FoldingSegment = foldingSegment;
     }
 
     internal readonly int LineStart;
-    internal readonly FoldMarker FoldMarker;
+    internal readonly FoldingSegment FoldingSegment;
 
-    internal int LineEnd => LineStart + FoldMarker.FoldText.Length;
+    internal int LineEnd => LineStart + FoldingSegment.FoldText.Length;
 }

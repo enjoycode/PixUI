@@ -4,5 +4,5 @@ namespace CodeEditor;
 
 public interface IFoldingProvider
 {
-    List<FoldMarker>? GenerateFoldMarkers(Document document);
+    List<FoldingSegment>? GenerateFoldMarkers(Document document);
 }

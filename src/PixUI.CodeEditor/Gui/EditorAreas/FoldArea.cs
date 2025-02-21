@@ -19,7 +19,7 @@ internal sealed class FoldArea : EditorArea
         return PixUI.Paint.Shared(new Color(200, 200, 200, 255), PaintStyle.Stroke, 1.5f);
     }
 
-    private bool SelectedFoldingFrom(IList<FoldMarker> list)
+    private bool SelectedFoldingFrom(IList<FoldingSegment> list)
     {
         foreach (var fm in list)
         {
@@ -78,15 +78,13 @@ internal sealed class FoldArea : EditorArea
                 Bounds.Top + y * fontHeight - visibleLineRemainder,
                 Bounds.Width,
                 fontHeight);
-            if (rect.IntersectsWith(markerRect.Left, markerRect.Top, markerRect.Width,
-                    markerRect.Height))
+            if (rect.IntersectsWith(markerRect.Left, markerRect.Top, markerRect.Width, markerRect.Height))
             {
                 //TODO: paint separator line?
                 // canvas.drawLine(ui.Offset(drawingPosition.left, markerRect.top),
                 //     ui.Offset(drawingPosition.left, markerRect.bottom), normalPaint);
 
-                var currentLine = Document
-                    .GetFirstLogicalLine(TextEditor.TextView.FirstPhysicalLine + y);
+                var currentLine = Document.GetFirstLogicalLine(TextEditor.TextView.FirstPhysicalLine + y);
                 if (currentLine < Document.TotalNumberOfLines)
                 {
                     PaintFoldMarker(canvas, currentLine, markerRect);

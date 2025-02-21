@@ -6,7 +6,7 @@ internal sealed class CaretLeft : IEditCommand
     {
         var position = editor.Caret.Position;
         var foldings = editor.Document.FoldingManager.GetFoldedFoldingsWithEnd(position.Line);
-        FoldMarker? justBeforeCaret = null;
+        FoldingSegment? justBeforeCaret = null;
         foreach (var fm in foldings)
         {
             if (fm.EndColumn == position.Column)
@@ -48,7 +48,7 @@ internal sealed class CaretRight : IEditCommand
         var curLine = editor.Document.GetLineSegment(editor.Caret.Line);
         var position = editor.Caret.Position;
         var foldings = editor.Document.FoldingManager.GetFoldedFoldingsWithStart(position.Line);
-        FoldMarker? justBehindCaret = null;
+        FoldingSegment? justBehindCaret = null;
         foreach (var fm in foldings)
         {
             if (fm.StartColumn == position.Column)

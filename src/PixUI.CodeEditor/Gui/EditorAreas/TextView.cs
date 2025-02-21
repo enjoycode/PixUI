@@ -68,7 +68,7 @@ internal sealed class TextView : EditorArea //TODO: rename to TextArea
         }
 
         var line = Document.GetLineSegment(lineNumber);
-        FoldMarker? inFoldMarker = null;
+        FoldingSegment? inFoldMarker = null;
         var para = line.GetLineParagraph(TextEditor);
         var columnInLine = para.GetGlyphPositionAtCoordinate(visualPosX, 1).Position;
         var column = columnInLine;
@@ -81,15 +81,15 @@ internal sealed class TextView : EditorArea //TODO: rename to TextArea
                 if (columnInLine >= fold.LineStart && columnInLine < fold.LineEnd)
                 {
                     //in fold, TODO: nearest left or right
-                    inFoldMarker = fold.FoldMarker;
-                    lineNumber = fold.FoldMarker.EndLine;
-                    column = fold.FoldMarker.EndColumn;
+                    inFoldMarker = fold.FoldingSegment;
+                    lineNumber = fold.FoldingSegment.EndLine;
+                    column = fold.FoldingSegment.EndColumn;
                     break;
                 }
                 else if (columnInLine >= fold.LineEnd)
                 {
-                    lineNumber = fold.FoldMarker.EndLine;
-                    column = fold.FoldMarker.EndColumn + (columnInLine - fold.LineEnd);
+                    lineNumber = fold.FoldingSegment.EndLine;
+                    column = fold.FoldingSegment.EndColumn + (columnInLine - fold.LineEnd);
                 }
             }
         }
@@ -217,9 +217,9 @@ internal sealed class TextView : EditorArea //TODO: rename to TextArea
 internal readonly struct LogicalColumnInfo
 {
     internal readonly TextLocation Location;
-    internal readonly FoldMarker? InFoldMarker;
+    internal readonly FoldingSegment? InFoldMarker;
 
-    internal LogicalColumnInfo(TextLocation location, FoldMarker? inFoldMarker)
+    internal LogicalColumnInfo(TextLocation location, FoldingSegment? inFoldMarker)
     {
         Location = location;
         InFoldMarker = inFoldMarker;

@@ -10,9 +10,9 @@ public enum FoldType
     TypeBody
 }
 
-public sealed class FoldMarker : ISegment, IComparable<FoldMarker>
+public sealed class FoldingSegment : ISegment, IComparable<FoldingSegment>
 {
-    public FoldMarker(Document document,
+    public FoldingSegment(Document document,
         int startLine, int startColumn,
         int endLine, int endColumn, FoldType foldType,
         string? foldText = null, bool isFolded = false)
@@ -137,7 +137,7 @@ public sealed class FoldMarker : ISegment, IComparable<FoldMarker>
         }
     }
 
-    public int CompareTo(FoldMarker? other)
+    public int CompareTo(FoldingSegment? other)
     {
         if (other == null) return 1;
 

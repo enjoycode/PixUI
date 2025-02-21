@@ -13,8 +13,8 @@ public sealed class FoldingManager
     }
 
     private readonly Document _document;
-    private List<FoldMarker> _foldMarker = new List<FoldMarker>();
-    private List<FoldMarker> _foldMarkerByEnd = new List<FoldMarker>();
+    private List<FoldingSegment> _foldMarker = new List<FoldingSegment>();
+    private List<FoldingSegment> _foldMarkerByEnd = new List<FoldingSegment>();
 
     #region ====Events====
 
@@ -40,9 +40,9 @@ public sealed class FoldingManager
         return true;
     }
 
-    public List<FoldMarker> GetTopLevelFoldedFoldings()
+    public List<FoldingSegment> GetTopLevelFoldedFoldings()
     {
-        var foldings = new List<FoldMarker>();
+        var foldings = new List<FoldingSegment>();
         var end = new TextLocation(0, 0);
         foreach (var fm in _foldMarker)
         {
@@ -57,14 +57,14 @@ public sealed class FoldingManager
         return foldings;
     }
 
-    internal List<FoldMarker> GetFoldingsWithStart(int lineNumber)
+    internal List<FoldingSegment> GetFoldingsWithStart(int lineNumber)
     {
         return GetFoldingsByStartAfterColumn(lineNumber, -1, false);
     }
 
-    internal List<FoldMarker> GetFoldingsContainsLineNumber(int lineNumber)
+    internal List<FoldingSegment> GetFoldingsContainsLineNumber(int lineNumber)
     {
-        var foldings = new List<FoldMarker>();
+        var foldings = new List<FoldingSegment>();
         foreach (var fm in _foldMarker)
         {
             if (fm.StartLine < lineNumber && lineNumber < fm.EndLine)
@@ -74,32 +74,32 @@ public sealed class FoldingManager
         return foldings;
     }
 
-    internal List<FoldMarker> GetFoldingsWithEnd(int lineNumber)
+    internal List<FoldingSegment> GetFoldingsWithEnd(int lineNumber)
     {
         return GetFoldingsByEndAfterColumn(lineNumber, 0 /*-1*/, false);
     }
 
-    internal List<FoldMarker> GetFoldedFoldingsWithStartAfterColumn(int lineNumber, int column)
+    internal List<FoldingSegment> GetFoldedFoldingsWithStartAfterColumn(int lineNumber, int column)
     {
         return GetFoldingsByStartAfterColumn(lineNumber, column, true);
     }
 
-    internal List<FoldMarker> GetFoldedFoldingsWithStart(int lineNumber)
+    internal List<FoldingSegment> GetFoldedFoldingsWithStart(int lineNumber)
     {
         return GetFoldingsByStartAfterColumn(lineNumber, -1, true);
     }
 
-    internal List<FoldMarker> GetFoldedFoldingsWithEnd(int lineNumber)
+    internal List<FoldingSegment> GetFoldedFoldingsWithEnd(int lineNumber)
     {
         return GetFoldingsByEndAfterColumn(lineNumber, 0 /*-1*/, true);
     }
 
-    private List<FoldMarker> GetFoldingsByStartAfterColumn(int lineNumber, int column, bool forceFolded)
+    private List<FoldingSegment> GetFoldingsByStartAfterColumn(int lineNumber, int column, bool forceFolded)
     {
-        var foldings = new List<FoldMarker>();
+        var foldings = new List<FoldingSegment>();
 
         //TODO: check web's BinarySearch
-        var pattern = new FoldMarker(_document, lineNumber, column, lineNumber, column,
+        var pattern = new FoldingSegment(_document, lineNumber, column, lineNumber, column,
             FoldType.Unspecified, "", false);
         var index = _foldMarker.BinarySearch(pattern, StartComparer.Instance);
         if (index < 0) index = ~index;
@@ -116,11 +116,11 @@ public sealed class FoldingManager
         return foldings;
     }
 
-    private List<FoldMarker> GetFoldingsByEndAfterColumn(int lineNumber, int column, bool forceFolded)
+    private List<FoldingSegment> GetFoldingsByEndAfterColumn(int lineNumber, int column, bool forceFolded)
     {
-        var foldings = new List<FoldMarker>();
+        var foldings = new List<FoldingSegment>();
 
-        var pattern = new FoldMarker(_document, lineNumber, column, lineNumber, column,
+        var pattern = new FoldingSegment(_document, lineNumber, column, lineNumber, column,
             FoldType.Unspecified, "", false);
         var index = _foldMarkerByEnd.BinarySearch(pattern, EndComparer.Instance);
         if (index < 0) index = ~index;
@@ -137,7 +137,7 @@ public sealed class FoldingManager
         return foldings;
     }
 
-    public void UpdateFoldings(List<FoldMarker>? newFoldings)
+    public void UpdateFoldings(List<FoldingSegment>? newFoldings)
     {
         // final int oldFoldingCount = foldMarker.length;
         if (newFoldings != null && newFoldings.Count != 0)
@@ -177,7 +177,7 @@ public sealed class FoldingManager
         if (newFoldings != null)
         {
             _foldMarker = newFoldings;
-            _foldMarkerByEnd = new List<FoldMarker>(newFoldings);
+            _foldMarkerByEnd = new List<FoldingSegment>(newFoldings);
             _foldMarkerByEnd.Sort((a, b) => EndComparer.Instance.Compare(a, b));
         }
         else
@@ -191,22 +191,22 @@ public sealed class FoldingManager
     }
 }
 
-internal sealed class StartComparer : IComparer<FoldMarker>
+internal sealed class StartComparer : IComparer<FoldingSegment>
 {
     internal static readonly StartComparer Instance = new StartComparer();
 
-    public int Compare(FoldMarker x, FoldMarker y)
+    public int Compare(FoldingSegment x, FoldingSegment y)
     {
         if (x.StartLine < y.StartLine) return -1;
         return x.StartLine == y.StartLine ? x.StartColumn.CompareTo(y.StartColumn) : 1;
     }
 }
 
-internal sealed class EndComparer : IComparer<FoldMarker>
+internal sealed class EndComparer : IComparer<FoldingSegment>
 {
     internal static readonly EndComparer Instance = new EndComparer();
 
-    public int Compare(FoldMarker x, FoldMarker y)
+    public int Compare(FoldingSegment x, FoldingSegment y)
     {
         if (x.EndLine < y.EndLine) return -1;
         return x.EndLine == y.EndLine ? x.EndColumn.CompareTo(y.EndColumn) : 1;
