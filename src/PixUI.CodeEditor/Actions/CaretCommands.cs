@@ -4,14 +4,19 @@ internal sealed class CaretLeft : IEditCommand
 {
     public void Execute(TextEditor editor)
     {
-        var position = editor.Caret.Position;
-        var foldings = editor.Document.FoldingManager.GetFoldedFoldingsWithEnd(position.Line);
+        var caret = editor.Caret;
+        if (caret.Line == 0 && caret.Column == 0)
+            return;
+
+        var position = caret.Position;
+        var caretOffset = caret.Offset;
+        var foldings = editor.Document.FoldingManager.FindOverlapping(caretOffset - 1);
         FoldingSegment? justBeforeCaret = null;
-        foreach (var fm in foldings)
+        foreach (var fs in foldings)
         {
-            if (fm.EndColumn == position.Column)
+            if (fs.EndOffset == caretOffset && fs.IsFolded)
             {
-                justBeforeCaret = fm;
+                justBeforeCaret = fs;
                 // the first folding found is the folding with the smallest Start position
                 break;
             }
@@ -19,8 +24,10 @@ internal sealed class CaretLeft : IEditCommand
 
         if (justBeforeCaret != null)
         {
-            position.Line = justBeforeCaret.StartLine;
-            position.Column = justBeforeCaret.StartColumn;
+            var foldStartLine = editor.Document.GetLineSegmentByOffset(justBeforeCaret.StartOffset);
+            var foldStartColumn = justBeforeCaret.StartOffset - foldStartLine.Offset;
+            position.Line = foldStartLine.LineNumber;
+            position.Column = foldStartColumn;
         }
         else
         {
@@ -32,11 +39,11 @@ internal sealed class CaretLeft : IEditCommand
             {
                 var lineAbove = editor.Document.GetLineSegment(position.Line - 1);
                 position.Column = lineAbove.Length;
-                position.Line = position.Line - 1;
+                position.Line -= 1;
             }
         }
 
-        editor.Caret.Position = position;
+        caret.Position = position;
         //textArea.setDesiredColumn();
     }
 }
@@ -45,23 +52,26 @@ internal sealed class CaretRight : IEditCommand
 {
     public void Execute(TextEditor editor)
     {
-        var curLine = editor.Document.GetLineSegment(editor.Caret.Line);
-        var position = editor.Caret.Position;
-        var foldings = editor.Document.FoldingManager.GetFoldedFoldingsWithStart(position.Line);
+        var caret = editor.Caret;
+        var curLine = editor.Document.GetLineSegment(caret.Line);
+        var position = caret.Position;
+        var foldings = editor.Document.FoldingManager.GetFoldingsAt(caret.Offset);
         FoldingSegment? justBehindCaret = null;
-        foreach (var fm in foldings)
+        foreach (var fs in foldings)
         {
-            if (fm.StartColumn == position.Column)
+            if (fs.IsFolded)
             {
-                justBehindCaret = fm;
+                justBehindCaret = fs;
                 break;
             }
         }
 
         if (justBehindCaret != null)
         {
-            position.Line = justBehindCaret.EndLine;
-            position.Column = justBehindCaret.EndColumn;
+            var foldEndLine = editor.Document.GetLineSegmentByOffset(justBehindCaret.EndOffset);
+            var foldEndColumn = justBehindCaret.EndOffset - foldEndLine.Offset;
+            position.Line = foldEndLine.LineNumber;
+            position.Column = foldEndColumn;
         }
         else
         {
@@ -77,7 +87,7 @@ internal sealed class CaretRight : IEditCommand
             }
         }
 
-        editor.Caret.Position = position;
+        caret.Position = position;
         //textArea.setDesiredColumn();
     }
 }

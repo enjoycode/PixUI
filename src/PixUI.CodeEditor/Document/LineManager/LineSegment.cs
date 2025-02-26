@@ -26,7 +26,7 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
     ///   nodeTotalLength = left.nodeTotalLength + documentLine.TotalLength + right.nodeTotalLength
     /// </summary>
     internal int NodeTotalLength { get; set; }
-    
+
     internal LineSegment InitLineNode()
     {
         NodeTotalCount = 1;
@@ -404,79 +404,93 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
 
     private void BuildParagraphByFoldings(ParagraphBuilder pb, TextEditor editor)
     {
-        // there can't be a folding witch starts in an above line and ends here,
+        // there can't be a folding with starts in an above line and ends here,
         // because the line is a new one, there must be a return before this line.
 
-        var line = LineNumber;
-        var column = -1;
+        var startOffset = Offset;
+        var nextLineStartOffset = Offset + TotalLength;
         var lineChars = 0; //used for calc fold offset in line
+        var foldingManager = editor.Document.FoldingManager;
         FoldingSegment? preFold = null;
+        LineSegment? preFoldEndLine = null;
 
         while (true)
         {
-            var starts = editor.Document.FoldingManager.GetFoldedFoldingsWithStartAfterColumn(line, column);
-            if (starts.Count <= 0)
+            //find first folded after startOffset
+            FoldingSegment? folded = null;
+            var after = foldingManager.FindFirstWithStartAfter(startOffset);
+            while (after != null)
             {
-                if (line == LineNumber)
+                if (after.StartOffset >= nextLineStartOffset)
                 {
-                    //current line has no fold
+                    break;
+                }
+
+                if (after.IsFolded)
+                {
+                    folded = after;
+                    break;
+                }
+
+                after = foldingManager.GetNextFolding(after);
+            }
+
+            if (folded == null)
+            {
+                if (preFold == null)
+                {
+                    //current line has no folded
                     BuildParagraphByTokens(pb, editor, 0, TextLocation.MaxColumn);
                 }
                 else
                 {
-                    //has no fold follow
-                    var endLine = editor.Document.GetLineSegment(preFold!.EndLine);
-                    endLine.BuildParagraphByTokens(pb, editor, preFold!.EndColumn, TextLocation.MaxColumn);
+                    //has no folded follow
+                    var preFoldEndColumn = preFold.EndOffset - preFoldEndLine!.Offset;
+                    preFoldEndLine.BuildParagraphByTokens(pb, editor, preFoldEndColumn, TextLocation.MaxColumn);
                 }
 
                 break;
             }
 
-            //search the first starting folding
-            var firstFolding = starts[0];
-            foreach (var fm in starts)
-            {
-                if (fm.StartColumn < firstFolding.StartColumn)
-                    firstFolding = fm;
-            }
+            //found folded at this line
+            var foldedStartLineSegment = editor.Document.GetLineSegmentByOffset(folded.StartOffset);
+            var foldedStartColumn = folded.StartOffset - foldedStartLineSegment.Offset;
+            var foldedEndLineSegment = editor.Document.GetLineSegmentByOffset(folded.EndOffset);
 
-            starts.Clear();
-
-            if (line == LineNumber)
+            if (preFold == null)
             {
-                if (firstFolding.StartColumn > 0)
+                if (foldedStartColumn > 0)
                 {
                     //eg: if (xxx) {
                     //             -> fold start here
-                    BuildParagraphByTokens(pb, editor, 0, firstFolding.StartColumn);
-                    lineChars += firstFolding.StartColumn;
+                    BuildParagraphByTokens(pb, editor, 0, foldedStartColumn);
+                    lineChars += foldedStartColumn;
                 }
             }
             else
             {
                 //eg: if (xxx) {...} else {...}
                 //             <---> preFold here
-                var endLine = editor.Document.GetLineSegment(preFold!.EndLine);
-                endLine.BuildParagraphByTokens(pb, editor, preFold!.EndColumn, firstFolding.StartColumn);
-                lineChars += firstFolding.StartColumn - preFold.EndColumn;
+                var preFoldEndColumn = preFold.EndOffset - preFoldEndLine!.Offset;
+                preFoldEndLine.BuildParagraphByTokens(pb, editor, preFoldEndColumn, foldedStartColumn);
+                lineChars += foldedStartColumn - preFoldEndColumn;
             }
 
             // add folded text
             pb.PushStyle(editor.Theme.FoldedTextStyle);
-            pb.AddText(firstFolding.FoldText);
+            pb.AddText(folded.FoldedText);
             pb.Pop();
             CachedFolds ??= new List<CachedFoldInfo>();
-            CachedFolds.Add(new CachedFoldInfo(lineChars, firstFolding));
-            lineChars += firstFolding.FoldText.Length;
+            CachedFolds.Add(new CachedFoldInfo(lineChars, folded));
+            lineChars += folded.FoldedText.Length;
 
             // goto next iterator
-            column = firstFolding.EndColumn;
-            line = firstFolding.EndLine;
-            preFold = firstFolding;
-            if (line >= editor.Document.TotalNumberOfLines)
-            {
+            startOffset = folded.EndOffset;
+            nextLineStartOffset = foldedEndLineSegment.Offset + foldedEndLineSegment.TotalLength;
+            preFold = folded;
+            preFoldEndLine = foldedEndLineSegment;
+            if (startOffset >= editor.Document.TextLength)
                 break;
-            }
         } //end while
     }
 
@@ -503,9 +517,11 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
         var offsetInLine = -1;
         foreach (var fold in CachedFolds!)
         {
-            if (line == fold.FoldingSegment.EndLine)
+            var foldEndLine = editor.Document.GetLineSegmentByOffset(fold.FoldingSegment.EndOffset);
+            if (line == foldEndLine.LineNumber)
             {
-                offsetInLine = fold.LineEnd + column - fold.FoldingSegment.EndColumn;
+                var foldEndColumn = fold.FoldingSegment.EndOffset - foldEndLine.Offset;
+                offsetInLine = fold.LineEnd + column - foldEndColumn;
                 break;
             }
         }
@@ -561,5 +577,5 @@ internal readonly struct CachedFoldInfo
     internal readonly int LineStart;
     internal readonly FoldingSegment FoldingSegment;
 
-    internal int LineEnd => LineStart + FoldingSegment.FoldText.Length;
+    internal int LineEnd => LineStart + FoldingSegment.FoldedText.Length;
 }

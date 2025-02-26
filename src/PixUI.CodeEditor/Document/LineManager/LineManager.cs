@@ -37,19 +37,19 @@ public sealed class LineManager
         var v = 0;
         var foldEnd = 0;
         var foldings = _document.FoldingManager.GetTopLevelFoldedFoldings();
-        foreach (var fm in foldings)
+        foreach (var fs in foldings)
         {
-            if (fm.StartLine >= foldEnd)
+            var fsStartLine = _document.GetLineNumberByOffset(fs.StartOffset);
+            if (fsStartLine >= foldEnd)
             {
-                if (v + fm.StartLine - foldEnd >= visibleLineNumber)
+                if (v + fsStartLine - foldEnd >= visibleLineNumber)
                     break;
 
-                v += fm.StartLine - foldEnd;
-                foldEnd = fm.EndLine;
+                v += fsStartLine - foldEnd;
+                var fsEndLine = _document.GetLineNumberByOffset(fs.EndOffset);
+                foldEnd = fsEndLine;
             }
         }
-
-        foldings.Clear();
 
         return foldEnd + visibleLineNumber - v;
     }
@@ -62,22 +62,22 @@ public sealed class LineManager
         var visibleLine = 0;
         var foldEnd = 0;
         var foldings = _document.FoldingManager.GetTopLevelFoldedFoldings();
-        foreach (var fm in foldings)
+        foreach (var fs in foldings)
         {
-            if (fm.StartLine >= logicalLineNumber)
+            var fsStartLine = _document.GetLineNumberByOffset(fs.StartOffset);
+            if (fsStartLine >= logicalLineNumber)
                 break;
 
-            if (fm.StartLine >= foldEnd)
+            if (fsStartLine >= foldEnd)
             {
-                visibleLine += fm.StartLine - foldEnd;
-                if (fm.EndLine > logicalLineNumber)
+                var fsEndLine = _document.GetLineNumberByOffset(fs.EndOffset);
+                visibleLine += fsStartLine - foldEnd;
+                if (fsEndLine > logicalLineNumber)
                     return visibleLine;
 
-                foldEnd = fm.EndLine;
+                foldEnd = fsEndLine;
             }
         }
-
-        foldings.Clear();
 
         // Debug.Assert(logicalLineNumber >= foldEnd);
         visibleLine += logicalLineNumber - foldEnd;

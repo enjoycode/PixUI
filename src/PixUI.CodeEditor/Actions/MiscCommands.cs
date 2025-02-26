@@ -15,7 +15,7 @@ internal sealed class BackspaceCommand : IEditCommand
         var caretOffset = editor.Caret.Offset;
         if (caretOffset <= 0) return;
 
-        var curLineNr = editor.Document.GetLineNumberForOffset(caretOffset);
+        var curLineNr = editor.Document.GetLineNumberByOffset(caretOffset);
         var curLine = editor.Document.GetLineSegment(curLineNr);
         var curLineOffset = curLine.Offset;
         if (curLineOffset == caretOffset)

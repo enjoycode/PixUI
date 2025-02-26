@@ -129,10 +129,10 @@ public sealed class Document : IDisposable
     #region ====Position Methods====
 
     /// Returns a valid line number for the given offset.
-    public int GetLineNumberForOffset(int offset) => _lineManager.GetLineNumberByOffset(offset);
+    public int GetLineNumberByOffset(int offset) => _lineManager.GetLineNumberByOffset(offset);
 
     /// Returns a [LineSegment] for the given offset.
-    public LineSegment GetLineSegmentForOffset(int offset) => _lineManager.GetLineSegmentByOffset(offset);
+    public LineSegment GetLineSegmentByOffset(int offset) => _lineManager.GetLineSegmentByOffset(offset);
 
     public LineSegment GetLineSegment(int lineNumber) => _lineManager.GetLineSegment(lineNumber);
 
@@ -151,7 +151,7 @@ public sealed class Document : IDisposable
     /// returns the logical line/column position from an offset
     public TextLocation OffsetToPosition(int offset)
     {
-        var lineNumber = GetLineNumberForOffset(offset);
+        var lineNumber = GetLineNumberByOffset(offset);
         var line = GetLineSegment(lineNumber);
         return new TextLocation(offset - line.Offset, lineNumber);
     }
@@ -165,47 +165,47 @@ public sealed class Document : IDisposable
         return Math.Min(TextLength, line.Offset + Math.Min(line.Length, position.Column));
     }
 
-    internal void UpdateSegmentsOnDocumentChanged<T>(IList<T> list, DocumentEventArgs e)
-        where T : ISegment
-    {
-        var removedCharacters = e.Length > 0 ? e.Length : 0;
-        var insertedCharacters = string.IsNullOrEmpty(e.Text) ? 0 : e.Text.Length;
-        for (var i = 0; i < list.Count; ++i)
-        {
-            ISegment s = list[i];
-            var segmentStart = s.Offset;
-            var segmentEnd = s.Offset + s.Length;
-
-            if (e.Offset <= segmentStart)
-            {
-                segmentStart -= removedCharacters;
-                if (segmentStart < e.Offset) segmentStart = e.Offset;
-            }
-
-            if (e.Offset < segmentEnd)
-            {
-                segmentEnd -= removedCharacters;
-                if (segmentEnd < e.Offset) segmentEnd = e.Offset;
-            }
-
-            // Debug.Assert(segmentStart <= segmentEnd);
-
-            if (segmentStart == segmentEnd)
-            {
-                list.RemoveAt(i);
-                --i;
-                continue;
-            }
-
-            if (e.Offset <= segmentStart) segmentStart += insertedCharacters;
-            if (e.Offset < segmentEnd) segmentEnd += insertedCharacters;
-
-            // Debug.Assert(segmentStart < segmentEnd);
-
-            s.Offset = segmentStart;
-            s.Length = segmentEnd - segmentStart;
-        }
-    }
+    // internal void UpdateSegmentsOnDocumentChanged<T>(IList<T> list, DocumentEventArgs e)
+    //     where T : ISegment
+    // {
+    //     var removedCharacters = e.Length > 0 ? e.Length : 0;
+    //     var insertedCharacters = string.IsNullOrEmpty(e.Text) ? 0 : e.Text.Length;
+    //     for (var i = 0; i < list.Count; ++i)
+    //     {
+    //         ISegment s = list[i];
+    //         var segmentStart = s.Offset;
+    //         var segmentEnd = s.Offset + s.Length;
+    //
+    //         if (e.Offset <= segmentStart)
+    //         {
+    //             segmentStart -= removedCharacters;
+    //             if (segmentStart < e.Offset) segmentStart = e.Offset;
+    //         }
+    //
+    //         if (e.Offset < segmentEnd)
+    //         {
+    //             segmentEnd -= removedCharacters;
+    //             if (segmentEnd < e.Offset) segmentEnd = e.Offset;
+    //         }
+    //
+    //         // Debug.Assert(segmentStart <= segmentEnd);
+    //
+    //         if (segmentStart == segmentEnd)
+    //         {
+    //             list.RemoveAt(i);
+    //             --i;
+    //             continue;
+    //         }
+    //
+    //         if (e.Offset <= segmentStart) segmentStart += insertedCharacters;
+    //         if (e.Offset < segmentEnd) segmentEnd += insertedCharacters;
+    //
+    //         // Debug.Assert(segmentStart < segmentEnd);
+    //
+    //         s.Offset = segmentStart;
+    //         s.Length = segmentEnd - segmentStart;
+    //     }
+    // }
 
     #endregion
 

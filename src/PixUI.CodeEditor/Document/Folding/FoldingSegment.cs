@@ -1,148 +1,41 @@
-using System;
-
 namespace CodeEditor;
 
-public enum FoldType
+public sealed class FoldingSegment : TextSegment
 {
-    Unspecified,
-    MemberBody,
-    Region,
-    TypeBody
-}
-
-public sealed class FoldingSegment : ISegment, IComparable<FoldingSegment>
-{
-    public FoldingSegment(Document document,
-        int startLine, int startColumn,
-        int endLine, int endColumn, FoldType foldType,
-        string? foldText = null, bool isFolded = false)
+    public FoldingSegment(int startOffset, int length, string foldedText = "...", bool isFolded = false)
     {
-        _document = document;
+        StartOffset = startOffset;
+        Length = length;
+        FoldedText = foldedText;
         IsFolded = isFolded;
-        _foldType = foldType;
-        FoldText = string.IsNullOrEmpty(foldText) ? "..." : foldText;
-
-        startLine = Math.Min(_document.TotalNumberOfLines - 1, Math.Max(startLine, 0));
-        var startLineSegment = _document.GetLineSegment(startLine);
-
-        endLine = Math.Min(document.TotalNumberOfLines - 1, Math.Max(endLine, 0));
-        var endLineSegment = _document.GetLineSegment(endLine);
-
-        _offset = startLineSegment.Offset + Math.Min(startColumn, startLineSegment.Length);
-        _length = endLineSegment.Offset + Math.Min(endColumn, endLineSegment.Length) - _offset;
     }
 
-    private readonly Document _document;
-    internal bool IsFolded;
-    private FoldType _foldType;
-    internal string FoldText { get; }
+    /// <summary>
+    /// Gets/sets if the section is folded.
+    /// </summary>
+    public bool IsFolded { get; internal set; }
 
-    private int _startLine = -1;
-    private int _startColumn;
-    private int _endLine = -1;
-    private int _endColumn;
+    /// <summary>
+    /// Gets/Sets the text used to display the collapsed version of the folding section.
+    /// </summary>
+    public string FoldedText { get; internal set; }
 
-    private int _offset;
-    private int _length;
+    /// <summary>
+    /// Gets/Sets an additional object associated with this folding section.
+    /// </summary>
+    public object? Tag { get; set; }
 
-    public int Offset
+    internal TextLocation GetStartLocation(Document document)
     {
-        get => _offset;
-        set
-        {
-            _offset = value;
-            _startLine = _endLine = -1;
-        }
+        var line = document.GetLineSegmentByOffset(StartOffset);
+        var column = StartOffset - line.Offset;
+        return new TextLocation(column, line.LineNumber);
     }
 
-    public int Length
+    internal TextLocation GetEndLocation(Document document)
     {
-        get => _length;
-        set
-        {
-            _length = value;
-            _endLine = -1;
-        }
-    }
-
-    public int StartLine
-    {
-        get
-        {
-            if (_startLine < 0) GetStartPointForOffset(Offset);
-            return _startLine;
-        }
-    }
-
-    public int StartColumn
-    {
-        get
-        {
-            if (_startLine < 0) GetStartPointForOffset(Offset);
-            return _startColumn;
-        }
-    }
-
-    public int EndLine
-    {
-        get
-        {
-            if (_endLine < 0) GetEndPointForOffset(Offset + Length);
-            return _endLine;
-        }
-    }
-
-    public int EndColumn
-    {
-        get
-        {
-            if (_endLine < 0) GetEndPointForOffset(Offset + Length);
-            return _endColumn;
-        }
-    }
-
-    private void GetStartPointForOffset(int offset)
-    {
-        if (offset > _document.TextLength)
-        {
-            _startLine = _document.TotalNumberOfLines + 1;
-            _startColumn = 1;
-        }
-        else if (offset < 0)
-        {
-            _startLine = _startColumn = -1;
-        }
-        else
-        {
-            _startLine = _document.GetLineNumberForOffset(offset);
-            _startColumn = offset - _document.GetLineSegment(_startLine).Offset;
-        }
-    }
-
-    private void GetEndPointForOffset(int offset)
-    {
-        if (offset > _document.TextLength)
-        {
-            _endLine = _document.TotalNumberOfLines + 1;
-            _endColumn = 1;
-        }
-        else if (offset < 0)
-        {
-            _endLine = _endColumn = -1;
-        }
-        else
-        {
-            _endLine = _document.GetLineNumberForOffset(offset);
-            _endColumn = offset - _document.GetLineSegment(_endLine).Offset;
-        }
-    }
-
-    public int CompareTo(FoldingSegment? other)
-    {
-        if (other == null) return 1;
-
-        return Offset != other.Offset
-            ? Offset.CompareTo(other.Offset)
-            : Length.CompareTo(other.Length);
+        var line = document.GetLineSegmentByOffset(EndOffset);
+        var column = EndOffset - line.Offset;
+        return new TextLocation(column, line.LineNumber);
     }
 }

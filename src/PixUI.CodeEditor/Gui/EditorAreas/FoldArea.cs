@@ -7,7 +7,7 @@ internal sealed class FoldArea : EditorArea
 {
     public FoldArea(TextEditor textEditor) : base(textEditor) { }
 
-    private int _selectedFoldLine = -1;
+    // private int _selectedFoldLine = -1;
 
     private static Paint GetNormalPaint()
     {
@@ -21,10 +21,10 @@ internal sealed class FoldArea : EditorArea
 
     private bool SelectedFoldingFrom(IList<FoldingSegment> list)
     {
-        foreach (var fm in list)
-        {
-            if (_selectedFoldLine == fm.StartLine) return true;
-        }
+        // foreach (var fm in list)
+        // {
+        //     if (_selectedFoldLine == fm.StartLine) return true;
+        // }
 
         return false;
     }
@@ -40,24 +40,31 @@ internal sealed class FoldArea : EditorArea
         if (realLine < 0 || realLine + 1 >= Document.TotalNumberOfLines)
             return;
 
-        var foldings = Document.FoldingManager.GetFoldingsWithStart(realLine);
-        foreach (var fm in foldings)
+        var line = Document.GetLineSegment(realLine);
+        var changed = false;
+        // find foldings start at this line
+        //var foldings = Document.FoldingManager.GetFoldingsWithStart(realLine);
+        var fs = Document.FoldingManager.FindFirstWithStartAfter(line.Offset);
+        while (fs != null)
         {
-            fm.IsFolded = !fm.IsFolded;
+            if (fs.StartOffset >= line.Offset + line.TotalLength)
+                break;
+            fs.IsFolded = !fs.IsFolded;
+            changed = true;
+            fs = Document.FoldingManager.GetNextFolding(fs);
         }
 
+        if (!changed)
+            return;
+
         // clear line cached paragraph
-        var line = Document.GetLineSegment(realLine);
         line.ClearCachedParagraph();
         // update the caret position
         TextEditor.Caret.UpdateCaretPosition();
         // notify folding changed
-        if (foldings.Count > 0)
-        {
-            Document.FoldingManager.RaiseFoldingsChanged();
-            // TODO:重绘范围
-            TextEditor.Controller.Widget.RequestInvalidate(true, null);
-        }
+        Document.FoldingManager.RaiseFoldingsChanged();
+        // TODO:重绘范围
+        TextEditor.Controller.Widget.RequestInvalidate(true, null);
     }
 
     internal override void Paint(Canvas canvas, Rect rect)
@@ -87,109 +94,109 @@ internal sealed class FoldArea : EditorArea
                 var currentLine = Document.GetFirstLogicalLine(TextEditor.TextView.FirstPhysicalLine + y);
                 if (currentLine < Document.TotalNumberOfLines)
                 {
-                    PaintFoldMarker(canvas, currentLine, markerRect);
+                    // PaintFoldMarker(canvas, currentLine, markerRect);
                 }
             }
         }
     }
 
-    private void PaintFoldMarker(Canvas canvas, int lineNumber, Rect rect)
-    {
-        var foldingManager = Document.FoldingManager;
-        //TODO: 优化一次循环
-        var foldingsWithStart = foldingManager.GetFoldingsWithStart(lineNumber);
-        var foldingsBetween = foldingManager.GetFoldingsContainsLineNumber(lineNumber);
-        var foldingsWithEnd = foldingManager.GetFoldingsWithEnd(lineNumber);
+    // private void PaintFoldMarker(Canvas canvas, int lineNumber, Rect rect)
+    // {
+    //     var foldingManager = Document.FoldingManager;
+    //     //TODO: 优化一次循环
+    //     var foldingsWithStart = foldingManager.GetFoldingsWithStart(lineNumber);
+    //     var foldingsBetween = foldingManager.GetFoldingsContainsLineNumber(lineNumber);
+    //     var foldingsWithEnd = foldingManager.GetFoldingsWithEnd(lineNumber);
+    //
+    //     var isFoldStart = foldingsWithStart.Count > 0;
+    //     var isBetween = foldingsBetween.Count > 0;
+    //     var isFoldEnd = foldingsWithEnd.Count > 0;
+    //
+    //     var isStartSelected = SelectedFoldingFrom(foldingsWithStart);
+    //     var isBetweenSelected = SelectedFoldingFrom(foldingsBetween);
+    //     var isEndSelected = SelectedFoldingFrom(foldingsWithEnd);
+    //
+    //     var foldMarkerSize = TextEditor.TextView.FontHeight * 0.57f;
+    //     foldMarkerSize -= foldMarkerSize % 2;
+    //     var foldMarkerYPos = rect.Top + (rect.Height - foldMarkerSize) / 2;
+    //     var xPos = rect.Left + (rect.Width - foldMarkerSize) / 2 + foldMarkerSize / 2;
+    //
+    //     if (isFoldStart)
+    //     {
+    //         var isVisible = true;
+    //         var moreLinedOpenFold = false;
+    //         foreach (var fm in foldingsWithStart)
+    //         {
+    //             if (fm.IsFolded)
+    //                 isVisible = false;
+    //             else
+    //                 moreLinedOpenFold = fm.EndLine > fm.StartLine;
+    //         }
+    //
+    //         var isFoldEndFromUpperFold = false;
+    //         foreach (var fm in foldingsWithEnd)
+    //         {
+    //             if (fm.EndLine > fm.StartLine && !fm.IsFolded)
+    //                 isFoldEndFromUpperFold = true;
+    //         }
+    //
+    //         PaintMarker(canvas,
+    //             Rect.FromLTWH(rect.Left + (rect.Width - foldMarkerSize) / 2f,
+    //                 foldMarkerYPos, foldMarkerSize, foldMarkerSize),
+    //             isVisible, isStartSelected);
+    //
+    //         // paint line above fold marker
+    //         if (isBetween || isFoldEndFromUpperFold)
+    //         {
+    //             canvas.DrawLine(xPos, rect.Top, xPos, foldMarkerYPos - 1,
+    //                 isBetweenSelected ? GetSelectedPaint() : GetNormalPaint());
+    //         }
+    //
+    //         // paint line below fold marker
+    //         if (isBetween || moreLinedOpenFold)
+    //         {
+    //             canvas.DrawLine(
+    //                 xPos, foldMarkerYPos + foldMarkerSize + 1,
+    //                 xPos, rect.Bottom,
+    //                 isEndSelected || (isStartSelected && isVisible) || isBetweenSelected
+    //                     ? GetSelectedPaint()
+    //                     : GetNormalPaint());
+    //         }
+    //     }
+    //     else
+    //     {
+    //         if (isFoldEnd)
+    //         {
+    //             var midY = rect.Top + rect.Height / 2;
+    //
+    //             // paint fold end marker
+    //             canvas.DrawLine(
+    //                 xPos, midY,
+    //                 xPos + foldMarkerSize / 2, midY,
+    //                 isEndSelected ? GetSelectedPaint() : GetNormalPaint());
+    //
+    //             // paint line above fold end marker
+    //             // must be drawn after fold marker because it might have a different color than the fold marker
+    //             canvas.DrawLine(xPos, rect.Top, xPos, midY,
+    //                 isBetweenSelected || isEndSelected ? GetSelectedPaint() : GetNormalPaint());
+    //
+    //             // paint line below fold end marker
+    //             if (isBetween)
+    //             {
+    //                 canvas.DrawLine(xPos, midY + 1, xPos, rect.Bottom,
+    //                     isBetweenSelected ? GetSelectedPaint() : GetNormalPaint());
+    //             }
+    //         }
+    //         else if (isBetween)
+    //         {
+    //             // just paint the line
+    //             canvas.DrawLine(xPos, rect.Top, xPos, rect.Bottom,
+    //                 isBetweenSelected ? GetSelectedPaint() : GetNormalPaint());
+    //         }
+    //     }
+    // }
 
-        var isFoldStart = foldingsWithStart.Count > 0;
-        var isBetween = foldingsBetween.Count > 0;
-        var isFoldEnd = foldingsWithEnd.Count > 0;
-
-        var isStartSelected = SelectedFoldingFrom(foldingsWithStart);
-        var isBetweenSelected = SelectedFoldingFrom(foldingsBetween);
-        var isEndSelected = SelectedFoldingFrom(foldingsWithEnd);
-
-        var foldMarkerSize = TextEditor.TextView.FontHeight * 0.57f;
-        foldMarkerSize -= foldMarkerSize % 2;
-        var foldMarkerYPos = rect.Top + (rect.Height - foldMarkerSize) / 2;
-        var xPos = rect.Left + (rect.Width - foldMarkerSize) / 2 + foldMarkerSize / 2;
-
-        if (isFoldStart)
-        {
-            var isVisible = true;
-            var moreLinedOpenFold = false;
-            foreach (var fm in foldingsWithStart)
-            {
-                if (fm.IsFolded)
-                    isVisible = false;
-                else
-                    moreLinedOpenFold = fm.EndLine > fm.StartLine;
-            }
-
-            var isFoldEndFromUpperFold = false;
-            foreach (var fm in foldingsWithEnd)
-            {
-                if (fm.EndLine > fm.StartLine && !fm.IsFolded)
-                    isFoldEndFromUpperFold = true;
-            }
-
-            PaintMarker(canvas,
-                Rect.FromLTWH(rect.Left + (rect.Width - foldMarkerSize) / 2f,
-                    foldMarkerYPos, foldMarkerSize, foldMarkerSize),
-                isVisible, isStartSelected);
-
-            // paint line above fold marker
-            if (isBetween || isFoldEndFromUpperFold)
-            {
-                canvas.DrawLine(xPos, rect.Top, xPos, foldMarkerYPos - 1,
-                    isBetweenSelected ? GetSelectedPaint() : GetNormalPaint());
-            }
-
-            // paint line below fold marker
-            if (isBetween || moreLinedOpenFold)
-            {
-                canvas.DrawLine(
-                    xPos, foldMarkerYPos + foldMarkerSize + 1,
-                    xPos, rect.Bottom,
-                    isEndSelected || (isStartSelected && isVisible) || isBetweenSelected
-                        ? GetSelectedPaint()
-                        : GetNormalPaint());
-            }
-        }
-        else
-        {
-            if (isFoldEnd)
-            {
-                var midY = rect.Top + rect.Height / 2;
-
-                // paint fold end marker
-                canvas.DrawLine(
-                    xPos, midY,
-                    xPos + foldMarkerSize / 2, midY,
-                    isEndSelected ? GetSelectedPaint() : GetNormalPaint());
-
-                // paint line above fold end marker
-                // must be drawn after fold marker because it might have a different color than the fold marker
-                canvas.DrawLine(xPos, rect.Top, xPos, midY,
-                    isBetweenSelected || isEndSelected ? GetSelectedPaint() : GetNormalPaint());
-
-                // paint line below fold end marker
-                if (isBetween)
-                {
-                    canvas.DrawLine(xPos, midY + 1, xPos, rect.Bottom,
-                        isBetweenSelected ? GetSelectedPaint() : GetNormalPaint());
-                }
-            }
-            else if (isBetween)
-            {
-                // just paint the line
-                canvas.DrawLine(xPos, rect.Top, xPos, rect.Bottom,
-                    isBetweenSelected ? GetSelectedPaint() : GetNormalPaint());
-            }
-        }
-    }
-
-    private void PaintMarker(Canvas canvas, Rect rect, bool isOpened, bool isSelected)
+    private static void PaintMarker(Canvas canvas, Rect rect, bool isOpened, bool isSelected)
     {
         canvas.DrawRect(Rect.FromLTWH(rect.Left, rect.Top, rect.Width, rect.Height),
             isSelected ? GetSelectedPaint() : GetNormalPaint());

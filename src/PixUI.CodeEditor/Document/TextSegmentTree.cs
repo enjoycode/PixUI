@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace CodeEditor;
 /// <remarks><inheritdoc cref="TextSegment"/></remarks>
 /// <see cref="TextSegment"/>
 internal sealed class TextSegmentTree<T> : RedBlackTree<TextSegment>, ISegmentTree, ICollection<T>
-    where T : TextSegment, IRedBlackTreeNode<T>
+    where T : TextSegment
 {
     #region ====FirstSegment/LastSegment====
 
@@ -44,7 +45,7 @@ internal sealed class TextSegmentTree<T> : RedBlackTree<TextSegment>, ISegmentTr
     {
         if (!Contains(segment))
             throw new ArgumentException("segment is not inside the segment tree");
-        return segment.Successor();
+        return (T?)((TextSegment)segment).Successor();
     }
 
     /// <summary>
@@ -56,7 +57,7 @@ internal sealed class TextSegmentTree<T> : RedBlackTree<TextSegment>, ISegmentTr
     {
         if (!Contains(segment))
             throw new ArgumentException("segment is not inside the segment tree");
-        return segment.Predecessor();
+        return (T?)((TextSegment)segment).Predecessor();
     }
 
     #endregion
@@ -128,6 +129,188 @@ internal sealed class TextSegmentTree<T> : RedBlackTree<TextSegment>, ISegmentTr
                 // didn't find any node containing the offset
                 return null;
             }
+        }
+    }
+
+    #endregion
+
+    #region ====FindOverlappingSegments====
+
+    /// <summary>
+    /// Finds all segments that contain the given offset.
+    /// (StartOffset &lt;= offset &lt;= EndOffset)
+    /// Segments are returned in the order given by GetNextSegment/GetPreviousSegment.
+    /// </summary>
+    /// <returns>Returns a new collection containing the results of the query.
+    /// This means it is safe to modify the TextSegmentCollection while iterating through the result collection.</returns>
+    public ReadOnlyCollection<T> FindSegmentsContaining(int offset)
+    {
+        return FindOverlappingSegments(offset, 0);
+    }
+
+    /// <summary>
+    /// Finds all segments that overlap with the given segment (including touching segments).
+    /// </summary>
+    /// <returns>Returns a new collection containing the results of the query.
+    /// This means it is safe to modify the TextSegmentCollection while iterating through the result collection.</returns>
+    public ReadOnlyCollection<T> FindOverlappingSegments(ISegment segment)
+    {
+        ArgumentNullException.ThrowIfNull(segment);
+        return FindOverlappingSegments(segment.Offset, segment.Length);
+    }
+
+    /// <summary>
+    /// Finds all segments that overlap with the given segment (including touching segments).
+    /// Segments are returned in the order given by GetNextSegment/GetPreviousSegment.
+    /// </summary>
+    /// <returns>Returns a new collection containing the results of the query.
+    /// This means it is safe to modify the TextSegmentCollection while iterating through the result collection.</returns>
+    public ReadOnlyCollection<T> FindOverlappingSegments(int offset, int length)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(length);
+
+        var results = new List<T>();
+        if (Root != null)
+        {
+            FindOverlappingSegments(results, Root, offset, offset + length);
+        }
+
+        return new ReadOnlyCollection<T>(results);
+    }
+
+    private static void FindOverlappingSegments(List<T> results, TextSegment node, int low, int high)
+    {
+        // low and high are relative to node.LeftMost startpos (not node.LeftMost.Offset)
+        if (high < 0)
+        {
+            // node is irrelevant for search because all intervals in node are after high
+            return;
+        }
+
+        // find values relative to node.Offset
+        var nodeLow = low - node.NodeLength;
+        var nodeHigh = high - node.NodeLength;
+        if (node.Left != null)
+        {
+            nodeLow -= node.Left.TotalNodeLength;
+            nodeHigh -= node.Left.TotalNodeLength;
+        }
+
+        if (node.DistanceToMaxEnd < nodeLow)
+        {
+            // node is irrelevant for search because all intervals in node are before low
+            return;
+        }
+
+        if (node.Left != null)
+            FindOverlappingSegments(results, node.Left, low, high);
+
+        if (nodeHigh < 0)
+        {
+            // node and everything in node.right is before low
+            return;
+        }
+
+        if (nodeLow <= node.SegmentLength)
+        {
+            results.Add((T)node);
+        }
+
+        if (node.Right != null)
+            FindOverlappingSegments(results, node.Right, nodeLow, nodeHigh);
+    }
+
+    #endregion
+
+    #region ====UpdateOffsets====
+    
+    public void UpdateOffsets(in DocumentEventArgs e)
+    {
+        // if (_isConnectedToDocument)
+        //     throw new InvalidOperationException("This TextSegmentCollection will automatically update offsets; do not call UpdateOffsets manually!");
+        // OnDocumentChanged(this, e);
+        
+        UpdateOffsetsInternal(new OffsetChangeEntry(e.Offset, e.Length, e.Text.Length));
+        
+        CheckProperties();
+    }
+
+    private void UpdateOffsetsInternal(in OffsetChangeEntry change)
+    {
+        // Special case pure insertions, because they don't always cause a text segment to increase in size when the replaced region
+        // is inside a segment (when offset is at start or end of a text semgent).
+        if (change.RemovalLength == 0)
+        {
+            InsertText(change.Offset, change.InsertionLength);
+        }
+        else
+        {
+            ReplaceText(change);
+        }
+    }
+
+    private void InsertText(int offset, int length)
+    {
+        if (length == 0)
+            return;
+
+        // enlarge segments that contain offset (excluding those that have offset as endpoint)
+        foreach (var segment in FindSegmentsContaining(offset))
+        {
+            if (segment.StartOffset < offset && offset < segment.EndOffset)
+            {
+                segment.Length += length;
+            }
+        }
+
+        // move start offsets of all segments >= offset
+        var node = FindFirstSegmentWithStartAfter(offset);
+        if (node != null)
+        {
+            node.NodeLength += length;
+            UpdateAfterChildrenChange(node);
+        }
+    }
+
+    private void ReplaceText(in OffsetChangeEntry change)
+    {
+        Debug.Assert(change.RemovalLength > 0);
+        var offset = change.Offset;
+        foreach (var segment in FindOverlappingSegments(offset, change.RemovalLength))
+        {
+            if (segment.StartOffset <= offset)
+            {
+                if (segment.EndOffset >= offset + change.RemovalLength)
+                {
+                    // Replacement inside segment: adjust segment length
+                    segment.Length += change.InsertionLength - change.RemovalLength;
+                }
+                else
+                {
+                    // Replacement starting inside segment and ending after segment end: set segment end to removal position
+                    //segment.EndOffset = offset;
+                    segment.Length = offset - segment.StartOffset;
+                }
+            }
+            else
+            {
+                // Replacement starting in front of text segment and running into segment.
+                // Keep segment.EndOffset constant and move segment.StartOffset to the end of the replacement
+                var remainingLength = segment.EndOffset - (offset + change.RemovalLength);
+                RemoveSegment(segment);
+                segment.StartOffset = offset + change.RemovalLength;
+                segment.Length = Math.Max(0, remainingLength);
+                AddSegment(segment);
+            }
+        }
+
+        // move start offsets of all segments > offset
+        var node = FindFirstSegmentWithStartAfter(offset + 1);
+        if (node != null)
+        {
+            Debug.Assert(node.NodeLength >= change.RemovalLength);
+            node.NodeLength += change.InsertionLength - change.RemovalLength;
+            UpdateAfterChildrenChange(node);
         }
     }
 

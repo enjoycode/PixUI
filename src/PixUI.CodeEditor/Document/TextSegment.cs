@@ -29,7 +29,6 @@ namespace CodeEditor;
 /// </para>
 /// </remarks>
 /// <seealso cref="ISegment"/>
-/// <seealso cref="AnchorSegment"/>
 /// <seealso cref="TextSegmentTree{T}"/>
 public class TextSegment : IRedBlackTreeNode<TextSegment>, ISegment
 {

@@ -65,50 +65,23 @@ public sealed class TreeSitterSyntaxParser : ISyntaxParser
             ? _edit.startPosition
             : TSPoint.FromLocation(Document.OffsetToPosition(offset + textLength));
 
-#if __WEB__
-        _oldTree?.Edit(_edit);
-#else
         _oldTree?.Edit(ref _edit);
-#endif
-        Parse();
-        Tokenize(_startLineOfChanged, _endLineOfChanged);
     }
 
     #endregion
 
     #region ====Parse & Tokenize====
 
-    public ValueTask<ValueTuple<int, int>> ParseAndTokenize() => new((_startLineOfChanged, _endLineOfChanged));
+    public ValueTask<ValueTuple<int, int>> ParseAndTokenize()
+    {
+        Parse();
+        Tokenize(_startLineOfChanged, _endLineOfChanged);
 
-    [TSRawScript(@"
-        public Parse(reset: boolean) {
-            let input = new CodeEditor.ParserInput(this._document.TextBuffer);
-            // @ts-ignore
-            let newTree = this._parser.parse(input.Read.bind(input), reset === true ? null : this._oldTree);
-
-            //获取变动范围
-            if (this._oldTree && !reset) {
-                let changes = newTree.getChangedRanges(this._oldTree);
-
-                this._oldTree.delete();
-
-                this._startLineOfChanged = this._edit.startPosition.row;
-                this._endLineOfChanged = this._startLineOfChanged + 1;
-                for (const range of changes) {
-                    this._startLineOfChanged = Math.min(this._startLineOfChanged, range.startPosition.row);
-                    this._endLineOfChanged = Math.max(this._endLineOfChanged, range.endPosition.row);
-                }
-            }
-            this._oldTree = newTree;
-
-            //生成FoldMarkers
-            let foldMarkers = this.Language.GenerateFoldMarkers(this._document);
-            this._document.FoldingManager.UpdateFoldings(foldMarkers);
-        }
-")]
+        return new((_startLineOfChanged, _endLineOfChanged));
+    }
+    
     private unsafe void Parse()
     {
-#if !__WEB__
         using var input = new ParserInput(Document.TextBuffer);
         var gcHandle = GCHandle.Alloc(input);
         var tsInput = new TSInput
@@ -163,8 +136,7 @@ public sealed class TreeSitterSyntaxParser : ISyntaxParser
 
         //生成FoldMarkers
         var foldMarkers = Language.GenerateFoldMarkers(Document);
-        Document.FoldingManager.UpdateFoldings(foldMarkers);
-#endif
+        Document.FoldingManager.UpdateFoldings(foldMarkers, 0);
     }
 
     /// <summary>

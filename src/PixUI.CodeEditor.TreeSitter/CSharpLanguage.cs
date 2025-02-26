@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace CodeEditor;
 
 internal sealed class CSharpLanguage : ICodeLanguage
@@ -308,30 +305,23 @@ initializer: [
 
     private TSQuery? _foldQuery;
 
-    public List<FoldingSegment>? GenerateFoldMarkers(Document document)
+    public IEnumerable<NewFolding> GenerateFoldMarkers(Document document)
     {
-        var syntaxParser = (TreeSitterSyntaxParser) document.SyntaxParser;
+        var syntaxParser = (TreeSitterSyntaxParser)document.SyntaxParser;
         var rootNode = syntaxParser.RootNode;
-        if (rootNode == null) return null;
+        if (rootNode == null)
+            yield break;
 
         _foldQuery ??= TSCSharpLanguage.Instance.Query(FoldQuery)!;
         var captures = _foldQuery.Captures(rootNode.Value);
-#if __WEB__
-            var lastNodeId = 0;
-#else
+
         var lastNodeId = IntPtr.Zero;
-#endif
-        var result = new List<FoldingSegment>();
         foreach (var capture in captures)
         {
             if (lastNodeId == capture.node.id) continue;
             lastNodeId = capture.node.id;
 
-#if __WEB__
-            var node = capture.node;
-#else
             var node = TSNode.Create(capture.node)!.Value;
-#endif
 
             //暂跳过同一行的
             if (node.StartPosition.row == node.EndPosition.row) continue;
@@ -339,13 +329,9 @@ initializer: [
             var startIndex = node.StartIndex / TreeSitterSyntaxParser.ParserEncoding;
             var endIndex = node.EndIndex / TreeSitterSyntaxParser.ParserEncoding;
 
-            var mark = new FoldingSegment(document, 0, 0, 0, 0, FoldType.TypeBody, "{...}");
-            mark.Offset = startIndex;
-            mark.Length = endIndex - startIndex;
-            result.Add(mark);
+            var folding = new NewFolding(startIndex, endIndex - startIndex, "{...}");
+            yield return folding;
         }
-
-        return result;
     }
 
     #endregion

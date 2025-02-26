@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using PixUI;
 
 namespace CodeEditor;
@@ -78,18 +79,20 @@ internal sealed class TextView : EditorArea //TODO: rename to TextArea
             foreach (var fold in line.CachedFolds)
             {
                 if (columnInLine < fold.LineStart) break;
+
+                var fsEndLocation = fold.FoldingSegment.GetEndLocation(Document);
                 if (columnInLine >= fold.LineStart && columnInLine < fold.LineEnd)
                 {
                     //in fold, TODO: nearest left or right
                     inFoldMarker = fold.FoldingSegment;
-                    lineNumber = fold.FoldingSegment.EndLine;
-                    column = fold.FoldingSegment.EndColumn;
+                    lineNumber = fsEndLocation.Line;
+                    column = fsEndLocation.Column;
                     break;
                 }
                 else if (columnInLine >= fold.LineEnd)
                 {
-                    lineNumber = fold.FoldingSegment.EndLine;
-                    column = fold.FoldingSegment.EndColumn + (columnInLine - fold.LineEnd);
+                    lineNumber = fsEndLocation.Line;
+                    column = fsEndLocation.Column + (columnInLine - fold.LineEnd);
                 }
             }
         }
@@ -112,24 +115,26 @@ internal sealed class TextView : EditorArea //TODO: rename to TextArea
     /// <returns>负值或大于TextView.Width表示超出可见范围(包括滚动偏移量 )</returns>
     internal float GetDrawingXPos(int logicalLine, int logicalColumn)
     {
-        var foldings = Document.FoldingManager.GetTopLevelFoldedFoldings();
+        var foldings = Document.FoldingManager.GetTopLevelFoldedFoldings().ToArray();
 
         // search the folding that's interesting
         var foldedLineNumber = -1;
-        for (var i = foldings.Count - 1; i >= 0; i--)
+        for (var i = foldings.Length - 1; i >= 0; i--)
         {
-            var f = foldings[i];
+            var fs = foldings[i];
+            var fsStartLine = Document.GetLineNumberByOffset(fs.StartOffset);
+            var fsEndLine = Document.GetLineNumberByOffset(fs.EndOffset);
             if (foldedLineNumber >= 0)
             {
                 // has found fold in pre iterator
-                if (f.EndLine == foldedLineNumber)
-                    foldedLineNumber = f.StartLine;
+                if (fsEndLine == foldedLineNumber)
+                    foldedLineNumber = fsStartLine;
                 else
                     break;
             }
-            else if (f.StartLine == logicalLine || f.EndLine == logicalLine)
+            else if (fsStartLine == logicalLine || fsEndLine == logicalLine)
             {
-                foldedLineNumber = f.StartLine;
+                foldedLineNumber = fsStartLine;
             }
         }
 

@@ -297,7 +297,7 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>
 
     private static int FindWordStart(Document document, int offset)
     {
-        var line = document.GetLineSegmentForOffset(offset);
+        var line = document.GetLineSegmentByOffset(offset);
 
         if (offset > 0 &&
             IsWhiteSpace(document.GetCharAt(offset - 1)) &&
@@ -335,7 +335,7 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>
 
     private static int FindWordEnd(Document document, int offset)
     {
-        var line = document.GetLineSegmentForOffset(offset);
+        var line = document.GetLineSegmentByOffset(offset);
         if (line.Length == 0) return offset;
         var endPos = line.Offset + line.Length;
         offset = Math.Min(offset, endPos - 1);

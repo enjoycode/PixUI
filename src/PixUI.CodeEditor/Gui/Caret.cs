@@ -17,11 +17,11 @@ public sealed class Caret
     }
 
     private readonly TextEditor _textEditor;
-    private int _line = 0;
-    private int _column = 0;
+    private int _line;
+    private int _column;
 
-    private float _caretPosX = 0;
-    private float _caretPosY = 0;
+    private float _caretPosX;
+    private float _caretPosY;
         
     internal event Action? PositionChanged;
 
