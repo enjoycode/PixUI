@@ -29,61 +29,6 @@ public sealed class LineManager
 
     public LineSegment GetLineSegment(int lineNumber) => _lineCollection.GetNodeByIndex(lineNumber);
 
-    public int GetFirstLogicalLine(int visibleLineNumber)
-    {
-        if (!_document.TextEditorOptions.EnableFolding)
-            return visibleLineNumber;
-
-        var v = 0;
-        var foldEnd = 0;
-        var foldings = _document.FoldingManager.GetTopLevelFoldedFoldings();
-        foreach (var fs in foldings)
-        {
-            var fsStartLine = _document.GetLineNumberByOffset(fs.StartOffset);
-            if (fsStartLine >= foldEnd)
-            {
-                if (v + fsStartLine - foldEnd >= visibleLineNumber)
-                    break;
-
-                v += fsStartLine - foldEnd;
-                var fsEndLine = _document.GetLineNumberByOffset(fs.EndOffset);
-                foldEnd = fsEndLine;
-            }
-        }
-
-        return foldEnd + visibleLineNumber - v;
-    }
-
-    public int GetVisibleLine(int logicalLineNumber)
-    {
-        if (!_document.TextEditorOptions.EnableFolding)
-            return logicalLineNumber;
-
-        var visibleLine = 0;
-        var foldEnd = 0;
-        var foldings = _document.FoldingManager.GetTopLevelFoldedFoldings();
-        foreach (var fs in foldings)
-        {
-            var fsStartLine = _document.GetLineNumberByOffset(fs.StartOffset);
-            if (fsStartLine >= logicalLineNumber)
-                break;
-
-            if (fsStartLine >= foldEnd)
-            {
-                var fsEndLine = _document.GetLineNumberByOffset(fs.EndOffset);
-                visibleLine += fsStartLine - foldEnd;
-                if (fsEndLine > logicalLineNumber)
-                    return visibleLine;
-
-                foldEnd = fsEndLine;
-            }
-        }
-
-        // Debug.Assert(logicalLineNumber >= foldEnd);
-        visibleLine += logicalLineNumber - foldEnd;
-        return visibleLine;
-    }
-
     public void SetContent(string text)
     {
         _lineCollection.Clear();
@@ -132,13 +77,13 @@ public sealed class LineManager
         if (ds == null)
         {
             // no newline is being inserted, all text is inserted in a single line
-            segment.InsertedLinePart(this, offset - segment.Offset, text.Length);
+            segment.InsertedLinePart(_document, offset - segment.Offset, text.Length);
             SetSegmentLength(segment, segment.TotalLength + text.Length);
             return;
         }
 
         var firstLine = segment;
-        firstLine.InsertedLinePart(this, offset - firstLine.Offset, ds.Value.Offset);
+        firstLine.InsertedLinePart(_document, offset - firstLine.Offset, ds.Value.Offset);
         var lastDelimiterEnd = 0;
         while (ds != null)
         {
@@ -160,7 +105,7 @@ public sealed class LineManager
         // insert rest after last delimiter
         if (lastDelimiterEnd != text.Length)
         {
-            segment.InsertedLinePart(this, 0, text.Length - lastDelimiterEnd);
+            segment.InsertedLinePart(_document, 0, text.Length - lastDelimiterEnd);
             SetSegmentLength(segment, segment.TotalLength + text.Length - lastDelimiterEnd);
         }
     }
@@ -175,7 +120,7 @@ public sealed class LineManager
         if (offset + length < startSegmentOffset + startSegment.TotalLength)
         {
             // just removing a part of this line segment
-            startSegment.RemovedLinePart(this, deferredEventList, offset - startSegmentOffset, length);
+            startSegment.RemovedLinePart(_document, deferredEventList, offset - startSegmentOffset, length);
             SetSegmentLength(startSegment, startSegment.TotalLength - length);
             return;
         }
@@ -184,7 +129,7 @@ public sealed class LineManager
         // possibly remove lines in between if multiple delimiters were deleted
         int charactersRemovedInStartLine = startSegmentOffset + startSegment.TotalLength - offset;
         //Debug.Assert(charactersRemovedInStartLine > 0);
-        startSegment.RemovedLinePart(this, deferredEventList,
+        startSegment.RemovedLinePart(_document, deferredEventList,
             offset - startSegmentOffset, charactersRemovedInStartLine);
 
         var endSegment = _lineCollection.GetNodeByOffset(offset + length);
@@ -198,7 +143,7 @@ public sealed class LineManager
 
         var endSegmentOffset = endSegment.Offset;
         var charactersLeftInEndLine = endSegmentOffset + endSegment.TotalLength - (offset + length);
-        endSegment.RemovedLinePart(this, deferredEventList, 0,
+        endSegment.RemovedLinePart(_document, deferredEventList, 0,
             endSegment.TotalLength - charactersLeftInEndLine);
         startSegment.MergedWith(endSegment, offset - startSegmentOffset);
         SetSegmentLength(startSegment,

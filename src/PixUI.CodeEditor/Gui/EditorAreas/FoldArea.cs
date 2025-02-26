@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using PixUI;
 
@@ -75,29 +76,45 @@ internal sealed class FoldArea : EditorArea
         var paint = PixUI.Paint.Shared(TextEditor.Theme.TextBgColor);
         canvas.DrawRect(rect, paint);
 
-        var fontHeight = TextEditor.TextView.FontHeight;
-        var visibleLineRemainder = TextEditor.TextView.VisibleLineDrawingRemainder;
-        var maxHeight = (int)((Bounds.Height + visibleLineRemainder) / fontHeight + 1);
-        for (var y = 0; y < maxHeight; ++y)
-        {
-            var markerRect = Rect.FromLTWH(
-                Bounds.Left,
-                Bounds.Top + y * fontHeight - visibleLineRemainder,
-                Bounds.Width,
-                fontHeight);
-            if (rect.IntersectsWith(markerRect.Left, markerRect.Top, markerRect.Width, markerRect.Height))
-            {
-                //TODO: paint separator line?
-                // canvas.drawLine(ui.Offset(drawingPosition.left, markerRect.top),
-                //     ui.Offset(drawingPosition.left, markerRect.bottom), normalPaint);
+        var firstLineNum = TextEditor.TextView.FirstVisibleLine;
+        var lastLineNum = Document.GetFirstLogicalLine(firstLineNum + TextEditor.TextView.VisibleLineCount);
+        lastLineNum = Math.Min(lastLineNum, Document.TotalNumberOfLines - 1);
+        var firstLine = Document.GetLineSegment(firstLineNum);
+        var lastLine = Document.GetLineSegment(lastLineNum);
+        var viewStartOffset = firstLine.Offset;
+        var viewEndOffset = lastLine.Offset + lastLine.Length;
 
-                var currentLine = Document.GetFirstLogicalLine(TextEditor.TextView.FirstPhysicalLine + y);
-                if (currentLine < Document.TotalNumberOfLines)
-                {
-                    // PaintFoldMarker(canvas, currentLine, markerRect);
-                }
-            }
-        }
+        var foldings = Document.FoldingManager.FindOverlapping(viewStartOffset, viewEndOffset - viewStartOffset);
+        if (foldings.Count == 0)
+            return;
+        
+        
+
+        Console.WriteLine($"视图范围: {firstLineNum} -- {lastLineNum} ");
+
+        // var fontHeight = TextEditor.TextView.FontHeight;
+        // var visibleLineRemainder = TextEditor.TextView.VisibleLineDrawingRemainder;
+        // var maxHeight = (int)((Bounds.Height + visibleLineRemainder) / fontHeight + 1);
+        // for (var y = 0; y < maxHeight; ++y)
+        // {
+        //     var markerRect = Rect.FromLTWH(
+        //         Bounds.Left,
+        //         Bounds.Top + y * fontHeight - visibleLineRemainder,
+        //         Bounds.Width,
+        //         fontHeight);
+        //     if (rect.IntersectsWith(markerRect.Left, markerRect.Top, markerRect.Width, markerRect.Height))
+        //     {
+        //         //TODO: paint separator line?
+        //         // canvas.drawLine(ui.Offset(drawingPosition.left, markerRect.top),
+        //         //     ui.Offset(drawingPosition.left, markerRect.bottom), normalPaint);
+        //
+        //         var currentLine = Document.GetFirstLogicalLine(TextEditor.TextView.FirstPhysicalLine + y);
+        //         if (currentLine < Document.TotalNumberOfLines)
+        //         {
+        //             // PaintFoldMarker(canvas, currentLine, markerRect);
+        //         }
+        //     }
+        // }
     }
 
     // private void PaintFoldMarker(Canvas canvas, int lineNumber, Rect rect)

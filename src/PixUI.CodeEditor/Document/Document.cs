@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace CodeEditor;
 
@@ -140,13 +139,13 @@ public sealed class Document : IDisposable
     /// example : lineNumber == 100 foldings are in the linetracker
     /// between 0..1 (2 folded, invisible lines) this method returns 102
     /// the 'logical' line number
-    public int GetFirstLogicalLine(int lineNumber) => _lineManager.GetFirstLogicalLine(lineNumber);
+    public int GetFirstLogicalLine(int lineNumber) => FoldingManager.GetFirstLogicalLine(lineNumber);
 
     /// Get the visible line for a given logical line.
     /// example : lineNumber == 100 foldings are in the linetracker
     /// between 0..1 (2 folded, invisible lines) this method returns 98
     /// the 'visible' line number
-    public int GetVisibleLine(int lineNumber) => _lineManager.GetVisibleLine(lineNumber);
+    public int GetVisibleLine(int lineNumber) => FoldingManager.GetVisibleLine(lineNumber);
 
     /// returns the logical line/column position from an offset
     public TextLocation OffsetToPosition(int offset)
@@ -164,6 +163,12 @@ public sealed class Document : IDisposable
         var line = GetLineSegment(position.Line);
         return Math.Min(TextLength, line.Offset + Math.Min(line.Length, position.Column));
     }
+
+    #endregion
+
+    public void Dispose() => SyntaxParser.Dispose();
+
+    #region ====Backup====
 
     // internal void UpdateSegmentsOnDocumentChanged<T>(IList<T> list, DocumentEventArgs e)
     //     where T : ISegment
@@ -208,6 +213,4 @@ public sealed class Document : IDisposable
     // }
 
     #endregion
-
-    public void Dispose() => SyntaxParser.Dispose();
 }

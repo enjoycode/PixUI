@@ -42,8 +42,7 @@ internal sealed class TextView : EditorArea //TODO: rename to TextArea
         {
             if (FirstVisibleLine != value)
             {
-                TextEditor.VirtualTop = new Point(TextEditor.VirtualTop.X,
-                    Document.GetVisibleLine(value) * FontHeight);
+                TextEditor.VirtualTop = new Point(TextEditor.VirtualTop.X, Document.GetVisibleLine(value) * FontHeight);
             }
         }
     }
@@ -208,7 +207,7 @@ internal sealed class TextView : EditorArea //TODO: rename to TextArea
                 FontHeight);
             //TODO: check lineRect overlaps with dirty area.
 
-            var currentLine = Document.GetFirstLogicalLine(Document.GetVisibleLine(FirstVisibleLine) + y);
+            var currentLine = Document.GetFirstLogicalLine(FirstPhysicalLine + y);
             if (currentLine >= Document.TotalNumberOfLines) return;
             var lineSegment = Document.GetLineSegment(currentLine);
             if (lineSegment.Length == 0) continue;

@@ -38,6 +38,65 @@ public sealed class FoldingManager : IDisposable
             //     affectedFolding.ValidateCollapsedLineSections();
         }
     }
+    
+    #region ====Visible & Logical Lines====
+    
+    public int GetFirstLogicalLine(int visibleLineNumber)
+    {
+        if (!_document.TextEditorOptions.EnableFolding)
+            return visibleLineNumber;
+
+        var v = 0;
+        var foldEnd = 0;
+        var foldings = GetTopLevelFoldedFoldings();
+        foreach (var fs in foldings)
+        {
+            var fsStartLine = _document.GetLineNumberByOffset(fs.StartOffset);
+            if (fsStartLine >= foldEnd)
+            {
+                if (v + fsStartLine - foldEnd >= visibleLineNumber)
+                    break;
+
+                v += fsStartLine - foldEnd;
+                var fsEndLine = _document.GetLineNumberByOffset(fs.EndOffset);
+                foldEnd = fsEndLine;
+            }
+        }
+
+        return foldEnd + visibleLineNumber - v;
+    }
+
+    public int GetVisibleLine(int logicalLineNumber)
+    {
+        if (!_document.TextEditorOptions.EnableFolding)
+            return logicalLineNumber;
+
+        var visibleLine = 0;
+        var foldEnd = 0;
+        var foldings = GetTopLevelFoldedFoldings();
+        foreach (var fs in foldings)
+        {
+            var fsStartLine = _document.GetLineNumberByOffset(fs.StartOffset);
+            if (fsStartLine >= logicalLineNumber)
+                break;
+
+            if (fsStartLine >= foldEnd)
+            {
+                var fsEndLine = _document.GetLineNumberByOffset(fs.EndOffset);
+                visibleLine += fsStartLine - foldEnd;
+                if (fsEndLine > logicalLineNumber)
+                    return visibleLine;
+
+                foldEnd = fsEndLine;
+            }
+        }
+
+        // Debug.Assert(logicalLineNumber >= foldEnd);
+        visibleLine += logicalLineNumber - foldEnd;
+        return visibleLine;
+    }
+    
+    #endregion
 
     #region ====Old Api====
 

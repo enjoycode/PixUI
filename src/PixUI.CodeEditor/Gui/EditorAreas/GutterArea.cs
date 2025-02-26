@@ -51,8 +51,7 @@ internal sealed class GutterArea : EditorArea
             var yPos = Bounds.Top + lineHeight * y - visibleLineRemainder + Theme.LineSpace;
             if (rect.IntersectsWith(Bounds.Left, yPos, Bounds.Width, lineHeight))
             {
-                var curLine = Document.GetFirstLogicalLine(
-                    Document.GetVisibleLine(TextEditor.TextView.FirstVisibleLine) + y);
+                var curLine = Document.GetFirstLogicalLine(TextEditor.TextView.FirstPhysicalLine + y);
                 if (curLine < Document.TotalNumberOfLines)
                     DrawLineNumber(canvas, curLine + 1, yPos);
             }

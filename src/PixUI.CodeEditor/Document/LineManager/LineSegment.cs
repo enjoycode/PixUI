@@ -132,11 +132,11 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
     /// <summary>
     /// Is called when a part of the line is inserted.
     /// </summary>
-    internal void InsertedLinePart(LineManager manager, int startColumn, int length)
+    internal void InsertedLinePart(Document document, int startColumn, int length)
     {
         if (length == 0) return;
 
-        ClearFoldedLineCache(manager);
+        ClearFoldedLineCache(document);
 
         //TODO:
         //Console.WriteLine("InsertedLinePart " + startColumn + ", " + length);
@@ -155,12 +155,12 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
     /// <summary>
     /// Is called when a part of the line is removed.
     /// </summary>
-    internal void RemovedLinePart(LineManager manager, DeferredEventList deferredEventList,
+    internal void RemovedLinePart(Document document, DeferredEventList deferredEventList,
         int startColumn, int length)
     {
         if (length == 0) return;
 
-        ClearFoldedLineCache(manager);
+        ClearFoldedLineCache(document);
 
         //Console.WriteLine("RemovedLinePart " + startColumn + ", " + length);
         //TODO: anchors
@@ -542,14 +542,14 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
         CachedFolds = null;
     }
 
-    private void ClearFoldedLineCache(LineManager manager)
+    private void ClearFoldedLineCache(Document document)
     {
         var thisLine = LineNumber;
-        var visibleLine = manager.GetVisibleLine(thisLine);
-        var logicalLine = manager.GetFirstLogicalLine(visibleLine);
+        var visibleLine = document.GetVisibleLine(thisLine);
+        var logicalLine = document.GetFirstLogicalLine(visibleLine);
         if (logicalLine != thisLine)
         {
-            manager.GetLineSegment(logicalLine).ClearCachedParagraph();
+            document.GetLineSegment(logicalLine).ClearCachedParagraph();
         }
     }
 
