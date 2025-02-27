@@ -18,7 +18,7 @@ public sealed class TextEditor
         SelectionManager = new SelectionManager(this);
 
         TextView = new TextView(this);
-        LeftAreas = new EditorArea[] { new GutterArea(this), new FoldArea(this) };
+        LeftAreas = new EditorArea[] { new GutterArea(this), new FoldingArea(this) };
 
         //TODO: Caret position changed to matching bracket
     }
@@ -211,25 +211,19 @@ public sealed class TextEditor
     {
         //TODO: check dirtyArea
 
-        var lines = Document.FoldingManager.GetLogicalLines(TextView.FirstVisibleLine, TextView.VisibleLineCount)
+        var lines = Document.FoldingManager
+            .GetLogicalLines(TextView.FirstVisibleLine, TextView.VisibleLineCount)
             .ToArray();
-        for (var i = 0; i < lines.Length; i++)
-        {
-            if (i == 0) Console.Write('[');
-            Console.Write(lines[i] + 1);
-            Console.Write(i != lines.Length - 1 ? ',' : ']');
-        }
-        Console.WriteLine();
 
         // paint left areas
         foreach (var area in LeftAreas)
         {
             if (!area.IsVisible) continue;
-            area.Paint(canvas, area.Bounds);
+            area.Paint(canvas, area.Bounds, lines);
         }
 
         // paint text area
-        TextView.Paint(canvas, TextView.Bounds);
+        TextView.Paint(canvas, TextView.Bounds, lines);
     }
 
     #endregion

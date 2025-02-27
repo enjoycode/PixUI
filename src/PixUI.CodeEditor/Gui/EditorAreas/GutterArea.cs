@@ -1,4 +1,3 @@
-using System;
 using PixUI;
 
 namespace CodeEditor;
@@ -17,10 +16,12 @@ internal sealed class GutterArea : EditorArea
     private Paragraph[] GenerateNumberCache()
     {
         var cache = new Paragraph[10];
-        using var ts = new TextStyle() { Color = Theme.LineNumberColor };
+        using var ts = new TextStyle();
+        ts.Color = Theme.LineNumberColor;
         for (var i = 0; i < 10; i++)
         {
-            using var ps = new ParagraphStyle() { MaxLines = 1 };
+            using var ps = new ParagraphStyle();
+            ps.MaxLines = 1;
             using var pb = new ParagraphBuilder(ps);
             pb.PushStyle(ts);
             pb.AddText(i.ToString());
@@ -34,7 +35,7 @@ internal sealed class GutterArea : EditorArea
 
     internal override Size Size => new Size(_numberWidth * 5, -1);
 
-    internal override void Paint(Canvas canvas, Rect rect)
+    internal override void Paint(Canvas canvas, Rect rect, int[] viewLines)
     {
         if (rect.Width <= 0 || rect.Height <= 0) return;
 
@@ -45,16 +46,10 @@ internal sealed class GutterArea : EditorArea
         // line numbers
         var lineHeight = TextEditor.TextView.FontHeight;
         var visibleLineRemainder = TextEditor.TextView.VisibleLineDrawingRemainder;
-        var maxHeight = (int)((Bounds.Height + visibleLineRemainder) / lineHeight) + 1;
-        for (var y = 0; y < maxHeight; y++)
+        for (var i = 0; i < viewLines.Length; i++)
         {
-            var yPos = Bounds.Top + lineHeight * y - visibleLineRemainder + Theme.LineSpace;
-            if (rect.IntersectsWith(Bounds.Left, yPos, Bounds.Width, lineHeight))
-            {
-                var curLine = Document.GetFirstLogicalLine(TextEditor.TextView.FirstPhysicalLine + y);
-                if (curLine < Document.TotalNumberOfLines)
-                    DrawLineNumber(canvas, curLine + 1, yPos);
-            }
+            var yPos = Bounds.Top + lineHeight * i - visibleLineRemainder + Theme.LineSpace;
+            DrawLineNumber(canvas, viewLines[i] + 1, yPos);
         }
     }
 

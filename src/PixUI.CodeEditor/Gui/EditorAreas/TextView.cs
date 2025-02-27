@@ -172,7 +172,7 @@ internal sealed class TextView : EditorArea //TODO: rename to TextArea
         }
     }
 
-    internal override void Paint(Canvas canvas, Rect rect)
+    internal override void Paint(Canvas canvas, Rect rect, int[] viewLines)
     {
         if (rect.Width <= 0 || rect.Height <= 0) return;
 
@@ -188,33 +188,22 @@ internal sealed class TextView : EditorArea //TODO: rename to TextArea
         canvas.DrawRect(rect, paint);
 
         // paint lines one by one
-        var maxLines = (int)((Bounds.Height + VisibleLineDrawingRemainder) / FontHeight + 1);
-        PaintLines(canvas, maxLines);
-
-        if (horizontalDelta > 0)
-            canvas.Restore();
-    }
-
-    private void PaintLines(Canvas canvas, int maxLines)
-    {
-        var horizontalDelta = TextEditor.VirtualTop.X;
-        for (var y = 0; y < maxLines; y++)
+        for (var i = 0; i < viewLines.Length; i++)
         {
             var lineRect = Rect.FromLTWH(
                 Bounds.Left - horizontalDelta,
-                Bounds.Top + y * FontHeight - VisibleLineDrawingRemainder,
+                Bounds.Top + i * FontHeight - VisibleLineDrawingRemainder,
                 Bounds.Width + horizontalDelta,
                 FontHeight);
-            //TODO: check lineRect overlaps with dirty area.
-
-            var currentLine = Document.GetFirstLogicalLine(FirstPhysicalLine + y);
-            if (currentLine >= Document.TotalNumberOfLines) return;
-            var lineSegment = Document.GetLineSegment(currentLine);
+            var lineSegment = Document.GetLineSegment(viewLines[i]);
             if (lineSegment.Length == 0) continue;
 
             var lineParagraph = lineSegment.GetLineParagraph(TextEditor);
             canvas.DrawParagraph(lineParagraph, lineRect.Left, lineRect.Top + Theme.LineSpace);
         }
+
+        if (horizontalDelta > 0)
+            canvas.Restore();
     }
 }
 
