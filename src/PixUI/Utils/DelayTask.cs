@@ -10,7 +10,7 @@ namespace PixUI;
 [TSType("PixUI.DelayTask")]
 public sealed class DelayTask
 {
-    private int _flag = 0;
+    private int _flag;
     private readonly int _millisecondsDelay;
     private readonly Action _action;
 

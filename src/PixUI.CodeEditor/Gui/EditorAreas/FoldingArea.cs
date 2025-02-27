@@ -62,9 +62,7 @@ internal sealed class FoldingArea : EditorArea
         // update the caret position
         TextEditor.Caret.UpdateCaretPosition();
         // notify folding changed
-        Document.FoldingManager.RaiseFoldingsChanged();
-        // TODO:重绘范围
-        TextEditor.Controller.Widget.RequestInvalidate(true, null);
+        Document.FoldingManager.RaiseFoldingsChanged(new FoldingChangeEventArgs(FoldingChangeType.FoldedStatus, null));
     }
 
     internal override void Paint(Canvas canvas, Rect rect, int[] viewLines)

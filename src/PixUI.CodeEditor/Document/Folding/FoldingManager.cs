@@ -17,11 +17,6 @@ public sealed class FoldingManager : IDisposable
     private readonly TextSegmentTree<FoldingSegment> _foldings = new();
     private bool _isFirstUpdate = true;
 
-    internal void RaiseFoldingsChanged()
-    {
-        // FoldingsChanged?.Invoke();
-    }
-
     private void OnDocumentChanged(DocumentEventArgs e)
     {
         _foldings.UpdateOffsets(e);
@@ -38,6 +33,17 @@ public sealed class FoldingManager : IDisposable
             //     affectedFolding.ValidateCollapsedLineSections();
         }
     }
+
+    #region ====ChangeEvent====
+
+    public event Action<FoldingChangeEventArgs>? FoldingChanged;
+
+    internal void RaiseFoldingsChanged(FoldingChangeEventArgs args)
+    {
+        FoldingChanged?.Invoke(args);
+    }
+
+    #endregion
 
     #region ====Visible & Logical Lines====
 
@@ -273,7 +279,7 @@ public sealed class FoldingManager : IDisposable
             throw new ArgumentException("Folding must be within document boundary");
         var fs = new FoldingSegment(offset, length);
         _foldings.Add(fs);
-        // Redraw(fs);
+        RaiseFoldingsChanged(new FoldingChangeEventArgs(FoldingChangeType.Add, fs));
         return fs;
     }
 
@@ -286,7 +292,7 @@ public sealed class FoldingManager : IDisposable
             throw new ArgumentNullException(nameof(fs));
         fs.IsFolded = false;
         _foldings.Remove(fs);
-        //Redraw(fs);
+        RaiseFoldingsChanged(new FoldingChangeEventArgs(FoldingChangeType.Remove, fs));
     }
 
     #endregion
@@ -368,4 +374,23 @@ public sealed class FoldingManager : IDisposable
     {
         _document.DocumentChanged -= OnDocumentChanged;
     }
+}
+
+public readonly struct FoldingChangeEventArgs
+{
+    public FoldingChangeEventArgs(FoldingChangeType changeType, FoldingSegment? changeItem)
+    {
+        ChangeType = changeType;
+        FoldingSegment = changeItem;
+    }
+
+    public readonly FoldingSegment? FoldingSegment;
+    public readonly FoldingChangeType ChangeType;
+}
+
+public enum FoldingChangeType
+{
+    Add,
+    Remove,
+    FoldedStatus,
 }

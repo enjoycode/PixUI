@@ -4,7 +4,7 @@ using PixUI;
 
 namespace CodeEditor;
 
-public sealed class CodeEditorController : WidgetController<CodeEditorWidget>
+public sealed class CodeEditorController : WidgetController<CodeEditorWidget>, IDisposable
 {
     public CodeEditorController(string fileName, ITextBuffer textBuffer, ISyntaxParser syntaxParser,
         ICompletionProvider? completionProvider = null, string? tag = null)
@@ -16,6 +16,7 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>
         _completionContext = new CompletionContext(this, completionProvider);
 
         Document.DocumentChanged += _OnDocumentChanged;
+        Document.FoldingManager.FoldingChanged += _OnFoldingChanged;
         TextEditor.Caret.PositionChanged += _OnCaretPositionChanged;
     }
 
@@ -253,6 +254,13 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>
             Widget.RequestInvalidate(true, null /*dirtyLines*/);
     }
 
+    private void _OnFoldingChanged(FoldingChangeEventArgs e)
+    {
+        //暂全部刷新
+        if (Widget != null!)
+            Widget.RequestInvalidate(true, null /*TODO*/);
+    }
+
     private void _OnCaretPositionChanged()
     {
         if (!_caretChangedByTextInput)
@@ -367,4 +375,11 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>
     }
 
     #endregion
+
+    public void Dispose()
+    {
+        Document.DocumentChanged -= _OnDocumentChanged;
+        Document.FoldingManager.FoldingChanged -= _OnFoldingChanged;
+        TextEditor.Caret.PositionChanged -= _OnCaretPositionChanged;
+    }
 }
