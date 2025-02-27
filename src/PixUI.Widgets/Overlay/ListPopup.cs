@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace PixUI;
 
-public delegate Widget ListPopupItemBuilder<T>(T data, int index, State<bool> isHover,
+public delegate Widget ListPopupItemBuilder<in T>(T data, int index, State<bool> isHover,
     State<bool> isSelected);
 
 internal readonly struct ItemState
@@ -17,11 +17,6 @@ internal readonly struct ItemState
         HoverState = hoverState;
         SelectedState = selectedState;
     }
-
-#if __WEB__
-        internal static readonly ItemState Empty = new ItemState(false, false);
-        internal ItemState Clone() => new ItemState(HoverState, SelectedState);
-#endif
 }
 
 internal sealed class ListPopupItemWidget : SingleChildWidget, IMouseRegion
@@ -244,6 +239,9 @@ public class ListPopup<T> : Popup
 
     public override EventPreviewResult PreviewEvent(EventType type, object? e)
     {
+        if (_listViewController.DataSource == null || _listViewController.DataSource.Count == 0)
+            return EventPreviewResult.NotProcessed; //暂简单判断无数据不拦截
+        
         if (type == EventType.KeyDown)
         {
             var keyEvent = (KeyEvent)e!;
