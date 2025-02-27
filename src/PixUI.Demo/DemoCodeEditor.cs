@@ -15,8 +15,13 @@ public sealed class Person
 {
     public string Name { get; set; }
 
-    public void SayHello()
+    public void SayHello(int n)
     {
+        if (n > 0) {
+            Write(1);
+        } else {
+            Write(2);
+        }
         System.Console.WriteLine(Name);
     }
 } //中国 */

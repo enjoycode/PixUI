@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using PixUI;
 
 namespace CodeEditor;
@@ -209,6 +210,16 @@ public sealed class TextEditor
     internal void Paint(Canvas canvas, Size size, IDirtyArea? dirtyArea)
     {
         //TODO: check dirtyArea
+
+        var lines = Document.FoldingManager.GetLogicalLines(TextView.FirstVisibleLine, TextView.VisibleLineCount)
+            .ToArray();
+        for (var i = 0; i < lines.Length; i++)
+        {
+            if (i == 0) Console.Write('[');
+            Console.Write(lines[i] + 1);
+            Console.Write(i != lines.Length - 1 ? ',' : ']');
+        }
+        Console.WriteLine();
 
         // paint left areas
         foreach (var area in LeftAreas)

@@ -76,21 +76,18 @@ internal sealed class FoldArea : EditorArea
         var paint = PixUI.Paint.Shared(TextEditor.Theme.TextBgColor);
         canvas.DrawRect(rect, paint);
 
-        var firstLineNum = TextEditor.TextView.FirstVisibleLine;
-        var lastLineNum = Document.GetFirstLogicalLine(firstLineNum + TextEditor.TextView.VisibleLineCount);
-        lastLineNum = Math.Min(lastLineNum, Document.TotalNumberOfLines - 1);
-        var firstLine = Document.GetLineSegment(firstLineNum);
-        var lastLine = Document.GetLineSegment(lastLineNum);
-        var viewStartOffset = firstLine.Offset;
-        var viewEndOffset = lastLine.Offset + lastLine.Length;
-
-        var foldings = Document.FoldingManager.FindOverlapping(viewStartOffset, viewEndOffset - viewStartOffset);
-        if (foldings.Count == 0)
-            return;
-        
-        
-
-        Console.WriteLine($"视图范围: {firstLineNum} -- {lastLineNum} ");
+        // var firstLineNum = TextEditor.TextView.FirstVisibleLine;
+        // var lastLineNum = Document.GetFirstLogicalLine(firstLineNum + TextEditor.TextView.VisibleLineCount);
+        // lastLineNum = Math.Min(lastLineNum, Document.TotalNumberOfLines - 1);
+        // var firstLine = Document.GetLineSegment(firstLineNum);
+        // var lastLine = Document.GetLineSegment(lastLineNum);
+        // var viewStartOffset = firstLine.Offset;
+        // var viewEndOffset = lastLine.Offset + lastLine.Length;
+        //
+        // var foldings = Document.FoldingManager.FindOverlapping(viewStartOffset, viewEndOffset - viewStartOffset);
+        // if (foldings.Count == 0)
+        //     return;
+        // Console.WriteLine($"视图范围: {firstLineNum} -- {lastLineNum} ");
 
         // var fontHeight = TextEditor.TextView.FontHeight;
         // var visibleLineRemainder = TextEditor.TextView.VisibleLineDrawingRemainder;

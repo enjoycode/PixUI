@@ -38,32 +38,88 @@ public sealed class FoldingManager : IDisposable
             //     affectedFolding.ValidateCollapsedLineSections();
         }
     }
-    
+
     #region ====Visible & Logical Lines====
-    
+
+    public IEnumerable<int> GetLogicalLines(int visibleStartLine, int count)
+    {
+        if (_document.TextEditorOptions.EnableFolding)
+        {
+            var curLogicalLine = -1;
+            var foldings = GetTopLevelFoldedFoldings();
+            var diff = 0;
+            var preFoldedEndLine = 0;
+            foreach (var fs in foldings)
+            {
+                var fsStartLine = _document.GetLineNumberByOffset(fs.StartOffset);
+                var fsEndLine = _document.GetLineNumberByOffset(fs.EndOffset);
+
+                while (fsStartLine > curLogicalLine)
+                {
+                    curLogicalLine = curLogicalLine == -1
+                        ? preFoldedEndLine + visibleStartLine - diff
+                        : curLogicalLine + 1;
+                    if (curLogicalLine >= _document.TotalNumberOfLines)
+                        yield break;
+                    yield return curLogicalLine;
+                    count--;
+                    if (count <= 0)
+                        yield break;
+                }
+
+                if (fsStartLine >= preFoldedEndLine)
+                {
+                    diff += fsStartLine - preFoldedEndLine;
+                    preFoldedEndLine = fsEndLine;
+                    curLogicalLine = Math.Max(fsEndLine, curLogicalLine);
+                }
+            }
+
+            // after all folded or there's no any folded
+            while (count > 0)
+            {
+                curLogicalLine = curLogicalLine == -1 ? visibleStartLine : curLogicalLine + 1;
+                if (curLogicalLine >= _document.TotalNumberOfLines)
+                    yield break;
+                yield return curLogicalLine;
+                count--;
+            }
+        }
+        else
+        {
+            for (var i = 0; i < count; i++)
+            {
+                var logicalLineNum = visibleStartLine + i;
+                if (logicalLineNum >= _document.TotalNumberOfLines)
+                    break;
+                yield return logicalLineNum;
+            }
+        }
+    }
+
     public int GetFirstLogicalLine(int visibleLineNumber)
     {
         if (!_document.TextEditorOptions.EnableFolding)
             return visibleLineNumber;
 
-        var v = 0;
-        var foldEnd = 0;
+        var diff = 0;
+        var preFoldedEndLine = 0;
         var foldings = GetTopLevelFoldedFoldings();
         foreach (var fs in foldings)
         {
             var fsStartLine = _document.GetLineNumberByOffset(fs.StartOffset);
-            if (fsStartLine >= foldEnd)
+            if (fsStartLine >= preFoldedEndLine)
             {
-                if (v + fsStartLine - foldEnd >= visibleLineNumber)
+                if (diff + fsStartLine - preFoldedEndLine >= visibleLineNumber)
                     break;
 
-                v += fsStartLine - foldEnd;
+                diff += fsStartLine - preFoldedEndLine;
                 var fsEndLine = _document.GetLineNumberByOffset(fs.EndOffset);
-                foldEnd = fsEndLine;
+                preFoldedEndLine = fsEndLine;
             }
         }
 
-        return foldEnd + visibleLineNumber - v;
+        return preFoldedEndLine + visibleLineNumber - diff;
     }
 
     public int GetVisibleLine(int logicalLineNumber)
@@ -95,7 +151,7 @@ public sealed class FoldingManager : IDisposable
         visibleLine += logicalLineNumber - foldEnd;
         return visibleLine;
     }
-    
+
     #endregion
 
     #region ====Old Api====
@@ -170,7 +226,7 @@ public sealed class FoldingManager : IDisposable
     //     // TODO: returns the longest folding instead of any folding at the first position after startOffset
     //     return _foldings.FindFirstSegmentWithStartAfter(startOffset);
     // }
-    
+
     public FoldingSegment? FindFirstWithStartAfter(int startOffset) =>
         _foldings.FindFirstSegmentWithStartAfter(startOffset);
 

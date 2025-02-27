@@ -95,10 +95,9 @@ public sealed class SelectionManager
 
         if (newSelectionStart.Line >= _textEditor.Document.TotalNumberOfLines)
         {
-            newSelectionStart.Line = _textEditor.Document.TotalNumberOfLines - 1;
-            newSelectionStart.Column =
-                _textEditor.Document.GetLineSegment(_textEditor.Document.TotalNumberOfLines - 1)
-                    .Length;
+            var lastLine = _textEditor.Document.TotalNumberOfLines - 1;
+            newSelectionStart.Line = lastLine;
+            newSelectionStart.Column = lastLine < 0 ? -1 : _textEditor.Document.GetLineSegment(lastLine).Length;
         }
 
         SelectionStart = newSelectionStart;

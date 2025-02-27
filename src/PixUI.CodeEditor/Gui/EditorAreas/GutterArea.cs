@@ -62,16 +62,9 @@ internal sealed class GutterArea : EditorArea
     {
         //TODO:暂计算至千位
         var unitPlace = lineNumber % 10;
-
-#if __WEB__
-            var tenPlace = (int)(lineNumber / 10) % 10;
-            var hundredPlace = (int)(lineNumber / 100f) % 10;
-            var thousandPlace = (int)(lineNumber / 1000f) % 10;
-#else
         var tenPlace = lineNumber / 10 % 10;
         var hundredPlace = lineNumber / 100 % 10;
         var thousandPlace = lineNumber / 1000 % 10;
-#endif
 
         canvas.DrawParagraph(_numberCache[unitPlace], 2 + _numberWidth * 3, yPos);
         if (lineNumber >= 10)
