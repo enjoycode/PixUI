@@ -9,6 +9,9 @@ public interface IDynamicState
     void WriteTo(Utf8JsonWriter writer);
 }
 
+/// <summary>
+/// 单个值状态
+/// </summary>
 public interface IDynamicValueState : IDynamicState
 {
     void ReadFrom(ref Utf8JsonReader reader, DynamicState state);
@@ -24,21 +27,24 @@ public interface IDynamicValueState : IDynamicState
     State GetRuntimeState(IDynamicContext ctx, DynamicState state);
 }
 
-public interface IDynamicDataSourceState : IDynamicState
+/// <summary>
+/// 数据表状态
+/// </summary>
+public interface IDynamicTableState : IDynamicState
 {
     /// <summary>
-    /// 数据集变更事件，用于通知绑定的组件刷新数据
+    /// 数据变更事件，用于通知绑定的组件刷新数据
     /// </summary>
-    event Action DataSourceChanged;
+    event Action DataChanged;
 
     void ReadFrom(ref Utf8JsonReader reader);
 
-    ValueTask<object?> GetRuntimeDataSource(IDynamicContext dynamicContext);
+    ValueTask<object?> GetRuntimeState(IDynamicContext dynamicContext);
 }
 
 public enum DynamicStateType
 {
-    EntityList,
+    DataTable,
     Int,
     String,
     DateTime,
@@ -46,6 +52,9 @@ public enum DynamicStateType
     Double,
 }
 
+/// <summary>
+/// 设计时的状态
+/// </summary>
 public sealed class DynamicState
 {
     public string Name { get; set; } = null!;
@@ -58,7 +67,7 @@ public sealed class DynamicState
     /// </summary>
     public Type GetValueStateValueType()
     {
-        if (Type == DynamicStateType.EntityList)
+        if (Type == DynamicStateType.DataTable)
             throw new NotSupportedException("Only for value state");
 
         var valueType = Type switch

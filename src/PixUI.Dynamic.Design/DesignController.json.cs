@@ -50,7 +50,7 @@ partial class DesignController
             //Type
             writer.WriteString(nameof(DynamicState.Type), state.Type.ToString());
             //AllowNull
-            if (state.Type != DynamicStateType.EntityList)
+            if (state.Type != DynamicStateType.DataTable)
                 writer.WriteBoolean(nameof(DynamicState.AllowNull), state.AllowNull);
             //Value
             if (state.Value == null)
@@ -244,20 +244,20 @@ partial class DesignController
         StatesController.DataSource = states;
     }
 
-    private static void ReadState(ref Utf8JsonReader reader, string name, IList<DynamicState> states)
+    private static void ReadState(ref Utf8JsonReader reader, string name, List<DynamicState> states)
     {
         var state = new DynamicState { Name = name };
         reader.Read(); //{
         reader.Read(); //Type prop
         reader.Read(); //Type value
         state.Type = Enum.Parse<DynamicStateType>(reader.GetString()!);
-        if (state.Type == DynamicStateType.EntityList)
+        if (state.Type == DynamicStateType.DataTable)
         {
             reader.Read(); //Value prop
             var peekReader = reader;
             if (!(peekReader.Read() && peekReader.TokenType == JsonTokenType.Null))
             {
-                var ds = DesignSettings.MakeDataSourceState!();
+                var ds = DesignSettings.MakeTableState!();
                 ds.ReadFrom(ref reader);
                 state.Value = ds;
             }

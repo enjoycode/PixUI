@@ -6,7 +6,7 @@ namespace PixUI;
 public interface IDataSourceBinder
 {
     /// <summary>
-    /// 数据集发生变更后刷新数据
+    /// 数据源发生变更后刷新数据
     /// </summary>
-    void OnDataSourceChanged();
+    void OnDataChanged();
 }

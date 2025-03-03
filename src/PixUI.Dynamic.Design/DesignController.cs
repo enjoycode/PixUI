@@ -75,7 +75,7 @@ public sealed partial class DesignController
 
     public List<DynamicState> FindStatesByValueType(DynamicStateType type, bool allowNull)
     {
-        if (type == DynamicStateType.EntityList) throw new NotSupportedException();
+        if (type == DynamicStateType.DataTable) throw new NotSupportedException();
 
         return StatesController.DataSource!
             .Where(s => s.Type == type && s.AllowNull == allowNull)
@@ -87,7 +87,7 @@ public sealed partial class DesignController
         if (StatesController.DataSource == null) yield break;
         foreach (var state in StatesController.DataSource)
         {
-            if (state.Type == DynamicStateType.EntityList) yield return state;
+            if (state.Type == DynamicStateType.DataTable) yield return state;
         }
     }
 

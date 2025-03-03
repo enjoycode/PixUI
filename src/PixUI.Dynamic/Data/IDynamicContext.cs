@@ -21,10 +21,10 @@ public static class DynamicContextExtensions
     public static ValueTask<object?> GetDataSource(this IDynamicContext context, string name)
     {
         var state = context.FindState(name);
-        if (state == null || state.Type != DynamicStateType.EntityList || state.Value == null)
+        if (state == null || state.Type != DynamicStateType.DataTable || state.Value == null)
             return new ValueTask<object?>();
 
-        return ((IDynamicDataSourceState)state.Value).GetRuntimeDataSource(context);
+        return ((IDynamicTableState)state.Value).GetRuntimeState(context);
     }
 
     /// <summary>
@@ -41,8 +41,8 @@ public static class DynamicContextExtensions
 #else
             return State.Empty;
 #endif
-        if (state.Type == DynamicStateType.EntityList)
-            throw new Exception($"State is {nameof(DynamicStateType.EntityList)}: {name}");
+        if (state.Type == DynamicStateType.DataTable)
+            throw new Exception($"State is {nameof(DynamicStateType.DataTable)}: {name}");
         return ((IDynamicValueState)state.Value!).GetRuntimeState(context, state);
     }
 
@@ -53,9 +53,9 @@ public static class DynamicContextExtensions
     {
         if (string.IsNullOrEmpty(dataSource)) return;
         var state = context.FindState(dataSource);
-        if (state is not { Type: DynamicStateType.EntityList } || state.Value == null) return;
+        if (state is not { Type: DynamicStateType.DataTable } || state.Value == null) return;
 
-        ((IDynamicDataSourceState)state.Value).DataSourceChanged += widget.OnDataSourceChanged;
+        ((IDynamicTableState)state.Value).DataChanged += widget.OnDataChanged;
     }
 
     /// <summary>
@@ -66,8 +66,8 @@ public static class DynamicContextExtensions
         if (string.IsNullOrEmpty(dataSource)) return;
 
         var state = context.FindState(dataSource);
-        if (state is not { Type: DynamicStateType.EntityList } || state.Value == null) return;
+        if (state is not { Type: DynamicStateType.DataTable } || state.Value == null) return;
 
-        ((IDynamicDataSourceState)state.Value).DataSourceChanged -= widget.OnDataSourceChanged;
+        ((IDynamicTableState)state.Value).DataChanged -= widget.OnDataChanged;
     }
 }
