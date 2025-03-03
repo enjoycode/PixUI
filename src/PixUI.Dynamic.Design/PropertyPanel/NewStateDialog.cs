@@ -17,7 +17,7 @@ internal sealed class NewStateDialog : Dialog
 
     private readonly DesignController _designController;
     private readonly State<string> _name = "";
-    private readonly State<string?> _type = "EntityList";
+    private readonly State<string?> _type = nameof(DynamicStateType.DataTable);
 
     public string Name => _name.Value;
     public DynamicStateType Type => Enum.Parse<DynamicStateType>(_type.Value!);
