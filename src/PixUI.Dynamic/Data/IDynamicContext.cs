@@ -18,13 +18,13 @@ public static class DynamicContextExtensions
     /// </summary>
     /// <param name="context"></param>
     /// <param name="name">数据集状态的名称</param>
-    public static ValueTask<object?> GetDataSet(this IDynamicContext context, string name)
+    public static ValueTask<object?> GetDataSource(this IDynamicContext context, string name)
     {
         var state = context.FindState(name);
-        if (state == null || state.Type != DynamicStateType.DataSet || state.Value == null)
+        if (state == null || state.Type != DynamicStateType.EntityList || state.Value == null)
             return new ValueTask<object?>();
 
-        return ((IDynamicDataSetState)state.Value).GetRuntimeDataSet(context);
+        return ((IDynamicDataSourceState)state.Value).GetRuntimeDataSource(context);
     }
 
     /// <summary>
@@ -41,33 +41,33 @@ public static class DynamicContextExtensions
 #else
             return State.Empty;
 #endif
-        if (state.Type == DynamicStateType.DataSet)
-            throw new Exception($"State is DataSet: {name}");
+        if (state.Type == DynamicStateType.EntityList)
+            throw new Exception($"State is {nameof(DynamicStateType.EntityList)}: {name}");
         return ((IDynamicValueState)state.Value!).GetRuntimeState(context, state);
     }
 
     /// <summary>
     /// 组件监听数据集变更
     /// </summary>
-    public static void BindToDataSet(this IDynamicContext context, IDataSetBinder widget, string? dataset)
+    public static void BindToDataSource(this IDynamicContext context, IDataSourceBinder widget, string? dataSource)
     {
-        if (string.IsNullOrEmpty(dataset)) return;
-        var state = context.FindState(dataset);
-        if (state is not { Type: DynamicStateType.DataSet } || state.Value == null) return;
+        if (string.IsNullOrEmpty(dataSource)) return;
+        var state = context.FindState(dataSource);
+        if (state is not { Type: DynamicStateType.EntityList } || state.Value == null) return;
 
-        ((IDynamicDataSetState)state.Value).DataSetValueChanged += widget.OnDataSetValueChanged;
+        ((IDynamicDataSourceState)state.Value).DataSourceChanged += widget.OnDataSourceChanged;
     }
 
     /// <summary>
     /// 组件取消监听数据集变更
     /// </summary>
-    public static void UnbindToDataSet(this IDynamicContext context, IDataSetBinder widget, string? dataset)
+    public static void UnbindFromDataSource(this IDynamicContext context, IDataSourceBinder widget, string? dataSource)
     {
-        if (string.IsNullOrEmpty(dataset)) return;
+        if (string.IsNullOrEmpty(dataSource)) return;
 
-        var state = context.FindState(dataset);
-        if (state is not { Type: DynamicStateType.DataSet } || state.Value == null) return;
+        var state = context.FindState(dataSource);
+        if (state is not { Type: DynamicStateType.EntityList } || state.Value == null) return;
 
-        ((IDynamicDataSetState)state.Value).DataSetValueChanged -= widget.OnDataSetValueChanged;
+        ((IDynamicDataSourceState)state.Value).DataSourceChanged -= widget.OnDataSourceChanged;
     }
 }

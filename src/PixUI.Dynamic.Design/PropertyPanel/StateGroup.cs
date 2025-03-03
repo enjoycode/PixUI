@@ -78,9 +78,9 @@ internal sealed class StateGroup : View
 
     private async void OnEditState(DynamicState state)
     {
-        if (state.Type == DynamicStateType.DataSet)
+        if (state.Type == DynamicStateType.EntityList)
         {
-            var dlg = DesignSettings.GetDataSetStateEditor?.Invoke(_designController, state);
+            var dlg = DesignSettings.GetDataSourceStateEditor?.Invoke(_designController, state);
             dlg?.Show();
         }
         else

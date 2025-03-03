@@ -24,21 +24,21 @@ public interface IDynamicValueState : IDynamicState
     State GetRuntimeState(IDynamicContext ctx, DynamicState state);
 }
 
-public interface IDynamicDataSetState : IDynamicState
+public interface IDynamicDataSourceState : IDynamicState
 {
     /// <summary>
     /// 数据集变更事件，用于通知绑定的组件刷新数据
     /// </summary>
-    event Action DataSetValueChanged;
+    event Action DataSourceChanged;
 
     void ReadFrom(ref Utf8JsonReader reader);
 
-    ValueTask<object?> GetRuntimeDataSet(IDynamicContext dynamicContext);
+    ValueTask<object?> GetRuntimeDataSource(IDynamicContext dynamicContext);
 }
 
 public enum DynamicStateType
 {
-    DataSet,
+    EntityList,
     Int,
     String,
     DateTime,
@@ -58,7 +58,7 @@ public sealed class DynamicState
     /// </summary>
     public Type GetValueStateValueType()
     {
-        if (Type == DynamicStateType.DataSet)
+        if (Type == DynamicStateType.EntityList)
             throw new NotSupportedException("Only for value state");
 
         var valueType = Type switch

@@ -6,9 +6,9 @@ public static class DesignSettings
 {
     public static Func<DesignElement, DynamicEventMeta, Dialog>? GetEventEditor;
     
-    public static Func<DesignController, DynamicState, Dialog>? GetDataSetStateEditor;
+    public static Func<DesignController, DynamicState, Dialog>? GetDataSourceStateEditor;
 
-    public static Func<IDynamicDataSetState>? MakeDataSetState;
+    public static Func<IDynamicDataSourceState>? MakeDataSourceState;
 
     public static Func<DynamicState, Dialog>? GetValueStateEditor;
 
