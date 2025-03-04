@@ -74,6 +74,12 @@ public sealed class DataGrid<T> : Widget, IMouseRegion
 
     #region ====Overrides====
 
+    protected override void OnMounted()
+    {
+        base.OnMounted();
+        _controller.Columns.OnMounted();
+    }
+
     public override void VisitChildren(Func<Widget, bool> action)
     {
         if (Header != null && action(Header)) return;
