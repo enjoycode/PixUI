@@ -35,22 +35,15 @@ internal sealed class StateGroup : View
                 },
                 new Card
                 {
-                    Child = new DataGrid<DynamicState>(_designController.StatesController)
-                    {
-                        Height = 119,
-                        Columns =
+                    Child = new DataGrid<DynamicState>(_designController.StatesController) { Height = 119 }
+                        .AddTextColumn("Name", s => s.Name)
+                        .AddTextColumn("Type", s => s.Type.ToString())
+                        .AddButtonColumn("Value", (s, i) => new Button(icon: MaterialIcons.Edit)
                         {
-                            new DataGridTextColumn<DynamicState>("Name", s => s.Name),
-                            new DataGridTextColumn<DynamicState>("Type", s => s.Type.ToString()),
-                            new DataGridButtonColumn<DynamicState>("Value",
-                                (s, i) => new Button(icon: MaterialIcons.Edit)
-                                {
-                                    Style = ButtonStyle.Transparent,
-                                    Shape = ButtonShape.Pills,
-                                    OnTap = _ => OnEditState(s),
-                                }) { Width = ColumnWidth.Fixed(50) }
-                        }
-                    }
+                            Style = ButtonStyle.Transparent,
+                            Shape = ButtonShape.Pills,
+                            OnTap = _ => OnEditState(s),
+                        }, 50)
                 }
             }
         };

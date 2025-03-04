@@ -50,13 +50,8 @@ internal sealed class BindPropertyStateDialog : Dialog
         {
             Padding = EdgeInsets.All(20),
             Child = new DataGrid<DynamicState>(_dgController)
-            {
-                Columns =
-                {
-                    new DataGridTextColumn<DynamicState>("Name", s => s.Name),
-                    new DataGridTextColumn<DynamicState>("Type", s => s.Type.ToString()),
-                }
-            }
+                .AddTextColumn("Name", s => s.Name)
+                .AddTextColumn("Type", s => s.Type.ToString())
         };
     }
 

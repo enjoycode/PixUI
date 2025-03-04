@@ -46,6 +46,16 @@ public static class DataGridExtensions
         return grid;
     }
 
+    public static DataGrid<T> AddHostColumn<T>(this DataGrid<T> grid, string label, Func<T, int, Widget> cellBuilder,
+        ColumnWidth? width = null)
+    {
+        var column = new DataGridHostColumn<T>(label, cellBuilder);
+        if (width != null)
+            column.Width = width;
+        grid.Columns.Add(column);
+        return grid;
+    }
+
     public static DataGrid<T> AddButtonColumn<T>(this DataGrid<T> grid, string label, Func<T, int, Button> cellBuilder,
         ColumnWidth? width = null, bool frozen = true)
     {
