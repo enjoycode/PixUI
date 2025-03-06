@@ -18,6 +18,7 @@ public sealed class DataGridColumns<T> : Collection<DataGridColumn<T>>
     {
         CalcHeaderRows();
         
+        _controller.ClearLeafColumns();
         foreach (var column in this)
         {
             _controller.GetLeafColumns(column, null);

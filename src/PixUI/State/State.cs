@@ -8,9 +8,9 @@ namespace PixUI;
 public abstract class State : IDisposable
 {
     private List<Action<State>>? _bindings;
-    private static readonly EmptyState _emptyState = new EmptyState();
+    private static readonly EmptyState EmptyState = new EmptyState();
 
-    public static State Empty => _emptyState;
+    public static State Empty => EmptyState;
     
     public abstract object? BoxedValue { get; }
 
