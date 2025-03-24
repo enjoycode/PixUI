@@ -58,6 +58,8 @@ internal sealed class StateGroup : View
         if (dlgResult != DialogResult.OK) return;
 
         var item = new DynamicState() { Name = dlg.Name, Type = dlg.Type };
+        if (item.Type != DynamicStateType.DataTable)
+            item.Value = DesignSettings.MakeValueState!(); //暂在这里直接新建，防止未设置状态值时绑定至组件
         _designController.StatesController.Add(item);
     }
 
