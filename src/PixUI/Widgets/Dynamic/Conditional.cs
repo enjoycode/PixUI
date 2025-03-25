@@ -6,20 +6,18 @@ namespace PixUI;
 internal sealed class WhenBuilder<T>
 {
     internal readonly Predicate<T> Match;
-    private readonly Func<Widget> Builder;
+    private readonly Func<Widget> _builder;
     private Widget? _cachedWidget;
 
     public WhenBuilder(Predicate<T> match, Func<Widget> builder)
     {
         Match = match;
-        Builder = builder;
+        _builder = builder;
     }
 
     internal Widget? GetWidget()
     {
-        if (_cachedWidget == null)
-            _cachedWidget = Builder();
-        return _cachedWidget;
+        return _cachedWidget ??= _builder();
     }
 }
 
