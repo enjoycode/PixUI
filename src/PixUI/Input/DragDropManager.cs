@@ -14,7 +14,7 @@ public static class DragDropManager
     private static HitTestEntry? _dropHitEntry;
 
     private static Overlay? _overlay;
-    private static readonly DraggingDecorator _decorator = new();
+    private static readonly DraggingDecorator Decorator = new();
 
     internal static DragEvent? DragEvent { get; private set; }
 
@@ -96,7 +96,7 @@ public static class DragDropManager
             }
         }
 
-        _decorator.Repaint();
+        Decorator.Repaint();
 
         return true;
     }
@@ -131,8 +131,8 @@ public static class DragDropManager
     {
         if (_dragging == null) return;
         _overlay = ((Widget)_dragging).Overlay;
-        _overlay?.Show(_decorator);
+        _overlay?.Show(Decorator);
     }
 
-    private static void HideDecorator() => _overlay?.Remove(_decorator);
+    private static void HideDecorator() => _overlay?.Remove(Decorator);
 }
