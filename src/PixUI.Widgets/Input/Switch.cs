@@ -14,32 +14,30 @@ public sealed class Switch : Toggleable
 
     #region ====Widget Overrides====
 
-    private const float _kTrackWidth = 40;
-    private const float _kTrackHeight = 24f;
-    private const float _kTrackRadius = _kTrackHeight / 2.0f;
-    private const float _kTrackInnerStart = _kTrackHeight / 2.0f;
-    private const float _kTrackInnerEnd = _kTrackWidth - _kTrackInnerStart;
-    private const float _kSwitchWidth = _kTrackWidth + 6;
-    private const float _kSwitchHeight = _kTrackHeight + 6;
+    private const float KTrackWidth = 40;
+    private const float KTrackHeight = 24f;
+    private const float KTrackRadius = KTrackHeight / 2.0f;
+    private const float KTrackInnerStart = KTrackHeight / 2.0f;
+    private const float KTrackInnerEnd = KTrackWidth - KTrackInnerStart;
+    private const float KSwitchWidth = KTrackWidth + 6;
+    private const float KSwitchHeight = KTrackHeight + 6;
 
     // private const float _kTrackInnerLength = _kTrackInnerEnd - _kTrackInnerStart;
 
-    private const float _kThumbExtension = 7f;
-    private const float _kThumbRadius = _kTrackHeight / 2 - 2;
-    private static readonly Color _kThumbBorderColor = new Color(0x0A000000);
+    private const float KThumbExtension = 7f;
+    private const float KThumbRadius = KTrackHeight / 2 - 2;
+    private static readonly Color KThumbBorderColor = new Color(0x0A000000);
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
-
-        SetSize(Math.Min(width, _kSwitchWidth), Math.Min(height, _kSwitchHeight));
+        var max = CacheAndGetMaxSize(availableWidth, availableHeight);
+        SetSize(Math.Min(max.Width, KSwitchWidth), Math.Min(max.Height, KSwitchHeight));
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
         canvas.Save();
-        canvas.Translate(0, (_kSwitchHeight - _kTrackHeight) / 2f);
+        canvas.Translate(0, (KSwitchHeight - KTrackHeight) / 2f);
 
         var currentValue = _positionController.Value;
         var currentReactionValue = 0f;
@@ -52,26 +50,26 @@ public sealed class Switch : Toggleable
 
         // track
         var trackRect = Rect.FromLTWH(
-            (W - _kTrackWidth) / 2f, (H - _kSwitchHeight) / 2f, _kTrackWidth, _kTrackHeight
+            (W - KTrackWidth) / 2f, (H - KSwitchHeight) / 2f, KTrackWidth, KTrackHeight
         );
-        var trackRRect = RRect.FromRectAndRadius(trackRect, _kTrackRadius, _kTrackRadius);
+        var trackRRect = RRect.FromRectAndRadius(trackRect, KTrackRadius, KTrackRadius);
         canvas.DrawRRect(trackRRect, paint);
 
         // thumb
-        var currentThumbExtension = _kThumbExtension * currentReactionValue;
+        var currentThumbExtension = KThumbExtension * currentReactionValue;
         var thumbLeft = FloatUtils.Lerp(
-            trackRect.Left + _kTrackInnerStart - _kThumbRadius,
-            trackRect.Left + _kTrackInnerEnd - _kThumbRadius - currentThumbExtension,
+            trackRect.Left + KTrackInnerStart - KThumbRadius,
+            trackRect.Left + KTrackInnerEnd - KThumbRadius - currentThumbExtension,
             visualPosition
         );
         var thumbRight = FloatUtils.Lerp(
-            trackRect.Left + _kTrackInnerStart + _kThumbRadius + currentThumbExtension,
-            trackRect.Left + _kTrackInnerEnd + _kThumbRadius,
+            trackRect.Left + KTrackInnerStart + KThumbRadius + currentThumbExtension,
+            trackRect.Left + KTrackInnerEnd + KThumbRadius,
             visualPosition
         );
-        var thumbCenterY = _kTrackHeight / 2.0f;
-        var thumbBounds = new Rect(thumbLeft, thumbCenterY - _kThumbRadius, thumbRight,
-            thumbCenterY + _kThumbRadius);
+        var thumbCenterY = KTrackHeight / 2.0f;
+        var thumbBounds = new Rect(thumbLeft, thumbCenterY - KThumbRadius, thumbRight,
+            thumbCenterY + KThumbRadius);
 
         var clipPath = new Path();
         clipPath.AddRRect(trackRRect);
@@ -109,7 +107,7 @@ public sealed class Switch : Toggleable
 
         // border and fill
         rrect.Inflate(0.5f, 0.5f);
-        paint.Color = _kThumbBorderColor;
+        paint.Color = KThumbBorderColor;
         paint.MaskFilter = null;
         canvas.DrawRRect(rrect, paint);
         rrect.Deflate(0.5f, 0.5f);
