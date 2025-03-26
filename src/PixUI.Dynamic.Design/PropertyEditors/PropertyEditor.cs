@@ -63,15 +63,15 @@ public sealed class PropertyEditor : Widget
     private readonly Button? _deleteButton;
     private readonly Button? _bindButton;
     private readonly State<Color>? _bindingColorState; //用于表示状态属性是否绑定
-    private static readonly State<float> _buttonSize = 20f;
+    private static readonly State<float> ButtonSize = 20f;
 
     private Button BuildBindButton()
     {
         var button = new Button(icon: MaterialIcons.Link)
         {
             Style = ButtonStyle.Transparent,
-            Width = _buttonSize,
-            Height = _buttonSize
+            Width = ButtonSize,
+            Height = ButtonSize
         };
         button.Parent = this;
         return button;
@@ -82,8 +82,8 @@ public sealed class PropertyEditor : Widget
         var button = new Button(icon: MaterialIcons.Clear)
         {
             Style = ButtonStyle.Transparent,
-            Width = _buttonSize,
-            Height = _buttonSize,
+            Width = ButtonSize,
+            Height = ButtonSize,
         };
         button.Parent = this;
         return button;
@@ -91,7 +91,7 @@ public sealed class PropertyEditor : Widget
 
     #region ====ValueEditors====
 
-    private static readonly List<ValueEditorInfo> _valueEditors = new();
+    private static readonly List<ValueEditorInfo> ValueEditors = new();
 
     private static Func<State, DesignElement, Widget> CreateEditorMaker(Type valueType, Type editorType)
     {
@@ -124,7 +124,7 @@ public sealed class PropertyEditor : Widget
             )
         );
 
-        _valueEditors.Add(editor);
+        ValueEditors.Add(editor);
     }
 
     public static void RegisterClassValueEditor<TValue, TEditor>(bool isDefault, string? name = null)
@@ -141,17 +141,17 @@ public sealed class PropertyEditor : Widget
             )
         );
 
-        _valueEditors.Add(editor);
+        ValueEditors.Add(editor);
     }
 
     private static ValueEditorInfo? TryGetValueEditorByName(string name) =>
-        _valueEditors.FirstOrDefault(e => e.Name == name);
+        ValueEditors.FirstOrDefault(e => e.Name == name);
 
     /// <summary>
     /// 根据值类型获取默认的编辑器
     /// </summary>
     private static ValueEditorInfo? TryGetValueEditorByValueType(Type valueType) =>
-        _valueEditors.FirstOrDefault(e => e.IsDefault && e.ValueType == valueType);
+        ValueEditors.FirstOrDefault(e => e.IsDefault && e.ValueType == valueType);
 
     #endregion
 
@@ -294,21 +294,21 @@ public sealed class PropertyEditor : Widget
     {
         var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
-        _targetEditor.Layout(maxSize.Width - _buttonSize.Value * 2, maxSize.Height);
+        _targetEditor.Layout(maxSize.Width - ButtonSize.Value * 2, maxSize.Height);
         _targetEditor.SetPosition(0, 0);
         SetSize(maxSize.Width, _targetEditor.H);
 
         // 按钮固定位置
         if (_deleteButton != null)
         {
-            _deleteButton.Layout(_buttonSize.Value, _buttonSize.Value);
-            _deleteButton.SetPosition(maxSize.Width - _buttonSize.Value, (H - _deleteButton.H) / 2f);
+            _deleteButton.Layout(ButtonSize.Value, ButtonSize.Value);
+            _deleteButton.SetPosition(maxSize.Width - ButtonSize.Value, (H - _deleteButton.H) / 2f);
         }
 
         if (_bindButton != null)
         {
-            _bindButton.Layout(_buttonSize.Value, _buttonSize.Value);
-            _bindButton.SetPosition(maxSize.Width - _buttonSize.Value * 2, (H - _bindButton.H) / 2f);
+            _bindButton.Layout(ButtonSize.Value, ButtonSize.Value);
+            _bindButton.SetPosition(maxSize.Width - ButtonSize.Value * 2, (H - _bindButton.H) / 2f);
         }
     }
 

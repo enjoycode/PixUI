@@ -2,7 +2,7 @@ using System;
 
 namespace PixUI;
 
-public sealed class DataGrid<T> : Widget, IMouseRegion
+public sealed class DataGrid<T> : Widget, IDroppable
 {
     public DataGrid(DataGridController<T> controller)
     {
@@ -71,6 +71,54 @@ public sealed class DataGrid<T> : Widget, IMouseRegion
         else
             Body.ScrollBars.Hide(false);
     }
+
+    #region ====DragDrop====
+
+    public bool AllowDrop
+    {
+        get => _controller.AllowDrop;
+        set => _controller.AllowDrop = value;
+    }
+
+    public Func<DragEvent, bool>? OnAllowDrop
+    {
+        get => _controller.OnAllowDrop;
+        set => _controller.OnAllowDrop = value;
+    }
+
+    public Action<DragEvent>? OnDrop
+    {
+        get => _controller.OnDrop;
+        set => _controller.OnDrop = value;
+    }
+
+    bool IDroppable.AllowDrop(DragEvent dragEvent) => AllowDrop;
+
+    void IDroppable.OnDragOver(DragEvent dragEvent, Point local)
+    {
+        dragEvent.DropEffect = DropEffect.Move;
+        dragEvent.DropPosition = DropPosition.In;
+
+        var allowDrop = true;
+        if (_controller.OnAllowDrop != null)
+            allowDrop = _controller.OnAllowDrop(dragEvent);
+        if (!allowDrop)
+        {
+            dragEvent.DropEffect = DropEffect.None;
+            dragEvent.DropHintImage = null;
+        }
+        // else
+        // {
+        //     //TODO:考虑缓存dropHintImage
+        //     // dragEvent.DropHintImage = BuildDropHintImage(dragEvent.DropPosition);
+        // }
+    }
+
+    void IDroppable.OnDragLeave(DragEvent dragEvent) { }
+
+    void IDroppable.OnDrop(DragEvent dragEvent, Point local) => _controller.OnDrop?.Invoke(dragEvent);
+
+    #endregion
 
     #region ====Overrides====
 

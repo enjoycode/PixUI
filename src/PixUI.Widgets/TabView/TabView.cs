@@ -75,15 +75,14 @@ public sealed class TabView<T> : Widget
     public override void Layout(float availableWidth, float availableHeight)
     {
         //TODO:支持上、下、左、右布局
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var max = CacheAndGetMaxSize(availableWidth, availableHeight);
 
-        _tabBar.Layout(width, _tabBarIndent);
+        _tabBar.Layout(max.Width, _tabBarIndent);
         _tabBar.SetPosition(0, 0);
-        _tabBody.Layout(width, height - _tabBar.H);
+        _tabBody.Layout(max.Width, max.Height - _tabBar.H);
         _tabBody.SetPosition(0, _tabBar.H);
 
-        SetSize(width, height);
+        SetSize(max.Width, max.Height);
     }
 
     #endregion

@@ -68,7 +68,7 @@ public sealed class TabBar<T> : Widget, ITabBar
     {
         _tabs[index].Parent = null;
         _tabs.RemoveAt(index);
-        Invalidate(InvalidAction.Relayout);
+        Relayout();
     }
 
     #endregion
@@ -114,34 +114,33 @@ public sealed class TabBar<T> : Widget, ITabBar
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var max = CacheAndGetMaxSize(availableWidth, availableHeight);
         if (_tabs.Count == 0)
         {
-            SetSize(width, height);
+            SetSize(max.Width, max.Height);
             return;
         }
 
         if (Scrollable)
         {
-            SetSize(width, height); //TODO:考虑累加宽度
+            SetSize(max.Width, max.Height); //TODO:考虑累加宽度
 
             var offsetX = 0f;
             for (var i = 0; i < _tabs.Count; i++)
             {
-                _tabs[i].Layout(float.PositiveInfinity, height);
+                _tabs[i].Layout(float.PositiveInfinity, max.Height);
                 _tabs[i].SetPosition(offsetX, 0);
                 offsetX += _tabs[i].W;
             }
         }
         else
         {
-            SetSize(width, height);
+            SetSize(max.Width, max.Height);
 
-            var tabWidth = width / _tabs.Count;
+            var tabWidth = max.Width / _tabs.Count;
             for (var i = 0; i < _tabs.Count; i++)
             {
-                _tabs[i].Layout(tabWidth, height);
+                _tabs[i].Layout(tabWidth, max.Height);
                 _tabs[i].SetPosition(tabWidth * i, 0);
             }
         }
@@ -151,7 +150,7 @@ public sealed class TabBar<T> : Widget, ITabBar
     {
         if (BgColor != null)
             canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(BgColor.Value));
-        
+
         if (area is RepaintChild repaintChild)
         {
             repaintChild.Repaint(canvas);

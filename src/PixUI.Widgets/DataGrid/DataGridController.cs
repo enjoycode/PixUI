@@ -33,6 +33,16 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
     public DataGridColumns<T> Columns { get; }
 
+    #region ====DragDrop====
+
+    public bool AllowDrop { get; set; }
+
+    public Func<DragEvent, bool>? OnAllowDrop { get; set; }
+
+    public Action<DragEvent>? OnDrop { get; set; }
+
+    #endregion
+
     #region ----Layout Properties----
 
     /// <summary>
@@ -586,7 +596,8 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
     public void Add(T item)
     {
-        _dataSource!.Add(item);
+        _dataSource ??= new List<T>();
+        _dataSource.Add(item);
         //TODO: refresh DataView
         _owner?.Body.Repaint();
     }
