@@ -13,7 +13,7 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
     private Widget? _suffix;
     private readonly T _editor = null!;
 
-    private InputBorder? _border;
+    private InputBorder? _border = InputBorder.DefaultOutline;
     private State<Color>? _fillColor;
     private State<EdgeInsets>? _padding;
     private readonly FocusedDecoration _focusedDecoration;
@@ -168,11 +168,13 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
         var bounds = Rect.FromLTWH(0, 0, W, H);
-        var border = _border ?? InputBorder.DefaultOutline;
 
         //画背景及边框
         var fillColor = _fillColor?.Value ?? Colors.White;
-        border.Paint(canvas, bounds, IsReadonly ? Theme.DisabledBgColor : fillColor);
+        if (_border != null)
+            _border.Paint(canvas, bounds, IsReadonly ? Theme.DisabledBgColor : fillColor);
+        else
+            canvas.DrawRect(bounds, PixUI.Paint.Shared(fillColor));
 
         PaintChildren(canvas, area);
     }
