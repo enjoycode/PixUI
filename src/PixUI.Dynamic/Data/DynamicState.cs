@@ -33,9 +33,9 @@ public interface IDynamicValueState : IDynamicState
 public interface IDynamicTableState : IDynamicState
 {
     /// <summary>
-    /// 数据变更事件，用于通知绑定的组件刷新数据
+    /// 数据变更事件，用于通知绑定的组件刷新数据或重置相关配置
     /// </summary>
-    event Action DataChanged;
+    event Action<bool> DataChanged;
 
     void ReadFrom(ref Utf8JsonReader reader);
 
