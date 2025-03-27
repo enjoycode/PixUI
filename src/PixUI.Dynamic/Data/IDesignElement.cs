@@ -1,3 +1,6 @@
 namespace PixUI.Dynamic;
 
-public interface IDesignElement { }
+public interface IDesignElement
+{
+    DynamicWidgetData Data { get; }
+}
