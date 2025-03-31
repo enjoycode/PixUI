@@ -10,7 +10,7 @@ public static class DesignSettings
     /// <summary>
     /// 根据类型创建DynamicState的Value属性值的委托
     /// </summary>
-    public static Func<DynamicStateType, IDynamicState> CreateDynamicStateValue = null!;
+    public static Func<DynamicStateType, IDynamicStateValue> CreateDynamicStateValue = null!;
 
     /// <summary>
     /// 获取状态对应的设计时编辑器

@@ -4,17 +4,17 @@ using System.Threading.Tasks;
 
 namespace PixUI.Dynamic;
 
-public interface IDynamicState
+public interface IDynamicStateValue
 {
     void WriteTo(Utf8JsonWriter writer);
-    
+
     void ReadFrom(ref Utf8JsonReader reader, DynamicState state);
 }
 
 /// <summary>
-/// 单个值状态
+/// 基元类型状态值
 /// </summary>
-public interface IDynamicValueState : IDynamicState
+public interface IDynamicPrimitive : IDynamicStateValue
 {
     /// <summary>
     /// 获取设计时的值
@@ -28,9 +28,9 @@ public interface IDynamicValueState : IDynamicState
 }
 
 /// <summary>
-/// 数据表状态
+/// 数据表状态值
 /// </summary>
-public interface IDynamicTableState : IDynamicState
+public interface IDynamicTable : IDynamicStateValue
 {
     /// <summary>
     /// 数据变更事件，用于通知绑定的组件刷新数据或重置相关配置
@@ -57,16 +57,16 @@ public sealed class DynamicState
 {
     public string Name { get; set; } = null!;
     public DynamicStateType Type { get; set; }
-    public IDynamicState? Value { get; set; }
+    public IDynamicStateValue? Value { get; set; }
     public bool AllowNull { get; set; }
 
     /// <summary>
-    /// 根据状态类型(DynamicStateType)获取相应的反射值类型(Type)
+    /// 根据状态类型(DynamicStateType)获取相应的运行时类型(Type)
     /// </summary>
-    public Type GetValueStateValueType()
+    public Type GetTypeOfPrimitiveState()
     {
         if (Type == DynamicStateType.DataTable)
-            throw new NotSupportedException("Only for value state");
+            throw new NotSupportedException("Only for primitive value state");
 
         var valueType = Type switch
         {

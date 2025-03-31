@@ -24,7 +24,7 @@ public static class DynamicContextExtensions
         if (state == null || state.Type != DynamicStateType.DataTable || state.Value == null)
             return new ValueTask<object?>();
 
-        return ((IDynamicTableState)state.Value).GetRuntimeState(context);
+        return ((IDynamicTable)state.Value).GetRuntimeState(context);
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public static class DynamicContextExtensions
 #endif
         if (state.Type == DynamicStateType.DataTable)
             throw new Exception($"State is {nameof(DynamicStateType.DataTable)}: {name}");
-        return ((IDynamicValueState)state.Value!).GetRuntimeState(context, state);
+        return ((IDynamicPrimitive)state.Value!).GetRuntimeState(context, state);
     }
 
     /// <summary>
@@ -55,7 +55,7 @@ public static class DynamicContextExtensions
         var state = context.FindState(dataSource);
         if (state is not { Type: DynamicStateType.DataTable } || state.Value == null) return;
 
-        ((IDynamicTableState)state.Value).DataChanged += widget.OnDataChanged;
+        ((IDynamicTable)state.Value).DataChanged += widget.OnDataChanged;
     }
 
     /// <summary>
@@ -68,6 +68,6 @@ public static class DynamicContextExtensions
         var state = context.FindState(dataSource);
         if (state is not { Type: DynamicStateType.DataTable } || state.Value == null) return;
 
-        ((IDynamicTableState)state.Value).DataChanged -= widget.OnDataChanged;
+        ((IDynamicTable)state.Value).DataChanged -= widget.OnDataChanged;
     }
 }

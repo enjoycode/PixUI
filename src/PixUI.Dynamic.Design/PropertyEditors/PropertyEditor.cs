@@ -217,7 +217,7 @@ public sealed class PropertyEditor : Widget
             if (valueSource == ValueSource.State)
             {
                 var state = propertyEditor.Element.Controller.FindState(currentValue.Value.StateName);
-                var stateValue = state?.Value as IDynamicValueState;
+                var stateValue = state?.Value as IDynamicPrimitive;
                 return stateValue?.GetDesignValue(propertyEditor.Element.Controller.DesignCanvas); //注意非运行时值
             }
 
