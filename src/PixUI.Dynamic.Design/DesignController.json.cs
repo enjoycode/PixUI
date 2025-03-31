@@ -257,8 +257,8 @@ partial class DesignController
             var peekReader = reader;
             if (!(peekReader.Read() && peekReader.TokenType == JsonTokenType.Null))
             {
-                var ds = DesignSettings.MakeTableState!();
-                ds.ReadFrom(ref reader);
+                var ds = DesignSettings.CreateDynamicStateValue(state.Type);
+                ds.ReadFrom(ref reader, state);
                 state.Value = ds;
             }
             else
@@ -278,7 +278,7 @@ partial class DesignController
             var peekReader = reader;
             if (!(peekReader.Read() && peekReader.TokenType == JsonTokenType.Null))
             {
-                var vs = DesignSettings.MakeValueState!();
+                var vs = DesignSettings.CreateDynamicStateValue(state.Type);
                 vs.ReadFrom(ref reader, state);
                 state.Value = vs;
             }
