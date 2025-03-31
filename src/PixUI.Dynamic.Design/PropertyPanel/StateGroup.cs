@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-
 namespace PixUI.Dynamic.Design;
 
 internal sealed class StateGroup : View
@@ -38,7 +35,7 @@ internal sealed class StateGroup : View
                     Child = new DataGrid<DynamicState>(_designController.StatesController) { Height = 119 }
                         .AddTextColumn("Name", s => s.Name)
                         .AddTextColumn("Type", s => s.Type.ToString())
-                        .AddButtonColumn("Value", (s, i) => new Button(icon: MaterialIcons.Edit)
+                        .AddButtonColumn("Value", (s, _) => new Button(icon: MaterialIcons.Edit)
                         {
                             Style = ButtonStyle.Transparent,
                             Shape = ButtonShape.Pills,
@@ -59,7 +56,7 @@ internal sealed class StateGroup : View
 
         var item = new DynamicState() { Name = dlg.Name, Type = dlg.Type };
         if (item.Type != DynamicStateType.DataTable)
-            item.Value = DesignSettings.MakeValueState!(); //暂在这里直接新建，防止未设置状态值时绑定至组件
+            item.Value = DesignSettings.CreateDynamicStateValue(item.Type); //暂在这里直接新建，防止未设置状态值时绑定至组件
         _designController.StatesController.Add(item);
     }
 
@@ -73,14 +70,17 @@ internal sealed class StateGroup : View
 
     private async void OnEditState(DynamicState state)
     {
+        if (DesignSettings.GetStateEditor == null!)
+            return;
+
         if (state.Type == DynamicStateType.DataTable)
         {
-            var dlg = DesignSettings.GetTableStateEditor?.Invoke(_designController, state);
+            var dlg = DesignSettings.GetStateEditor(_designController, state);
             dlg?.Show();
         }
         else
         {
-            var dlg = DesignSettings.GetValueStateEditor?.Invoke(state);
+            var dlg = DesignSettings.GetStateEditor(_designController, state);
             if (dlg != null)
             {
                 var res = await dlg.ShowAsync();

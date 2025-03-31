@@ -7,6 +7,8 @@ namespace PixUI.Dynamic;
 public interface IDynamicState
 {
     void WriteTo(Utf8JsonWriter writer);
+    
+    void ReadFrom(ref Utf8JsonReader reader, DynamicState state);
 }
 
 /// <summary>
@@ -14,8 +16,6 @@ public interface IDynamicState
 /// </summary>
 public interface IDynamicValueState : IDynamicState
 {
-    void ReadFrom(ref Utf8JsonReader reader, DynamicState state);
-
     /// <summary>
     /// 获取设计时的值
     /// </summary>
@@ -36,8 +36,6 @@ public interface IDynamicTableState : IDynamicState
     /// 数据变更事件，用于通知绑定的组件刷新数据或重置相关配置
     /// </summary>
     event Action<bool> DataChanged;
-
-    void ReadFrom(ref Utf8JsonReader reader);
 
     ValueTask<object?> GetRuntimeState(IDynamicContext dynamicContext);
 }

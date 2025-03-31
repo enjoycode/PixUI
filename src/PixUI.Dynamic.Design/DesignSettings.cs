@@ -2,21 +2,23 @@ using System;
 
 namespace PixUI.Dynamic.Design;
 
+/// <summary>
+/// 动态化设计时的委托
+/// </summary>
 public static class DesignSettings
 {
-    public static Func<DesignElement, DynamicEventMeta, Dialog>? GetEventEditor;
-    
     /// <summary>
-    /// 获取数据表状态的编辑器
+    /// 根据类型创建DynamicState的Value属性值的委托
     /// </summary>
-    public static Func<DesignController, DynamicState, Dialog>? GetTableStateEditor;
-    
-    public static Func<IDynamicTableState>? MakeTableState;
+    public static Func<DynamicStateType, IDynamicState> CreateDynamicStateValue = null!;
 
     /// <summary>
-    /// 获取单个值状态的编辑器
+    /// 获取状态对应的设计时编辑器
     /// </summary>
-    public static Func<DynamicState, Dialog>? GetValueStateEditor;
+    public static Func<DesignController, DynamicState, Dialog?> GetStateEditor = null!;
 
-    public static Func<IDynamicValueState>? MakeValueState;
+    /// <summary>
+    /// 获取事件对应的设计时编辑器
+    /// </summary>
+    public static Func<DesignElement, DynamicEventMeta, Dialog?> GetEventEditor = null!;
 }
