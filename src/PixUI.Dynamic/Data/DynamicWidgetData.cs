@@ -193,7 +193,7 @@ public struct DynamicValue
 /// </summary>
 public sealed class PropertyValue
 {
-    public string Name { get; set; } = null!;
+    public string Name { get; init; } = null!;
     public DynamicValue Value { get; set; }
 }
 
@@ -202,7 +202,7 @@ public sealed class PropertyValue
 /// </summary>
 public sealed class EventValue
 {
-    public string Name { get; set; } = null!;
+    public string Name { get; init; } = null!;
 
     public IEventAction Action { get; set; } = null!;
 }

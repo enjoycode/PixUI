@@ -30,7 +30,7 @@ public interface IDynamicPrimitive : IDynamicStateValue
 /// <summary>
 /// 数据表状态值
 /// </summary>
-public interface IDynamicTable : IDynamicStateValue
+public interface IDynamicDataTable : IDynamicStateValue
 {
     /// <summary>
     /// 数据变更事件，用于通知绑定的组件刷新数据或重置相关配置
@@ -40,9 +40,15 @@ public interface IDynamicTable : IDynamicStateValue
     ValueTask<object?> GetRuntimeState(IDynamicContext dynamicContext);
 }
 
+/// <summary>
+/// 数据行状态值
+/// </summary>
+public interface IDynamicDataRow : IDynamicStateValue { }
+
 public enum DynamicStateType
 {
     DataTable,
+    DataRow,
     Int,
     String,
     DateTime,
@@ -55,7 +61,7 @@ public enum DynamicStateType
 /// </summary>
 public sealed class DynamicState
 {
-    public string Name { get; set; } = null!;
+    public string Name { get; init; } = null!;
     public DynamicStateType Type { get; set; }
     public IDynamicStateValue? Value { get; set; }
     public bool AllowNull { get; set; }
@@ -65,7 +71,7 @@ public sealed class DynamicState
     /// </summary>
     public Type GetTypeOfPrimitiveState()
     {
-        if (Type == DynamicStateType.DataTable)
+        if (Type is DynamicStateType.DataTable or DynamicStateType.DataRow)
             throw new NotSupportedException("Only for primitive value state");
 
         var valueType = Type switch

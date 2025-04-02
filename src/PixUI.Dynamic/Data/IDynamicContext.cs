@@ -24,15 +24,15 @@ public static class DynamicContextExtensions
         if (state == null || state.Type != DynamicStateType.DataTable || state.Value == null)
             return new ValueTask<object?>();
 
-        return ((IDynamicTable)state.Value).GetRuntimeState(context);
+        return ((IDynamicDataTable)state.Value).GetRuntimeState(context);
     }
 
     /// <summary>
-    /// 获取运行时状态实例
+    /// 获取运行时基元类型的状态实例
     /// </summary>
     /// <param name="context"></param>
     /// <param name="name">定义的状态名称</param>
-    public static State GetState(this IDynamicContext context, string name)
+    public static State GetPrimitiveState(this IDynamicContext context, string name)
     {
         var state = context.FindState(name);
         if (state == null)
@@ -41,8 +41,8 @@ public static class DynamicContextExtensions
 #else
             return State.Empty;
 #endif
-        if (state.Type == DynamicStateType.DataTable)
-            throw new Exception($"State is {nameof(DynamicStateType.DataTable)}: {name}");
+        if (state.Type is DynamicStateType.DataTable or DynamicStateType.DataRow)
+            throw new Exception($"State is not primitive type: {name}");
         return ((IDynamicPrimitive)state.Value!).GetRuntimeState(context, state);
     }
 
@@ -55,7 +55,7 @@ public static class DynamicContextExtensions
         var state = context.FindState(dataSource);
         if (state is not { Type: DynamicStateType.DataTable } || state.Value == null) return;
 
-        ((IDynamicTable)state.Value).DataChanged += widget.OnDataChanged;
+        ((IDynamicDataTable)state.Value).DataChanged += widget.OnDataChanged;
     }
 
     /// <summary>
@@ -68,6 +68,6 @@ public static class DynamicContextExtensions
         var state = context.FindState(dataSource);
         if (state is not { Type: DynamicStateType.DataTable } || state.Value == null) return;
 
-        ((IDynamicTable)state.Value).DataChanged -= widget.OnDataChanged;
+        ((IDynamicDataTable)state.Value).DataChanged -= widget.OnDataChanged;
     }
 }

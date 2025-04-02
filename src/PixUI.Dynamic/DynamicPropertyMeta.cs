@@ -50,11 +50,10 @@ public sealed class DynamicPropertyMeta
     /// <summary>
     /// ValueType是否可空值类型
     /// </summary>
-    public bool IsNullableValueType =>
-        ValueType is { IsValueType: true, IsGenericType: true } &&
-        ValueType.GetGenericTypeDefinition() == typeof(Nullable<>);
+    public bool IsNullableValueType => ValueType is { IsValueType: true, IsGenericType: true } &&
+                                       ValueType.GetGenericTypeDefinition() == typeof(Nullable<>);
 
-    public object? GetRuntimeValue(in DynamicValue source, IDynamicContext dynamicContext)
+    private object? GetRuntimeValue(in DynamicValue source, IDynamicContext dynamicContext)
     {
         if (source.From == ValueSource.Const)
         {
@@ -70,7 +69,7 @@ public sealed class DynamicPropertyMeta
 
         if (source.From == ValueSource.State)
         {
-            return dynamicContext.GetState(source.StateName);
+            return dynamicContext.GetPrimitiveState(source.StateName);
         }
 
         throw new NotImplementedException();
