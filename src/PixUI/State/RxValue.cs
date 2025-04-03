@@ -26,7 +26,7 @@ public sealed class RxValue<T> : State<T>
         }
     }
 
-    //类似Nullable<T>暂不支持隐式转换为相应的值
+    //暂不支持隐式转换为相应的值
     //public static implicit operator T(Rx<T> rx) => rx.Value;
 
     public static implicit operator RxValue<T>(T value) => new(value);

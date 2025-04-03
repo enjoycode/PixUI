@@ -70,7 +70,7 @@ public abstract class State<T> : State
     /// <summary>
     /// 转换为State&lt;bool&gt;的计算属性
     /// </summary>
-    public State<bool> ToStateOfBool(Func<T, bool> getter) => RxComputed<bool>.Make<T, bool>(this, getter);
+    public State<bool> ToStateOfBool(Func<T, bool> getter) => RxComputed<bool>.Make(this, getter);
 
     public State<TR> ToComputed<TR>(Func<T, TR> getter, Action<TR>? setter = null, Func<bool>? notifier = null) =>
         RxComputed<TR>.Make(this, getter, setter, notifier);
