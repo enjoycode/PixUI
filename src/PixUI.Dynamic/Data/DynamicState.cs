@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -24,6 +25,9 @@ public interface IDynamicPrimitive : IDynamicStateValue
     /// <summary>
     /// 获取运行时状态
     /// </summary>
+    /// <param name="ctx"></param>
+    /// <param name="state">设计时的状态</param>
+    /// <returns>运行时的状态</returns>
     State GetRuntimeState(IDynamicContext ctx, DynamicState state);
 }
 
@@ -43,7 +47,12 @@ public interface IDynamicDataTable : IDynamicStateValue
 /// <summary>
 /// 数据行状态值
 /// </summary>
-public interface IDynamicDataRow : IDynamicStateValue { }
+public interface IDynamicDataRow : IDynamicStateValue, IWithChildStates { }
+
+public interface IWithChildStates
+{
+    IEnumerable<DynamicState> GetChildStates(DynamicState parent);
+}
 
 public enum DynamicStateType
 {

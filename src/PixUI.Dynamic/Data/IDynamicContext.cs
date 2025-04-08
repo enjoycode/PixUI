@@ -8,6 +8,10 @@ namespace PixUI.Dynamic;
 /// </summary>
 public interface IDynamicContext
 {
+    /// <summary>
+    /// 根据名称找到设计时的状态
+    /// </summary>
+    /// <param name="name">eg: name or row.Name</param>
     DynamicState? FindState(string name);
 }
 

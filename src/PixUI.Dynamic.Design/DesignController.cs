@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -70,19 +69,49 @@ public sealed partial class DesignController
     /// </summary>
     internal readonly DataGridController<DynamicState> StatesController = new();
 
-    public DynamicState? FindState(string name) =>
-        StatesController.DataSource!.FirstOrDefault(s => s.Name == name);
-
-    public List<DynamicState> FindStatesByValueType(DynamicStateType type, bool allowNull)
+    public DynamicState? FindState(string name)
     {
-        if (type == DynamicStateType.DataTable) throw new NotSupportedException();
+        var allStates = StatesController.DataSource;
+        if (allStates == null || allStates.Count == 0)
+            return null;
 
-        return StatesController.DataSource!
-            .Where(s => s.Type == type && s.AllowNull == allowNull)
-            .ToList();
+        if (name.Contains('.'))
+        {
+            return allStates.Where(s => s.Value is IWithChildStates)
+                .SelectMany(s => ((IWithChildStates)s.Value!).GetChildStates(s))
+                .FirstOrDefault(s => s.Name == name);
+        }
+
+        return allStates.FirstOrDefault(s => s.Name == name);
     }
 
-    public IEnumerable<DynamicState> GetAllDataSource()
+    /// <summary>
+    /// 获取所有基元类型的状态列表
+    /// </summary>
+    public List<DynamicState> FindPrimitiveStates(DynamicStateType type, bool allowNull)
+    {
+        if (type is DynamicStateType.DataTable or DynamicStateType.DataRow)
+            throw new NotSupportedException();
+
+        var allStates = StatesController.DataSource!;
+        var list = allStates
+            .Where(s => s.Type == type && s.AllowNull == allowNull)
+            .ToList();
+
+        //继续查询DataTable及DataRow对应的子级状态
+        var withChildren = allStates
+            .Where(s => s.Value is IWithChildStates)
+            .SelectMany(s => ((IWithChildStates)s.Value!).GetChildStates(s))
+            .Where(s => s.Type == type && s.AllowNull == allowNull);
+        list.AddRange(withChildren);
+
+        return list;
+    }
+
+    /// <summary>
+    /// 获取所有数据表状态列表
+    /// </summary>
+    public IEnumerable<DynamicState> FindDataTableStates()
     {
         if (StatesController.DataSource == null) yield break;
         foreach (var state in StatesController.DataSource)

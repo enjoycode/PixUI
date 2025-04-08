@@ -27,7 +27,7 @@ internal sealed class BindPropertyStateDialog : Dialog
         try
         {
             var stateType = DynamicState.GetStateTypeByValueType(_propertyMeta, out var allowNull);
-            var list = _element.Controller.FindStatesByValueType(stateType, allowNull);
+            var list = _element.Controller.FindPrimitiveStates(stateType, allowNull);
             _dgController.DataSource = list;
 
             //选择
