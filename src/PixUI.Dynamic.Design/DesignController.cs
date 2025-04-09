@@ -120,6 +120,16 @@ public sealed partial class DesignController
         }
     }
 
+    public IEnumerable<DynamicState> FindDataTableAndDataRowStates()
+    {
+        if (StatesController.DataSource == null) yield break;
+        foreach (var state in StatesController.DataSource)
+        {
+            if (state.Type is DynamicStateType.DataTable or DynamicStateType.DataRow)
+                yield return state;
+        }
+    }
+
     #region ====ContextMenu====
 
     internal void ShowContextMenu()

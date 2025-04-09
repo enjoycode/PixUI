@@ -41,7 +41,10 @@ public interface IDynamicDataTable : IDynamicStateValue
     /// </summary>
     event Action<bool> DataChanged;
 
-    ValueTask<object?> GetRuntimeState(IDynamicContext dynamicContext);
+    /// <summary>
+    /// 获取运行时的值
+    /// </summary>
+    ValueTask<object?> GetRuntimeValue(IDynamicContext dynamicContext);
 }
 
 /// <summary>

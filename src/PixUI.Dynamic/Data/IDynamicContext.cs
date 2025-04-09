@@ -28,7 +28,7 @@ public static class DynamicContextExtensions
         if (state == null || state.Type != DynamicStateType.DataTable || state.Value == null)
             return new ValueTask<object?>();
 
-        return ((IDynamicDataTable)state.Value).GetRuntimeState(context);
+        return ((IDynamicDataTable)state.Value).GetRuntimeValue(context);
     }
 
     /// <summary>
