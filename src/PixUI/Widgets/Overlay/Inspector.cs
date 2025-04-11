@@ -27,7 +27,7 @@ public sealed class Inspector : Widget
         {
             var instance = (Inspector)inspector;
             instance._target = target;
-            instance.Invalidate(InvalidAction.Repaint);
+            instance.Repaint();
             return instance;
         }
     }

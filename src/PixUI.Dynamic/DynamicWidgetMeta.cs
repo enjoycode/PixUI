@@ -1,8 +1,12 @@
 using System;
 using System.Linq;
-using System.Reflection;
 
 namespace PixUI.Dynamic;
+
+/// <summary>
+/// 设计时创建占位用的DesignElement的委托
+/// </summary>
+public delegate Widget CreateDesignElement(string slotName, Size? size, DynamicWidgetMeta? meta, Widget? child);
 
 /// <summary>
 /// 动态组件定义
@@ -15,15 +19,17 @@ public sealed class DynamicWidgetMeta
         DynamicEventMeta[]? events = null,
         ContainerSlot[]? slots = null,
         float? initWidth = null,
-        float? initHeight = null)
+        float? initHeight = null,
+        Action<IDesignElement, CreateDesignElement>? onAddToCanvas = null)
     {
         _instanceMaker = instanceMaker;
-        Catelog = catalog;
+        Catalog = catalog;
         Name = name;
         WidgetType = widgetType;
         Icon = icon;
         Events = events;
         Slots = slots;
+        OnAddToCanvas = onAddToCanvas ?? OnAddToCanvasDefault;
 
         // 暂简单根据是否反向包装来判断，可考虑添加Sizable参数来判断
         if (IsReversedWrapElement)
@@ -52,13 +58,14 @@ public sealed class DynamicWidgetMeta
         DynamicEventMeta[]? events = null,
         ContainerSlot[]? slots = null,
         float? initWidth = null,
-        float? initHeight = null)
+        float? initHeight = null,
+        Action<IDesignElement, CreateDesignElement>? onAddToCanvas = null)
         where T : Widget
     {
         var widgetType = typeof(T);
         return new DynamicWidgetMeta(catalog ?? string.Empty, name ?? widgetType.Name,
             widgetType, icon, Activator.CreateInstance<T> /*use Emit?*/,
-            properties, events, slots, initWidth, initHeight);
+            properties, events, slots, initWidth, initHeight, onAddToCanvas);
     }
 
     private readonly Func<Widget> _instanceMaker;
@@ -66,7 +73,7 @@ public sealed class DynamicWidgetMeta
     /// <summary>
     /// 工具箱显示的分类 eg: Charts
     /// </summary>
-    public readonly string Catelog;
+    public readonly string Catalog;
 
     /// <summary>
     /// 工具箱显示的名称(惟一性) eg: PieChart
@@ -82,7 +89,12 @@ public sealed class DynamicWidgetMeta
     public readonly DynamicEventMeta[]? Events;
     public readonly ContainerSlot[]? Slots;
 
-    public bool ShowOnToolbox => Catelog != string.Empty;
+    /// <summary>
+    /// 设计时添加至画布后的操作(一般用于添加子级占位)
+    /// </summary>
+    public readonly Action<IDesignElement, CreateDesignElement>? OnAddToCanvas;
+
+    public bool ShowOnToolbox => Catalog != string.Empty;
     public bool IsContainer => Slots is { Length: > 0 };
 
     public bool IsReversedWrapElement => Slots is { Length: 1 } &&
@@ -130,4 +142,18 @@ public sealed class DynamicWidgetMeta
     /// 创建目标组件的实例
     /// </summary>
     public Widget CreateInstance() => _instanceMaker();
+
+    private static void OnAddToCanvasDefault(IDesignElement designElement, CreateDesignElement createPlaceHolder)
+    {
+        if (designElement.Target is SingleChildWidget { IsLayoutTight: true })
+        {
+            var meta = designElement.Meta!;
+            if (meta.IsContainer)
+            {
+                var defaultSlot = meta.DefaultSlot;
+                defaultSlot.SetChild(designElement.Target!,
+                    createPlaceHolder(defaultSlot.PropertyName, new(100, 100), null, null));
+            }
+        }
+    }
 }

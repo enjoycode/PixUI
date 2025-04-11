@@ -43,7 +43,7 @@ public sealed class Toolbox : View
     {
         var all = DynamicWidgetManager.GetAll()
             .Where(t => t.ShowOnToolbox)
-            .GroupBy(w => w.Catelog);
+            .GroupBy(w => w.Catalog);
 
         var treeList = new List<ToolboxNode>();
         foreach (var group in all)

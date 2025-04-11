@@ -153,30 +153,27 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
 
             Child = child; //注意设置初始化值后再设置Child
 
-            //暂在这里特殊处理Row, Column等IsLayoutTight的容器实例，默认添加占位的子组件
-            if (Child is SingleChildWidget { IsLayoutTight: true })
-            {
-                if (Meta.IsContainer)
-                {
-                    var defaultSlot = Meta.DefaultSlot;
-                    defaultSlot.SetChild(Child, new DesignElement(Controller, defaultSlot.PropertyName)
-                    {
-                        Width = 100, Height = 100,
-                    });
-                }
-            }
-            else if (Child is Row || Child is Column) //TODO: 应判断childMeta是否需要创建占位子组件
-            {
-                var defaultSlot = Meta.DefaultSlot;
-                for (var i = 0; i < 3; i++)
-                {
-                    defaultSlot.TryAddChild(Child, new DesignElement(Controller, "Children")
-                    {
-                        Width = 100, Height = 50,
-                    });
-                }
-            }
+            //暂在这里默认添加占位的子组件
+            Meta.OnAddToCanvas?.Invoke(this, CreatePlaceHolder);
         }
+    }
+
+    private Widget CreatePlaceHolder(string slotName, Size? size, DynamicWidgetMeta? meta, Widget? child)
+    {
+        var placeHolder = meta == null
+            ? new DesignElement(Controller, slotName)
+            : new DesignElement(Controller, meta, slotName);
+
+        if (size != null)
+        {
+            placeHolder.Width = size.Value.Width;
+            placeHolder.Height = size.Value.Height;
+        }
+
+        if (child != null)
+            placeHolder.Child = child;
+
+        return placeHolder;
     }
 
     /// <summary>
@@ -553,7 +550,7 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
             // eg: add Expanded to Row
             childToBeAdded = meta.CreateInstance();
             childElement = new DesignElement(Controller, meta, defaultSlot.PropertyName);
-            meta.Slots![0].SetChild(childToBeAdded, childElement);
+            meta.DefaultSlot.SetChild(childToBeAdded, childElement);
         }
         else
         {
@@ -688,12 +685,12 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
         else if (dragEvent.DropPosition is DropPosition.Left or DropPosition.Upper)
         {
             var insertIndex = Parent!.IndexOfChild(this);
-            ParentElement!.AddToMultiSlot(ParentElement.Meta!.DefaultSlot!, widgetMeta, local, insertIndex);
+            ParentElement!.AddToMultiSlot(ParentElement.Meta!.DefaultSlot, widgetMeta, local, insertIndex);
         }
         else if (dragEvent.DropPosition is DropPosition.Right or DropPosition.Under)
         {
             var insertIndex = Parent!.IndexOfChild(this) + 1;
-            ParentElement!.AddToMultiSlot(ParentElement.Meta!.DefaultSlot!, widgetMeta, local, insertIndex);
+            ParentElement!.AddToMultiSlot(ParentElement.Meta!.DefaultSlot, widgetMeta, local, insertIndex);
         }
     }
 

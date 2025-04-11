@@ -4,20 +4,24 @@ namespace PixUI;
 
 public sealed class FormItem : Widget
 {
+    public FormItem() {}
+    
     public FormItem(string label, Widget widget, int columnSpan = 1)
     {
         if (columnSpan < 1) throw new ArgumentException();
 
-        _widget = widget;
-        _widget.Parent = this;
-        _label = label;
+        Child = widget;
+        Child.Parent = this;
+        Label = label;
         ColumnSpan = columnSpan;
     }
 
-    private readonly Widget _widget;
-    private readonly string _label;
     private HorizontalAlignment _labelHorizontalAlignment = HorizontalAlignment.Right;
     private VerticalAlignment _labelVerticalAlignment = VerticalAlignment.Middle;
+    
+    public Widget Child { get; init; }
+
+    public string Label { get; init; }
 
     public HorizontalAlignment LabelHorizontalAlignment
     {
@@ -74,7 +78,7 @@ public sealed class FormItem : Widget
 
     #region ====Widget Overrides====
 
-    public override void VisitChildren(Func<Widget, bool> action) => action(_widget);
+    public override void VisitChildren(Func<Widget, bool> action) => action(Child);
 
     public override void Layout(float availableWidth, float availableHeight)
     {
@@ -83,11 +87,11 @@ public sealed class FormItem : Widget
 
         EnsureBuildLabelParagraph();
 
-        var lableWidth = ((Form)Parent!).LabelWidth + 5;
-        _widget.Layout(availableWidth - lableWidth, availableHeight);
-        _widget.SetPosition(lableWidth, 0);
+        var labelWidth = ((Form)Parent!).LabelWidth + 5;
+        Child.Layout(availableWidth - labelWidth, availableHeight);
+        Child.SetPosition(labelWidth, 0);
 
-        SetSize(availableWidth, Math.Max(_cachedLabelParagraph!.Height, _widget.H));
+        SetSize(availableWidth, Math.Max(_cachedLabelParagraph!.Height, Child.H));
     }
 
     private void EnsureBuildLabelParagraph()
@@ -97,7 +101,7 @@ public sealed class FormItem : Widget
         var form = Parent as Form;
         var textColor = (TextColor ?? form?.TextColor) ?? Colors.Black;
         var fontSize = (FontSize ?? form?.FontSize) ?? Theme.DefaultFontSize;
-        _cachedLabelParagraph = TextPainter.BuildParagraph(_label, float.PositiveInfinity, fontSize, textColor);
+        _cachedLabelParagraph = TextPainter.BuildParagraph(Label, float.PositiveInfinity, fontSize, textColor);
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
@@ -107,15 +111,15 @@ public sealed class FormItem : Widget
         EnsureBuildLabelParagraph();
 
         var parent = (Form)Parent!;
-        var lableWidth = parent.LabelWidth;
+        var labelWidth = parent.LabelWidth;
         var hAlignment = _labelHorizontalAlignment;
         var vAlignment = _labelVerticalAlignment;
         //先画Label
         var x = 0f;
         if (hAlignment == HorizontalAlignment.Center)
-            x = (lableWidth - _cachedLabelParagraph!.MaxIntrinsicWidth) / 2;
+            x = (labelWidth - _cachedLabelParagraph!.MaxIntrinsicWidth) / 2;
         else if (hAlignment == HorizontalAlignment.Right)
-            x = lableWidth - _cachedLabelParagraph!.MaxIntrinsicWidth;
+            x = labelWidth - _cachedLabelParagraph!.MaxIntrinsicWidth;
         var y = 0f;
         if (vAlignment == VerticalAlignment.Middle)
             y = (H - _cachedLabelParagraph!.Height) / 2f;
@@ -123,7 +127,7 @@ public sealed class FormItem : Widget
             y = H - _cachedLabelParagraph!.Height;
 
         canvas.Save(); //TODO:优化不必要的Save and Clip
-        canvas.ClipRect(Rect.FromLTWH(0, 0, lableWidth, H), ClipOp.Intersect, false);
+        canvas.ClipRect(Rect.FromLTWH(0, 0, labelWidth, H), ClipOp.Intersect, false);
         canvas.DrawParagraph(_cachedLabelParagraph!, x, y);
         canvas.Restore();
 
@@ -131,7 +135,7 @@ public sealed class FormItem : Widget
         PaintChildren(canvas, area);
     }
 
-    public override string ToString() => $"{nameof(FormItem)}[\"{_label}\"]";
+    public override string ToString() => $"{nameof(FormItem)}[\"{Label}\"]";
 
     #endregion
 }

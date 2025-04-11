@@ -85,8 +85,8 @@ public sealed class Positioned : Widget
         var y = 0f;
         var w = Width?.Value;
         var h = Height?.Value;
-        var calcX_afterLayoutChild = false;
-        var calcY_afterLayoutChild = false;
+        var calcXAfterLayoutChild = false;
+        var calcYAfterLayoutChild = false;
 
         if (_left != null && _right != null)
         {
@@ -102,7 +102,7 @@ public sealed class Positioned : Widget
                 if (w.HasValue)
                     x = availableWidth - w.Value - _right.Value;
                 else
-                    calcX_afterLayoutChild = true;
+                    calcXAfterLayoutChild = true;
             }
         }
 
@@ -120,7 +120,7 @@ public sealed class Positioned : Widget
                 if (h.HasValue)
                     y = availableHeight - h.Value - _bottom.Value;
                 else
-                    calcY_afterLayoutChild = true;
+                    calcYAfterLayoutChild = true;
             }
         }
 
@@ -138,9 +138,9 @@ public sealed class Positioned : Widget
         w ??= _child.W;
         h ??= _child.H;
 
-        if (calcX_afterLayoutChild)
+        if (calcXAfterLayoutChild)
             x = availableWidth - w.Value - _right!.Value;
-        if (calcY_afterLayoutChild)
+        if (calcYAfterLayoutChild)
             y = availableHeight - h.Value - _bottom!.Value;
 
         SetPosition(x, y);

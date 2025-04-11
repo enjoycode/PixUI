@@ -49,8 +49,7 @@ public abstract class SingleChildWidget : Widget
     /// </summary>
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var max = CacheAndGetMaxSize(availableWidth, availableHeight);
 
         var padding = _padding?.Value ?? EdgeInsets.All(0);
 
@@ -59,17 +58,17 @@ public abstract class SingleChildWidget : Widget
             if (IsLayoutTight)
                 SetSize(0, 0);
             else
-                SetSize(width, height);
+                SetSize(max.Width, max.Height);
             return;
         }
 
-        Child.Layout(width - padding.Left - padding.Right, height - padding.Top - padding.Bottom);
+        Child.Layout(max.Width - padding.Left - padding.Right, max.Height - padding.Top - padding.Bottom);
         Child.SetPosition(padding.Left, padding.Top);
 
         if (IsLayoutTight)
             SetSize(Child.W + padding.Left + padding.Right, Child.H + padding.Top + padding.Bottom);
         else
-            SetSize(width, height);
+            SetSize(max.Width, max.Height);
     }
 
     protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)

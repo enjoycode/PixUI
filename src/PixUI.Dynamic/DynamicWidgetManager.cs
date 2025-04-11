@@ -24,9 +24,11 @@ public static partial class DynamicWidgetManager
         Register(MakePositionedMeta());
         Register(MakeCardMeta());
         Register(MakeCenterMeta());
+        Register(MakeFormMeta());
+        Register(MakeFormItemMeta());
     }
 
-    private static readonly Dictionary<string, DynamicWidgetMeta> _dynamicWidgets = new();
+    private static readonly Dictionary<string, DynamicWidgetMeta> DynamicWidgets = new();
 
     private static IEventActionManager? _eventActionManager;
 
@@ -39,10 +41,10 @@ public static partial class DynamicWidgetManager
 
     public static void Register(DynamicWidgetMeta dynamicWidgetMeta, bool replaceExists = false)
     {
-        if (_dynamicWidgets.ContainsKey(dynamicWidgetMeta.Name) && !replaceExists)
+        if (DynamicWidgets.ContainsKey(dynamicWidgetMeta.Name) && !replaceExists)
             throw new Exception("Already exists.");
 
-        _dynamicWidgets[dynamicWidgetMeta.Name] = dynamicWidgetMeta;
+        DynamicWidgets[dynamicWidgetMeta.Name] = dynamicWidgetMeta;
     }
 
     public static void Register<T>(IconData icon,
@@ -91,7 +93,7 @@ public static partial class DynamicWidgetManager
             DynamicValue? initValue = null;
             if (propAttr.InitValue != null)
                 initValue = new DynamicValue() { Value = propAttr.InitValue };
-            
+
             //TODO: 使用以下示例确认是否init-only属性，不再需要手工指定DynamicProperty.InitSetter属性
             //参考: https://www.meziantou.net/csharp9-init-only-properties-are-not-read-only.htm
             //prop.SetMethod!.ReturnParameter.GetRequiredCustomModifiers(),
@@ -115,7 +117,7 @@ public static partial class DynamicWidgetManager
             return false;
         }
     }
-    
+
     // public static bool IsInitOnly(this PropertyInfo propertyInfo)
     // {
     //     var setMethod = propertyInfo.SetMethod;
@@ -132,7 +134,7 @@ public static partial class DynamicWidgetManager
         return propInfo == null ? MaterialIcons.Widgets : (IconData)propInfo.GetValue(null)!;
     }
 
-    public static IList<DynamicWidgetMeta> GetAll() => _dynamicWidgets.Values.ToList();
+    public static IList<DynamicWidgetMeta> GetAll() => DynamicWidgets.Values.ToList();
 
-    public static DynamicWidgetMeta GetByName(string name) => _dynamicWidgets[name]!;
+    public static DynamicWidgetMeta GetByName(string name) => DynamicWidgets[name]!;
 }
