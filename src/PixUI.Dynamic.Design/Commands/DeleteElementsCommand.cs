@@ -12,7 +12,7 @@ public sealed class DeleteElementsCommand : DesignCommand
             if (element.IsRoot)
             {
                 element.ClearMeta();
-                element.Invalidate(InvalidAction.Relayout);
+                element.Relayout();
                 controller.OnSelectionChanged();
                 controller.RaiseOutlineChanged();
                 break; //ignore others
@@ -29,17 +29,22 @@ public sealed class DeleteElementsCommand : DesignCommand
             }
             else if (element.Parent is DesignElement reversed) //上级是反向包装的
             {
-                if (reversed.Target is Positioned) //同时删除Positioned
-                {
-                    childElement = reversed;
-                    childWidget = reversed.Parent!;
-                    parentElement = (DesignElement)childWidget.Parent!.Parent!;
-                }
-                else
-                {
-                    childWidget = childElement = element;
-                    parentElement = reversed;
-                }
+                //直接删除上级 eg: Positioned or FormItem
+                childElement = reversed;
+                childWidget = reversed.Parent!;
+                parentElement = (DesignElement)childWidget.Parent!.Parent!;
+
+                // if (reversed.Target is Positioned) //同时删除Positioned
+                // {
+                //     childElement = reversed;
+                //     childWidget = reversed.Parent!;
+                //     parentElement = (DesignElement)childWidget.Parent!.Parent!;
+                // }
+                // else
+                // {
+                //     childWidget = childElement = element;
+                //     parentElement = reversed;
+                // }
             }
             else
             {
@@ -52,7 +57,7 @@ public sealed class DeleteElementsCommand : DesignCommand
             {
                 if (slot.TryRemoveChild(parentElement.Target!, childWidget))
                 {
-                    parentElement.Invalidate(InvalidAction.Relayout);
+                    parentElement.Relayout();
                     lastParentElement = parentElement;
                     controller.RaiseOutlineChanged();
                 }
@@ -63,7 +68,7 @@ public sealed class DeleteElementsCommand : DesignCommand
                 if (isReversed)
                 {
                     parentElement.Child = null;
-                    parentElement.Parent?.Parent?.Invalidate(InvalidAction.Relayout); //暂重布局上级的上级
+                    parentElement.Parent?.Parent?.Relayout(); //暂重布局上级的上级
                     lastParentElement = parentElement;
                     controller.RaiseOutlineChanged();
                 }
@@ -71,7 +76,7 @@ public sealed class DeleteElementsCommand : DesignCommand
                 {
                     if (slot.TrySetChild(parentElement.Target!, null))
                     {
-                        parentElement.Invalidate(InvalidAction.Relayout);
+                        parentElement.Relayout();
                         lastParentElement = parentElement;
                         controller.RaiseOutlineChanged();
                     }

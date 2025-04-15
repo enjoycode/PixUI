@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace PixUI.Dynamic;
 
 partial class DynamicWidgetManager
@@ -16,14 +18,14 @@ partial class DynamicWidgetManager
         [
             new(nameof(Row.Children), ContainerType.MultiChild, ChildrenLayoutAxis.Horizontal)
         ],
-        onAddToCanvas: static (element, createPlaceHolder) =>
+        onAddToCanvas: static (element) =>
         {
             //默认添加3个占位子级
             var defaultSlot = element.Meta!.DefaultSlot;
             for (var i = 0; i < 3; i++)
             {
                 defaultSlot.TryAddChild(element.Target!,
-                    createPlaceHolder(defaultSlot.PropertyName, new(100, 50), null, null));
+                    element.CreatePlaceHolder(defaultSlot.PropertyName, new(100, 50), null, null));
             }
         }
     );
@@ -40,14 +42,14 @@ partial class DynamicWidgetManager
         [
             new(nameof(Column.Children), ContainerType.MultiChild, ChildrenLayoutAxis.Vertical)
         ],
-        onAddToCanvas: static (element, createPlaceHolder) =>
+        onAddToCanvas: static (element) =>
         {
             //默认添加3个占位子级
             var defaultSlot = element.Meta!.DefaultSlot;
             for (var i = 0; i < 3; i++)
             {
                 defaultSlot.TryAddChild(element.Target!,
-                    createPlaceHolder(defaultSlot.PropertyName, new(100, 50), null, null));
+                    element.CreatePlaceHolder(defaultSlot.PropertyName, new(100, 50), null, null));
             }
         }
     );
@@ -125,15 +127,15 @@ partial class DynamicWidgetManager
         [
             new(nameof(Form.Children), ContainerType.MultiChild, ChildrenLayoutAxis.Vertical)
         ],
-        onAddToCanvas: static (element, createPlaceHolder) =>
+        onAddToCanvas: static (element) =>
         {
             var defaultSlot = element.Meta!.DefaultSlot;
             for (var i = 0; i < 3; i++)
             {
                 var formItemMeta = GetByName(nameof(FormItem));
-                var child = createPlaceHolder(nameof(FormItem.Child), new(100, 30), null, null);
+                var child = element.CreatePlaceHolder(nameof(FormItem.Child), new(100, 30), null, null);
                 var formItem = new FormItem("Label:",
-                    createPlaceHolder(defaultSlot.PropertyName, null, formItemMeta, child));
+                    element.CreatePlaceHolder(defaultSlot.PropertyName, null, formItemMeta, child));
 
                 defaultSlot.TryAddChild(element.Target!, formItem);
             }
@@ -145,11 +147,16 @@ partial class DynamicWidgetManager
         catalog: CatalogLayout,
         properties:
         [
-            new(nameof(FormItem.Label), typeof(string), false, true, initValue: string.Empty)
+            new(nameof(FormItem.Label), typeof(string), false, initValue: "Label:")
         ],
         slots:
         [
             new(nameof(FormItem.Child), ContainerType.SingleChildReversed)
-        ]
+        ],
+        onAddToCanvas: static (element) =>
+        {
+            Debug.Assert(element.Child == null);
+            element.Child = element.CreatePlaceHolder(nameof(FormItem.Child), new(100, 30), null, null);
+        }
     );
 }

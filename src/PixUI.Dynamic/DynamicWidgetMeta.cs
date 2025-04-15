@@ -6,6 +6,8 @@ namespace PixUI.Dynamic;
 /// <summary>
 /// 设计时创建占位用的DesignElement的委托
 /// </summary>
+/// <param name="meta">是否指定类型，否则表示占位</param>
+/// <param name="child">是否指定子级实例</param>
 public delegate Widget CreateDesignElement(string slotName, Size? size, DynamicWidgetMeta? meta, Widget? child);
 
 /// <summary>
@@ -20,7 +22,7 @@ public sealed class DynamicWidgetMeta
         ContainerSlot[]? slots = null,
         float? initWidth = null,
         float? initHeight = null,
-        Action<IDesignElement, CreateDesignElement>? onAddToCanvas = null)
+        Action<IDesignElement>? onAddToCanvas = null)
     {
         _instanceMaker = instanceMaker;
         Catalog = catalog;
@@ -59,7 +61,7 @@ public sealed class DynamicWidgetMeta
         ContainerSlot[]? slots = null,
         float? initWidth = null,
         float? initHeight = null,
-        Action<IDesignElement, CreateDesignElement>? onAddToCanvas = null)
+        Action<IDesignElement>? onAddToCanvas = null)
         where T : Widget
     {
         var widgetType = typeof(T);
@@ -92,7 +94,7 @@ public sealed class DynamicWidgetMeta
     /// <summary>
     /// 设计时添加至画布后的操作(一般用于添加子级占位)
     /// </summary>
-    public readonly Action<IDesignElement, CreateDesignElement>? OnAddToCanvas;
+    public readonly Action<IDesignElement>? OnAddToCanvas;
 
     public bool ShowOnToolbox => Catalog != string.Empty;
     public bool IsContainer => Slots is { Length: > 0 };
@@ -143,16 +145,19 @@ public sealed class DynamicWidgetMeta
     /// </summary>
     public Widget CreateInstance() => _instanceMaker();
 
-    private static void OnAddToCanvasDefault(IDesignElement designElement, CreateDesignElement createPlaceHolder)
+    private static void OnAddToCanvasDefault(IDesignElement designElement)
     {
+        var meta = designElement.Meta!;
+        if (meta.IsReversedWrapElement)
+            return;
+        
         if (designElement.Target is SingleChildWidget { IsLayoutTight: true })
         {
-            var meta = designElement.Meta!;
             if (meta.IsContainer)
             {
                 var defaultSlot = meta.DefaultSlot;
                 defaultSlot.SetChild(designElement.Target!,
-                    createPlaceHolder(defaultSlot.PropertyName, new(100, 100), null, null));
+                    designElement.CreatePlaceHolder(defaultSlot.PropertyName, new(100, 100), null, null));
             }
         }
     }

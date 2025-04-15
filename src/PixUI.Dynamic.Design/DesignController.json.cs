@@ -327,7 +327,7 @@ partial class DesignController
                 {
                     result = meta.CreateInstance();
                     element = new DesignElement(this, meta, slotName);
-                    meta.Slots![0].SetChild(result, element);
+                    meta.DefaultSlot.SetChild(result, element);
                 }
                 else
                 {

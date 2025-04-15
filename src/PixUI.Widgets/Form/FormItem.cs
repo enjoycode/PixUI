@@ -4,24 +4,48 @@ namespace PixUI;
 
 public sealed class FormItem : Widget
 {
-    public FormItem() {}
-    
+#pragma warning disable CS8618, CS9264
+    public FormItem()
+#pragma warning restore CS8618, CS9264
+    {
+        _label = "Label:";
+        ColumnSpan = 1;
+    }
+
     public FormItem(string label, Widget widget, int columnSpan = 1)
     {
         if (columnSpan < 1) throw new ArgumentException();
 
-        Child = widget;
-        Child.Parent = this;
-        Label = label;
+        _child = widget;
+        _child.Parent = this;
+        _label = label;
         ColumnSpan = columnSpan;
     }
 
     private HorizontalAlignment _labelHorizontalAlignment = HorizontalAlignment.Right;
     private VerticalAlignment _labelVerticalAlignment = VerticalAlignment.Middle;
-    
-    public Widget Child { get; init; }
 
-    public string Label { get; init; }
+    public Widget Child
+    {
+        get => _child;
+        init
+        {
+            _child = value;
+            _child.Parent = this;
+            Relayout();
+        }
+    }
+
+    public string Label
+    {
+        get => _label;
+        set
+        {
+            _label = value;
+            ClearCache();
+            Repaint();
+        }
+    }
 
     public HorizontalAlignment LabelHorizontalAlignment
     {
@@ -51,6 +75,8 @@ public sealed class FormItem : Widget
     private Color? _textColor;
     private float? _fontSize;
     private Paragraph? _cachedLabelParagraph;
+    private readonly Widget _child;
+    private string _label;
 
     public Color? TextColor
     {

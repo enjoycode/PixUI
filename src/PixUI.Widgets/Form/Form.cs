@@ -87,7 +87,7 @@ public sealed class Form : MultiChildWidget<FormItem>
 
         //单列可用宽度
         var columnWidth = (max.Width - (_columns - 1) * _horizontalSpacing
-                                 - _padding.Left - _padding.Right) / _columns;
+                                     - _padding.Left - _padding.Right) / _columns;
 
         var y = _padding.Top;
         var colIndex = 0;
@@ -100,8 +100,7 @@ public sealed class Form : MultiChildWidget<FormItem>
             var child = _children[i];
             var span = Math.Min(child.ColumnSpan, _columns - colIndex);
             child.Layout(columnWidth * span + (span - 1) * _horizontalSpacing, leftHeight);
-            child.SetPosition(
-                _padding.Left + colIndex * _horizontalSpacing + colIndex * columnWidth, y);
+            child.SetPosition(_padding.Left + colIndex * _horizontalSpacing + colIndex * columnWidth, y);
             rowHeight = Math.Max(rowHeight, child.H);
 
             colIndex += span;

@@ -23,7 +23,7 @@ public sealed class Expanded : SingleChildWidget
                 value = 1;
             _flex = value;
             if (IsMounted)
-                Parent?.Invalidate(InvalidAction.Relayout);
+                Parent?.Relayout();
         }
     }
 
