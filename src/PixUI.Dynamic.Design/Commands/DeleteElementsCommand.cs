@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace PixUI.Dynamic.Design;
 
 public sealed class DeleteElementsCommand : DesignCommand
@@ -34,6 +36,8 @@ public sealed class DeleteElementsCommand : DesignCommand
                 childWidget = reversed.Parent!;
                 parentElement = (DesignElement)childWidget.Parent!.Parent!;
 
+                #region ----backup----
+
                 // if (reversed.Target is Positioned) //同时删除Positioned
                 // {
                 //     childElement = reversed;
@@ -45,6 +49,8 @@ public sealed class DeleteElementsCommand : DesignCommand
                 //     childWidget = childElement = element;
                 //     parentElement = reversed;
                 // }
+
+                #endregion
             }
             else
             {
@@ -55,6 +61,9 @@ public sealed class DeleteElementsCommand : DesignCommand
             var slot = parentElement.Meta!.GetSlot(childElement.SlotName);
             if (slot.ContainerType == ContainerType.MultiChild)
             {
+                //TODO: 删除所有子级的同时删除上级
+                //if (!DesignController.GetAllChildrenElements(parentElement).Any())
+
                 if (slot.TryRemoveChild(parentElement.Target!, childWidget))
                 {
                     parentElement.Relayout();
@@ -64,6 +73,7 @@ public sealed class DeleteElementsCommand : DesignCommand
             }
             else
             {
+                //TODO: 删除后补上占位
                 var isReversed = slot.ContainerType == ContainerType.SingleChildReversed;
                 if (isReversed)
                 {
