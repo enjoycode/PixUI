@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 using PixUI.Platform;
 
@@ -10,7 +9,7 @@ namespace PixUI;
 
 public sealed class FontCollection
 {
-    public const string DefaultFamilyName = "MiSans";
+    public static readonly string DefaultFamilyName;
 
     public static readonly FontCollection Instance = new();
 
@@ -24,29 +23,51 @@ public sealed class FontCollection
 
     public event Action? FontChanged;
 
+    static FontCollection()
+    {
+        if (OperatingSystem.IsBrowser() /*RuntimeInformation.ProcessArchitecture == Architecture.Wasm*/)
+            DefaultFamilyName = "MiSans";
+        else if (OperatingSystem.IsMacOS() /*RuntimeInformation.IsOSPlatform(OSPlatform.OSX)*/)
+            DefaultFamilyName = "Helvetica Neue";
+        else if (OperatingSystem.IsWindows() /*RuntimeInformation.IsOSPlatform(OSPlatform.Windows)*/)
+            DefaultFamilyName = "Microsoft YaHei SC";
+        else
+            DefaultFamilyName = "sans-serif";
+    }
+
     private FontCollection()
     {
         _assetFontMgrHandle = SkiaApi.sk_typeface_font_provider_new();
-        var isWasm = RuntimeInformation.ProcessArchitecture.ToString() == "Wasm";
-        _fontCollectionHandle = SkiaApi.sk_font_collection_new(_assetFontMgrHandle, isWasm);
+        _fontCollectionHandle = SkiaApi.sk_font_collection_new(_assetFontMgrHandle, OperatingSystem.IsBrowser());
     }
 
-    public void RegisterTypefaceToAsset(SKData data, string fontFamily, bool raiseEvent = true)
+    /// <summary>
+    /// 加载并注册字体
+    /// </summary>
+    public void RegisterTypeface(SKData data, string fontFamily, bool isAsset)
     {
-        var typeface = Typeface.FromData(data);
+        Typeface? typeface = null;
+        if (OperatingSystem.IsBrowser())
+        {
+            typeface = Typeface.GetObject(SkiaApi.sk_typeface_make_from_data(data.Handle));
+        }
+        else
+        {
+            var defaultFontMgr = SkiaApi.sk_font_collection_get_fallback_manager(Handle);
+            typeface = Typeface.GetObject(SkiaApi.sk_fontmgr_create_from_data(defaultFontMgr, data.Handle, 0));
+        }
+
         if (typeface == null)
         {
-            Console.WriteLine("Can't create Typeface from data");
+            Log.Error($"Can't create Typeface[{fontFamily}] from data");
             return;
         }
 
         SkiaApi.sk_typeface_font_provider_register_typeface(_assetFontMgrHandle, typeface.Handle);
-#if DEBUG
-        Console.WriteLine($"FontCollection.RegisterTypefaceToAsset: {typeface.FamilyName}");
-#endif
+        Log.Debug($"FontCollection.RegisterTypeface: {typeface.FamilyName}");
 
         _loaded.Add(fontFamily, typeface);
-        if (raiseEvent)
+        if (isAsset)
             FontChanged?.Invoke();
     }
 
@@ -75,10 +96,7 @@ public sealed class FontCollection
     /// <summary>
     /// 仅从资源中匹配，目前仅用于加载Icon及Emoji字体
     /// </summary>
-    public Typeface? TryMatchFamilyFromAsset(string familyName)
-    {
-        return _loaded.TryGetValue(familyName, out var typeface) ? typeface : null;
-    }
+    public Typeface? TryMatchFamilyFromAsset(string familyName) => _loaded.GetValueOrDefault(familyName);
 
     public bool StartLoadFontFromAsset(string asmName, string assetPath, string familyName)
     {
@@ -87,14 +105,16 @@ public sealed class FontCollection
 
         Task.Run(() =>
         {
-            var stream = AssetLoader.LoadAsStream(asmName, assetPath);
+            using var stream = AssetLoader.LoadAsStream(asmName, assetPath);
             if (stream == null) return;
 
             var data = SKData.Create(stream);
-            stream.Dispose();
+            if (data == null)
+                throw new Exception("Can't create SKData from stream");
+
             UIApplication.Current.BeginInvoke(() =>
             {
-                RegisterTypefaceToAsset(data, familyName);
+                RegisterTypeface(data, familyName, true);
                 data.Dispose();
             });
         });

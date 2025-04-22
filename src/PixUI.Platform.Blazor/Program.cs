@@ -25,7 +25,7 @@ public static class Program
         await using var fontDataStream =
             await BlazorApplication.HttpClient.GetStreamAsync("/fonts/MiSans-Regular.woff2");
         using var fontData = SKData.Create(fontDataStream);
-        FontCollection.Instance.RegisterTypefaceToAsset(fontData!, FontCollection.DefaultFamilyName, false);
+        FontCollection.Instance.RegisterTypeface(fontData!, FontCollection.DefaultFamilyName, false);
 
         BlazorApplication.Run(() => new DemoRoute(), glHandle, width, height, ratio, routePath, isMacOS);
     }

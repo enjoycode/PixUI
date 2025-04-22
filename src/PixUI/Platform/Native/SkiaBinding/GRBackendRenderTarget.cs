@@ -46,15 +46,15 @@ public unsafe class GRBackendRenderTarget : SKObject, ISKSkipObjectRegistration
     // public SKSizeI Size => new SKSizeI (Width, Height);
     // public SKRectI Rect => new SKRectI (0, 0, Width, Height);
 
-    public GRGlFramebufferInfo GetGlFramebufferInfo() =>
-        GetGlFramebufferInfo(out var info) ? info : default;
+    // public GRGlFramebufferInfo GetGlFramebufferInfo() =>
+    //     GetGlFramebufferInfo(out var info) ? info : default;
 
-    public bool GetGlFramebufferInfo(out GRGlFramebufferInfo glInfo)
-    {
-        fixed (GRGlFramebufferInfo* g = &glInfo)
-        {
-            return SkiaApi.gr_backendrendertarget_get_gl_framebufferinfo(Handle, g);
-        }
-    }
+    // public bool GetGlFramebufferInfo(out GRGlFramebufferInfo glInfo)
+    // {
+    //     fixed (GRGlFramebufferInfo* g = &glInfo)
+    //     {
+    //         return SkiaApi.gr_backendrendertarget_get_gl_framebufferinfo(Handle, g);
+    //     }
+    // }
 }
 #endif

@@ -65,7 +65,7 @@ public sealed class MacMetalWindowContext : MetalWindowContext
         return true;
     }
 
-    protected internal override void OnDestroyContext()
+    protected override void OnDestroyContext()
     {
         _mainView.Layer = null;
         _mainView.WantsLayer = false;

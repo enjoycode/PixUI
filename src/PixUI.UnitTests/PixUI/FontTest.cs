@@ -21,7 +21,7 @@ public class FontTest
     }
 
     [Test]
-    public void FintTypefaceNotExistsTest()
+    public void FindTypefaceNotExistsTest()
     {
         var typeface = GetTypeface("NotExistsTypeface", false, false);
         Assert.NotNull(typeface);

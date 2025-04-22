@@ -21,8 +21,8 @@ internal sealed class Person
         {
             ls.Add(new Person
             {
-                City = "City" + (i / 4).ToString(),
-                Name = "Name" + i,
+                City = "City" + (i / 4) + "中N",
+                Name = "Name" + i + "中N",
                 Female = i % 2 == 0,
                 Score = random.Next(0, 100),
             });

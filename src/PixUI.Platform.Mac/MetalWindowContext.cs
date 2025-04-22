@@ -46,16 +46,10 @@ public abstract class MetalWindowContext : NativeWindowContext
     /// parameters change prior to initializing a new Metal context. This will in turn call
     /// onDestroyContext().
     /// </summary>
-    protected internal abstract void OnDestroyContext();
+    protected abstract void OnDestroyContext();
 
     public override unsafe Canvas GetOnScreenCanvas()
     {
-        // IntPtr drawable; //测试下来无值
-        // var surface = SKSurface.CreateFromMetalLayer(Context!, MetalLayer!.Handle,
-        //     GRSurfaceOrigin.TopLeft, SampleCount, SKColorType.Bgra8888, 
-        //     DisplayParams.ColorSpace, DisplayParams.SurfaceProps, out drawable);
-        // DrawableHandler = ObjCRuntime.Runtime.GetINativeObject<CoreAnimation.ICAMetalDrawable> (drawable, true);
-
         var currentDrawable = MetalLayer!.NextDrawable();
         var fbInfo = new GRMtlTextureInfoNative();
         fbInfo.fTexture = (void*)currentDrawable!.Texture.Handle;

@@ -274,7 +274,9 @@ public sealed unsafe class Canvas : SKObject
 
     #endregion
 
-    #region ====Clear====
+    #region ====Clear & Flush====
+
+    public void Flush() => SkiaApi.sk_canvas_flush(Handle);
 
     public void Clear() => Clear(Color.Empty);
 

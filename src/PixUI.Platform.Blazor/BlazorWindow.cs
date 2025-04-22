@@ -55,7 +55,7 @@ public sealed class BlazorWindow : UIWindow
 
     protected override Canvas GetOffscreenCanvas() => _offScreenSurface!.Canvas;
 
-    protected override void Present() => _onScreenSurface?.Flush();
+    protected override void Present() => _grContext?.Flush();
 
     internal void FirstShow()
     {
@@ -66,7 +66,7 @@ public sealed class BlazorWindow : UIWindow
         RootWidget.Paint(widgetsCanvas);
 
         var overlayCanvas = GetOnscreenCanvas();
-        _offScreenSurface?.Flush();
+        widgetsCanvas?.Flush(); // _offScreenSurface?.Flush();
         _offScreenSurface?.Draw(overlayCanvas, 0, 0, null);
 
         Present();

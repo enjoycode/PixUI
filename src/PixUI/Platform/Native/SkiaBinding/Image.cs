@@ -63,7 +63,8 @@ public sealed class Image : SKObject, ISKReferenceCounted
 
     public SKData Encode(EncodedImageFormat format, int quality)
     {
-        return SKData.GetObject(SkiaApi.sk_image_encode_specific(Handle, format, quality));
+        //TODO: remove this or use `SkPngEncoder::Encode`, `SkJpegEncoder::Encode`, `SkWebpEncoder::Encode`
+        throw new NotImplementedException();
     }
 
     #region ====ToShader====

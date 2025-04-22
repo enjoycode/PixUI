@@ -59,7 +59,7 @@ public abstract class TextBase : Widget
                 {
                     _cachedParagraph?.Dispose();
                     _cachedParagraph = null;
-                    Invalidate(InvalidAction.Relayout);
+                    Relayout();
                 }
             }
         }
@@ -145,8 +145,8 @@ public abstract class TextBase : Widget
 
         //非EditableText超出范围(overflow)裁截绘制区域
         var paragraphWidth = _cachedParagraph!.MaxIntrinsicWidth;
-        var paragraphHegith = _cachedParagraph.Height;
-        var overflow = this is not EditableText && (paragraphWidth > W || paragraphHegith > H);
+        var paragraphHeight = _cachedParagraph.Height;
+        var overflow = this is not EditableText && (paragraphWidth > W || paragraphHeight > H);
         if (overflow)
         {
             canvas.Save();
@@ -154,7 +154,7 @@ public abstract class TextBase : Widget
         }
 
         canvas.DrawParagraph(_cachedParagraph!, 0, 0);
-
+        
         if (overflow)
             canvas.Restore();
     }

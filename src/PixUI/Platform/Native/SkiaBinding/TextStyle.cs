@@ -9,8 +9,7 @@ public sealed class TextStyle : SKObject
 
     public TextStyle() : this(SkiaApi.sk_text_style_new(), true)
     {
-        if (OperatingSystem.IsBrowser())
-            SetFontFamilies(new[] { FontCollection.DefaultFamilyName });
+        SetFontFamilies(new[] { FontCollection.DefaultFamilyName });
     }
 
     protected override void DisposeNative() => SkiaApi.sk_text_style_delete(Handle);
@@ -92,6 +91,7 @@ public readonly struct FontStyle
 {
     public readonly FontWeight? Weight;
     public readonly FontSlant? Slant;
+    //TODO: 与skia定义一致
 
     public FontStyle(FontWeight weight, FontSlant slant)
     {

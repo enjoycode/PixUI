@@ -73,15 +73,5 @@ public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegi
 
     public void Draw(Canvas canvas, float x, float y, Paint? paint)
         => SkiaApi.sk_surface_draw(Handle, canvas.Handle, x, y, paint?.Handle ?? IntPtr.Zero);
-
-    public void Flush() => Flush(true);
-
-    public void Flush(bool submit, bool synchronous = false)
-    {
-        if (submit)
-            SkiaApi.sk_surface_flush_and_submit(Handle, synchronous);
-        else
-            SkiaApi.sk_surface_flush(Handle);
-    }
 }
 #endif

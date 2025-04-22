@@ -25,14 +25,14 @@ public sealed class DemoDataGrid : View
                     }
                 }
                 .AddRowNumColumn("行号", 60, frozen: true)
-                .AddTextColumn("City", p => p.City, 100, cellStyle: CellStyle.AlignCenter(), autoMergeCell: true)
-                .AddTextColumn("Name", p => p.Name, 400)
-                .AddGroupColumn("Gender", out var genderGroup)
+                .AddTextColumn("城市", p => p.City, 100, cellStyle: CellStyle.AlignCenter(), autoMergeCell: true)
+                .AddTextColumn("姓名", p => p.Name, 400)
+                .AddGroupColumn("性别", out var genderGroup)
                 .AddIconColumnTo(genderGroup, "Icon", p => p.Female ? MaterialIcons.Woman : MaterialIcons.Man, 60,
                     cellStyleGetter: (p, _) => p.Female ? greenCellStyle : redCellStyle)
                 .AddCheckboxColumnTo(genderGroup, "IsMan", p => !p.Female, width: 100)
-                .AddTextColumn("Score", p => p.Score.ToString(), 100)
-                .AddButtonColumn("Action", (person, _) => new Button(icon: MaterialIcons.ShoppingCart)
+                .AddTextColumn("成绩", p => p.Score.ToString(), 100)
+                .AddButtonColumn("操作", (person, _) => new Button(icon: MaterialIcons.ShoppingCart)
                 {
                     OnTap = _ => Notification.Info(person.Name)
                 }, width: 80, frozen: true)
