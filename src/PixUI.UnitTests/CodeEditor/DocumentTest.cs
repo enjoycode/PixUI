@@ -44,6 +44,8 @@ class Person
         doc.Open(SrcCode);
         // doc.SyntaxParser.Tokenize(2, 3);
         var line = doc.GetLineSegment(5);
+#if DEBUG
         line.DumpTokens(doc);
+#endif
     }
 }

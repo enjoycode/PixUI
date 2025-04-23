@@ -4867,12 +4867,6 @@ public unsafe partial class SkiaApi
 	internal static extern Int32 sk_fontmgr_count_families (sk_fontmgr_t param0);
 		
 
-	// sk_fontmgr_t* sk_fontmgr_create_default()
-		
-	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
-	internal static extern sk_fontmgr_t sk_fontmgr_create_default ();
-		
-
 	// sk_typeface_t* sk_fontmgr_create_from_data(sk_fontmgr_t*, sk_data_t* data, int index)
 		
 	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]

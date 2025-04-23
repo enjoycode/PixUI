@@ -5,10 +5,11 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <InvariantGlobalization>false</InvariantGlobalization>
-        <WasmIncludeFullIcuData>true</WasmIncludeFullIcuData>
-        <WasmIcuDataFileName>icudt.dat</WasmIcuDataFileName>
-        <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
+        <InvariantGlobalization>true</InvariantGlobalization>
+<!--        <InvariantGlobalization>false</InvariantGlobalization>-->
+<!--        <WasmIncludeFullIcuData>true</WasmIncludeFullIcuData>-->
+<!--        <WasmIcuDataFileName>icudt.dat</WasmIcuDataFileName>-->
+<!--        <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>-->
         
 <!--        <BlazorWebAssemblyJiterpreter>false</BlazorWebAssemblyJiterpreter>-->
 <!--        <WasmEnableThreads>false</WasmEnableThreads>-->
@@ -19,12 +20,13 @@
 <!--        <WasmNativeStrip>false</WasmNativeStrip>-->
 <!--        <WasmProfilers>browser;</WasmProfilers>-->
 <!--        <WasmBuildNative>true</WasmBuildNative>-->
+
+<!--        <EmccExtraCFlags>-s MAIN_MODULE=2 -sAUTOLOAD_DYLIBS=0</EmccExtraCFlags>-->
         
         <WasmEnableSIMD>true</WasmEnableSIMD>
         <WasmAllowUndefinedSymbols>true</WasmAllowUndefinedSymbols>
         <EmccInitialHeapSize>128MB</EmccInitialHeapSize>
         <EmccExtraCFlags>-s USE_WEBGL2=1 -s MAX_WEBGL_VERSION=2</EmccExtraCFlags>
-        <!--        <EmccExtraCFlags>-s MAIN_MODULE=2 -sAUTOLOAD_DYLIBS=0</EmccExtraCFlags>-->
         <EmccExtraLDFlags>-lGL</EmccExtraLDFlags>
     </PropertyGroup>
 
@@ -40,16 +42,16 @@
         <NativeFileReference Include="libs\tree-sitter-csharp.a" />
     </ItemGroup>
 
-    <Target Name="UseCustomICU" AfterTargets="ResolveRuntimePackAssets">
-        <ItemGroup>
-            <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.Extension)' == '.dat' AND $([System.String]::Copy('%(ReferenceCopyLocalPaths.FileName)').StartsWith('icudt'))" />
+<!--    <Target Name="UseCustomICU" AfterTargets="ResolveRuntimePackAssets">-->
+<!--        <ItemGroup>-->
+<!--            <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.Extension)' == '.dat' AND $([System.String]::Copy('%(ReferenceCopyLocalPaths.FileName)').StartsWith('icudt'))" />-->
 
-            <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)libs\icudt.dat" DestinationSubPath="icudt.dat" />
-            <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)libs\icudt_CJK.dat" DestinationSubPath="icudt_CJK.dat" />
-            <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)libs\icudt_EFIGS.dat" DestinationSubPath="icudt_EFIGS.dat" />
-            <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)libs\icudt_no_CJK.dat" DestinationSubPath="icudt_no_CJK.dat" />
-        </ItemGroup>
-    </Target>
+<!--            <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)libs\icudt.dat" DestinationSubPath="icudt.dat" />-->
+<!--            <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)libs\icudt_CJK.dat" DestinationSubPath="icudt_CJK.dat" />-->
+<!--            <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)libs\icudt_EFIGS.dat" DestinationSubPath="icudt_EFIGS.dat" />-->
+<!--            <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)libs\icudt_no_CJK.dat" DestinationSubPath="icudt_no_CJK.dat" />-->
+<!--        </ItemGroup>-->
+<!--    </Target>-->
 
     <ItemGroup>
         <ProjectReference Include="..\PixUI.Demo\PixUI.Demo.csproj" />
