@@ -39,24 +39,15 @@
 
 <script src="_framework/blazor.webassembly.js" autostart="false"></script>
 <script type="module">
-    import {PixUI} from './pixui.js'
-    
+    import { PixUI } from './pixui.js'
+
     window.PixUI = PixUI
 
     window.onload = async function () {
-        await Blazor.start()
-        // await Blazor.start({
-        //     configureRuntime: function (builder) {
-        //         builder.withConfig({
-        //             browserProfilerOptions: {}
-        //         })
-        //     }
-        // })
-
+        PixUI.Init()
+        await Blazor.start();
         let loadingEl = document.getElementById("loading")
         loadingEl.remove()
-        
-        await PixUI.Run("PixUI.Platform.Blazor", [])
     }
 </script>
 </body>

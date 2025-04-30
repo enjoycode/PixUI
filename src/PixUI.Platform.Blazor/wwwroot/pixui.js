@@ -65,13 +65,14 @@ export let PixUI = {
             'renderViaOffscreenBackBuffer': 0,
         }
         contextAttributes['majorVersion'] = (typeof WebGL2RenderingContext !== 'undefined') ? 2 : 1
-        let handle = Module.GL.createContext(this._htmlCanvas, contextAttributes)
+        let gl = globalThis.Blazor.runtime.Module.GL;
+        let handle = gl.createContext(this._htmlCanvas, contextAttributes)
         if (handle) {
-            Module.GL.makeContextCurrent(handle)
-            Module.GL.currentContext.GLctx.getExtension('WEBGL_debug_renderer_info')
+            gl.makeContextCurrent(handle)
+            gl.currentContext.GLctx.getExtension('WEBGL_debug_renderer_info')
             //https://github.com/dotnet/runtime/issues/76077
-            window.GL = Module.GL
-            window.GLctx = Module.GL.currentContext.GLctx
+            globalThis.GL = gl
+            globalThis.GLctx = gl.currentContext.GLctx
         } else {
             //TODO: fallback to software surface
             alert("Can't use gpu")
@@ -209,17 +210,25 @@ export let PixUI = {
         return await navigator.clipboard.readText()
     },
 
-    Run: async function (asmName, args) {
-        this._asmName = asmName;
-
+    Init: function () {
         this.CreateCanvas()
         this.CreateInput()
-        let glHandel = this.GetGLContext()
+    },
+
+    BeforeRunApp: function () {
+        this._asmName = Blazor.runtime.getConfig().mainAssemblyName
+        
+        let glHandle = this.GetGLContext()
         let routePath = document.location.hash.length > 0 ? document.location.hash.substring(1) : null
         let isMacOS = navigator.userAgent.includes("Mac")
-        await DotNet.invokeMethodAsync(this._asmName, "Run", glHandel, 
-            window.innerWidth, window.innerHeight, window.devicePixelRatio, routePath, isMacOS, ...args)
-        this.BindEvents()
+        return {
+            GLHandle: glHandle,
+            Width: window.innerWidth,
+            Height: window.innerHeight,
+            PixelRatio: window.devicePixelRatio,
+            RoutePath: routePath,
+            IsMacOS: isMacOS
+        }
     }
 
 }
