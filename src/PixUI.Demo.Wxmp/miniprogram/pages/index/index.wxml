@@ -1,0 +1,5 @@
+<!--index.wxml-->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <canvas type="2d" id="canvas" style="position: absolute; z-index: 1; width: 100%; height: 100%;"></canvas>
+  <input id="input" type="text" style="position: absolute;z-index: 3;border: none;width: 0; height: 0;padding: 0;"></input>
+</scroll-view>
