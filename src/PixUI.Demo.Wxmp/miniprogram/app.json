@@ -2,6 +2,24 @@
   "pages": [
     "pages/index/index"
   ],
+  "subPackages": [ 
+    {
+      "root": "dotnet/pkgs/pkg1",
+      "pages": []
+    },
+    {
+      "root": "dotnet/pkgs/pkg2",
+      "pages": []
+    },
+    {
+      "root": "dotnet/pkgs/pkg3",
+      "pages": []
+    },
+    {
+      "root": "dotnet/pkgs/pkg4",
+      "pages": []
+    }
+  ],
   "window": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "Weixin",

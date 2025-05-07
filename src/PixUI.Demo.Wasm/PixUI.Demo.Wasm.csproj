@@ -7,9 +7,21 @@
     <WasmMainJSPath>main.mjs</WasmMainJSPath>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    
     <InvariantGlobalization>true</InvariantGlobalization>
+    <BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
+    <BlazorWebAssemblyJiterpreter>false</BlazorWebAssemblyJiterpreter>
+<!--    <PublishTrimmed>true</PublishTrimmed>-->
+<!--    <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>-->
+<!--    <MetadataUpdaterSupport>false</MetadataUpdaterSupport>-->
+
     <WasmBuildNative>true</WasmBuildNative>
+    <WasmNativeDebugSymbols>false</WasmNativeDebugSymbols>
     <WasmAllowUndefinedSymbols>true</WasmAllowUndefinedSymbols>
+    <WasmEmitSymbolMap>false</WasmEmitSymbolMap>
+    
+    <EmccLinkOptimizationFlag>-Oz</EmccLinkOptimizationFlag>
+    <EmccCompileOptimizationFlag>-Oz</EmccCompileOptimizationFlag>
     <EmccInitialHeapSize>128MB</EmccInitialHeapSize>
     <EmccExtraCFlags>-s USE_WEBGL2=1 -s MAX_WEBGL_VERSION=2</EmccExtraCFlags>
     <EmccExtraLDFlags>-lGL</EmccExtraLDFlags>
@@ -17,7 +29,7 @@
 
   <ItemGroup>
     <EmccExportedRuntimeMethod Include="GL" />
-    <NativeFileReference Include="..\PixUI.Platform.Blazor\libs\skia.a" />
+    <NativeFileReference Include="libs\skia.a" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,5 +37,9 @@
     <ProjectReference Include="..\PixUI.Platform.Wxmp\PixUI.Platform.Wxmp.csproj" />
     <ProjectReference Include="..\PixUI.Widgets\PixUI.Widgets.csproj" />
     <ProjectReference Include="..\PixUI\PixUI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="libs\" />
   </ItemGroup>
 </Project>

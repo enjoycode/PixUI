@@ -3,6 +3,10 @@
 
 https://github.com/dotnet/runtime/blob/main/src/mono/wasm/build/WasmApp.Common.targets
 
+https://github.com/dotnet/runtime/blob/main/src/mono/wasm/features.md
+
+https://learn.microsoft.com/en-us/dotnet/core/deploying/trimming/trimming-options#trimming-framework-library-features
+
 https://learn.microsoft.com/en-us/aspnet/core/blazor/webassembly-native-dependencies?view=aspnetcore-8.0
 
 关于Exception: 

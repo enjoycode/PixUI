@@ -1,0 +1,1 @@
+export const assets = ["dotnet.native.wasm","System.Net.Requests.wasm"]
