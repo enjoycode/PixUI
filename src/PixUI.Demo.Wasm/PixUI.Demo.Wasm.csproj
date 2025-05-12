@@ -7,7 +7,11 @@
     <WasmMainJSPath>main.mjs</WasmMainJSPath>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    
+
+    <WasmEnableThreads>false</WasmEnableThreads>
+    <WasmEnableSIMD>true</WasmEnableSIMD>
+    <WasmEnableExceptionHandling>true</WasmEnableExceptionHandling>
+
     <InvariantGlobalization>true</InvariantGlobalization>
     <BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
     <BlazorWebAssemblyJiterpreter>false</BlazorWebAssemblyJiterpreter>
@@ -17,12 +21,15 @@
 
     <WasmBuildNative>true</WasmBuildNative>
     <WasmNativeDebugSymbols>false</WasmNativeDebugSymbols>
+    <WasmNativeStrip>true</WasmNativeStrip> <!-- false时可生成未优化的dotnet.native.js -->
     <WasmAllowUndefinedSymbols>true</WasmAllowUndefinedSymbols>
     <WasmEmitSymbolMap>false</WasmEmitSymbolMap>
-    
+
+   
     <EmccLinkOptimizationFlag>-Oz</EmccLinkOptimizationFlag>
     <EmccCompileOptimizationFlag>-Oz</EmccCompileOptimizationFlag>
-    <EmccInitialHeapSize>128MB</EmccInitialHeapSize>
+    <EmccInitialHeapSize>16777216</EmccInitialHeapSize>
+    <EmccMaximumHeapSize>268435456</EmccMaximumHeapSize>
     <EmccExtraCFlags>-s USE_WEBGL2=1 -s MAX_WEBGL_VERSION=2</EmccExtraCFlags>
     <EmccExtraLDFlags>-lGL</EmccExtraLDFlags>
   </PropertyGroup>

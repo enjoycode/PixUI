@@ -142,7 +142,7 @@ export type LoaderHelpers = {
     afterConfigLoaded: PromiseAndController<MonoConfig>,
     allDownloadsQueued: PromiseAndController<void>,
     allDownloadsFinished: PromiseAndController<void>,
-    //wasmCompilePromise: PromiseAndController<WXWebAssembly.Module>,
+    //Rick wasmCompilePromise: PromiseAndController<WXWebAssembly.Module>,
     wasmCompilePromise: PromiseAndController<string>,
     runtimeModuleLoaded: PromiseAndController<void>,
     loadingWorkers: PromiseAndController<PThreadWorker[]>,

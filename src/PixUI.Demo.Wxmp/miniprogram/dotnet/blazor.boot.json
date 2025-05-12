@@ -1,15 +1,15 @@
 {
   "mainAssemblyName": "PixUI.Demo.Wasm.dll",
   "resources": {
-    "hash": "sha256-wKcs1VWmjJuunl+jI7In9HAGMXBiTofQvk+X4L2nXIU=",
+    "hash": "sha256-qnyOV01O66bbv8R5r7lVHTdlwWY6gt+gr+fvFB3y2VA=",
     "jsModuleNative": {
-      "dotnet.native.js": "sha256-Ijz7/OlZkCj1KkLgwbVdEDoMSy6a92OAX8jChrN7tI4="
+      "dotnet.native.js": "sha256-GyX93lu2a1hWfOTQZZhq098VeS1T6jyICeEOrD8gqrA="
     },
     "jsModuleRuntime": {
       "dotnet.runtime.js": "sha256-dCmS9Zx4egtLYSUgTI3R6gMS+Yg8MkzxW1CgEMJKAEw="
     },
     "wasmNative": {
-      "dotnet.native.wasm": "sha256-J18GYhBoKCpkMobeFQnKKtYOf25taUNtUMAzKtpR+hU="
+      "dotnet.native.wasm": "sha256-gz2MW7sC1yne7zEndjlk7SEMuTe/lmpRpwDbquombvI="
     },
     "coreAssembly": {
       "System.Runtime.InteropServices.JavaScript.wasm": "sha256-eSQNRS0Zms6F78hPluxG1dJnlPVV1SAxRLjHJ8B943Y=",
@@ -183,22 +183,10 @@
       "WindowsBase.wasm": "sha256-GcDi5293y2A7oSiFYTbBTUe0d+ISbvgeel4ZNd8KkPM=",
       "mscorlib.wasm": "sha256-9PjsU0gaxxz5Vyw++p9DeYUWLsaXbaMS2RbX6wmTUmk=",
       "netstandard.wasm": "sha256-DS8keXxU4eQpa1kIoiFxOA2Ii2g9hoNWSaVi8F8AnIE=",
-      "PixUI.wasm": "sha256-FUOT2KotE8OMBTcxOhroIgjOzMTFiQRReMbEklA6Td8=",
-      "PixUI.MaterialIcons.wasm": "sha256-FAoW8ifPxcwajvxxEAck2Bf328gpNvh/kmAVqSpIADM=",
-      "PixUI.Platform.Wasm.wasm": "sha256-vX8WzWTv4fbExPiEb8SRKxB56OcXmX+HL+AYAP/kzTY=",
-      "PixUI.Platform.Wxmp.wasm": "sha256-t6aKFkLr4+zbFcYjwBuFAi/LBUXimWV7x/dtrTtOgcM=",
-      "PixUI.TSAttributes.wasm": "sha256-rW5BQZC3rARBiF6xOmOYjcnnmeTdve49+k+Vy/2QCdc=",
-      "PixUI.Widgets.wasm": "sha256-xxSbV23CNKii9Ebfe9ebXyhfGwK0DVIWpNtaI/73fc8=",
-      "PixUI.Demo.Wasm.wasm": "sha256-n6Tbj2SMTjGlfhPc2Jreo6br+5Vbuf0BQPhLmVoIV5E="
+      "PixUI.Demo.Wasm.wasm": "sha256-ewKF7SfaWWR/MUMuSiPfYCCiHwQfWmv9hNfDhS7Xy3s="
     },
     "pdb": {
-      "PixUI.pdb": "sha256-kvO/Z7VAwtfmPHZadpBmePvU+qAW1I9oUErmzpLY7UU=",
-      "PixUI.MaterialIcons.pdb": "sha256-qMz4EC6pQb1XQ5RSPYJBl9t1ZsOy9O3HryQfQnwGFzw=",
-      "PixUI.Platform.Wasm.pdb": "sha256-RROu2lbO8GyMQxV+vAJ3JXm4dqkpeSjOA667+ySl4zc=",
-      "PixUI.Platform.Wxmp.pdb": "sha256-1boUYzNemy1q5QA3NSWYBFF+Y1/WjRfbyVQtEwfF92c=",
-      "PixUI.TSAttributes.pdb": "sha256-Uk/fGP7E9XQmdPW5cRLp2oiTiztK03pYLIXRRS08BmE=",
-      "PixUI.Widgets.pdb": "sha256-DTrh1kjMx3XaXrLFjQ15Ayc7ZkgEhumJY8G+YIXL1Vg=",
-      "PixUI.Demo.Wasm.pdb": "sha256-2QOwRctWgwiyO//JoAVHc47Sl4ieJjmiQQ5ewX4kCg4="
+      "PixUI.Demo.Wasm.pdb": "sha256-wBo2mrvv5S2gb1zEpxJi8JhJZh+p+plBrMDwJohbi/Y="
     },
     "coreVfs": {
       "runtimeconfig.bin": {

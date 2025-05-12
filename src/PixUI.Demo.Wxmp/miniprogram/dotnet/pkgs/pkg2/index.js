@@ -1,1 +1,1 @@
-export const assets = ["System.Private.CoreLib.wasm","System.Private.Xml.wasm","System.Linq.Parallel.wasm"]
+export const assets = ["dotnet.native.wasm","System.Data.Common.wasm","System.Private.DataContractSerialization.wasm","System.Text.Encoding.CodePages.wasm","System.Text.Json.wasm","System.Linq.Expressions.wasm","System.ComponentModel.Annotations.wasm","System.Threading.Timer.wasm"]

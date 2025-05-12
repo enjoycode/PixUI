@@ -109,7 +109,7 @@ export function setLoaderGlobals (
         afterConfigLoaded: createPromiseController<MonoConfig>(),
         allDownloadsQueued: createPromiseController<void>(),
         allDownloadsFinished: createPromiseController<void>(),
-        wasmCompilePromise: createPromiseController<WXWebAssembly.Module>(),
+        wasmCompilePromise: createPromiseController<string/*WebAssembly.Module*/>(),
         runtimeModuleLoaded: createPromiseController<void>(),
         loadingWorkers: createPromiseController<PThreadWorker[]>(),
 
