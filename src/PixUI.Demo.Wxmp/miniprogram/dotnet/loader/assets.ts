@@ -826,7 +826,7 @@ export async function streamingCompileWasm () {
         //     }
         // }
         //Rick
-        let compiledModule = "/dotnet/pkgs/pkg2/dotnet.native.wasm.br";
+        let compiledModule = "/dotnet/pkgs/pkg1/dotnet.native.wasm.br";
         wasmModuleAsset.pendingDownloadInternal = null as any; // GC
         wasmModuleAsset.pendingDownload = null as any; // GC
         wasmModuleAsset.buffer = null as any; // GC

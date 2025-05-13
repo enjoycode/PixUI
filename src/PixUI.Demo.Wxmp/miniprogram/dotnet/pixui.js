@@ -1,56 +1,11 @@
 export const PixUI = {
+    _exports: null,
     _htmlCanvas: null,
     _htmlInput: null,
     _asmName: "PixUI",
     _baseHref: "http://localhost" /*(document.getElementsByTagName('base')[0] || {href: document.location.origin + '/'}).href*/,
 
-    CreateCanvas: function () {
-        this._htmlCanvas = document.createElement("canvas")
-        this._htmlCanvas.style.position = "absolute"
-        this._htmlCanvas.style.zIndex = "1"
-        this.UpdateCanvasSize()
-        document.body.append(this._htmlCanvas)
-    },
-
-    CreateInput: function () {
-        let input = document.createElement('input')
-        input.id = '_i'
-        input.style.position = 'absolute'
-        input.style.width = input.style.height = input.style.padding = '0'
-        input.type = 'text'
-        input.style.border = 'none'
-        input.style.zIndex = '3'
-
-        document.body.appendChild(input);
-
-        input.addEventListener('input', ev => {
-            if (ev.data && !ev.isComposing) { //非IME输入
-                this.OnTextInput(ev.data);
-            }
-        });
-        input.addEventListener('compositionend', ev => {
-            // this._input.value = '';
-            if (ev.data) { //IME输入
-                this.OnTextInput(ev.data);
-            }
-        });
-
-        this._htmlInput = input;
-    },
-
-    UpdateCanvasSize: function () {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        const ratio = window.devicePixelRatio;
-        //set physical size
-        this._htmlCanvas.width = width * ratio;
-        this._htmlCanvas.height = height * ratio;
-        //set logical size
-        this._htmlCanvas.style.width = width + "px";
-        this._htmlCanvas.style.height = height + "px";
-    },
-
-    GetGLContext: function () {
+    GetGLContext: function (gl) {
         let contextAttributes = {
             'alpha': 1,
             'depth': 1,
@@ -64,15 +19,15 @@ export const PixUI = {
             'explicitSwapControl': 0,
             'renderViaOffscreenBackBuffer': 0,
         }
-        contextAttributes['majorVersion'] = (typeof WebGL2RenderingContext !== 'undefined') ? 2 : 1
-        let gl = globalThis.Blazor.runtime.Module.GL;
-        let handle = gl.createContext(this._htmlCanvas, contextAttributes)
+        contextAttributes['majorVersion'] = 1; /*(typeof WebGL2RenderingContext !== 'undefined') ? 2 : 1*/
+        let ctx = this._htmlCanvas.getContext('webgl');
+        let handle = gl.registerContext(ctx, contextAttributes);
         if (handle) {
             gl.makeContextCurrent(handle)
-            gl.currentContext.GLctx.getExtension('WEBGL_debug_renderer_info')
+            ctx.getExtension('WEBGL_debug_renderer_info'); //gl.currentContext.GLctx.getExtension('WEBGL_debug_renderer_info')
             //https://github.com/dotnet/runtime/issues/76077
             globalThis.GL = gl
-            globalThis.GLctx = gl.currentContext.GLctx
+            globalThis.GLctx = ctx; //gl.currentContext.GLctx
         } else {
             //TODO: fallback to software surface
             alert("Can't use gpu")
@@ -169,7 +124,7 @@ export const PixUI = {
 
     StartTextInput: function () {
         setTimeout(() => {
-            this._htmlInput.focus({preventScroll: true});
+            this._htmlInput.focus({ preventScroll: true });
         }, 0);
     },
 
@@ -197,8 +152,8 @@ export const PixUI = {
     },
 
     PostInvalidateEvent: function () {
-        requestAnimationFrame(() => {
-            DotNet.invokeMethod(this._asmName, "OnInvalidate")
+        this._htmlCanvas.requestAnimationFrame(() => {
+            this._exports.OnInvalidate();
         });
     },
 
@@ -210,27 +165,11 @@ export const PixUI = {
         return await navigator.clipboard.readText()
     },
 
-    Init: function (canvas, input) {
-      this._htmlCanvas = canvas;
-      this._htmlInput = input;
+    Init: function (asmName, exports, canvas, input) {
+        this._exports = exports;
+        this._asmName = asmName;
+        this._htmlCanvas = canvas;
+        //this._htmlInput = input;
     },
-
-    BeforeRunApp: function () {
-        this._asmName = Blazor.runtime.getConfig().mainAssemblyName
-        
-        let glHandle = this.GetGLContext()
-        //let routePath = document.location.hash.length > 0 ? document.location.hash.substring(1) : null
-        let routePath = null;
-        //let isMacOS = navigator.userAgent.includes("Mac")
-        let isMacOS = false;
-        return {
-            GLHandle: glHandle,
-            Width: window.innerWidth,
-            Height: window.innerHeight,
-            PixelRatio: window.devicePixelRatio,
-            RoutePath: routePath,
-            IsMacOS: isMacOS
-        }
-    }
 
 }

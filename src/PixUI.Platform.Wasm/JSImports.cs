@@ -4,6 +4,8 @@ namespace PixUI.Platform.Wasm;
 
 public partial class JSImports
 {
-    [JSImport("node.process.version", "main.mjs")]
-    internal static partial string GetNodeVersion();
+    private const string MODULE_NAME = "main.mjs";
+
+    [JSImport("PixUI.PostInvalidateEvent", MODULE_NAME)]
+    internal static partial void PostInvalidateEvent();
 }

@@ -46,8 +46,7 @@ public sealed class BlazorWindow : UIWindow
                 ColorSpace = ColorSpace.SRGB
             },
             0, GRSurfaceOrigin.BottomLeft, null, false);
-        if (ratio != 1)
-            _offScreenSurface!.Canvas.Scale(ratio, ratio);
+        _offScreenSurface!.Canvas.Scale(ratio, ratio);
         _onScreenSurface = SKSurface.CreateGLOnScreen(_grContext!, pixWidth, pixHeigh);
     }
 

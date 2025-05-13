@@ -488,14 +488,12 @@ async function initializeModules (es6Modules: [RuntimeModuleExportsInternal, Nat
     const diagnosticModule = es6Modules[2];
     setRuntimeGlobals(globalObjectsRoot);
     initializeExports(globalObjectsRoot);
-    console.log("初始化Modules1:", globalObjectsRoot.module);
     if (diagnosticModule) {
         diagnosticModule.setRuntimeGlobals(globalObjectsRoot);
     }
 
     await configureRuntimeStartup(emscriptenModule);
     loaderHelpers.runtimeModuleLoaded.promise_control.resolve();
-    console.log("初始化Modules2");
 
     const result = emscriptenFactory((originalModule: EmscriptenModuleInternal) => {
         Object.assign(emscriptenModule, {

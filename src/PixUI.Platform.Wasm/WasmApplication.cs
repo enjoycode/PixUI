@@ -30,14 +30,12 @@ public sealed class WasmApplication : UIApplication
         Window.FirstShow();
     }
 
-    public override void PostInvalidateEvent()
-    {
-        throw new NotImplementedException();
-    }
+    public override void PostInvalidateEvent() => JSImports.PostInvalidateEvent();
 
     public override void BeginInvoke(Action action)
     {
-        throw new NotImplementedException();
+        //TODO: fix if thread supported
+        action();
     }
 
     internal void RunInvalidateRequest() => OnInvalidateRequest();

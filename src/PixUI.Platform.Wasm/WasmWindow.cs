@@ -36,16 +36,18 @@ internal sealed class WasmWindow : UIWindow
         _ratio = ratio;
 
         var pixWidth = (int)(width * ratio);
-        var pixHeigh = (int)(height * ratio);
+        var pixHeight = (int)(height * ratio);
         _offScreenSurface = SKSurface.Create(_grContext!, true, new ImageInfo
             {
-                Width = pixWidth, Height = pixHeigh, AlphaType = AlphaType.Premul, ColorType = ColorType.Rgba8888,
+                Width = pixWidth, Height = pixHeight, AlphaType = AlphaType.Premul, ColorType = ColorType.Rgba8888,
                 ColorSpace = ColorSpace.SRGB
             },
             0, GRSurfaceOrigin.BottomLeft, null, false);
-        if (ratio != 1)
-            _offScreenSurface!.Canvas.Scale(ratio, ratio);
-        _onScreenSurface = SKSurface.CreateGLOnScreen(_grContext!, pixWidth, pixHeigh);
+        if (_offScreenSurface == null) throw new Exception("Can't create off screen surface");
+        _offScreenSurface!.Canvas.Scale(ratio, ratio);
+
+        _onScreenSurface = SKSurface.CreateGLOnScreen(_grContext!, pixWidth, pixHeight);
+        if (_onScreenSurface == null) throw new Exception("Can't create on screen surface");
     }
 
     protected override Canvas GetOnscreenCanvas() => _onScreenSurface!.Canvas;
@@ -65,7 +67,13 @@ internal sealed class WasmWindow : UIWindow
         var overlayCanvas = GetOnscreenCanvas();
         widgetsCanvas?.Flush(); // _offScreenSurface?.Flush();
         _offScreenSurface?.Draw(overlayCanvas, 0, 0, null);
-
+        
+        // test draw onscreen bounds
+        // var paint = Paint.Shared (Colors.Blue, PaintStyle.Stroke, 4f);
+        // overlayCanvas.Scale(_ratio, _ratio);
+        // overlayCanvas.DrawRect(0, 0, Width, Height, paint);
+        // overlayCanvas.ResetMatrix();
+        
         Present();
     }
 
@@ -83,14 +91,14 @@ internal sealed class WasmWindow : UIWindow
     }
 
     public override void StartTextInput() => throw new NotImplementedException();
-        //((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("PixUI.StartTextInput");
+    //((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("PixUI.StartTextInput");
 
     public override void StopTextInput() => throw new NotImplementedException();
-        //((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("PixUI.StopTextInput");
+    //((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("PixUI.StopTextInput");
 
     public override void SetTextInputRect(Rect rect) => throw new NotImplementedException();
-        // ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("PixUI.SetInputRect",
-        //     rect.X, rect.Y, rect.Width, rect.Height);
+    // ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("PixUI.SetInputRect",
+    //     rect.X, rect.Y, rect.Width, rect.Height);
 
     internal void RouteGoto(int historyId) => RouteHistoryManager.Goto(historyId);
 

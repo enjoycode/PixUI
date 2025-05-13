@@ -5,10 +5,12 @@ import { dotnet } from '../../dotnet/loader/index1'
 import { WebAssemblyBootResourceType, AssetBehaviors } from '../../dotnet/types/index1'
 
 // 获取应用实例
-const app = getApp<IAppOption>()
+// const app = getApp<IAppOption>()
 
 Component({
     data: {
+        canvasWidth: '100%',
+        canvasHeight: '100%',
         canIUseGetUserProfile: wx.canIUse('getUserProfile'),
         canIUseNicknameComp: wx.canIUse('input.type.nickname'),
     },
@@ -29,27 +31,36 @@ Component({
             }
 
             //设置全局变量
-            (<any>globalThis).Module = {};
+            // (<any>globalThis).Module = {};
             (<any>globalThis).bootUrl = "http://localhost:5000";
             (<any>globalThis).WebAssembly = (<any>globalThis).WXWebAssembly;
             // (<any>globalThis).fs = wx.getFileSystemManager();
-            // (<any>globalThis).PixUI = PixUI;
+            (<any>globalThis).PixUI = PixUI;
 
             //查询视图元素
             const query = this.createSelectorQuery();
             let getCanvas = new Promise<any>(resole => {
-                query.select("#canvas").fields({ node: true }).exec(res => resole(res[0].node));
+                query.select("#canvas").fields({ node: true, size: true }).exec(res => resole(res[0].node));
             });
             let getInput = new Promise<any>(resole => {
                 query.select("#input").fields({ node: true }).exec(res => resole(res[0].node));
             });
             let canvas = await getCanvas;
             let input = await getInput;
-            console.log(canvas, input);
-
+            let width = canvas.width;
+            let height = canvas.height;
+            let pixelRatio = 2; //wx.getWindowInfo().pixelRatio;
+            canvas.width = width * pixelRatio;
+            canvas.height = height * pixelRatio;
+            console.log(canvas.width, canvas.height)
+            this.setData({
+                canvasWidth: width  + 'px',
+                canvasHeight: height + 'px'
+            })
+            
             //开始启动dotnet
             const { setModuleImports, getAssemblyExports, getConfig, runMain } = await dotnet
-                .withDiagnosticTracing(true)
+                .withDiagnosticTracing(false)
                 .withConfig({
                     environmentVariables: {
                         "MONO_LOG_LEVEL": "debug", //enable Mono VM detailed logging by
@@ -60,23 +71,17 @@ Component({
                 //.withConfig({ maxParallelDownloads: 3, enableDownloadRetry: true }) //测试时从Github下载资源有并发限制
                 .withConfigSrc("blazor.boot.json")
                 .withResourceLoader((type, name, defaultUri, integrity, behavior) => this.loadResource(assetMap, type, name, defaultUri, integrity, behavior))
-                .withRuntimeOptions(["--no-jiterpreter-traces-enabled","--no-jiterpreter-jit-call-enabled", "--no-jiterpreter-interp-entry-enabled", "--no-jiterpreter-wasm-eh-enabled"])
+                .withRuntimeOptions(["--no-jiterpreter-traces-enabled", "--no-jiterpreter-jit-call-enabled", "--no-jiterpreter-interp-entry-enabled", "--no-jiterpreter-wasm-eh-enabled"])
                 .create();
 
-            setModuleImports('main.mjs', {
-                node: {
-                    process: {
-                        version: () => "V1234567"
-                    }
-                }
-            });
+            setModuleImports('main.mjs', { PixUI: PixUI });
 
+            console.log("准备执行C# Main", canvas.width, canvas.height, wx.getWindowInfo());
             const config: any = getConfig();
-            // const exports = await getAssemblyExports(config.mainAssemblyName);
-            // const text = exports.MyClass.Greeting();
-            // console.log(text);
-
-            console.log("准备执行C# Main")
+            const exports = await getAssemblyExports("PixUI.Platform.Wasm.dll");
+            const jsExports = exports.PixUI.Platform.Wasm.JSExports;
+            PixUI.Init(config.mainAssemblyName, jsExports, canvas, input);
+            jsExports.InitAppArgs(PixUI.GetGLContext((<any>dotnet).instance.Module.GL), width, height, pixelRatio);
             runMain(config.mainAssemblyName);
         },
 
