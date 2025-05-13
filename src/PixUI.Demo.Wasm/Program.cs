@@ -1,18 +1,20 @@
+using LiveCharts;
+using LiveChartsCore;
 using PixUI;
 using PixUI.Platform.Wasm;
 
 Console.WriteLine("Hello World!");
 
 // //初始化默认字体
-// await using var fontDataStream =
-//     await BlazorApplication.HttpClient.GetStreamAsync("/fonts/MiSans-Regular.woff2");
+// var httpClient = new HttpClient();
+// var fontUrl =
+//     "https://github.com/enjoycode/PixUI/raw/refs/heads/main/src/PixUI.Platform.Blazor/wwwroot/fonts/MiSans-Regular.woff2";
+// await using var fontDataStream = await httpClient.GetStreamAsync(fontUrl);
 // using var fontData = SKData.Create(fontDataStream);
 // FontCollection.Instance.RegisterTypeface(fontData!, FontCollection.DefaultFamilyName, false);
 
-WasmApplication.Run(() => new Center()
-{
-    Child = new Button("Hello World!") { Icon = MaterialIcons.Home }
-});
+WasmApplication.Run(() => new DemoChart());
+
 
 // internal sealed class DemoWidget : Widget
 // {
@@ -36,3 +38,55 @@ WasmApplication.Run(() => new Center()
 //         canvas.DrawRRect(rrect, paint);
 //     }
 // }
+
+internal sealed class DemoChart : View
+{
+    private readonly CartesianChart? _chart;
+
+    public DemoChart()
+    {
+        Child = new Column()
+        {
+            Spacing = 10,
+            Children =
+            [
+                new Card
+                {
+                    Width = 400,
+                    Height = 300,
+                    Child = new CartesianChart
+                    {
+                        Series = MakeSeries(),
+                    }.RefBy(ref _chart!)
+                },
+                new Button("Hello World!") { Icon = MaterialIcons.Home, OnTap = _ => ChangeData() }
+            ]
+        };
+    }
+
+    private void ChangeData()
+    {
+        _chart!.Series = MakeSeries();
+    }
+
+    private ISeries[] MakeSeries()
+    {
+        return
+        [
+            new ColumnSeries<float> { Values = GetRandomData(), },
+            new LineSeries<float> { Values = GetRandomData(), Fill = null }
+        ];
+    }
+
+    private float[] GetRandomData()
+    {
+        var rand = Random.Shared;
+        var result = new float[7];
+        for (var i = 0; i < result.Length; i++)
+        {
+            result[i] = rand.Next(1, 30);
+        }
+
+        return result;
+    }
+}

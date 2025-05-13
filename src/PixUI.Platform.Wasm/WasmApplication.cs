@@ -15,9 +15,8 @@ public sealed class WasmApplication : UIApplication
 
     public static void Run(Func<Widget> rootBuilder)
     {
-        // TODO:
-        // Cursor.PlatformCursors = new BlazorCursors();
-        // Clipboard.Init(new BlazorClipboard());
+        Cursor.PlatformCursors = new WasmCursors();
+        //TODO: Clipboard.Init(new BlazorClipboard());
 
         var app = new WasmApplication();
         Current = app;

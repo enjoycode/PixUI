@@ -36,90 +36,12 @@ export const PixUI = {
         return handle;
     },
 
-    BindEvents: function () {
-        // window.onresize = ev => {
-        //     this.UpdateCanvasSize()
-        //     DotNet.invokeMethod(this._asmName, "OnResize", window.innerWidth, window.innerHeight, window.devicePixelRatio)
-        // }
-
-        // window.onmousemove = ev => {
-        //     ev.preventDefault();
-        //     ev.stopPropagation();
-        //     DotNet.invokeMethod(this._asmName, "OnMouseMove", ev.buttons, ev.x, ev.y, ev.movementX, ev.movementY)
-        // }
-        // window.onmouseout = ev => {
-        //     DotNet.invokeMethod(this._asmName, "OnMouseMoveOutWindow")
-        // }
-        // window.onmousedown = ev => {
-        //     ev.preventDefault();
-        //     ev.stopPropagation();
-        //     DotNet.invokeMethod(this._asmName, "OnMouseDown", ev.button, ev.x, ev.y, ev.movementX, ev.movementY)
-        // }
-        // window.onmouseup = ev => {
-        //     ev.preventDefault();
-        //     ev.stopPropagation();
-        //     DotNet.invokeMethod(this._asmName, "OnMouseUp", ev.button, ev.x, ev.y, ev.movementX, ev.movementY)
-        // }
-        // window.oncontextmenu = ev => {
-        //     ev.preventDefault();
-        //     ev.stopPropagation();
-        // }
-        // window.ondragover = ev => {
-        //     ev.preventDefault();
-        // }
-        // window.ondrop = async (ev) => {
-        //     ev.preventDefault();
-        //     for (const file of ev.dataTransfer.files) {
-        //         await DotNet.invokeMethodAsync(this._asmName, "OnDropFile", ev.x, ev.y, file.name, file.size, file.type, DotNet.createJSStreamReference(file))
-        //     }
-        // }
-        // window.onkeydown = ev => {
-        //     DotNet.invokeMethod(this._asmName, "OnKeyDown", ev.key, ev.code, ev.altKey, ev.ctrlKey, ev.shiftKey, ev.metaKey)
-        //     if (ev.code === 'Tab') {
-        //         ev.preventDefault();
-        //     }
-        // }
-        // window.onkeyup = ev => {
-        //     DotNet.invokeMethod(this._asmName, "OnKeyUp", ev.key, ev.code, ev.altKey, ev.ctrlKey, ev.shiftKey, ev.metaKey)
-        //     if (ev.code === 'Tab') {
-        //         ev.preventDefault();
-        //     }
-        // }
-
-        // window.onpopstate = ev => {
-        //     //console.log("location: " + document.location + ", state: " + JSON.stringify(ev.state));
-
-        //     if (typeof ev.state === 'number') {
-        //         //浏览器前进或后退跳转的
-        //         DotNet.invokeMethod(this._asmName, "RouteGoto", ev.state)
-        //     } else {
-        //         //直接在浏览器地址栏输入的
-        //         let path = "/"
-        //         if (document.location.hash.length > 0) {
-        //             path = document.location.hash.substring(1)
-        //         }
-        //         //同步替换浏览器的历史记录
-        //         let url = this._baseHref + '#' + path
-        //         let id = DotNet.invokeMethod(this._asmName, "NewRouteId")
-        //         history.replaceState(id, "", url)
-        //         DotNet.invokeMethod(this._asmName, "RoutePush", path)
-        //     }
-        // }
-
-        // //注意onwheel事件附加在画布元素上
-        // this._htmlCanvas.onwheel = ev => {
-        //     ev.preventDefault();
-        //     ev.stopPropagation();
-        //     DotNet.invokeMethod(this._asmName, "OnScroll", ev.x, ev.y, ev.deltaX, ev.deltaY)
-        // }
-    },
-
     OnTextInput: function (s) {
         DotNet.invokeMethod(this._asmName, "OnTextInput", s)
     },
 
     SetCursor: function (name) {
-        window.document.body.style.cursor = name
+        //window.document.body.style.cursor = name
     },
 
     StartTextInput: function () {
@@ -170,6 +92,14 @@ export const PixUI = {
         this._asmName = asmName;
         this._htmlCanvas = canvas;
         //this._htmlInput = input;
+    },
+
+    //以下事件处理
+    onMouseDown(button, x, y, dx, dy) {
+        this._exports.OnMouseDown(button, x, y, dx, dy);
+    },
+    onMouseUp(button, x, y, dx, dy) {
+        this._exports.OnMouseUp(button, x, y, dx, dy);
     },
 
 }

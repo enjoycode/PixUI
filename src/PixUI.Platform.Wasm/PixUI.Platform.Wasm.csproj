@@ -11,4 +11,10 @@
       <ProjectReference Include="..\PixUI\PixUI.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Include="..\PixUI.Platform.Blazor\InputUtils.cs">
+        <Link>InputUtils.cs</Link>
+      </Compile>
+    </ItemGroup>
+
 </Project>

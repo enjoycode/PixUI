@@ -36,6 +36,10 @@ Component({
             (<any>globalThis).WebAssembly = (<any>globalThis).WXWebAssembly;
             // (<any>globalThis).fs = wx.getFileSystemManager();
             (<any>globalThis).PixUI = PixUI;
+            //TODO: 参考node-fetch and node-abort-controller
+            // (<any>globalThis).fetch = (req) => {
+            //     console.log(req);
+            // };
 
             //查询视图元素
             const query = this.createSelectorQuery();
@@ -170,6 +174,16 @@ Component({
 
             // 其他类型的资源
             throw new Error("不支持: " + name);
+        },
+
+        //事件处理
+        onTouchStart(e) {
+            //console.log("onTouchStart", e, e.touches[0].clientX, e.touches[0].clientY);
+            PixUI.onMouseDown(0, e.touches[0].clientX, e.touches[0].clientY, 0, 0);
+        },
+        onTouchEnd(e) {
+            // console.log("onTouchEnd", e);
+            PixUI.onMouseUp(0, e.changedTouches[0].clientX, e.changedTouches[0].clientY, 0, 0);
         },
 
     },

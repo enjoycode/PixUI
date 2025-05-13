@@ -1,5 +1,5 @@
 <!--index.wxml-->
 <scroll-view class="scrollarea" scroll-y type="list">
-    <canvas id="canvas" type="webgl" width="390px" height="753px" style="position: absolute; z-index: 1; width: {{canvasWidth}}; height: {{canvasHeight}};" disable-scroll="true"></canvas>
+    <canvas id="canvas" type="webgl" width="390px" height="753px" style="position: absolute; z-index: 1; width: {{canvasWidth}}; height: {{canvasHeight}};" disable-scroll="true" bindtouchstart="onTouchStart" bindtouchend="onTouchEnd"></canvas>
     <input id="input" type="text" style="position: absolute;z-index: 3;border: none;width: 0; height: 0;padding: 0;"></input>
 </scroll-view>

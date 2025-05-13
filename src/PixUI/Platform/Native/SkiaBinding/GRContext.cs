@@ -27,7 +27,7 @@ public unsafe class GRContext : GRRecordingContext
 
     public static GRContext? CreateGl(GRGlInterface? backendContext, GRContextOptions? options)
     {
-        var ctx = backendContext == null ? IntPtr.Zero : backendContext.Handle;
+        var ctx = backendContext?.Handle ?? IntPtr.Zero;
 
         if (options == null)
             return GetObject(SkiaApi.gr_direct_context_make_gl(ctx));
