@@ -3,6 +3,8 @@ import { PixUI } from '../../dotnet/pixui.js'
 import { BrotliDecode } from '../../dotnet/decode.min.js';
 import { dotnet } from '../../dotnet/loader/index1'
 import { WebAssemblyBootResourceType, AssetBehaviors } from '../../dotnet/types/index1'
+import { fetch_like } from '../../dotnet/loader/polyfills.js';
+import { AbortController } from '../../dotnet/abortController.js';
 
 // 获取应用实例
 // const app = getApp<IAppOption>()
@@ -11,8 +13,6 @@ Component({
     data: {
         canvasWidth: '100%',
         canvasHeight: '100%',
-        canIUseGetUserProfile: wx.canIUse('getUserProfile'),
-        canIUseNicknameComp: wx.canIUse('input.type.nickname'),
     },
     methods: {
         async onLoad() {
@@ -37,9 +37,8 @@ Component({
             // (<any>globalThis).fs = wx.getFileSystemManager();
             (<any>globalThis).PixUI = PixUI;
             //TODO: 参考node-fetch and node-abort-controller
-            // (<any>globalThis).fetch = (req) => {
-            //     console.log(req);
-            // };
+            (<any>globalThis).fetch = fetch_like;
+            (<any>globalThis).AbortController = AbortController;
 
             //查询视图元素
             const query = this.createSelectorQuery();

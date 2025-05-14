@@ -130,6 +130,7 @@ export async function fetch_like(url: string, init?: RequestInit): Promise<Respo
     //     };
     // }
 
+    console.log("fetch: ", url, init);
     return new Promise<Response>((resolve, reject) => {
       wx.request({
         url: url,

@@ -29,8 +29,8 @@
         "minifyWXML": true,
         "localPlugins": false,
         "condition": false,
-        "swc": true,
-        "disableSWC": false,
+        "swc": false,
+        "disableSWC": true,
         "disableUseStrict": false
     },
     "simulatorType": "wechat",

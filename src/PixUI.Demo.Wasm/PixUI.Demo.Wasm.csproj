@@ -50,4 +50,9 @@
   <ItemGroup>
     <Folder Include="libs\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Fonts\NotoMono-Regular.woff2" />
+    <EmbeddedResource Include="Fonts\NotoMono-Regular.woff2" />
+  </ItemGroup>
 </Project>
