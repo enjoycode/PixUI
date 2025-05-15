@@ -18,6 +18,10 @@
     {
       "root": "dotnet/pkgs/pkg4",
       "pages": []
+    },
+    {
+       "root": "dotnet/pkgs/pkg5",
+       "pages": []
     }
   ],
   "window": {

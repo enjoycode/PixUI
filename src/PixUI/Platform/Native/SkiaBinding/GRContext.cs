@@ -6,10 +6,8 @@ namespace PixUI;
 
 public unsafe class GRContext : GRRecordingContext
 {
-    internal GRContext(IntPtr h, bool owns) : base(h, owns) { }
-
-    protected override void Dispose(bool disposing) => base.Dispose(disposing);
-
+    private GRContext(IntPtr h, bool owns) : base(h, owns) { }
+    
     protected override void DisposeNative()
     {
         AbandonContext();
@@ -17,13 +15,11 @@ public unsafe class GRContext : GRRecordingContext
         base.DisposeNative();
     }
 
-    public static GRContext? CreateGl() => CreateGl(null, null);
+    // public static GRContext? CreateGl() => CreateGl(null, null);
 
-    public static GRContext? CreateGl(GRGlInterface backendContext) =>
-        CreateGl(backendContext, null);
+    public static GRContext? CreateGl(GRGlInterface backendContext) => CreateGl(backendContext, null);
 
-    // public static GRContext CreateGl(GRContextOptions options) =>
-    //     CreateGl(null, options);
+    // public static GRContext CreateGl(GRContextOptions options) => CreateGl(null, options);
 
     public static GRContext? CreateGl(GRGlInterface? backendContext, GRContextOptions? options)
     {

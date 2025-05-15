@@ -1,15 +1,15 @@
 {
   "mainAssemblyName": "PixUI.Demo.Wasm.dll",
   "resources": {
-    "hash": "sha256-RvKWuMqvfVe0VL990XdcRg1ohzszlquPsBvcrHbE9/4=",
+    "hash": "sha256-vnOXxlNz15DYCHKqUDw7qCQJ+8tDDHFjUBaDAgmQn9E=",
     "jsModuleNative": {
-      "dotnet.native.js": "sha256-3mdA4+PBgBXw8dkW80hdBba12CGOGc1GJk4H8fGuG0w="
+      "dotnet.native.js": "sha256-Jjy6anCDtpTZz8gL9+RnPAs3f7tPwAzBFbv3/Or8WZY="
     },
     "jsModuleRuntime": {
       "dotnet.runtime.js": "sha256-dCmS9Zx4egtLYSUgTI3R6gMS+Yg8MkzxW1CgEMJKAEw="
     },
     "wasmNative": {
-      "dotnet.native.wasm": "sha256-3SztKgz7C1srMtHo8v7uRPSvcRbA5j81trh7iqNpv3k="
+      "dotnet.native.wasm": "sha256-y+Dz9RgJtD58lMClq293LdZCWJbl1y4FuWpqAtUYGhA="
     },
     "coreAssembly": {
       "System.Runtime.InteropServices.JavaScript.wasm": "sha256-eSQNRS0Zms6F78hPluxG1dJnlPVV1SAxRLjHJ8B943Y=",
@@ -184,25 +184,25 @@
       "mscorlib.wasm": "sha256-9PjsU0gaxxz5Vyw++p9DeYUWLsaXbaMS2RbX6wmTUmk=",
       "netstandard.wasm": "sha256-DS8keXxU4eQpa1kIoiFxOA2Ii2g9hoNWSaVi8F8AnIE=",
       "LiveChartsCore.wasm": "sha256-PO8f/k+MIM/d0ACg3S6jfBocm80HLMLlGUaFSdj9lLI=",
-      "PixUI.wasm": "sha256-RseFsM3bXii1UKqwXFAsGyn7hRebtkcxYXGWoZCmf4M=",
-      "PixUI.LiveCharts.wasm": "sha256-sYV/QzhWIyLWzek3omIosenn4tJ4nXI3VkI/tiSnYjc=",
-      "PixUI.MaterialIcons.wasm": "sha256-s6iZeN74mkBF+08SRp3nOJsNiPIS8t338r2zm6NhAIw=",
-      "PixUI.Platform.Wasm.wasm": "sha256-5ZXkrW0k8Eo5LW2dveIisxDsK0emxJpaYtIA21CSEf8=",
-      "PixUI.Platform.Wxmp.wasm": "sha256-cHyIWm9okat0QnlVo/emXGUNdt69zjl4M8j6jXxYoQ8=",
-      "PixUI.TSAttributes.wasm": "sha256-E8IdjBseBc7NcplTQbjDZuDncf4QhRNlw6rkMGIdNrQ=",
-      "PixUI.Widgets.wasm": "sha256-2YbjMqrT1dpK8kHeXozDUC8mt9jWrRQfp9moGgrD4RQ=",
-      "PixUI.Demo.Wasm.wasm": "sha256-irQqWkJlvfq+8YXbeWVxjajIno97uhfrMQ7k0dWzbDY="
+      "PixUI.wasm": "sha256-hsLZpRNzA/qJim1/1s6ga4INd36ivpGCksqG0lHODCQ=",
+      "PixUI.LiveCharts.wasm": "sha256-kn2FwUjocThA9h0uh7624HK1cGkAXW3wYxuJkyE1gTM=",
+      "PixUI.MaterialIcons.wasm": "sha256-ZHrphb5XhuTYbrixYTTgEzykczsiyRHRBkfehkrbL2g=",
+      "PixUI.Platform.Wasm.wasm": "sha256-1UdryTx/BH2cPYdnarBTFTdoMqJRXjsdNugbz0gL6n0=",
+      "PixUI.Platform.Wxmp.wasm": "sha256-hVzuuaW47jCdt6mV8VX16m1sTTWIey0Bm12N7XIlLa0=",
+      "PixUI.TSAttributes.wasm": "sha256-u3nQkqpW2miWoMibasIpx4GOg9JRbcJx80xTRmHOwvI=",
+      "PixUI.Widgets.wasm": "sha256-Ic9rBwzFzekLY1WrsxyGmADzx3dIrn2xbXWpvxbJV58=",
+      "PixUI.Demo.Wasm.wasm": "sha256-lHyXXALFND1yQHEyajkQH3ln3mYMfmYxUFOQUnLPWUg="
     },
     "pdb": {
       "LiveChartsCore.pdb": "sha256-H5bgQmkHGBvWwrZcMgjp0f1U46Oux36UWYmwRWuOHkY=",
-      "PixUI.pdb": "sha256-h82sGkDZWNvuE3bXzijy+GIhGBDygIP+ydUJ4MpC+SE=",
-      "PixUI.LiveCharts.pdb": "sha256-NVylx2iM2pUN0adNdGnPWBw8rU2z7Pc8pXjYHHva4EQ=",
-      "PixUI.MaterialIcons.pdb": "sha256-W9zGW2q4bB6nYGl+sFn96pnMsMzh06g4IDPftKLJIyc=",
-      "PixUI.Platform.Wasm.pdb": "sha256-Ez475Og3CEl1emuYXc+vQIqr9H4dkGMFaVHK6CW1hb0=",
-      "PixUI.Platform.Wxmp.pdb": "sha256-v/nUrumfEHS5xX+gnyGrRO+16L2YFRKVzUvZRLEdn5s=",
-      "PixUI.TSAttributes.pdb": "sha256-vFsWHyxuzueZkCqwt7eeIffjFB6suJE9WvILcQ3NThI=",
-      "PixUI.Widgets.pdb": "sha256-DAzKCFUeeYsTjJdsVTPIRsLvzB7LRlqxlUksOmmF5d4=",
-      "PixUI.Demo.Wasm.pdb": "sha256-Ud4+j/v4tr9nyaAgk/vSNKpA2K7SoqXQN9oX8gw+gcQ="
+      "PixUI.pdb": "sha256-RUdjiMWP3cd0DqeZvhqwaXclHRUjt3eWcGb+xpVM8Z4=",
+      "PixUI.LiveCharts.pdb": "sha256-ni0+XRT4XHjXQdIACepFg2aV6cW9IkewUC4MAmJ6uew=",
+      "PixUI.MaterialIcons.pdb": "sha256-vMjUKTwjAjz2VNkp4UyLBQUIpx4nIA04ggY2kuAG8nw=",
+      "PixUI.Platform.Wasm.pdb": "sha256-PKLWSEhiw4CYoCDW3KxtEmh4FdyHBqSWa/037R53ASE=",
+      "PixUI.Platform.Wxmp.pdb": "sha256-/M8RWYWSnmDV/K89Un4qkeqWfXyrZ3MY3P15cJulWoY=",
+      "PixUI.TSAttributes.pdb": "sha256-3bEOd+EFOk+CFW/TH9dS+UMKC2In/K5NsPC6Yz/XA9U=",
+      "PixUI.Widgets.pdb": "sha256-GRC+5tmEzcXP8768UqQzam/CeYIK/uP6FL85J3WGaxg=",
+      "PixUI.Demo.Wasm.pdb": "sha256-YFMpCsx34ZkjjovDVL+Pr3DB1+TQvzYreu2KrQ3n1pw="
     },
     "coreVfs": {
       "runtimeconfig.bin": {

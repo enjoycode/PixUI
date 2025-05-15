@@ -60,19 +60,20 @@ internal sealed class WasmWindow : UIWindow
     {
         RootWidget.Layout(Width, Height);
         Overlay.Layout(Width, Height);
-
+        
         var widgetsCanvas = GetOffscreenCanvas();
         RootWidget.Paint(widgetsCanvas);
-
+        
         var overlayCanvas = GetOnscreenCanvas();
         widgetsCanvas?.Flush(); // _offScreenSurface?.Flush();
         _offScreenSurface?.Draw(overlayCanvas, 0, 0, null);
         
         // test draw onscreen bounds
-        // var paint = Paint.Shared (Colors.Blue, PaintStyle.Stroke, 4f);
+        // var paint = Paint.Shared (Colors.Blue, PaintStyle.Stroke, 18f);
         // overlayCanvas.Scale(_ratio, _ratio);
         // overlayCanvas.DrawRect(0, 0, Width, Height, paint);
         // overlayCanvas.ResetMatrix();
+        // //overlayCanvas.Flush();
         
         Present();
     }

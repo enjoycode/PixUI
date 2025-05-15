@@ -40,6 +40,8 @@ public sealed class FontCollection
         _assetFontMgrHandle = SkiaApi.sk_typeface_font_provider_new();
         _fontCollectionHandle = SkiaApi.sk_font_collection_new(_assetFontMgrHandle, OperatingSystem.IsBrowser());
     }
+    
+    public bool HasAny => _loading.Count > 0;
 
     /// <summary>
     /// 加载并注册字体
@@ -66,7 +68,7 @@ public sealed class FontCollection
         SkiaApi.sk_typeface_font_provider_register_typeface(_assetFontMgrHandle, typeface.Handle);
         Log.Debug($"FontCollection.RegisterTypeface: {typeface.FamilyName}");
 
-        _loaded.Add(fontFamily, typeface);
+        _loaded[fontFamily] = typeface;
         if (isAsset)
             FontChanged?.Invoke();
     }

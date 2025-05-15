@@ -10,7 +10,7 @@
 
     <WasmEnableThreads>false</WasmEnableThreads>
     <WasmEnableSIMD>true</WasmEnableSIMD>
-    <WasmEnableExceptionHandling>true</WasmEnableExceptionHandling>
+    <WasmEnableExceptionHandling>false</WasmEnableExceptionHandling>
 
     <InvariantGlobalization>true</InvariantGlobalization>
     <BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
@@ -28,8 +28,9 @@
    
     <EmccLinkOptimizationFlag>-Oz</EmccLinkOptimizationFlag>
     <EmccCompileOptimizationFlag>-Oz</EmccCompileOptimizationFlag>
-    <EmccInitialHeapSize>16777216</EmccInitialHeapSize>
-    <EmccMaximumHeapSize>268435456</EmccMaximumHeapSize>
+    <EmccInitialHeapSize>128MB</EmccInitialHeapSize>
+    <EmccMaximumHeapSize>256MB</EmccMaximumHeapSize>
+<!--    <EmccStackSize>8MB</EmccStackSize>-->
     <EmccExtraCFlags>-s USE_WEBGL2=1 -s MAX_WEBGL_VERSION=2</EmccExtraCFlags>
     <EmccExtraLDFlags>-lGL</EmccExtraLDFlags>
   </PropertyGroup>

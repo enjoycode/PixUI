@@ -24,7 +24,7 @@ export const PixUI = {
         let handle = gl.registerContext(ctx, contextAttributes);
         if (handle) {
             gl.makeContextCurrent(handle)
-            ctx.getExtension('WEBGL_debug_renderer_info'); //gl.currentContext.GLctx.getExtension('WEBGL_debug_renderer_info')
+            ctx.getExtension('WEBGL_debug_renderer_info');
             //https://github.com/dotnet/runtime/issues/76077
             globalThis.GL = gl
             globalThis.GLctx = ctx; //gl.currentContext.GLctx
@@ -37,7 +37,7 @@ export const PixUI = {
     },
 
     OnTextInput: function (s) {
-        DotNet.invokeMethod(this._asmName, "OnTextInput", s)
+        //DotNet.invokeMethod(this._asmName, "OnTextInput", s)
     },
 
     SetCursor: function (name) {
@@ -96,9 +96,11 @@ export const PixUI = {
 
     //以下事件处理
     onMouseDown(button, x, y, dx, dy) {
+        if (!this._exports) return;
         this._exports.OnMouseDown(button, x, y, dx, dy);
     },
     onMouseUp(button, x, y, dx, dy) {
+        if (!this._exports) return;
         this._exports.OnMouseUp(button, x, y, dx, dy);
     },
 

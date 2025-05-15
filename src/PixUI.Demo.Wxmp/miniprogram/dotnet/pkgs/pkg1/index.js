@@ -1,1 +1,1 @@
-export const assets = ["dotnet.native.wasm","System.Net.WebSockets.Client.wasm"]
+export const assets = ["dotnet.native.wasm","System.Collections.Concurrent.wasm"]

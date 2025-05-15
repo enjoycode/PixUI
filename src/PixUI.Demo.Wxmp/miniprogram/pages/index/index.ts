@@ -21,7 +21,8 @@ Component({
                 require.async("../../dotnet/pkgs/pkg1/index.js"),
                 require.async("../../dotnet/pkgs/pkg2/index.js"),
                 require.async("../../dotnet/pkgs/pkg3/index.js"),
-                require.async("../../dotnet/pkgs/pkg4/index.js")
+                require.async("../../dotnet/pkgs/pkg4/index.js"),
+                require.async("../../dotnet/pkgs/pkg5/index.js")
             ]);
             let assetMap = new Map<string, number>(); //key=name, value=pkg
             for (let i = 0; i < mods.length; i++) {
@@ -31,13 +32,13 @@ Component({
             }
 
             //设置全局变量
-            // (<any>globalThis).Module = {};
             (<any>globalThis).bootUrl = "http://localhost:5000";
             (<any>globalThis).WebAssembly = (<any>globalThis).WXWebAssembly;
             // (<any>globalThis).fs = wx.getFileSystemManager();
             (<any>globalThis).PixUI = PixUI;
             //TODO: 参考node-fetch and node-abort-controller
             (<any>globalThis).fetch = fetch_like;
+            //(<any>globalThis).Headers = 
             (<any>globalThis).AbortController = AbortController;
 
             //查询视图元素
@@ -63,7 +64,7 @@ Component({
             
             //开始启动dotnet
             const { setModuleImports, getAssemblyExports, getConfig, runMain } = await dotnet
-                .withDiagnosticTracing(false)
+                .withDiagnosticTracing(true)
                 .withConfig({
                     environmentVariables: {
                         "MONO_LOG_LEVEL": "debug", //enable Mono VM detailed logging by
@@ -74,7 +75,7 @@ Component({
                 //.withConfig({ maxParallelDownloads: 3, enableDownloadRetry: true }) //测试时从Github下载资源有并发限制
                 .withConfigSrc("blazor.boot.json")
                 .withResourceLoader((type, name, defaultUri, integrity, behavior) => this.loadResource(assetMap, type, name, defaultUri, integrity, behavior))
-                .withRuntimeOptions(["--no-jiterpreter-traces-enabled", "--no-jiterpreter-jit-call-enabled", "--no-jiterpreter-interp-entry-enabled", "--no-jiterpreter-wasm-eh-enabled"])
+                .withRuntimeOptions(["--no-jiterpreter-traces-enabled","--no-jiterpreter-jit-call-enabled", "--no-jiterpreter-interp-entry-enabled"])
                 .create();
 
             setModuleImports('main.mjs', { PixUI: PixUI });
