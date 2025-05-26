@@ -7,6 +7,11 @@ namespace PixUI.Dynamic;
 
 public interface IDynamicStateValue
 {
+    /// <summary>
+    /// 运行时从其他状态值复制，一般用于视图间传值
+    /// </summary>
+    void CopyFrom(IDynamicContext otherCtx, DynamicState otherState);
+
     void WriteTo(Utf8JsonWriter writer);
 
     void ReadFrom(ref Utf8JsonReader reader, DynamicState state);

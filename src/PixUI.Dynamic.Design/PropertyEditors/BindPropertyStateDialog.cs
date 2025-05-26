@@ -8,7 +8,7 @@ internal sealed class BindPropertyStateDialog : Dialog
     public BindPropertyStateDialog(DesignElement element, DynamicPropertyMeta propertyMeta)
     {
         Title.Value = "Bind Property To State";
-        Width = 250;
+        Width = 350;
         Height = 300;
 
         _element = element;
