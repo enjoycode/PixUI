@@ -22,23 +22,19 @@ internal sealed class NewStateDialog : Dialog
     public string Name => _name.Value;
     public DynamicStateType Type => Enum.Parse<DynamicStateType>(_type.Value!);
 
-    protected override Widget BuildBody()
+    protected override Widget BuildBody() => new Container()
     {
-        return new Container()
+        Padding = EdgeInsets.All(20),
+        Child = new Form()
         {
-            Padding = EdgeInsets.All(20),
-            Child = new Form()
+            LabelWidth = 80,
+            Children =
             {
-                LabelWidth = 80,
-                Children =
-                {
-                    new FormItem("Name:", new TextInput(_name)),
-                    new FormItem("Type:",
-                        new Select<string>(_type) { Options = Enum.GetNames(typeof(DynamicStateType)) })
-                }
+                new FormItem("Name:", new TextInput(_name)),
+                new FormItem("Type:", new Select<string>(_type) { Options = Enum.GetNames(typeof(DynamicStateType)) })
             }
-        };
-    }
+        }
+    };
 
     protected override ValueTask<bool> OnClosing(string result)
     {

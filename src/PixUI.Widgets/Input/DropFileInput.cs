@@ -32,6 +32,8 @@ public sealed class DropFileInput : SingleChildWidget, IDroppable
         init => _onDrop = value;
     }
 
+    private static readonly float[] Intervals = { 5f, 5f };
+
     bool IDroppable.AllowDrop(DragEvent dragEvent)
     {
         //TODO: 检查类型及大小限制
@@ -55,7 +57,7 @@ public sealed class DropFileInput : SingleChildWidget, IDroppable
 
         //Draw dash border
         paint = PixUI.Paint.Shared(Colors.Gray, PaintStyle.Stroke, 2f);
-        using var dash = PathEffect.CreateDash(new[] { 5f, 5f }, 10);
+        using var dash = PathEffect.CreateDash(Intervals, 10);
         paint.PathEffect = dash;
         canvas.DrawRRect(rect, paint);
     }
