@@ -62,7 +62,7 @@ public interface IDynamicDataRow : IDynamicStateValue, IWithChildStates { }
 /// </summary>
 public interface IWithChildStates
 {
-    IEnumerable<DynamicState> GetChildStates(DynamicState parent);
+    IEnumerable<DynamicState> GetChildStates(IDynamicContext context, DynamicState parent);
 }
 
 public enum DynamicStateType

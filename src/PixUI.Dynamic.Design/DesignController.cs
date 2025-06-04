@@ -78,7 +78,7 @@ public sealed partial class DesignController
         if (name.Contains('.'))
         {
             return allStates.Where(s => s.Value is IWithChildStates)
-                .SelectMany(s => ((IWithChildStates)s.Value!).GetChildStates(s))
+                .SelectMany(s => ((IWithChildStates)s.Value!).GetChildStates(DesignCanvas, s))
                 .FirstOrDefault(s => s.Name == name);
         }
 
@@ -101,7 +101,7 @@ public sealed partial class DesignController
         //继续查询DataTable及DataRow对应的子级状态
         var withChildren = allStates
             .Where(s => s.Value is IWithChildStates)
-            .SelectMany(s => ((IWithChildStates)s.Value!).GetChildStates(s))
+            .SelectMany(s => ((IWithChildStates)s.Value!).GetChildStates(DesignCanvas, s))
             .Where(s => s.Type == type && s.AllowNull == allowNull);
         list.AddRange(withChildren);
 
