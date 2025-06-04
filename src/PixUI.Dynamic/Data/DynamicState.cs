@@ -39,7 +39,7 @@ public interface IDynamicPrimitive : IDynamicStateValue
 /// <summary>
 /// 数据表状态值
 /// </summary>
-public interface IDynamicDataTable : IDynamicStateValue
+public interface IDynamicDataTable : IDynamicStateValue, IWithChildStates
 {
     /// <summary>
     /// 数据变更事件，用于通知绑定的组件刷新数据或重置相关配置
@@ -57,6 +57,9 @@ public interface IDynamicDataTable : IDynamicStateValue
 /// </summary>
 public interface IDynamicDataRow : IDynamicStateValue, IWithChildStates { }
 
+/// <summary>
+/// 具有子级状态的状态值
+/// </summary>
 public interface IWithChildStates
 {
     IEnumerable<DynamicState> GetChildStates(DynamicState parent);
