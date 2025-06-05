@@ -57,9 +57,10 @@ public static class DynamicContextExtensions
     {
         if (string.IsNullOrEmpty(dataSource)) return;
         var state = context.FindState(dataSource);
-        if (state is not { Type: DynamicStateType.DataTable } || state.Value == null) return;
+        if (state is not { Type: DynamicStateType.DataTable } || state.Value is not IDynamicDataTable dataTable) return;
 
-        ((IDynamicDataTable)state.Value).DataChanged += widget.OnDataChanged;
+        dataTable.DataChanged += widget.OnDataChanged;
+        widget.CurrentRowChanged += dataTable.OnCurrentRowChanged;
     }
 
     /// <summary>
@@ -70,8 +71,9 @@ public static class DynamicContextExtensions
         if (string.IsNullOrEmpty(dataSource)) return;
 
         var state = context.FindState(dataSource);
-        if (state is not { Type: DynamicStateType.DataTable } || state.Value == null) return;
+        if (state is not { Type: DynamicStateType.DataTable } || state.Value is not IDynamicDataTable dataTable) return;
 
-        ((IDynamicDataTable)state.Value).DataChanged -= widget.OnDataChanged;
+        dataTable.DataChanged -= widget.OnDataChanged;
+        widget.CurrentRowChanged -= dataTable.OnCurrentRowChanged;
     }
 }

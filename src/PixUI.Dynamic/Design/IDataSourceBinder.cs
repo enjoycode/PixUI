@@ -1,3 +1,5 @@
+using System;
+
 namespace PixUI;
 
 /// <summary>
@@ -5,6 +7,12 @@ namespace PixUI;
 /// </summary>
 public interface IDataSourceBinder
 {
+
+    /// <summary>
+    /// 当前数据行改变事件
+    /// </summary>
+    event Action<IDataSourceBinder, object?> CurrentRowChanged;
+    
     /// <summary>
     /// 数据源发生变更后刷新数据或重置相关配置
     /// </summary>

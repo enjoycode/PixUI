@@ -12,6 +12,11 @@ public interface IDynamicStateValue
     /// </summary>
     void CopyFrom(IDynamicContext otherCtx, DynamicState otherState);
 
+    /// <summary>
+    /// 运行时手动通知状态变更
+    /// </summary>
+    void NotifyStateChanged();
+
     void WriteTo(Utf8JsonWriter writer);
 
     void ReadFrom(ref Utf8JsonReader reader, DynamicState state);
@@ -50,6 +55,11 @@ public interface IDynamicDataTable : IDynamicStateValue, IWithChildStates
     /// 获取运行时的值
     /// </summary>
     ValueTask<object?> GetRuntimeValue(IDynamicContext dynamicContext);
+
+    /// <summary>
+    /// 当前行变更
+    /// </summary>
+    void OnCurrentRowChanged(IDataSourceBinder widget, object? dataRow);
 }
 
 /// <summary>
