@@ -1,5 +1,4 @@
 #if !__WEB__
-using System;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -14,16 +13,16 @@ public readonly struct Color : IEquatable<Color>
     public static Color FromArgb(byte alpha, byte red, byte green, byte blue) =>
         new(red, green, blue, alpha);
 
-    private readonly uint color;
+    private readonly uint _color;
 
     public Color(uint value)
     {
-        color = value;
+        _color = value;
     }
 
     public Color(byte red, byte green, byte blue, byte alpha = 255)
     {
-        color = (uint)((alpha << 24) | (red << 16) | (green << 8) | blue);
+        _color = (uint)((alpha << 24) | (red << 16) | (green << 8) | blue);
     }
 
     public Color WithRed(byte red) => new Color(red, Green, Blue, Alpha);
@@ -34,10 +33,10 @@ public readonly struct Color : IEquatable<Color>
 
     public Color WithAlpha(byte alpha) => new Color(Red, Green, Blue, alpha);
 
-    public byte Alpha => (byte)((color >> 24) & 0xff);
-    public byte Red => (byte)((color >> 16) & 0xff);
-    public byte Green => (byte)((color >> 8) & 0xff);
-    public byte Blue => (byte)((color) & 0xff);
+    public byte Alpha => (byte)((_color >> 24) & 0xff);
+    public byte Red => (byte)((_color >> 16) & 0xff);
+    public byte Green => (byte)((_color >> 8) & 0xff);
+    public byte Blue => (byte)((_color) & 0xff);
 
     public bool IsOpaque => Alpha == 0xFF;
 
@@ -133,7 +132,7 @@ public readonly struct Color : IEquatable<Color>
 
     public override string ToString() => $"#{Alpha:x2}{Red:x2}{Green:x2}{Blue:x2}";
 
-    public bool Equals(Color obj) => obj.color == color;
+    public bool Equals(Color obj) => obj._color == _color;
 
     public override bool Equals(object? other) => other is Color f && Equals(f);
 
@@ -141,11 +140,11 @@ public readonly struct Color : IEquatable<Color>
 
     public static bool operator !=(Color left, Color right) => !left.Equals(right);
 
-    public override int GetHashCode() => color.GetHashCode();
+    public override int GetHashCode() => _color.GetHashCode();
 
     public static implicit operator Color(uint color) => new(color);
 
-    public static explicit operator uint(Color color) => color.color;
+    public static explicit operator uint(Color color) => color._color;
 
     public static Color? Lerp(Color? a, Color? b, double t) => ColorUtils.Lerp(a, b, t);
 

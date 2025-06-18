@@ -1,6 +1,5 @@
 namespace PixUI;
 
-[TSType("CanvasKit.PaintStyle")]
 public enum PaintStyle
 {
     Fill = 0,
@@ -8,7 +7,6 @@ public enum PaintStyle
     //StrokeAndFill = 2,
 }
 
-[TSType("CanvasKit.StrokeCap")]
 public enum StrokeCap
 {
     Butt = 0,
@@ -16,7 +14,6 @@ public enum StrokeCap
     Square = 2,
 }
 
-[TSType("CanvasKit.StrokeJoin")]
 public enum StrokeJoin
 {
     Miter = 0,
@@ -24,14 +21,12 @@ public enum StrokeJoin
     Bevel = 2,
 }
 
-[TSType("CanvasKit.ClipOp")]
 public enum ClipOp
 {
     Difference = 0,
     Intersect = 1,
 }
 
-[TSType("CanvasKit.PathOp")]
 public enum PathOp
 {
     Difference = 0,
@@ -41,7 +36,6 @@ public enum PathOp
     ReverseDifference = 4,
 }
 
-[TSType("CanvasKit.BlendMode")]
 public enum BlendMode
 {
     Clear = 0,
@@ -75,7 +69,6 @@ public enum BlendMode
     Luminosity = 28,
 }
 
-[TSType("CanvasKit.ColorType")]
 public enum ColorType
 {
     //Unknown = 0,
@@ -104,7 +97,6 @@ public enum ColorType
     //Bgr101010x = 20,
 }
 
-[TSType("CanvasKit.AlphaType")]
 public enum AlphaType
 {
     Unknown = 0,
@@ -113,7 +105,6 @@ public enum AlphaType
     Unpremul = 3,
 }
 
-[TSType("CanvasKit.BlurStyle")]
 public enum BlurStyle
 {
     Normal = 0,
@@ -122,7 +113,6 @@ public enum BlurStyle
     Inner = 3,
 }
 
-[TSType("CanvasKit.FontSlant")]
 public enum FontSlant
 {
     Upright = 0,
@@ -130,7 +120,6 @@ public enum FontSlant
     Oblique = 2,
 }
 
-[TSType("CanvasKit.FontWeight")]
 public enum FontWeight
 {
     Invisible = 0,
@@ -146,7 +135,6 @@ public enum FontWeight
     ExtraBlack = 1000,
 }
 
-[TSType("CanvasKit.TextDirection")]
 public enum TextDirection
 {
     RTL,
@@ -166,7 +154,6 @@ public enum TextBaseline
     Ideographic
 }
 
-[TSType("CanvasKit.TextAlign")]
 public enum TextAlign
 {
     Left = 0,
@@ -174,14 +161,12 @@ public enum TextAlign
     Center = 2,
 }
 
-[TSType("CanvasKit.Affinity")]
 public enum Affinity
 {
     Upstream,
     Downstream
 }
 
-[TSType("CanvasKit.RectHeightStyle")]
 public enum BoxHeightStyle
 {
     /// <summary>
@@ -219,7 +204,6 @@ public enum BoxHeightStyle
     Strut
 }
 
-[TSType("CanvasKit.RectWidthStyle")]
 public enum BoxWidthStyle
 {
     /// <summary>
@@ -235,7 +219,6 @@ public enum BoxWidthStyle
     Max
 }
 
-[TSType("CanvasKit.Path1DEffectStyle")]
 public enum Path1DPathEffectStyle
 {
     Translate = 0,
@@ -243,7 +226,6 @@ public enum Path1DPathEffectStyle
     Morph = 2,
 }
 
-[TSType("CanvasKit.TileMode")]
 public enum TileMode
 {
     Clamp = 0,
@@ -252,7 +234,6 @@ public enum TileMode
     Decal = 3,
 }
 
-[TSType("CanvasKit.ColorChannel")]
 public enum ColorChannel
 {
     R = 0,
@@ -261,7 +242,6 @@ public enum ColorChannel
     A = 3,
 }
 
-[TSType("CanvasKit.EncodedImageFormat")]
 public enum EncodedImageFormat
 {
     // Bmp = 0,
@@ -279,7 +259,6 @@ public enum EncodedImageFormat
     // Heif = 11,
 }
 
-[TSType("CanvasKit.PlaceholderAlignment")]
 public enum PlaceholderAlignment
 {
     Baseline,

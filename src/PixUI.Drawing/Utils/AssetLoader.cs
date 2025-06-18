@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace PixUI.Platform;
+namespace PixUI;
 
 public static class AssetLoader
 {

@@ -1,9 +1,4 @@
 #if !__WEB__
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using PixUI.Platform;
 
 namespace PixUI;
 
@@ -40,7 +35,7 @@ public sealed class FontCollection
         _assetFontMgrHandle = SkiaApi.sk_typeface_font_provider_new();
         _fontCollectionHandle = SkiaApi.sk_font_collection_new(_assetFontMgrHandle, OperatingSystem.IsBrowser());
     }
-    
+
     public bool HasAny => _loading.Count > 0;
 
     /// <summary>
@@ -61,12 +56,12 @@ public sealed class FontCollection
 
         if (typeface == null)
         {
-            Log.Error($"Can't create Typeface[{fontFamily}] from data");
+            Console.WriteLine($"Can't create Typeface[{fontFamily}] from data");
             return;
         }
 
         SkiaApi.sk_typeface_font_provider_register_typeface(_assetFontMgrHandle, typeface.Handle);
-        Log.Debug($"FontCollection.RegisterTypeface: {typeface.FamilyName}");
+        Console.WriteLine($"FontCollection.RegisterTypeface: {typeface.FamilyName}");
 
         _loaded[fontFamily] = typeface;
         if (isAsset)
@@ -100,28 +95,6 @@ public sealed class FontCollection
     /// </summary>
     public Typeface? TryMatchFamilyFromAsset(string familyName) => _loaded.GetValueOrDefault(familyName);
 
-    public bool StartLoadFontFromAsset(string asmName, string assetPath, string familyName)
-    {
-        if (!_loading.Add(familyName))
-            return false;
-
-        Task.Run(() =>
-        {
-            using var stream = AssetLoader.LoadAsStream(asmName, assetPath);
-            if (stream == null) return;
-
-            var data = SKData.Create(stream);
-            if (data == null)
-                throw new Exception("Can't create SKData from stream");
-
-            UIApplication.Current.BeginInvoke(() =>
-            {
-                RegisterTypeface(data, familyName, true);
-                data.Dispose();
-            });
-        });
-
-        return true;
-    }
+    public bool HasLoading(string familyName) => !_loading.Add(familyName);
 }
 #endif
