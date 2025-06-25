@@ -62,16 +62,6 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
 
     public Point[] Points => GetPoints(PointCount);
 
-    public Point LastPoint
-    {
-        get
-        {
-            Point point;
-            SkiaApi.sk_path_get_last_point(Handle, &point);
-            return point;
-        }
-    }
-
     public Rect Bounds
     {
         get
@@ -157,6 +147,14 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
     {
         //暂简单判断最后一个
         return SkiaApi.sk_path_is_last_contour_closed(Handle);
+    }
+
+    public bool TryGetLastPoint(out Point point)
+    {
+        Point res;
+        var has = SkiaApi.sk_path_get_last_point(Handle, &res);
+        point = res;
+        return has;
     }
 
     public Point GetPoint(int index)
