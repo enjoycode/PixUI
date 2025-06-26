@@ -243,10 +243,11 @@ bin/gn gen out/wasm-wxmp-135 --args='target_cpu="wasm" is_official_build=true is
 ```
 
 ## MacOS
+暂手工加 extra_cflags_cc=[ "-DSK_CODEC_ENCODES_JPEG", "-DSK_CODEC_DECODES_JPEG" ]
 
 ### arm64
 ```bash
-bin/gn gen out/macos-arm64 --args='target_os="mac" target_cpu="arm64" is_official_build=true is_component_build=true skia_use_gl=false skia_use_vulkan=false skia_enable_tools=false skia_enable_pdf=true skia_pdf_subset_harfbuzz=true skia_use_zlib=true skia_use_icu=true skia_use_harfbuzz=true skia_use_metal=true skia_use_piex=true skia_use_system_icu=false skia_use_system_harfbuzz=false skia_use_system_expat=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false extra_cflags=[ "-DSKIA_C_DLL", "-DHAVE_ARC4RANDOM_BUF" ] extra_ldflags=[ ] '
+bin/gn gen out/macos-arm64 --args='target_os="mac" target_cpu="arm64" is_official_build=true is_component_build=true skia_use_gl=false skia_use_vulkan=false skia_enable_tools=false skia_enable_pdf=true skia_pdf_subset_harfbuzz=true skia_use_zlib=true skia_use_icu=true skia_use_harfbuzz=true skia_use_metal=true skia_use_piex=true skia_use_system_icu=false skia_use_system_harfbuzz=false skia_use_system_expat=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false extra_cflags=[ "-DSKIA_C_DLL", "-DHAVE_ARC4RANDOM_BUF" ] extra_cflags_cc=[ "-DSK_CODEC_ENCODES_JPEG", "-DSK_CODEC_DECODES_JPEG" ] extra_ldflags=[ ] '
 
 ninja -C out/macos-arm64 skia
 ```

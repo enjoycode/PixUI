@@ -8,6 +8,11 @@
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <OutputType>Library</OutputType>
+
+        <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))'">true</IsWindows>
+        <IsMacOS Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'">true</IsMacOS>
+        <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'">true</IsLinux>
+        <IsArm64 Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">true</IsArm64>
     </PropertyGroup>
 
     <ItemGroup>
@@ -119,6 +124,13 @@
     <ItemGroup>
       <Compile Remove="Resources\TestCode\TestIndexer.cs" />
       <EmbeddedResource Include="Resources\TestCode\TestIndexer.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(IsMacOS)'=='true' And '$(IsArm64)'=='true'">
+        <EmbeddedResource Include="..\PixUI.Platform.Mac\libs\osx-arm64\libskia.dylib">
+            <Link>%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
     </ItemGroup>
 
 </Project>
