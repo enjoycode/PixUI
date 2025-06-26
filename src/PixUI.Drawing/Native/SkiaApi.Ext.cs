@@ -177,6 +177,9 @@ partial class SkiaApi
 
     [DllImport(SKIA, CallingConvention = CallingConvention.Cdecl)]
     internal static extern float sk_paragraph_get_max_intrinsic_width(IntPtr paragraph);
+    
+    [DllImport(SKIA, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern ulong sk_paragraph_get_lines(IntPtr paragraph);
 
     [DllImport(SKIA, CallingConvention = CallingConvention.Cdecl)]
     internal static extern unsafe int sk_paragraph_get_glyph_position(IntPtr paragraph, float x,

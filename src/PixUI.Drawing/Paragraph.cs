@@ -18,6 +18,8 @@ namespace PixUI
 
         public float Height => SkiaApi.sk_paragraph_get_height(Handle);
 
+        public int Lines => (int)SkiaApi.sk_paragraph_get_lines(Handle);
+
         public PositionWithAffinity GetGlyphPositionAtCoordinate(float x, float y)
         {
             int affinity = 0;

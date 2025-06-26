@@ -16,7 +16,7 @@ public sealed unsafe class Font : SKObject
 
     protected override void DisposeNative() => SkiaApi.sk_font_delete(Handle);
 
-    public string Name => Typeface.FamilyName;
+    public string Name => Typeface!.FamilyName;
 
     public bool ForceAutoHinting
     {
@@ -121,10 +121,11 @@ public sealed unsafe class Font : SKObject
 
     public Size MeasureString(string text)
     {
-        Rect bounds;
         fixed (char* ptr = text)
         {
-            var width = SkiaApi.sk_font_measure_text(Handle, ptr, new IntPtr(text.Length * 2), SKTextEncoding.Utf16,
+            Rect bounds;
+            var width = SkiaApi.sk_font_measure_text(Handle, ptr,
+                new IntPtr(text.Length * 2), SKTextEncoding.Utf16,
                 &bounds, IntPtr.Zero);
             return new Size(width /*bounds.Width*/, bounds.Height);
         }
