@@ -35,7 +35,7 @@ partial class SkiaApi
 
     [DllImport(SKIA, CallingConvention = CallingConvention.Cdecl)]
     internal static extern void sk_font_collection_delete(IntPtr fontCollection);
-        
+
     [DllImport(SKIA, CallingConvention = CallingConvention.Cdecl)]
     internal static extern IntPtr sk_font_collection_get_fallback_manager(IntPtr fontCollection);
 
@@ -101,6 +101,7 @@ partial class SkiaApi
     #endregion
 
     #region ====ParagraphStyle====
+
     [DllImport(SKIA, CallingConvention = CallingConvention.Cdecl)]
     internal static extern IntPtr sk_paragraph_style_new();
 
@@ -177,9 +178,13 @@ partial class SkiaApi
 
     [DllImport(SKIA, CallingConvention = CallingConvention.Cdecl)]
     internal static extern float sk_paragraph_get_max_intrinsic_width(IntPtr paragraph);
-    
+
     [DllImport(SKIA, CallingConvention = CallingConvention.Cdecl)]
     internal static extern ulong sk_paragraph_get_lines(IntPtr paragraph);
+
+    [DllImport(SKIA, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern unsafe void sk_paragraph_get_linemetrics_at(IntPtr paragraph, int lineNumber,
+        LineMetrics* lineMetrics);
 
     [DllImport(SKIA, CallingConvention = CallingConvention.Cdecl)]
     internal static extern unsafe int sk_paragraph_get_glyph_position(IntPtr paragraph, float x,

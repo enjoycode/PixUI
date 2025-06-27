@@ -20,6 +20,17 @@ namespace PixUI
 
         public int Lines => (int)SkiaApi.sk_paragraph_get_lines(Handle);
 
+        public LineMetrics GetLineMetricsAt(int lineNumber)
+        {
+            var res = new LineMetrics();
+            unsafe
+            {
+                SkiaApi.sk_paragraph_get_linemetrics_at(Handle, lineNumber, &res);
+            }
+
+            return res;
+        }
+
         public PositionWithAffinity GetGlyphPositionAtCoordinate(float x, float y)
         {
             int affinity = 0;
