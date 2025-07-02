@@ -13,8 +13,7 @@ public enum PathConvexity
 
 public unsafe class Path : SKObject, ISKSkipObjectRegistration
 {
-    internal Path(IntPtr handle, bool owns)
-        : base(handle, owns) { }
+    private Path(IntPtr handle, bool owns) : base(handle, owns) { }
 
     public Path() : this(SkiaApi.sk_path_new(), true)
     {
@@ -270,8 +269,7 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
     public void Reset() => SkiaApi.sk_path_reset(Handle);
 
     public void AddRect(Rect rect, bool isCCW = false) =>
-        SkiaApi.sk_path_add_rect(Handle, &rect,
-            isCCW ? SKPathDirection.CounterClockwise : SKPathDirection.Clockwise);
+        SkiaApi.sk_path_add_rect(Handle, &rect, isCCW ? SKPathDirection.CounterClockwise : SKPathDirection.Clockwise);
 
     // public void AddRect(Rect rect, SKPathDirection direction, uint startIndex)
     // {
@@ -380,12 +378,10 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
         SkiaApi.sk_path_add_path_reverse(Handle, other.Handle);
     }
 
-    public void AddRRect(Rect rect, float rx, float ry,
-        SKPathDirection dir = SKPathDirection.Clockwise) =>
+    public void AddRRect(Rect rect, float rx, float ry, SKPathDirection dir = SKPathDirection.Clockwise) =>
         SkiaApi.sk_path_add_rounded_rect(Handle, &rect, rx, ry, dir);
 
-    public void AddCircle(float x, float y, float radius,
-        SKPathDirection dir = SKPathDirection.Clockwise) =>
+    public void AddCircle(float x, float y, float radius, SKPathDirection dir = SKPathDirection.Clockwise) =>
         SkiaApi.sk_path_add_circle(Handle, x, y, radius, dir);
 
     public void AddPoly(Point[] points, bool close = true)
@@ -482,15 +478,13 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
         return path;
     }
 
-    public static Point[] ConvertConicToQuads(Point p0, Point p1, Point p2, float w,
-        int pow2)
+    public static Point[] ConvertConicToQuads(Point p0, Point p1, Point p2, float w, int pow2)
     {
         ConvertConicToQuads(p0, p1, p2, w, out var pts, pow2);
         return pts;
     }
 
-    public static int ConvertConicToQuads(Point p0, Point p1, Point p2, float w,
-        out Point[] pts, int pow2)
+    public static int ConvertConicToQuads(Point p0, Point p1, Point p2, float w, out Point[] pts, int pow2)
     {
         var quadCount = 1 << pow2;
         var ptCount = 2 * quadCount + 1;
@@ -498,8 +492,7 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
         return ConvertConicToQuads(p0, p1, p2, w, pts, pow2);
     }
 
-    public static int ConvertConicToQuads(Point p0, Point p1, Point p2, float w,
-        Point[] pts, int pow2)
+    public static int ConvertConicToQuads(Point p0, Point p1, Point p2, float w, Point[] pts, int pow2)
     {
         if (pts == null)
             throw new ArgumentNullException(nameof(pts));
@@ -508,7 +501,6 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
             return SkiaApi.sk_path_convert_conic_to_quads(&p0, &p1, &p2, w, ptsptr, pow2);
         }
     }
-
 
     internal static Path? GetObject(IntPtr handle, bool owns = true) =>
         handle == IntPtr.Zero ? null : new Path(handle, owns);

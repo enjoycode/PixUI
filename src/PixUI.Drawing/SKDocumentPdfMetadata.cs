@@ -62,17 +62,17 @@ public struct SKDocumentPdfMetadata : IEquatable<SKDocumentPdfMetadata>
         EncodingQuality = encodingQuality;
     }
 
-    public string? Title { readonly get; set; }
-    public string? Author { readonly get; set; }
-    public string? Subject { readonly get; set; }
-    public string? Keywords { readonly get; set; }
-    public string? Creator { readonly get; set; }
-    public string? Producer { readonly get; set; }
-    public DateTime? Creation { readonly get; set; }
-    public DateTime? Modified { readonly get; set; }
-    public float RasterDpi { readonly get; set; }
-    public bool PdfA { readonly get; set; }
-    public int EncodingQuality { readonly get; set; }
+    public string? Title { get; set; }
+    public string? Author { get; set; }
+    public string? Subject { get; set; }
+    public string? Keywords { get; set; }
+    public string? Creator { get; set; }
+    public string? Producer { get; set; }
+    public DateTime? Creation { get; set; }
+    public DateTime? Modified { get; set; }
+    public float RasterDpi { get; set; }
+    public bool PdfA { get; set; }
+    public int EncodingQuality { get; set; }
 
     public readonly bool Equals(SKDocumentPdfMetadata obj) =>
         Title == obj.Title &&
