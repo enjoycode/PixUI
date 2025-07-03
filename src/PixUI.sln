@@ -65,6 +65,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.WxmpPkgs", "PixUI.Wxm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.Drawing", "PixUI.Drawing\PixUI.Drawing.csproj", "{47D972C4-5B7F-42F7-B9D2-2D9C3FC41D69}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.PdfViewer", "PixUI.PdfViewer\PixUI.PdfViewer.csproj", "{A9A69AAD-F366-4BC8-B69C-C0A42F6E4B6B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -179,6 +181,10 @@ Global
 		{47D972C4-5B7F-42F7-B9D2-2D9C3FC41D69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47D972C4-5B7F-42F7-B9D2-2D9C3FC41D69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47D972C4-5B7F-42F7-B9D2-2D9C3FC41D69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9A69AAD-F366-4BC8-B69C-C0A42F6E4B6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9A69AAD-F366-4BC8-B69C-C0A42F6E4B6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9A69AAD-F366-4BC8-B69C-C0A42F6E4B6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9A69AAD-F366-4BC8-B69C-C0A42F6E4B6B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
