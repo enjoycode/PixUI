@@ -47,14 +47,20 @@ public sealed class PdfViewController
 
         if (_pagesCache[pageIndex] == null)
         {
-            SKSurface surface = null!; //TODO: 考虑使用PictureRecorder
             Task.Run(async () =>
             {
+                SKSurface surface = null!;
+                // var recorder = new PictureRecorder();
+                var width = -1;
+                var height = -1;
                 await _document.RenderPageToAsync(pageIndex + 1, (rect, pageRotationMatrix) =>
                 {
-                    var (width, height) = _document.ScalePageToRequestedSize(rect, new Vector2(-1, -1));
+                    (width, height) = _document.ScalePageToRequestedSize(rect, new Vector2(-1, -1));
                     surface = SKSurface.Create(new ImageInfo() { Width = width, Height = height });
                     var target = new SkiaRenderTarget(surface.Canvas);
+
+                    // var canvas = recorder.BeginRecording(Rect.FromLTWH(0, 0, width, height));
+                    // var target = new SkiaRenderTarget(canvas);
                     _document.InitializeRenderTarget(target, rect, width, height, pageRotationMatrix);
                     return target;
                 }).ConfigureAwait(false);
@@ -63,6 +69,9 @@ public sealed class PdfViewController
                 {
                     _pagesCache[pageIndex] = surface.Snapshot();
                     surface.Dispose();
+
+                    // var picture = recorder.EndRecording();
+                    // _pagesCache[pageIndex] = Image.FromPicture(picture, new SizeI(width, height));
                     _view?.Repaint();
                 });
             });
