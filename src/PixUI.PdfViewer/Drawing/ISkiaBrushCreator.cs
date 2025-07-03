@@ -12,31 +12,31 @@ internal interface ISkiaBrushCreator : IDisposable
 
 internal class SolidColorBrushCreator : ISkiaBrushCreator
 {
-    private readonly Paint value;
+    private readonly Paint _value;
 
     public SolidColorBrushCreator(DeviceColor color)
     {
-        value = new Paint() { Color = color.AsSkColor() };
+        _value = new Paint() { Color = color.AsSkColor(), AntiAlias = true };
     }
 
-    public void Dispose() => value.Dispose();
+    public void Dispose() => _value.Dispose();
 
-    public Paint CreateBrush(SkiaGraphicsState topState) => value;
+    public Paint CreateBrush(SkiaGraphicsState topState) => _value;
 }
 
 internal abstract class IntermediateBrushHolder<T> : ISkiaBrushCreator where T : IDisposable
 {
-    protected readonly T value;
-    private readonly List<IDisposable> items = new();
+    protected readonly T Value;
+    private readonly List<IDisposable> _items = new();
 
     protected IntermediateBrushHolder(T value)
     {
-        this.value = value;
+        this.Value = value;
     }
 
     public void Dispose()
     {
-        foreach (var toDispose in items)
+        foreach (var toDispose in _items)
         {
             toDispose.Dispose();
         }
@@ -44,7 +44,7 @@ internal abstract class IntermediateBrushHolder<T> : ISkiaBrushCreator where T :
 
     protected TLocal RegisterForDispose<TLocal>(TLocal product) where TLocal : class, IDisposable
     {
-        items.Add(product);
+        _items.Add(product);
         return product;
     }
 
@@ -53,11 +53,11 @@ internal abstract class IntermediateBrushHolder<T> : ISkiaBrushCreator where T :
 
 internal class SurfacePatternHolder : IntermediateBrushHolder<SKSurface>
 {
-    private readonly Matrix3x2 patternTransform;
+    private readonly Matrix3x2 _patternTransform;
 
     public SurfacePatternHolder(SKSurface value, Matrix3x2 patternTransform) : base(value)
     {
-        this.patternTransform = patternTransform;
+        this._patternTransform = patternTransform;
     }
 
     public override Paint CreateBrush(SkiaGraphicsState topState)

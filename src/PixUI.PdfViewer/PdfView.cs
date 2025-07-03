@@ -35,11 +35,14 @@ public sealed class PdfView : Widget
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
         //TODO: 待完成，目前仅测试
-        canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(Colors.Red, PaintStyle.Stroke, 1));
-
         if (!_controller.TryGetRenderedPage(0, out var page))
             return;
 
-        canvas.DrawImage(page, 10, 10);
+        var windowRatio = UIWindow.Current.ScaleFactor;
+        var pageWidth = page.Width / windowRatio;
+        var pageHeight = page.Height / windowRatio;
+        canvas.DrawRect(Rect.FromLTWH(0, 0, pageWidth, pageHeight),
+            PixUI.Paint.Shared(Colors.Red, PaintStyle.Stroke, 1));
+        canvas.DrawImage(page, Rect.FromLTWH(0, 0, pageWidth, pageHeight));
     }
 }

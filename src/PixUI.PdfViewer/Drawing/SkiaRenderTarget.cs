@@ -8,8 +8,7 @@ namespace PixUI.PdfViewer.Drawing;
 
 internal partial class SkiaRenderTarget : RenderTargetBase<Canvas, SkiaGraphicsState>
 {
-    public SkiaRenderTarget(Canvas target) :
-        base(target)
+    public SkiaRenderTarget(Canvas target) : base(target)
     {
         State.ContextPushed += (_, __) => Target.Save();
         State.BeforeContextPopped += (_, __) => Target.Restore();
@@ -22,7 +21,6 @@ internal partial class SkiaRenderTarget : RenderTargetBase<Canvas, SkiaGraphicsS
     }
 
     public override IDrawTarget CreateDrawTarget() => new SkiaDrawTarget(Target, State);
-
 
     public override async ValueTask RenderBitmapAsync(IPdfBitmap bitmap)
     {
@@ -44,7 +42,6 @@ internal partial class SkiaRenderTarget : RenderTargetBase<Canvas, SkiaGraphicsS
     private readonly Paint _fillPaint = new();
 
     public override void Dispose()
-
     {
         _fillPaint.Dispose();
         base.Dispose();
