@@ -174,6 +174,9 @@ public sealed unsafe class Canvas : SKObject
     public void ClipRect(Rect rect, ClipOp op = ClipOp.Intersect, bool antialias = false) =>
         SkiaApi.sk_canvas_clip_rect_with_operation(Handle, &rect, op, antialias);
 
+    public void ClipRRect(RRect rRect, ClipOp op = ClipOp.Intersect, bool antialias = false) =>
+        SkiaApi.sk_canvas_clip_rrect_with_operation(Handle, rRect.Handle, op, antialias);
+
     public void ClipPath(Path path, ClipOp op, bool antialias)
     {
         if (path == null)

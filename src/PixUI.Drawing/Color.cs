@@ -13,6 +13,70 @@ public readonly struct Color : IEquatable<Color>
     public static Color FromArgb(byte alpha, byte red, byte green, byte blue) =>
         new(red, green, blue, alpha);
 
+    public static Color FromHsl(double hue, double saturation = 1, double lightness = 0.5, byte alpha = 255)
+    {
+        // 规范化输入值（使用Math.Clamp确保范围正确）
+        hue = Math.Min(Math.Max(hue % 360, 0), 360); // 色相0-360度
+        if (hue < 0) hue += 360;
+
+        saturation = Math.Min(Math.Max(saturation, 0), 1); // 饱和度0-1
+        lightness = Math.Min(Math.Max(lightness, 0), 1); // 亮度0-1
+
+        // 无颜色情况（饱和度为0）
+        if (saturation == 0)
+        {
+            byte l = (byte)(lightness * 255);
+            return Color.FromArgb(alpha, l, l, l);
+        }
+
+        // 计算临时值q
+        double q = lightness < 0.5
+            ? lightness * (1 + saturation)
+            : lightness + saturation - (lightness * saturation);
+
+        double p = 2 * lightness - q;
+        double hk = hue / 360.0;
+
+        // 计算三个颜色通道
+        double[] tc = { hk + 1.0 / 3, hk, hk - 1.0 / 3 };
+        double[] colors = new double[3];
+
+        for (int i = 0; i < 3; i++)
+        {
+            // 调整色相值到0-1范围
+            if (tc[i] < 0) tc[i] += 1;
+            if (tc[i] > 1) tc[i] -= 1;
+
+            // 计算各通道颜色值
+            if (tc[i] < 1.0 / 6)
+            {
+                colors[i] = p + ((q - p) * 6 * tc[i]);
+            }
+            else if (tc[i] < 1.0 / 2)
+            {
+                colors[i] = q;
+            }
+            else if (tc[i] < 2.0 / 3)
+            {
+                colors[i] = p + ((q - p) * 6 * (2.0 / 3 - tc[i]));
+            }
+            else
+            {
+                colors[i] = p;
+            }
+
+            // 确保最终值在0-1范围内（二次保护）
+            colors[i] = Math.Min(Math.Max(colors[i], 0), 1);
+        }
+
+        // 转换为RGB并四舍五入
+        return Color.FromArgb(
+            alpha,
+            (byte)(colors[0] * 255 + 0.5),
+            (byte)(colors[1] * 255 + 0.5),
+            (byte)(colors[2] * 255 + 0.5));
+    }
+    
     private readonly uint _color;
 
     public Color(uint value)
@@ -95,40 +159,6 @@ public readonly struct Color : IEquatable<Color>
 
         return (float)(maxval + minval) / 510;
     }
-
-    // public static SKColor FromHsv (float h, float s, float v, byte a = 255)
-    // {
-    // 	var colorf = SKColorF.FromHsv (h, s, v);
-    //
-    // 	// RGB results from 0 to 255
-    // 	var r = colorf.Red * 255f;
-    // 	var g = colorf.Green * 255f;
-    // 	var b = colorf.Blue * 255f;
-    //
-    // 	return new SKColor ((byte)r, (byte)g, (byte)b, a);
-    // }
-
-    // public readonly void ToHsl (out float h, out float s, out float l)
-    // {
-    // 	// RGB from 0 to 255
-    // 	var r = Red / 255f;
-    // 	var g = Green / 255f;
-    // 	var b = Blue / 255f;
-    //
-    // 	var colorf = new SKColorF (r, g, b);
-    // 	colorf.ToHsl (out h, out s, out l);
-    // }
-
-    // public readonly void ToHsv (out float h, out float s, out float v)
-    // {
-    // 	// RGB from 0 to 255
-    // 	var r = Red / 255f;
-    // 	var g = Green / 255f;
-    // 	var b = Blue / 255f;
-    //
-    // 	var colorf = new SKColorF (r, g, b);
-    // 	colorf.ToHsv (out h, out s, out v);
-    // }
 
     public override string ToString() => $"#{Alpha:x2}{Red:x2}{Green:x2}{Blue:x2}";
 

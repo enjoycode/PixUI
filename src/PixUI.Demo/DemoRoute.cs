@@ -26,6 +26,7 @@ public sealed class DemoRoute : View
             new("splitter", s => new DemoSplitter()),
             new("pdf", s => new DemoPdfViewer()),
             new("diagram", s => new DemoDiagram()),
+            new("colors", s => new DemoColorPicker()),
         };
         _navigator = new Navigator(routes);
 
@@ -81,6 +82,7 @@ public sealed class DemoRoute : View
                 MenuItem.Item("Splitter", null, () => _navigator.Push("splitter")),
                 MenuItem.Item("PdfViewer", null, () => _navigator.Push("pdf")),
                 MenuItem.Item("Diagram", null, () => _navigator.Push("diagram")),
+                MenuItem.Item("ColorPicker", null, () => _navigator.Push("colors")),
             }),
             // MenuItem.Item("Form", null, () => _navigator.Push("form")),
             MenuItem.Item("Charts", null, () => _navigator.Push("charts")),
