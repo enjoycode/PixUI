@@ -434,6 +434,7 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
     {
         fixed (Rect* r = &result)
         {
+            //TODO: use SkiaApi.sk_path_compute_tight_bounds(Handle, r);
             return SkiaApi.sk_pathop_tight_bounds(Handle, r);
         }
     }

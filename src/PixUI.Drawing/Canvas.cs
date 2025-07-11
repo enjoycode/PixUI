@@ -35,6 +35,9 @@ public sealed unsafe class Canvas : SKObject
     public void DrawLine(float x0, float y0, float x1, float y1, Paint paint) =>
         SkiaApi.sk_canvas_draw_line(Handle, x0, y0, x1, y1, paint.Handle);
 
+    public void DrawLine(Point x, Point y, Paint paint) =>
+        SkiaApi.sk_canvas_draw_line(Handle, x.X, x.Y, y.X, y.Y, paint.Handle);
+
     public void DrawRect(Rect rect, Paint paint) => SkiaApi.sk_canvas_draw_rect(Handle, &rect, paint.Handle);
 
     public void DrawRect(float x, float y, float w, float h, Paint paint) =>
@@ -168,7 +171,7 @@ public sealed unsafe class Canvas : SKObject
         }
     }
 
-    public void ClipRect(Rect rect, ClipOp op, bool antialias) =>
+    public void ClipRect(Rect rect, ClipOp op = ClipOp.Intersect, bool antialias = false) =>
         SkiaApi.sk_canvas_clip_rect_with_operation(Handle, &rect, op, antialias);
 
     public void ClipPath(Path path, ClipOp op, bool antialias)

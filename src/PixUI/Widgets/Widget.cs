@@ -128,6 +128,8 @@ public abstract class Widget : IDisposable
     /// </summary>
     protected internal float H { get; private set; }
 
+    public Rect LayoutBounds => Rect.FromLTWH(X, Y, W, H);
+
     protected internal float CachedAvailableWidth = float.NaN; //TODO:考虑移到有子级的内
     protected internal float CachedAvailableHeight = float.NaN;
 
@@ -453,7 +455,7 @@ public abstract class Widget : IDisposable
     /// <summary>
     /// 映射组件的本地坐标至窗体坐标
     /// </summary>
-    public Point LocalToWindow(float x, float y)
+    public Point LocalToWindow(float x, float y) //TODO: remove this and use GetTotalTransform()
     {
         Widget? temp = this;
         while (temp != null)

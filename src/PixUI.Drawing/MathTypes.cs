@@ -436,12 +436,33 @@ public partial struct Rect
         return FromLTWH(aspectLeft, aspectTop, aspectWidth, aspectHeight);
     }
 
+    public static RectI Ceiling(Rect value)
+    {
+        int x, y, w, h;
+        checked
+        {
+            x = (int)Math.Ceiling(value.X);
+            y = (int)Math.Ceiling(value.Y);
+            w = (int)Math.Ceiling(value.Width);
+            h = (int)Math.Ceiling(value.Height);
+        }
+
+        return RectI.FromLTWH(x, y, w, h);
+    }
+
     public void Inflate(float x, float y)
     {
         left -= x;
         top -= y;
         right += x;
         bottom += y;
+    }
+
+    public static Rect Inflate(Rect rect, float x, float y)
+    {
+        var res = rect;
+        res.Inflate(x, y);
+        return res;
     }
 
     public static Rect Intersect(Rect a, Rect b)

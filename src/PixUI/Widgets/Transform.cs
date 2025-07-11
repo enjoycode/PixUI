@@ -7,7 +7,7 @@ public class Transform : SingleChildWidget
 {
     private Matrix4 _transform;
     private Offset? _origin;
-    private bool _clipBounds; //裁剪范围,并只能在本组件范围内HitTest
+    private readonly bool _clipBounds; //裁剪范围,并只能在本组件范围内HitTest
 
     public Transform(Matrix4 transform, Offset? origin = null, bool clipBounds = true)
     {
