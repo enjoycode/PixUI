@@ -48,7 +48,7 @@ public sealed class TreeController<T>
 
     #region ----Selection----
 
-    private readonly List<TreeNode<T>> _selectedNodes = new();
+    private readonly List<TreeNode<T>> _selectedNodes = [];
 
     /// <summary>
     /// 第一个选中的节点
@@ -174,6 +174,22 @@ public sealed class TreeController<T>
         _selectedNodes.Add(node);
         node.IsSelected.Value = true;
 
+        SelectionChanged?.Invoke();
+    }
+
+    /// <summary>
+    /// 取消所有选择的节点
+    /// </summary>
+    public void ClearSelection()
+    {
+        if (_selectedNodes.Count == 0) return;
+        
+        foreach (var oldSelectedNode in _selectedNodes)
+        {
+            oldSelectedNode.IsSelected.Value = false;
+        }
+
+        _selectedNodes.Clear();
         SelectionChanged?.Invoke();
     }
 
