@@ -33,9 +33,9 @@ public sealed class Toolbox : View
     private static void BuildTreeNode(TreeNode<ToolboxNode> node)
     {
         var data = node.Data;
-        node.Label = new Text(data.IsCatelog ? data.CatelogName! : data.DynamicWidgetMeta!.Name);
-        node.Icon = data.IsCatelog ? new(MaterialIcons.Folder) : new(data.DynamicWidgetMeta!.Icon);
-        node.IsLeaf = !data.IsCatelog;
+        node.Label = new Text(data.IsCatalog ? data.CatalogName! : data.DynamicWidgetMeta!.Name);
+        node.Icon = data.IsCatalog ? new(MaterialIcons.Folder) : new(data.DynamicWidgetMeta!.Icon);
+        node.IsLeaf = !data.IsCatalog;
         node.IsExpanded = true;
     }
 
@@ -48,7 +48,7 @@ public sealed class Toolbox : View
         var treeList = new List<ToolboxNode>();
         foreach (var group in all)
         {
-            var groupIndex = treeList.FindIndex(n => n.CatelogName == group.Key);
+            var groupIndex = treeList.FindIndex(n => n.CatalogName == group.Key);
             if (groupIndex < 0)
             {
                 treeList.Add(new ToolboxNode(group.Key));
@@ -66,7 +66,7 @@ public sealed class Toolbox : View
 
     public void Rebuild() => BuildTreeDataSource();
 
-    private static bool OnAllowDrag(TreeNode<ToolboxNode> node) => !node.Data.IsCatelog;
+    private static bool OnAllowDrag(TreeNode<ToolboxNode> node) => !node.Data.IsCatalog;
 
     private void OnSelectionChanged()
     {
@@ -76,9 +76,9 @@ public sealed class Toolbox : View
 
 public sealed class ToolboxNode
 {
-    public ToolboxNode(string catelogName)
+    public ToolboxNode(string catalogName)
     {
-        CatelogName = catelogName;
+        CatalogName = catalogName;
         Children = new List<ToolboxNode>();
     }
 
@@ -87,10 +87,10 @@ public sealed class ToolboxNode
         DynamicWidgetMeta = widgetMeta;
     }
 
-    public string? CatelogName { get; }
+    public string? CatalogName { get; }
     public IList<ToolboxNode>? Children { get; }
 
     public DynamicWidgetMeta? DynamicWidgetMeta { get; }
 
-    public bool IsCatelog => CatelogName != null;
+    public bool IsCatalog => CatalogName != null;
 }
