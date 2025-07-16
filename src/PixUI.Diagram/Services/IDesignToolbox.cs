@@ -3,7 +3,7 @@
 public interface IDesignToolbox
 {
 
-    IDesignToolboxItem SelectedItem { get; }
+    IDesignToolboxItem? SelectedItem { get; }
 
     void ClearSelectedItem();
 
