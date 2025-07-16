@@ -77,7 +77,7 @@ public class DiagramShape : DiagramItem, IShape
         }
     }
 
-    protected internal override void Paint(Canvas g)
+    public override void Paint(Canvas g)
     {
         //TODO: 测试代码
         var clientRectangle = Rect.FromLTWH(0, 0, _bounds.Width, _bounds.Height);

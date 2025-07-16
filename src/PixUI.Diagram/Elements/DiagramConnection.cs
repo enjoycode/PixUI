@@ -1154,7 +1154,7 @@ public class DiagramConnection : DiagramItem, IConnection
 
     protected override void SetBounds(float x, float y, float width, float height, BoundsSpecified specified) { }
 
-    protected internal override void Paint(Canvas canvas)
+    public override void Paint(Canvas canvas)
     {
         if (_isDirty)
         {

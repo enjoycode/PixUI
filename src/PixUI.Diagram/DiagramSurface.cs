@@ -293,16 +293,13 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
 
     private static void LoopGetType<T>(IList<T> list, DiagramItem item) where T : class
     {
-        var target = item as T;
-        if (target != null)
+        if (item is T target)
             list.Add(target);
 
-        if (item.IsContainer && item.Items != null)
+        if (item is { IsContainer: true, Items: not null })
         {
-            for (int i = 0; i < item.Items.Length; i++)
-            {
-                LoopGetType(list, item.Items[i]);
-            }
+            foreach (var it in item.Items)
+                LoopGetType(list, it);
         }
     }
 

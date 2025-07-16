@@ -9,16 +9,13 @@ public abstract class DiagramItem
 
     protected internal DiagramSurface? Surface
     {
-        get { return Parent == null ? _surface : Parent.Surface; }
-        set { _surface = value; }
+        get => Parent == null ? _surface : Parent.Surface;
+        set => _surface = value;
     }
 
     public abstract Rect Bounds { get; set; }
 
-    public virtual bool Visible
-    {
-        get { return true; }
-    }
+    public virtual bool Visible => true;
 
     public bool IsSelected
     {
@@ -42,10 +39,7 @@ public abstract class DiagramItem
     /// <summary>
     /// 获取当前设计对象的设计时行为
     /// </summary>
-    internal virtual DesignBehavior DesignBehavior
-    {
-        get { return DesignBehavior.CanMove | DesignBehavior.CanResize; }
-    }
+    public virtual DesignBehavior DesignBehavior => DesignBehavior.CanMove | DesignBehavior.CanResize;
 
     public float StrokeThickness { get; set; } = 1f;
 
@@ -75,7 +69,7 @@ public abstract class DiagramItem
 
     #region ====Paint Methods====
 
-    protected internal abstract void Paint(Canvas canvas);
+    public abstract void Paint(Canvas canvas);
 
     protected internal virtual void Invalidate()
     {
@@ -85,8 +79,8 @@ public abstract class DiagramItem
         }
         else if (Surface != null)
         {
-            var ptCanvas = PointToSurface(Point.Empty);
-            var rect = Rect.FromLTWH(ptCanvas.X, ptCanvas.Y, Bounds.Width, Bounds.Height);
+            //var ptCanvas = PointToSurface(Point.Empty);
+            //var rect = Rect.FromLTWH(ptCanvas.X, ptCanvas.Y, Bounds.Width, Bounds.Height);
             //rect.Inflate(1,1);
             Surface.Repaint( /*TODO: Rect.Ceiling(rect)*/);
         }
@@ -212,16 +206,13 @@ public abstract class DiagramItem
 
     #region ====Container Implements====
 
-    private List<DiagramItem>? items;
+    private List<DiagramItem>? _items;
 
-    internal DiagramItem[]? Items => items?.ToArray();
+    public IEnumerable<DiagramItem> Items => _items ?? Enumerable.Empty<DiagramItem>();
 
     protected internal DiagramItem? Parent { get; set; }
 
-    protected internal virtual bool IsContainer
-    {
-        get { return false; }
-    }
+    protected internal virtual bool IsContainer => false;
 
     public void AddItem(DiagramItem item)
     {
@@ -229,8 +220,8 @@ public abstract class DiagramItem
             throw new InvalidOperationException();
 
         item.Parent = this;
-        items ??= new List<DiagramItem>();
-        items.Add(item);
+        _items ??= [];
+        _items.Add(item);
         item.OnAddToSurface();
         //非DiagramHostItem需要刷新Canvas
         Invalidate();
@@ -243,7 +234,7 @@ public abstract class DiagramItem
 
         item.OnRemoveFromSurface(); //注意：必须先于下面代码
         item.Parent = null;
-        items.Remove(item);
+        _items!.Remove(item);
         //todo: 非DiagramHostItem需要刷新Canvas
         Invalidate();
     }
@@ -256,13 +247,13 @@ public abstract class DiagramItem
     protected internal DiagramItem FindHoverItem(Point p)
     {
         DiagramItem found = null;
-        if (items != null)
+        if (_items != null)
         {
-            for (var i = 0; i < items.Count; i++)
+            for (var i = 0; i < _items.Count; i++)
             {
-                if (items[i].Visible && items[i].Bounds.Contains(p))
+                if (_items[i].Visible && _items[i].Bounds.Contains(p))
                 {
-                    found = items[i];
+                    found = _items[i];
                     if (found.IsContainer)
                     {
                         found = found.FindHoverItem(new Point(p.X - (int)found.Bounds.X,

@@ -51,5 +51,5 @@ public class DiagramHostItem : DiagramItem
         //     ((HostItemDesigner)Parent).hostControl.Controls.Remove(hostControl);
     }
 
-    protected internal override void Paint(Canvas g) { }
+    public override void Paint(Canvas g) { }
 }
