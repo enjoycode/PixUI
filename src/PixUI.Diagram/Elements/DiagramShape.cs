@@ -11,6 +11,8 @@ public class DiagramShape : DiagramItem, IShape
     private Rect _bounds = Rect.Empty;
     private GlidingStyle _glidingStyle = GlidingStyle.Rectangle;
 
+    public string TypeName => "Shape";
+
     public Point Position
     {
         get => _bounds.Location;

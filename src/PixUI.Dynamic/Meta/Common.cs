@@ -7,17 +7,17 @@ partial class DynamicWidgetManager
     private static DynamicWidgetMeta MakeButtonMeta() => DynamicWidgetMeta.Make<Button>(
         MaterialIcons.SmartButton,
         catalog: CatalogCommon,
-        properties: new DynamicPropertyMeta[]
-        {
+        properties:
+        [
             new(nameof(Button.Text), typeof(State<string>), true, true, "Button"),
             new(nameof(Button.Icon), typeof(State<IconData>), true, true),
             new(nameof(Button.TextColor), typeof(State<Color>), true),
-            new(nameof(Button.FillColor), typeof(State<Color>), true),
-        },
-        events: new DynamicEventMeta[]
-        {
+            new(nameof(Button.FillColor), typeof(State<Color>), true)
+        ],
+        events:
+        [
             new(nameof(Button.OnTap))
-        }
+        ]
     );
 
     private static DynamicWidgetMeta MakeTextMeta() => DynamicWidgetMeta.Make<Text>(

@@ -62,7 +62,7 @@ public sealed class SelectionService
         _selectedItems.Clear();
     }
 
-    internal void SelectItem(DiagramItem? item)
+    public void SelectItem(DiagramItem? item)
     {
         if (item == null && _selectedItems.Count > 0)
         {

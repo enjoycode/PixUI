@@ -2,6 +2,8 @@
 
 public interface IDiagramItem
 {
+    string TypeName { get; }
+
     /// <summary>
     /// Gets or sets whether the diagram entity is selected.
     /// </summary>
@@ -13,7 +15,7 @@ public interface IDiagramItem
     /// <summary>
     /// Gets or sets the position.
     /// </summary>
-    Point Position { get; set; }
+    Point Location { get; set; }
 
     Rect Bounds { get; }
 }

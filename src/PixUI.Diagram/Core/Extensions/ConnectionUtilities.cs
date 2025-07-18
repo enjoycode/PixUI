@@ -99,8 +99,8 @@ internal static class ConnectionUtilities
         for (var i = 0; i < connection.ConnectionPoints.Count; i++)
         {
             transformedPoints.Add(globalCoordinates
-                ? connection.ConnectionPoints[i].Add(connection.Position)
-                : connection.ConnectionPoints[i].Substract(connection.Position));
+                ? connection.ConnectionPoints[i].Add(connection.Location)
+                : connection.ConnectionPoints[i].Substract(connection.Location));
         }
 
         return transformedPoints;

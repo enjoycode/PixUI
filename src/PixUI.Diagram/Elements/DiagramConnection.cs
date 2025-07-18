@@ -25,6 +25,8 @@ public class DiagramConnection : DiagramItem, IConnection
     private string _title = string.Empty;
     private Paragraph? _cachedLayout;
 
+    public string TypeName => "Connection";
+
     #region ----文字相关属性----
 
     public virtual string Title
