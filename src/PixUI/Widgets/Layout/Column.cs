@@ -177,7 +177,7 @@ public sealed class Column : MultiChildWidget<Widget>
                         break;
                     }
 
-                    remainHeight -= _children[i].H;
+                    remainHeight -= _children[i].H; //TODO:***不要扣除Expanded的高度
                 }
 
                 var totalHeight = 0f;
@@ -217,7 +217,7 @@ public sealed class Column : MultiChildWidget<Widget>
                     }
                     else
                     {
-                        c.Layout(width, Math.Min(0, remainHeight));
+                        c.Layout(width, Math.Max(0, remainHeight));
                         c.SetPosition(c.X, totalHeight);
                         totalHeight += c.H;
                     }

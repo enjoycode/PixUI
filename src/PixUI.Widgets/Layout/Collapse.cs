@@ -62,7 +62,7 @@ public sealed class Collapse : Widget
     private void OnAnimationValueChanged()
     {
         _animationValue = _expandController!.Value;
-        Invalidate(InvalidAction.Relayout); //自身改变高度并通知上级
+        Relayout(); //自身改变高度并通知上级
     }
 
     private void OnTapExpander(PointerEvent e)
@@ -119,26 +119,26 @@ public sealed class Collapse : Widget
             return;
         }
 
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
         const float padding = 5f;
         _expandIcon.Layout(TitleHeight, TitleHeight);
-        _expandIcon.SetPosition(width - padding - _expandIcon.W, (TitleHeight - _expandIcon.H) / 2f);
+        _expandIcon.SetPosition(maxSize.Width - padding - _expandIcon.W, (TitleHeight - _expandIcon.H) / 2f);
 
         if (_title != null)
         {
-            _title.Layout(width - _expandIcon.W - padding, TitleHeight);
+            _title.Layout(maxSize.Width - _expandIcon.W - padding, TitleHeight);
             _title.SetPosition(padding, (TitleHeight - _title.H) / 2f);
         }
 
         if (_body != null)
         {
-            _body.Layout(width, height /*maybe infinity*/);
+            _body.Layout(maxSize.Width, maxSize.Height /*maybe infinity*/);
             _body.SetPosition(0, TitleHeight);
         }
 
-        SetSize(width, IsExpanded ? TitleHeight + _body?.H ?? 0 : TitleHeight);
+        SetSize(maxSize.Width, IsExpanded ? TitleHeight + _body?.H ?? 0 : TitleHeight);
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
