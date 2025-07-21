@@ -21,7 +21,8 @@ public sealed class ListViewController<T> : WidgetController<ListView<T>>
         set
         {
             _dataSource = value;
-            Widget.OnDataSourceChanged();
+            if (Widget != null!)
+                Widget.OnDataSourceChanged();
         }
     }
 
