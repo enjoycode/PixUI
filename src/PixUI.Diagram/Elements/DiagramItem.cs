@@ -210,7 +210,7 @@ public abstract class DiagramItem
 
     public IEnumerable<DiagramItem> Items => _items ?? Enumerable.Empty<DiagramItem>();
 
-    protected internal DiagramItem? Parent { get; set; }
+    public DiagramItem? Parent { get; private set; }
 
     protected internal virtual bool IsContainer => false;
 
