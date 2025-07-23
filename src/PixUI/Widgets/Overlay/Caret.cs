@@ -16,7 +16,7 @@ public sealed class Caret
     internal readonly Func<Color>? ColorBuilder;
     internal readonly Func<Rect> BoundsBuilder;
     private CaretDecorator? _decorator;
-    private Timer? timer;
+    private Timer? _timer;
     private bool _isHidden;
 
     public bool IsHidden
@@ -51,15 +51,15 @@ public sealed class Caret
     public void StartBlinking()
     {
         Show();
-        timer?.Dispose();
+        _timer?.Dispose();
         var blinkTime = TimeSpan.FromMilliseconds(530);
-        timer = new Timer(s => { UIApplication.Current.BeginInvoke(() => IsHidden = !IsHidden); }, null,
+        _timer = new Timer(s => { UIApplication.Current.BeginInvoke(() => IsHidden = !IsHidden); }, null,
             blinkTime, blinkTime);
     }
 
     public void StopBlinking()
     {
-        timer!.Dispose();
+        _timer!.Dispose();
         Hide();
     }
 }
