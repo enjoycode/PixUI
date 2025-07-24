@@ -2,15 +2,16 @@ namespace PixUI;
 
 public sealed class OpacitySlider : SliderBase
 {
-    public OpacitySlider(State<double> value, State<Color> noAlphaColor) : base(value)
+    public OpacitySlider(State<double> opacity, State<Color> hsl) : base(opacity)
     {
         MinValue = 0;
         MaxValue = 255;
-        _noAlphaColor = noAlphaColor;
-        _noAlphaColor.AddListener(_ => Repaint());
+
+        _hsl = hsl;
+        _hsl.AddListener(_ => Repaint());
     }
 
-    private readonly State<Color> _noAlphaColor;
+    private readonly State<Color> _hsl;
 
     protected override void DrawBackground(Canvas canvas)
     {
@@ -44,8 +45,9 @@ public sealed class OpacitySlider : SliderBase
         }
 
         //Draw linear
+        var noAlphaColor = _hsl.Value;
         using var linear = Shader.CreateLinearGradient(new Point(sliderRect.X, 0), new Point(sliderRect.Right, 0),
-            [Colors.Transparent, _noAlphaColor.Value], [0, 1], TileMode.Clamp);
+            [Colors.Transparent, noAlphaColor], [0, 1], TileMode.Clamp);
         paint.Shader = linear;
         canvas.DrawRect(sliderRect, paint);
 

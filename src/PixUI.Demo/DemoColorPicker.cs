@@ -9,7 +9,7 @@ public sealed class DemoColorPicker : View
             Padding = EdgeInsets.All(20),
             Width = 300,
             Height = 200,
-            Child = new ColorPalette()
+            Child = new ColorPalette(Colors.Blue)
         };
     }
 }

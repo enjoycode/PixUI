@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.Intrinsics.X86;
 
 namespace PixUI;
 
@@ -7,7 +8,7 @@ public abstract class SliderBase : Widget, IMouseRegion
     protected SliderBase(State<double> value)
     {
         _value = value;
-        _value.AddListener(s => Repaint());
+        _value.AddListener(_ => Repaint());
 
         MouseRegion = new MouseRegion();
         MouseRegion.PointerDown += OnPointerDown;
@@ -15,10 +16,11 @@ public abstract class SliderBase : Widget, IMouseRegion
     }
 
     private readonly State<double> _value;
-    private double _minValue = 0;
+    private double _minValue;
     private double _maxValue = 100;
-    protected const float SLIDER_HEIGHT = 16f;
-    protected const float PADDING = SLIDER_HEIGHT / 2 + 1;
+    protected const float SLIDER_HEIGHT = DragThumb.THUMB_RADIUS * 2;
+    protected const float V_PADDING = SLIDER_HEIGHT / 2 + 1;
+    protected const float H_PADDING = 0.5f;
 
     public MouseRegion MouseRegion { get; }
 
@@ -61,18 +63,18 @@ public abstract class SliderBase : Widget, IMouseRegion
 
     private void CalcAndSetValue(float posX)
     {
-        double ratio = (posX - PADDING) / (W - PADDING * 2);
+        double ratio = (posX - V_PADDING) / (W - V_PADDING * 2);
         ratio = Math.Clamp(ratio, 0, 1);
         _value.Value = ratio * (MaxValue - MinValue) + MinValue;
     }
 
     #endregion
 
-    protected Rect GetSliderRect() => Rect.FromLTWH(PADDING, PADDING, W - PADDING * 2, H - PADDING * 2);
+    protected Rect GetSliderRect() => Rect.FromLTWH(V_PADDING, H_PADDING, W - V_PADDING * 2, H - H_PADDING * 2);
 
     protected float GetPositionForValue()
     {
-        var w = W - PADDING * 2;
+        var w = W - V_PADDING * 2;
         var ratio = (_value.Value - MinValue) / (MaxValue - MinValue);
         return (float)(w * ratio);
     }
@@ -80,8 +82,7 @@ public abstract class SliderBase : Widget, IMouseRegion
     public override void Layout(float availableWidth, float availableHeight)
     {
         var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
-        SetSize(maxSize.Width, SLIDER_HEIGHT + PADDING * 2);
+        SetSize(maxSize.Width, SLIDER_HEIGHT + H_PADDING * 2);
     }
 
     protected virtual void DrawBackground(Canvas canvas)
@@ -94,21 +95,10 @@ public abstract class SliderBase : Widget, IMouseRegion
 
     protected virtual void DrawThumb(Canvas canvas)
     {
-        var cx = GetPositionForValue() + PADDING;
+        var cx = GetPositionForValue() + V_PADDING;
         var cy = H / 2;
-        var radius = (SLIDER_HEIGHT / 2);
 
-        var paint = PixUI.Paint.Shared(Colors.White);
-        paint.AntiAlias = true;
-        canvas.DrawCircle(cx, cy, radius, paint);
-
-        paint = PixUI.Paint.Shared(Colors.Red, PaintStyle.Stroke, 1);
-        paint.AntiAlias = true;
-        canvas.DrawCircle(cx, cy, radius, paint);
-
-        paint.Style = PaintStyle.Fill;
-        canvas.DrawCircle(cx, cy, radius - 3, paint);
-        paint.Reset();
+        DragThumb.Draw(canvas, cx, cy, Colors.Red);
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)

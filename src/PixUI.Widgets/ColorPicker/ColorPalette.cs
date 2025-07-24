@@ -2,23 +2,21 @@ namespace PixUI;
 
 public sealed class ColorPalette : View
 {
-    public ColorPalette()
+    public ColorPalette(State<Color> color)
     {
-        var rawColor = _hueValue.ToComputed(hue => Color.FromHsl(hue));
+        State<double> hueState = color.Value.GetHue();
+        State<double> opacityState = color.Value.Alpha;
+        State<Color> hslColor = color.Value.WithAlpha(255);
 
         Child = new Column()
         {
             Spacing = 5,
             Children =
             [
-                new Expanded(new ColorHslPanel(rawColor, _colorFromHsl)),
-                new ColorSlider(_hueValue),
-                new OpacitySlider(_alphaValue, rawColor),
+                new Expanded(new HslColorPanel(hueState, hslColor)),
+                new HueSlider(hueState),
+                new OpacitySlider(opacityState, hslColor),
             ]
         };
     }
-
-    private readonly State<double> _hueValue = 0;
-    private readonly State<double> _alphaValue = 255;
-    private readonly State<Color> _colorFromHsl = Colors.Red;
 }

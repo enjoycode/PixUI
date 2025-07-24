@@ -9,74 +9,87 @@ namespace PixUI;
 public readonly struct Color : IEquatable<Color>
 {
     public static readonly Color Empty = 0;
+    private const double OneSixth = 1.0 / 6.0;
+    private const double OneThird = 1.0 / 3.0;
+    private const double TwoThird = 2.0 / 3.0;
 
     public static Color FromArgb(byte alpha, byte red, byte green, byte blue) =>
         new(red, green, blue, alpha);
 
     public static Color FromHsl(double hue, double saturation = 1, double lightness = 0.5, byte alpha = 255)
     {
-        // 规范化输入值（使用Math.Clamp确保范围正确）
-        hue = Math.Min(Math.Max(hue % 360, 0), 360); // 色相0-360度
-        if (hue < 0) hue += 360;
+        double h = hue / 360;
+        double l = lightness;
+        double s = saturation;
+        double a = alpha;
+        double m2 = 0, m1 = 0;
 
-        saturation = Math.Min(Math.Max(saturation, 0), 1); // 饱和度0-1
-        lightness = Math.Min(Math.Max(lightness, 0), 1); // 亮度0-1
-
-        // 无颜色情况（饱和度为0）
-        if (saturation == 0)
+        if (s == 0.0)
         {
-            byte l = (byte)(lightness * 255);
-            return Color.FromArgb(alpha, l, l, l);
+            return FromArgb(
+                (byte)Clamp(a * 255, 0.0, 255, 5),
+                (byte)Clamp(l * 255, 0.0, 255, 5),
+                (byte)Clamp(l * 255, 0.0, 255, 5),
+                (byte)Clamp(l * 255, 0.0, 255, 5));
         }
 
-        // 计算临时值q
-        double q = lightness < 0.5
-            ? lightness * (1 + saturation)
-            : lightness + saturation - (lightness * saturation);
+        if (l <= 0.5)
+            m2 = l * (1.0 + s);
+        else
+            m2 = l + s - (l * s);
 
-        double p = 2 * lightness - q;
-        double hk = hue / 360.0;
+        m1 = (2.0 * l) - m2;
 
-        // 计算三个颜色通道
-        double[] tc = { hk + 1.0 / 3, hk, hk - 1.0 / 3 };
-        double[] colors = new double[3];
+        double r = ConvertValue(m1, m2, h + OneThird);
+        double g = ConvertValue(m1, m2, h);
+        double b = ConvertValue(m1, m2, h - OneThird);
 
-        for (int i = 0; i < 3; i++)
-        {
-            // 调整色相值到0-1范围
-            if (tc[i] < 0) tc[i] += 1;
-            if (tc[i] > 1) tc[i] -= 1;
-
-            // 计算各通道颜色值
-            if (tc[i] < 1.0 / 6)
-            {
-                colors[i] = p + ((q - p) * 6 * tc[i]);
-            }
-            else if (tc[i] < 1.0 / 2)
-            {
-                colors[i] = q;
-            }
-            else if (tc[i] < 2.0 / 3)
-            {
-                colors[i] = p + ((q - p) * 6 * (2.0 / 3 - tc[i]));
-            }
-            else
-            {
-                colors[i] = p;
-            }
-
-            // 确保最终值在0-1范围内（二次保护）
-            colors[i] = Math.Min(Math.Max(colors[i], 0), 1);
-        }
-
-        // 转换为RGB并四舍五入
-        return Color.FromArgb(
-            alpha,
-            (byte)(colors[0] * 255 + 0.5),
-            (byte)(colors[1] * 255 + 0.5),
-            (byte)(colors[2] * 255 + 0.5));
+        return FromArgb(
+            (byte)Clamp(a * 255, 0.0, 255, 5),
+            (byte)Clamp(r * 255, 0.0, 255, 5),
+            (byte)Clamp(g * 255, 0.0, 255, 5),
+            (byte)Clamp(b * 255, 0.0, 255, 5));
     }
-    
+
+    private static double ConvertValue(double m1, double m2, double hue)
+    {
+        hue = CustomMod(hue);
+
+        if (hue < OneSixth)
+            return m1 + (((m2 - m1) * hue) * 6.0);
+
+        if (hue < 0.5)
+            return m2;
+
+        if (hue < TwoThird)
+            return m1 + (((m2 - m1) * (TwoThird - hue)) * 6.0);
+
+        return m1;
+    }
+
+    private static double CustomMod(double number)
+    {
+        if (number > 0)
+        {
+            return number - Math.Floor(number);
+        }
+        else if (number < 0)
+        {
+            double abs = Math.Abs(number);
+            return 1 - (abs - Math.Floor(abs));
+        }
+
+        return 0;
+    }
+
+    private static double Clamp(double value, double minimum, double maximum, int precision)
+    {
+        var clampedValue = value > maximum ? maximum : value;
+        if (clampedValue < minimum) clampedValue = minimum;
+
+        return Math.Round(clampedValue, precision);
+    }
+
     private readonly uint _color;
 
     public Color(uint value)
@@ -113,23 +126,23 @@ public readonly struct Color : IEquatable<Color>
         int r = Red;
         int g = Green;
         int b = Blue;
-        byte minval = (byte)Math.Min(r, Math.Min(g, b));
-        byte maxval = (byte)Math.Max(r, Math.Max(g, b));
+        byte minVal = (byte)Math.Min(r, Math.Min(g, b));
+        byte maxVal = (byte)Math.Max(r, Math.Max(g, b));
 
-        if (maxval == minval)
+        if (maxVal == minVal)
             return 0.0f;
 
-        float diff = maxval - minval;
-        float rnorm = (maxval - r) / diff;
-        float gnorm = (maxval - g) / diff;
-        float bnorm = (maxval - b) / diff;
+        float diff = maxVal - minVal;
+        float rnorm = (maxVal - r) / diff;
+        float gnorm = (maxVal - g) / diff;
+        float bnorm = (maxVal - b) / diff;
 
         float hue = 0.0f;
-        if (r == maxval)
+        if (r == maxVal)
             hue = 60.0f * (6.0f + bnorm - gnorm);
-        if (g == maxval)
+        if (g == maxVal)
             hue = 60.0f * (2.0f + rnorm - bnorm);
-        if (b == maxval)
+        if (b == maxVal)
             hue = 60.0f * (4.0f + gnorm - rnorm);
         if (hue > 360.0f)
             hue = hue - 360.0f;
@@ -154,10 +167,10 @@ public readonly struct Color : IEquatable<Color>
 
     public float GetBrightness()
     {
-        byte minval = Math.Min(Red, Math.Min(Green, Blue));
-        byte maxval = Math.Max(Red, Math.Max(Green, Blue));
+        byte minVal = Math.Min(Red, Math.Min(Green, Blue));
+        byte maxVal = Math.Max(Red, Math.Max(Green, Blue));
 
-        return (float)(maxval + minval) / 510;
+        return (float)(maxVal + minVal) / 510;
     }
 
     public override string ToString() => $"#{Alpha:x2}{Red:x2}{Green:x2}{Blue:x2}";

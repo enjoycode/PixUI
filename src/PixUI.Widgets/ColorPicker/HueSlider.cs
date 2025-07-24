@@ -1,8 +1,8 @@
 namespace PixUI;
 
-public sealed class ColorSlider : SliderBase
+public sealed class HueSlider : SliderBase
 {
-    public ColorSlider(State<double> value) : base(value)
+    public HueSlider(State<double> value) : base(value)
     {
         MinValue = 0;
         MaxValue = 359.9;
