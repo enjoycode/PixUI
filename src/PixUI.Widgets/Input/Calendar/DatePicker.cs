@@ -31,7 +31,7 @@ public sealed class DatePicker : InputBase<EditableText>
 
     private readonly State<DateTime?> _value = null!;
     private readonly State<Color> _iconColor;
-    private const string format = "yyyy-MM-dd";
+    private const string FORMAT = "yyyy-MM-dd";
     private bool _showing;
     private DatePickerPopup? _popup;
 
@@ -82,7 +82,7 @@ public sealed class DatePicker : InputBase<EditableText>
         if (!e.IsFocused)
         {
             // restore edit text to DateTime format
-            Editor.Text.Value = _value.Value == null ? string.Empty : _value.Value.Value.ToString(format);
+            Editor.Text.Value = _value.Value == null ? string.Empty : _value.Value.Value.ToString(FORMAT);
             // maybe lost focus by tap button
             if (!ReferenceEquals(e.NewFocusedWidget, SuffixWidget))
                 HidePopup();
@@ -95,12 +95,12 @@ public sealed class DatePicker : InputBase<EditableText>
 
     private void OnValueChanged(State state)
     {
-        Editor.Text.Value = _value.Value == null ? string.Empty : _value.Value.Value.ToString(format);
+        Editor.Text.Value = _value.Value == null ? string.Empty : _value.Value.Value.ToString(FORMAT);
     }
 
     private void OnTextChanged(State state)
     {
-        if (DateTime.TryParseExact(Editor.Text.Value, format,
+        if (DateTime.TryParseExact(Editor.Text.Value, FORMAT,
                 CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTime))
             _value.Value = dateTime;
     }

@@ -45,7 +45,7 @@ public abstract class SelectBase<T> : InputBase<Widget>
         }
     }
 
-    public T[] Options { get; set; } = Array.Empty<T>();
+    public T[] Options { get; set; } = [];
 
     public Task<T[]> OptionsAsyncGetter
     {
