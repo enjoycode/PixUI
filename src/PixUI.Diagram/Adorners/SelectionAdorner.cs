@@ -61,27 +61,35 @@ internal sealed class SelectionAdorner : DesignAdorner, ISelectionAdorner
         canvas.DrawRect(rect, paint);
     }
 
-    protected internal override bool HitTest(Point pt, ref Cursor cursor)
+    protected internal override bool HitTest(Point pt, ref Cursor? cursor)
     {
         //TODO: 优化判断
         if (LeftTop.Contains(pt))
+        {
             _anchorLocation = ResizeAnchorLocation.LeftTop;
+        }
         else if (LeftCenter.Contains(pt))
         {
             _anchorLocation = ResizeAnchorLocation.LeftCenter;
             cursor = Cursors.ResizeLR;
         }
         else if (LeftBottom.Contains(pt))
+        {
             _anchorLocation = ResizeAnchorLocation.LeftBottom;
+        }
         else if (RightTop.Contains(pt))
+        {
             _anchorLocation = ResizeAnchorLocation.RightTop;
+        }
         else if (RightCenter.Contains(pt))
         {
             _anchorLocation = ResizeAnchorLocation.RightCenter;
             cursor = Cursors.ResizeLR;
         }
         else if (RightBottom.Contains(pt))
+        {
             _anchorLocation = ResizeAnchorLocation.RightBottom;
+        }
         else if (TopCenter.Contains(pt))
         {
             _anchorLocation = ResizeAnchorLocation.TopCenter;
@@ -93,12 +101,11 @@ internal sealed class SelectionAdorner : DesignAdorner, ISelectionAdorner
             cursor = Cursors.ResizeUD;
         }
         else
+        {
             _anchorLocation = ResizeAnchorLocation.None;
+        }
 
-        if (_anchorLocation != ResizeAnchorLocation.None)
-            return true;
-        else
-            return false;
+        return _anchorLocation != ResizeAnchorLocation.None;
     }
 
     protected internal override void OnMouseMove(PointerEvent e)

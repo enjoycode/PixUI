@@ -135,14 +135,31 @@ public abstract class DiagramItem
         Surface.Repaint( /*TODO: Rect.Ceiling(invalidRect)*/); //画旧区域与新区域的Union
     }
 
-    protected internal virtual void Move(int deltaX, int deltaY)
+    public virtual void Move(int deltaX, int deltaY)
     {
+        if ((DesignBehavior & DesignBehavior.CanMove) != DesignBehavior.CanMove) return;
+        if (deltaX == 0 && deltaY == 0) return;
+
+        if (Parent != null)
+        {
+            //预留10像素点 否则移到极限位置时候不容易在选中
+            const float threshold = 10f;
+            var newBounds = Rect.FromLTWH(Bounds.X + deltaX, Bounds.Y + deltaY, Bounds.Width, Bounds.Height);
+            if (newBounds.Y + threshold >= Parent.Bounds.Height) return;
+            if (newBounds.X + threshold >= Parent.Bounds.Width) return;
+            if (newBounds.X + newBounds.Width <= threshold) return;
+            if (newBounds.Y + newBounds.Height <= threshold) return;
+        }
+
         SetBounds(Bounds.X + deltaX, Bounds.Y + deltaY, Bounds.Width, Bounds.Height, BoundsSpecified.Location);
     }
 
     internal void Resize(ResizeAnchorLocation location, int deltaX, int deltaY)
     {
-        //todo: check minSize
+        if ((DesignBehavior & DesignBehavior.CanResize) != DesignBehavior.CanResize) return;
+        if (deltaX == 0 && deltaY == 0) return;
+
+        //TODO: check minSize
         var newBounds = Bounds;
 
         switch (location)
