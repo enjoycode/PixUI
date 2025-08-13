@@ -176,12 +176,10 @@ public abstract class DiagramItem
             case ResizeAnchorLocation.BottomCenter:
                 newBounds.Height += deltaY;
                 break;
-            default:
-                break;
         }
 
         SetBounds(newBounds.X, newBounds.Y, newBounds.Width, newBounds.Height,
-            BoundsSpecified.All); //todo: fix BoundsSpecified
+            BoundsSpecified.All); //TODO: fix BoundsSpecified
     }
 
     /// <summary>
@@ -193,7 +191,7 @@ public abstract class DiagramItem
         Invalidate();
 
         if (Parent == null)
-            Surface.RemoveItem(this);
+            Surface!.RemoveItem(this);
         else
             Parent.RemoveItem(this);
     }

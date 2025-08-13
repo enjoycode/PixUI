@@ -1,6 +1,6 @@
 ﻿namespace PixUI.Diagram;
 
-internal class DesignAdorner
+public class DesignAdorner
 {
     public DiagramItem Target { get; }
 
@@ -15,10 +15,7 @@ internal class DesignAdorner
     /// <summary>
     /// Point已转为控件坐标系
     /// </summary>
-    protected internal virtual bool HitTest(Point pt, ref Cursor cursor)
-    {
-        return false;
-    }
+    protected internal virtual bool HitTest(Point pt, ref Cursor? cursor) => false;
 
     /// <summary>
     /// 注意：坐标系已转为目标DiagramItem的坐标系
