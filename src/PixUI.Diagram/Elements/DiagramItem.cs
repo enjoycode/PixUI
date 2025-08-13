@@ -65,6 +65,11 @@ public abstract class DiagramItem
         // this.UpdateVisualStates();
     }
 
+    /// <summary>
+    /// 用于设计时新建的时候初始化
+    /// </summary>
+    protected internal virtual void OnCreated() { }
+
     #endregion
 
     #region ====Paint Methods====
@@ -244,7 +249,7 @@ public abstract class DiagramItem
     /// <returns>如果找不到子项，必须返回自己</returns>
     protected internal DiagramItem FindHoverItem(Point p)
     {
-        DiagramItem found = null;
+        DiagramItem? found = null;
         if (_items != null)
         {
             for (var i = 0; i < _items.Count; i++)
@@ -254,14 +259,13 @@ public abstract class DiagramItem
                     found = _items[i];
                     if (found.IsContainer)
                     {
-                        found = found.FindHoverItem(new Point(p.X - (int)found.Bounds.X,
-                            p.Y - (int)found.Bounds.Y));
+                        found = found.FindHoverItem(new Point(p.X - (int)found.Bounds.X, p.Y - (int)found.Bounds.Y));
                     }
                 }
             }
         }
 
-        return found == null ? this : found;
+        return found ?? this;
     }
 
     #endregion

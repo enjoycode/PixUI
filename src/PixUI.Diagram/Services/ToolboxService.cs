@@ -2,7 +2,6 @@
 
 public sealed class ToolboxService
 {
-
     private readonly DiagramSurface _surface;
     private DiagramItem? _currentContainer;
 
@@ -39,11 +38,10 @@ public sealed class ToolboxService
         _surface.Adorners.EndCreation();
 
         //开始创建DiagramItem，并加入画布
-        var newItem = SelectedItem.Create();
+        var newItem = SelectedItem!.Create();
         if (_currentContainer == null)
         {
-            IConnection connection = newItem as IConnection;
-            if (connection != null)
+            if (newItem is IConnection connection)
             {
                 connection.StartPoint = _surface.Adorners.CreationStartPoint;
                 connection.EndPoint = _surface.Adorners.CreationEndPoint;
@@ -52,13 +50,13 @@ public sealed class ToolboxService
             {
                 newItem.Bounds = _surface.Adorners.CreationRectangle;
             }
+
             _surface.AddItem(newItem);
         }
         else
         {
             var ptCanvas = _currentContainer.PointToSurface(Point.Empty);
-            IConnection connection = newItem as IConnection;
-            if (connection != null)
+            if (newItem is IConnection connection)
             {
                 var startPt = _surface.Adorners.CreationStartPoint;
                 var endPt = _surface.Adorners.CreationEndPoint;
@@ -76,11 +74,12 @@ public sealed class ToolboxService
             _currentContainer.AddItem(newItem);
         }
 
+        //初始化新建的
+        newItem.OnCreated();
         //选中新建的
         _surface.SelectionService.SelectItem(newItem);
 
         Cursor.Current = Cursors.Arrow;
         Toolbox?.ClearSelectedItem();
     }
-
 }
