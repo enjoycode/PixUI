@@ -20,6 +20,8 @@ public sealed class ColorPicker : InputBase<EditableText>
             TextColor = Colors.Black,
             OnTap = _ => SwitchPopup(),
         };
+
+        Padding = EdgeInsets.Only(4, 4, 0, 4);
     }
 
     private readonly State<Color> _state;
