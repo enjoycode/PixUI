@@ -108,7 +108,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
             return;
         }
 
-        //先判断有没有击中已选择项的锚点
+        //先判断有没有命中已选择项的锚点
         if (Adorners.HitTestItem != null)
         {
             Adorners.HitTestItem.OnMouseDown(e);

@@ -12,7 +12,7 @@ public sealed class DesignAdorners : FlowDecorator<DiagramSurface>
 
     internal void ClearSelected()
     {
-        for (int i = _adorners.Count - 1; i >= 0; i--)
+        for (var i = _adorners.Count - 1; i >= 0; i--)
         {
             if (_adorners[i] is ISelectionAdorner)
                 _adorners.RemoveAt(i);
@@ -40,7 +40,7 @@ public sealed class DesignAdorners : FlowDecorator<DiagramSurface>
 
         //HitTest各子级，注意：point已转换为DiagramItem的本地坐标系
         DesignAdorner? hitItem = null;
-        Cursor hitTestCursor = Cursors.Arrow;
+        var hitTestCursor = Cursors.Arrow;
         for (var i = 0; i < _adorners.Count; i++)
         {
             var item = _adorners[i];
@@ -58,7 +58,7 @@ public sealed class DesignAdorners : FlowDecorator<DiagramSurface>
 
         HitTestItem = hitItem;
         //改变当前Cursor
-        Cursor.Current = HitTestItem == null ? Cursors.Arrow : hitTestCursor;
+        Cursor.Current = HitTestItem == null || hitTestCursor == null ? Cursors.Arrow : hitTestCursor;
         return true;
     }
 
