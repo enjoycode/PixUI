@@ -7,7 +7,7 @@ public abstract class DiagramItem
     private DiagramSurface? _surface;
     private bool _isSelected;
 
-    protected internal DiagramSurface? Surface
+    public DiagramSurface? Surface
     {
         get => Parent == null ? _surface : Parent.Surface;
         set => _surface = value;
@@ -20,7 +20,7 @@ public abstract class DiagramItem
     public bool IsSelected
     {
         get => _isSelected;
-        set
+        internal set
         {
             if (_isSelected != value)
             {

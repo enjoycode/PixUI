@@ -22,6 +22,8 @@ public class DesignAdorner
     /// </summary>
     protected internal virtual void OnRender(Canvas canvas) { }
 
+    protected internal virtual void OnMouseDown(PointerEvent e) { }
+
     /// <summary>
     /// 注意：此时MouseButton 肯定== Left
     /// </summary>

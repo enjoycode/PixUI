@@ -5,12 +5,9 @@ public interface IDiagramItem
     string TypeName { get; }
 
     /// <summary>
-    /// Gets or sets whether the diagram entity is selected.
+    /// Gets whether the diagram entity is selected.
     /// </summary>
-    /// <value>
-    /// 	<c>True</c> if selected; otherwise, <c>false</c>.
-    /// </value>
-    bool IsSelected { get; set; }
+    bool IsSelected { get; }
 
     /// <summary>
     /// Gets or sets the position.
