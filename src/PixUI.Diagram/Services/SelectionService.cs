@@ -40,7 +40,7 @@ public sealed class SelectionService
 
     internal void DeleteSelection()
     {
-        for (int i = 0; i < _selectedItems.Count; i++)
+        for (var i = 0; i < _selectedItems.Count; i++)
         {
             //todo:判断是否允许删除，如RootView不允许删除
             _selectedItems[i].Remove();
@@ -49,7 +49,7 @@ public sealed class SelectionService
         ClearSelection();
     }
 
-    internal void ClearSelection()
+    public void ClearSelection()
     {
         SelectItem(null);
         _surface.ResetHoverItem();
