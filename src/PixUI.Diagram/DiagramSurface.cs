@@ -2,7 +2,7 @@
 
 public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
 {
-    public DiagramSurface()
+    public DiagramSurface(IDesignService designService)
     {
         Adorners = new DesignAdorners(this);
         ToolboxService = new ToolboxService(this);
@@ -16,6 +16,9 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
 
         FocusNode = new FocusNode();
         FocusNode.KeyDown += OnKeyDown;
+
+        DesignService = designService;
+        DesignService.InitSurface(this);
     }
 
     #region ====Fields & Properties====
@@ -34,6 +37,8 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
     #endregion
 
     #region ====Service about properties====
+
+    public IDesignService DesignService { get; }
 
     public ToolboxService ToolboxService { get; }
 
@@ -93,7 +98,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
             }
             else //处理已选择的对象的移动
             {
-                SelectionService.MoveSelection((int)e.DeltaX, (int)e.DeltaY);
+                DesignService.MoveSelection((int)e.DeltaX, (int)e.DeltaY);
             }
         }
 
@@ -223,19 +228,19 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
         switch (e.KeyCode)
         {
             case Keys.Delete:
-                SelectionService.DeleteSelection();
+                DesignService.DeleteSelection();
                 break;
             case Keys.Up:
-                SelectionService.MoveSelection(0, -1);
+                DesignService.MoveSelection(0, -1);
                 break;
             case Keys.Down:
-                SelectionService.MoveSelection(0, 1);
+                DesignService.MoveSelection(0, 1);
                 break;
             case Keys.Left:
-                SelectionService.MoveSelection(-1, 0);
+                DesignService.MoveSelection(-1, 0);
                 break;
             case Keys.Right:
-                SelectionService.MoveSelection(1, 0);
+                DesignService.MoveSelection(1, 0);
                 break;
         }
     }

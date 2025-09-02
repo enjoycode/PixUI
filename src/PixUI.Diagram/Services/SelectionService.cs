@@ -2,52 +2,18 @@
 
 public sealed class SelectionService
 {
-    private readonly DiagramSurface _surface;
-    private readonly List<DiagramItem> _selectedItems = new();
-
     public SelectionService(DiagramSurface surface)
     {
         _surface = surface;
     }
 
-    public DiagramItem[] SelectedItems
-    {
-        get { return _selectedItems.ToArray(); }
-    }
+    private readonly DiagramSurface _surface;
+    private readonly List<DiagramItem> _selectedItems = new();
+    public event EventHandler? SelectionChanged;
 
-    public bool HasSelectedItem
-    {
-        get { return _selectedItems.Count > 0; }
-    }
+    public IReadOnlyList<DiagramItem> SelectedItems => _selectedItems;
 
-    internal void MoveSelection(int deltaX, int deltaY)
-    {
-        //TODO: 先判断有没有不能Move的对象，有则全部不允许移动
-        //for (int i = 0; i < selectedItems.Count; i++)
-        //{
-        //    if ((selectedItems[i].DesignBehavior & DesignBehavior.CanMove) == 0)
-        //    {
-        //        return;
-        //    }
-        //}
-
-        //再处理移动所有选择的对象
-        for (var i = 0; i < _selectedItems.Count; i++)
-        {
-            _selectedItems[i].Move(deltaX, deltaY);
-        }
-    }
-
-    internal void DeleteSelection()
-    {
-        for (var i = 0; i < _selectedItems.Count; i++)
-        {
-            //todo:判断是否允许删除，如RootView不允许删除
-            _selectedItems[i].Remove();
-        }
-
-        ClearSelection();
-    }
+    public bool HasSelection => _selectedItems.Count > 0;
 
     public void ClearSelection()
     {
@@ -112,6 +78,4 @@ public sealed class SelectionService
 
         SelectionChanged?.Invoke(this, EventArgs.Empty);
     }
-
-    public event EventHandler? SelectionChanged;
 }

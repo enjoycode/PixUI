@@ -2,13 +2,13 @@
 
 public sealed class DiagramView : Transform, IScrollable, IMouseRegion
 {
-    public DiagramView() : base(Matrix4.CreateIdentity())
+    public DiagramView(IDesignService designService) : base(Matrix4.CreateIdentity())
     {
         _mouseRegion = new MouseRegion();
         _scrollBars = new ScrollBarDecorator<DiagramView>(this, this,
             () => new(MaxScrollOffsetX, MaxScrollOffsetY));
 
-        Surface = new DiagramSurface();
+        Surface = new DiagramSurface(designService);
         Child = Surface;
     }
 

@@ -207,7 +207,7 @@ public abstract class DiagramItem
     /// <summary>
     /// 从画布或上级移除自身
     /// </summary>
-    internal void Remove()
+    public void Remove()
     {
         //必须先发出重绘指令
         Invalidate();
