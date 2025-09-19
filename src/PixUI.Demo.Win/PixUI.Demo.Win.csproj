@@ -33,10 +33,10 @@
 				<Content Include="..\PixUI.Platform.Win\libs\arm64\icudtl.dat">
 					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 				</Content>
-				<Content Include="..\PixUI.CodeEditor\libs\win-arm64\tree-sitter.dll">
+				<Content Include="..\PixUI.CodeEditor.TreeSitter\libs\win-arm64\tree-sitter.dll">
 					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 				</Content>
-				<Content Include="..\PixUI.CodeEditor\libs\win-arm64\tree-sitter-csharp.dll">
+				<Content Include="..\PixUI.CodeEditor.TreeSitter\libs\win-arm64\tree-sitter-csharp.dll">
 					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 				</Content>
 			</ItemGroup>
@@ -49,10 +49,10 @@
 				<Content Include="..\PixUI.Platform.Win\libs\x64\icudtl.dat">
 					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 				</Content>
-				<Content Include="..\PixUI.CodeEditor\libs\win-x64\tree-sitter.dll">
+				<Content Include="..\PixUI.CodeEditor.TreeSitter\libs\win-x64\tree-sitter.dll">
 					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 				</Content>
-				<Content Include="..\PixUI.CodeEditor\libs\win-x64\tree-sitter-csharp.dll">
+				<Content Include="..\PixUI.CodeEditor.TreeSitter\libs\win-x64\tree-sitter-csharp.dll">
 					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 				</Content>
 			</ItemGroup>
