@@ -1,41 +1,37 @@
 #if !__WEB__
-using System;
-
 namespace PixUI;
 
 internal partial struct SKImageInfoNative
 {
-    public static void UpdateNative(ref ImageInfo managed, ref SKImageInfoNative native)
+    // public static void UpdateNative(ref ImageInfo managed, ref SKImageInfoNative native)
+    // {
+    //     native.colorspace = managed.ColorSpace?.Handle ?? IntPtr.Zero;
+    //     native.width = managed.Width;
+    //     native.height = managed.Height;
+    //     native.colorType = managed.ColorType.ToNative();
+    //     native.alphaType = managed.AlphaType;
+    // }
+
+    public static SKImageInfoNative FromManaged(ref ImageInfo managed) => new SKImageInfoNative
     {
-        native.colorspace = managed.ColorSpace?.Handle ?? IntPtr.Zero;
-        native.width = managed.Width;
-        native.height = managed.Height;
-        native.colorType = managed.ColorType.ToNative();
-        native.alphaType = managed.AlphaType;
-    }
+        colorspace = managed.ColorSpace?.Handle ?? IntPtr.Zero,
+        width = managed.Width,
+        height = managed.Height,
+        colorType = managed.ColorType.ToNative(),
+        alphaType = managed.AlphaType,
+    };
 
-    public static SKImageInfoNative FromManaged(ref ImageInfo managed) =>
-        new SKImageInfoNative
-        {
-            colorspace = managed.ColorSpace?.Handle ?? IntPtr.Zero,
-            width = managed.Width,
-            height = managed.Height,
-            colorType = managed.ColorType.ToNative(),
-            alphaType = managed.AlphaType,
-        };
-
-    public static ImageInfo ToManaged(ref SKImageInfoNative native) =>
-        new ImageInfo
-        {
-            ColorSpace = ColorSpace.GetObject(native.colorspace),
-            Width = native.width,
-            Height = native.height,
-            ColorType = native.colorType.FromNative(),
-            AlphaType = native.alphaType,
-        };
+    // public static ImageInfo ToManaged(ref SKImageInfoNative native) => new ImageInfo
+    // {
+    //     ColorSpace = ColorSpace.GetObject(native.colorspace),
+    //     Width = native.width,
+    //     Height = native.height,
+    //     ColorType = native.colorType.FromNative(),
+    //     AlphaType = native.alphaType,
+    // };
 }
 
-public unsafe struct ImageInfo : IEquatable<ImageInfo>
+public readonly unsafe struct ImageInfo : IEquatable<ImageInfo>
 {
     // public static readonly ImageInfo Empty;
     private static readonly ColorType PlatformColorType;
@@ -46,7 +42,7 @@ public unsafe struct ImageInfo : IEquatable<ImageInfo>
 
     static ImageInfo()
     {
-        PlatformColorType = PixUI.ColorType.Bgra8888; //SkiaApi.sk_colortype_get_default_8888().FromNative();
+        PlatformColorType = ColorType.Bgra8888; //SkiaApi.sk_colortype_get_default_8888().FromNative();
 
         //fixed (int* a = &PlatformColorAlphaShift)
         //fixed (int* r = &PlatformColorRedShift)
@@ -59,22 +55,22 @@ public unsafe struct ImageInfo : IEquatable<ImageInfo>
 
     public ImageInfo() { }
 
-    public int Width { get; set; } = 0;
+    public int Width { get; init; } = 0;
 
-    public int Height { get; set; } = 0;
+    public int Height { get; init; } = 0;
 
-    public ColorType ColorType { get; set; } = PlatformColorType;
+    public ColorType ColorType { get; init; } = PlatformColorType;
 
-    public AlphaType AlphaType { get; set; } = AlphaType.Premul;
+    public AlphaType AlphaType { get; init; } = AlphaType.Premul;
 
-    public ColorSpace? ColorSpace { get; set; } = null;
+    public ColorSpace? ColorSpace { get; init; } = null;
 
-    public readonly int BytesPerPixel => ColorType.GetBytesPerPixel();
+    public int BytesPerPixel => ColorType.GetBytesPerPixel();
 
     // public readonly int BitsPerPixel => BytesPerPixel * 8;
-        
-    public readonly int BytesSize => Width * Height * BytesPerPixel;
-        
+
+    public int BytesSize => Width * Height * BytesPerPixel;
+
     // public readonly long BytesSize64 => (long)Width * (long)Height * (long)BytesPerPixel;
     //
     // public readonly int RowBytes => Width * BytesPerPixel;
@@ -89,20 +85,20 @@ public unsafe struct ImageInfo : IEquatable<ImageInfo>
     //
     // public readonly SKRectI Rect => SKRectI.Create (Width, Height);
 
-    public readonly bool Equals(ImageInfo obj) =>
+    public bool Equals(ImageInfo obj) =>
         ColorSpace == obj.ColorSpace &&
         Width == obj.Width &&
         Height == obj.Height &&
         ColorType == obj.ColorType &&
         AlphaType == obj.AlphaType;
 
-    public readonly override bool Equals(object obj) => obj is ImageInfo f && Equals(f);
+    public override bool Equals(object? obj) => obj is ImageInfo f && Equals(f);
 
     public static bool operator ==(ImageInfo left, ImageInfo right) => left.Equals(right);
 
     public static bool operator !=(ImageInfo left, ImageInfo right) => !left.Equals(right);
 
-    public readonly override int GetHashCode()
+    public override int GetHashCode()
     {
         var hash = new HashCode();
         hash.Add(ColorSpace);
