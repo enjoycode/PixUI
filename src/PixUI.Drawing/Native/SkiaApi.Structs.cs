@@ -1263,7 +1263,7 @@ public unsafe partial struct SKHighContrastConfig : IEquatable<SKHighContrastCon
 
 // sk_imageinfo_t
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe partial struct SKImageInfoNative : IEquatable<PixUI.SKImageInfoNative>
+internal unsafe partial struct SKImageInfoNative : IEquatable<SKImageInfoNative>
 {
     // public sk_colorspace_t* colorspace
     public IntPtr colorspace;
@@ -1280,20 +1280,15 @@ internal unsafe partial struct SKImageInfoNative : IEquatable<PixUI.SKImageInfoN
     // public sk_alphatype_t alphaType
     public AlphaType alphaType;
 
-    public readonly bool Equals(PixUI.SKImageInfoNative obj) =>
+    public readonly bool Equals(SKImageInfoNative obj) =>
         colorspace == obj.colorspace && width == obj.width && height == obj.height &&
         colorType == obj.colorType && alphaType == obj.alphaType;
 
-    public readonly override bool Equals(object obj) =>
-        obj is PixUI.SKImageInfoNative f && Equals(f);
+    public readonly override bool Equals(object? obj) => obj is SKImageInfoNative f && Equals(f);
 
-    public static bool operator ==(PixUI.SKImageInfoNative left,
-        PixUI.SKImageInfoNative right) =>
-        left.Equals(right);
+    public static bool operator ==(SKImageInfoNative left, SKImageInfoNative right) => left.Equals(right);
 
-    public static bool operator !=(PixUI.SKImageInfoNative left,
-        PixUI.SKImageInfoNative right) =>
-        !left.Equals(right);
+    public static bool operator !=(SKImageInfoNative left, SKImageInfoNative right) => !left.Equals(right);
 
     public readonly override int GetHashCode()
     {
