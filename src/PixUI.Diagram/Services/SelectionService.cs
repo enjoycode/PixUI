@@ -45,8 +45,11 @@ public sealed class SelectionService
         }
     }
 
-    internal void SelectItems(DiagramItem[]? items)
+    public void SelectItems(DiagramItem[]? items)
     {
+        if (IsSameSelection(items))
+            return;
+
         if ((items == null || items.Length == 0) && _selectedItems.Count > 0)
         {
             ClearInternal();
@@ -62,6 +65,23 @@ public sealed class SelectionService
         }
 
         OnSelectionChanged();
+    }
+
+    private bool IsSameSelection(DiagramItem[]? newItems)
+    {
+        if (newItems == null)
+            return _selectedItems.Count <= 0;
+
+        if (newItems.Length != _selectedItems.Count)
+            return false;
+
+        for (var i = 0; i < newItems.Length; i++)
+        {
+            if (!ReferenceEquals(newItems[i], _selectedItems[i]))
+                return false;
+        }
+
+        return true;
     }
 
     private void OnSelectionChanged()

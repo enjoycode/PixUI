@@ -95,7 +95,7 @@ public abstract class DiagramItem
 
     #region ====Layout Methods====
 
-    internal Point PointToSurface(Point clientPt)
+    protected internal Point PointToSurface(Point clientPt)
     {
         var x = clientPt.X;
         var y = clientPt.Y;
@@ -111,7 +111,7 @@ public abstract class DiagramItem
         return new Point(x, y);
     }
 
-    internal Point PointToClient(Point surfacePt)
+    protected Point PointToClient(Point surfacePt)
     {
         Point zero = PointToSurface(Point.Empty);
         return new Point(surfacePt.X - zero.X, surfacePt.Y - zero.Y);
@@ -135,7 +135,7 @@ public abstract class DiagramItem
         Surface.Repaint( /*TODO: Rect.Ceiling(invalidRect)*/); //画旧区域与新区域的Union
     }
 
-    public virtual void Move(int deltaX, int deltaY)
+    public virtual void Move(float deltaX, float deltaY)
     {
         if ((DesignBehavior & DesignBehavior.CanMove) != DesignBehavior.CanMove) return;
         if (deltaX == 0 && deltaY == 0) return;
@@ -302,10 +302,7 @@ public abstract class DiagramItem
     /// <summary>
     /// Previews the mouse down. 画布坐标系
     /// </summary>
-    protected internal virtual bool PreviewMouseDown(PointerEvent e)
-    {
-        return false;
-    }
+    protected internal virtual bool PreviewMouseDown(PointerEvent e) => false;
 
     #endregion
 }

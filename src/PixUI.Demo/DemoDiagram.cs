@@ -32,7 +32,7 @@ internal sealed class DesignService : IDesignService
 
     public void InitSurface(DiagramSurface surface) => _surface = surface;
 
-    public void MoveSelection(int deltaX, int deltaY)
+    public void MoveSelection(float deltaX, float deltaY)
     {
         var selectedItems = _surface.SelectionService.SelectedItems;
         //TODO: 先判断有没有不能Move的对象，有则全部不允许移动

@@ -13,7 +13,7 @@ public interface IDesignService
     /// <summary>
     /// 移动选择的元素
     /// </summary>
-    void MoveSelection(int deltaX, int deltaY);
+    void MoveSelection(float deltaX, float deltaY);
 
     /// <summary>
     /// 从画布删除选择的元素

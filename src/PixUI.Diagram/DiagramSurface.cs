@@ -98,7 +98,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
             }
             else //处理已选择的对象的移动
             {
-                DesignService.MoveSelection((int)e.DeltaX, (int)e.DeltaY);
+                DesignService.MoveSelection(e.DeltaX, e.DeltaY);
             }
         }
 
