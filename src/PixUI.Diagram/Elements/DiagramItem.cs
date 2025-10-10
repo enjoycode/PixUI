@@ -95,6 +95,9 @@ public abstract class DiagramItem
 
     #region ====Layout Methods====
 
+    /// <summary>
+    /// 将本地坐标转换为画布坐标
+    /// </summary>
     protected internal Point PointToSurface(Point clientPt)
     {
         var x = clientPt.X;
@@ -111,9 +114,12 @@ public abstract class DiagramItem
         return new Point(x, y);
     }
 
-    protected Point PointToClient(Point surfacePt)
+    /// <summary>
+    /// 将画布坐标转换为本地坐标
+    /// </summary>
+    public Point PointToClient(Point surfacePt)
     {
-        Point zero = PointToSurface(Point.Empty);
+        var zero = PointToSurface(Point.Empty);
         return new Point(surfacePt.X - zero.X, surfacePt.Y - zero.Y);
     }
 
@@ -135,23 +141,23 @@ public abstract class DiagramItem
         Surface.Repaint( /*TODO: Rect.Ceiling(invalidRect)*/); //画旧区域与新区域的Union
     }
 
-    public virtual void Move(float deltaX, float deltaY)
+    public void Move(Offset delta)
     {
         if ((DesignBehavior & DesignBehavior.CanMove) != DesignBehavior.CanMove) return;
-        if (deltaX == 0 && deltaY == 0) return;
+        if (delta is { Dx: 0, Dy: 0 }) return;
 
         if (Parent != null)
         {
             //预留10像素点 否则移到极限位置时候不容易在选中
             const float threshold = 10f;
-            var newBounds = Rect.FromLTWH(Bounds.X + deltaX, Bounds.Y + deltaY, Bounds.Width, Bounds.Height);
+            var newBounds = Rect.FromLTWH(Bounds.X + delta.Dx, Bounds.Y + delta.Dy, Bounds.Width, Bounds.Height);
             if (newBounds.Y + threshold >= Parent.Bounds.Height) return;
             if (newBounds.X + threshold >= Parent.Bounds.Width) return;
             if (newBounds.X + newBounds.Width <= threshold) return;
             if (newBounds.Y + newBounds.Height <= threshold) return;
         }
 
-        SetBounds(Bounds.X + deltaX, Bounds.Y + deltaY, Bounds.Width, Bounds.Height, BoundsSpecified.Location);
+        SetBounds(Bounds.X + delta.Dx, Bounds.Y + delta.Dy, Bounds.Width, Bounds.Height, BoundsSpecified.Location);
     }
 
     internal void Resize(ResizeAnchorLocation location, int deltaX, int deltaY)

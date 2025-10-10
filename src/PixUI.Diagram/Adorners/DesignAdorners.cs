@@ -32,9 +32,14 @@ public sealed class DesignAdorners : FlowDecorator<DiagramSurface>
 
     protected override bool HitTest(float x, float y, HitTestResult result)
     {
+        return HitTest(x, y);
+    }
+
+    internal bool HitTest(float winX, float winY)
+    {
         //TODO: use total transform to map window point
         var winPt = Target.LocalToWindow(0, 0);
-        var canvasPt = new Point(x - winPt.X, y - winPt.Y);
+        var canvasPt = new Point(winX - winPt.X, winY - winPt.Y);
         if (!Target.LayoutBounds.Contains(canvasPt))
             return false;
 

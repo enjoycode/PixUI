@@ -26,13 +26,14 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
     internal DesignAdorners Adorners { get; }
 
     private Overlay? _cachedOverlay;
-    private DiagramItem? _hoverItem; //当前mouse下的元素
     private readonly List<DiagramItem> _items = new();
 
     public DiagramItem[] Items => _items.ToArray();
 
     public MouseRegion MouseRegion { get; }
     public FocusNode FocusNode { get; }
+
+    internal DiagramItem? HoverItem { get; private set; }
 
     #endregion
 
@@ -98,7 +99,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
             }
             else //处理已选择的对象的移动
             {
-                DesignService.MoveSelection(e.DeltaX, e.DeltaY);
+                DesignService.MoveSelection(new Offset(e.DeltaX, e.DeltaY));
             }
         }
 
@@ -108,7 +109,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
 
     private void OnMouseDown(PointerEvent e)
     {
-        if (_hoverItem != null && _hoverItem.PreviewMouseDown(e))
+        if (HoverItem != null && HoverItem.PreviewMouseDown(e))
         {
             return;
         }
@@ -128,7 +129,10 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
         }
 
         //设置选择的Item
-        SelectionService.SelectItem(_hoverItem);
+        SelectionService.SelectHoverItem();
+        //TODO:暂在这里强制装饰层命中检测，如果UI层实现了装饰器呈现时命中检测可以移除
+        var winPt = LocalToWindow(e.X, e.Y);
+        Adorners.HitTest(winPt.X, winPt.Y);
 
         //TODO:如果选择项为Container，则开始设置选择框的起始位置
     }
@@ -137,7 +141,8 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
     {
         if (e.Buttons == PointerButtons.Left)
         {
-            if (ToolboxService.SelectedItem != null) //新建模式下结束
+            //新建模式下结束
+            if (ToolboxService.SelectedItem != null)
                 ToolboxService.EndCreation((int)e.X, (int)e.Y);
 
             //通知adorners
@@ -152,11 +157,11 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
     /// </summary>
     private void FindHoverItemOnMouseMove(PointerEvent e)
     {
-        if (_hoverItem != null)
+        if (HoverItem != null)
         {
-            var ptCanvas = _hoverItem.PointToSurface(Point.Empty);
-            var rectCanvas = Rect.FromLTWH(ptCanvas.X, ptCanvas.Y, (int)_hoverItem.Bounds.Width,
-                (int)_hoverItem.Bounds.Height);
+            var ptCanvas = HoverItem.PointToSurface(Point.Empty);
+            var rectCanvas = Rect.FromLTWH(ptCanvas.X, ptCanvas.Y, (int)HoverItem.Bounds.Width,
+                (int)HoverItem.Bounds.Height);
             if (!rectCanvas.Contains(new Point(e.X, e.Y))) //已离开该区域 //todo:改判断为HitTest()，因为Connection不能判断边框
             {
                 //todo: 
@@ -164,10 +169,10 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
             else
             {
                 //如果是容器类的元素，尝试在hoverItem内部查找
-                if (_hoverItem.IsContainer)
+                if (HoverItem.IsContainer)
                 {
                     var clientPt = new Point(e.X - ptCanvas.X, e.Y - ptCanvas.Y);
-                    _hoverItem = _hoverItem.FindHoverItem(clientPt);
+                    HoverItem = HoverItem.FindHoverItem(clientPt);
                 }
 
                 return;
@@ -175,7 +180,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
         }
 
         //重新开始查找hoverItem
-        _hoverItem = GetItemUnderMouse((int)e.X, (int)e.Y);
+        HoverItem = GetItemUnderMouse((int)e.X, (int)e.Y);
         //if (hoverItem != null)
         //    Cursor.Current = Cursors.SizeAll;
         //else
@@ -219,7 +224,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
 
     internal void ResetHoverItem()
     {
-        _hoverItem = null;
+        HoverItem = null;
         //TODO:最好重新查找HoverItem
     }
 
@@ -231,16 +236,16 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
                 DesignService.DeleteSelection();
                 break;
             case Keys.Up:
-                DesignService.MoveSelection(0, -1);
+                DesignService.MoveSelection(new Offset(0, -1));
                 break;
             case Keys.Down:
-                DesignService.MoveSelection(0, 1);
+                DesignService.MoveSelection(new Offset(0, 1));
                 break;
             case Keys.Left:
-                DesignService.MoveSelection(-1, 0);
+                DesignService.MoveSelection(new Offset(-1, 0));
                 break;
             case Keys.Right:
-                DesignService.MoveSelection(1, 0);
+                DesignService.MoveSelection(new Offset(1, 0));
                 break;
         }
     }

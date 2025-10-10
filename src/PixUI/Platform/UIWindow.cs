@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using System.IO;
 
@@ -27,7 +26,7 @@ public abstract class UIWindow
     /// </summary>
     public static UIWindow Current { get; private set; } = null!; //TODO: 暂单窗体
 
-    public readonly Root RootWidget;
+    protected readonly Root RootWidget;
     public readonly Overlay Overlay;
 
     internal readonly FocusManagerStack FocusManagerStack = new();

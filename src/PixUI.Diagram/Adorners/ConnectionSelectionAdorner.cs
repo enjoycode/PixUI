@@ -48,7 +48,7 @@ internal sealed class ConnectionSelectionAdorner : DesignAdorner, ISelectionAdor
         return _pointsCache;
     }
 
-    protected internal override bool HitTest(Point pt, ref Cursor cursor)
+    protected internal override bool HitTest(Point pt, ref Cursor? cursor)
     {
         var list = GetEditPoints();
         for (var i = 0; i < list.Count; i++)
