@@ -15,7 +15,7 @@ internal sealed class PopupMenuStack : Popup
         _closeAll = closeAll;
     }
 
-    private readonly List<PopupMenu> _children = new List<PopupMenu>();
+    private readonly List<PopupMenu> _children = new();
 
     internal bool HasChild => _children.Count > 0;
 
@@ -29,7 +29,7 @@ internal sealed class PopupMenuStack : Popup
         if (_children.Count == 1)
             Show();
         else
-            Invalidate(InvalidAction.Repaint);
+            Repaint();
     }
 
     internal bool TryCloseSome(MenuItemWidget newHoverItem)
@@ -88,7 +88,7 @@ internal sealed class PopupMenuStack : Popup
         }
 
         if (needInvalidate)
-            Invalidate(InvalidAction.Repaint);
+            Repaint();
     }
 
     #endregion
