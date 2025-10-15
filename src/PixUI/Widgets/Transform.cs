@@ -81,9 +81,8 @@ public class Transform : SingleChildWidget
         var effectiveTransform = EffectiveTransform;
         //TODO: short path for effectiveTransform is Identity
 
-        // The provided paint `transform` (which describes the transform from the
-        // child to the parent in 3D) is processed by
-        // [RemovePerspectiveTransform] to remove the
+        // The provided paint `transform` (which describes the transform from the child to the parent in 3D)
+        // is processed by [RemovePerspectiveTransform] to remove the
         // perspective component and inverted before it is used to transform
         // `position` from the coordinate system of the parent to the system of the child.
         var transform = Matrix4.TryInvert(MatrixUtils.RemovePerspectiveTransform(effectiveTransform));

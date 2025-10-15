@@ -32,6 +32,7 @@ public sealed class ColorPickerPopup : Popup
     {
         if (type == EventType.PointerDown)
         {
+            //TODO:应转换为本地坐标点再判断是否包含
             var pointerEvent = (PointerEvent)e!;
             var localPos = LocalToWindow(0, 0);
             var winBounds = Rect.FromLTWH(localPos.X, localPos.Y, W, H);

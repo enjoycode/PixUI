@@ -455,8 +455,9 @@ public abstract class Widget : IDisposable
     /// <summary>
     /// 映射组件的本地坐标至窗体坐标
     /// </summary>
-    public Point LocalToWindow(float x, float y) //TODO: remove this and use GetTotalTransform()
+    public Point LocalToWindow(float x, float y)
     {
+        //TODO: use GetTotalTransform()
         Widget? temp = this;
         while (temp != null)
         {
@@ -482,6 +483,12 @@ public abstract class Widget : IDisposable
         // Debug.Assert(this is IRootWidget);
         return new Point(x, y);
     }
+
+    // TODO: ****
+    // public Matrix4 GetTotalTransform()
+    // {
+    //     
+    // }
 
     #endregion
 
