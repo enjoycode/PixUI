@@ -32,7 +32,7 @@ internal sealed class DesignService : IDesignService
 
     public void InitSurface(DiagramSurface surface) => _surface = surface;
 
-    public void MoveSelection(float deltaX, float deltaY)
+    public void MoveSelection(Offset offset)
     {
         var selectedItems = _surface.SelectionService.SelectedItems;
         //TODO: 先判断有没有不能Move的对象，有则全部不允许移动
@@ -44,7 +44,7 @@ internal sealed class DesignService : IDesignService
 
         //再处理移动所有选择的对象
         foreach (var item in selectedItems)
-            item.Move(deltaX, deltaY);
+            item.Move(offset);
     }
 
     public void DeleteSelection()
