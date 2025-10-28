@@ -122,7 +122,8 @@ internal sealed class CompletionContext
         if (_completionWindow == null)
         {
             _completionWindow = new ListPopup<ICompletionItem>(_controller.Widget.Overlay!,
-                BuildPopupItem, 250, 18, 8);
+                static (item, _, _, isSelected) => new CompletionItemWidget(item, isSelected),
+                250, 18, 8);
             _completionWindow.OnSelectionChanged = OnCompletionDone;
         }
 
@@ -132,8 +133,7 @@ internal sealed class CompletionContext
         var caret = _controller.TextEditor.Caret;
         var lineHeight = _controller.TextEditor.TextView.FontHeight;
         var pt2Win = _controller.Widget.LocalToWindow(0, 0);
-        _completionWindow.UpdatePosition(caret.CanvasPosX + pt2Win.X - 8,
-            caret.CanvasPosY + lineHeight + pt2Win.Y);
+        _completionWindow.UpdatePosition(caret.CanvasPosX + pt2Win.X - 8, caret.CanvasPosY + lineHeight + pt2Win.Y);
         _completionWindow.Show();
     }
 
@@ -207,8 +207,4 @@ internal sealed class CompletionContext
         _controller.TextEditor.InsertOrReplaceString(item.InsertText ?? item.Label,
             _controller.TextEditor.Caret.Offset - _completionStartOffset);
     }
-
-    private static Widget BuildPopupItem(ICompletionItem item, int index, State<bool> isHover,
-        State<bool> isSelected)
-        => new CompletionItemWidget(item, isSelected);
 }

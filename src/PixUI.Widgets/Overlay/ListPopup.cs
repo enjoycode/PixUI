@@ -47,6 +47,7 @@ internal sealed class ListPopupItemWidget : SingleChildWidget, IMouseRegion
             Child.Layout(fixedWidth, fixedHeight);
             Child.SetPosition(0, (fixedHeight - Child.H) / 2f); //暂上下居中
         }
+
         SetSize(fixedWidth, fixedHeight);
     }
 
@@ -66,8 +67,7 @@ internal sealed class ListPopupItemWidget : SingleChildWidget, IMouseRegion
 /// </summary>
 public class ListPopup<T> : Popup
 {
-    public ListPopup(Overlay overlay,
-        ListPopupItemBuilder<T> itemBuilder,
+    public ListPopup(Overlay overlay, ListPopupItemBuilder<T> itemBuilder,
         float popupWidth, float itemExtent, int maxShowItems = 5) : base(overlay)
     {
         _itemExtent = itemExtent;
@@ -241,7 +241,7 @@ public class ListPopup<T> : Popup
     {
         if (_listViewController.DataSource == null || _listViewController.DataSource.Count == 0)
             return EventPreviewResult.NotProcessed; //暂简单判断无数据不拦截
-        
+
         if (type == EventType.KeyDown)
         {
             var keyEvent = (KeyEvent)e!;

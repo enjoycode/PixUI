@@ -8,7 +8,7 @@ internal sealed class CompletionItemWidget : Widget
     {
         _item = item;
         _isSelected = isSelected;
-        _iconPainter = new IconPainter(() => Invalidate(InvalidAction.Repaint));
+        _iconPainter = new IconPainter(() => Repaint());
     }
 
     private readonly ICompletionItem _item;
@@ -30,7 +30,7 @@ internal sealed class CompletionItemWidget : Widget
         _paragraph ??= TextPainter.BuildParagraph(_item.Label, float.PositiveInfinity,
             fontSize, Colors.Black, null, 1, true);
 
-        canvas.DrawParagraph(_paragraph!, x + 20, y);
+        canvas.DrawParagraph(_paragraph, x + 20, y);
     }
 
     private static IconData GetIcon(CompletionItemKind kind)
