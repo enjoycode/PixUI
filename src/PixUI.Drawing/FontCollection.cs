@@ -43,7 +43,7 @@ public sealed class FontCollection
     /// </summary>
     public void RegisterTypeface(SKData data, string fontFamily, bool isAsset)
     {
-        Typeface? typeface = null;
+        Typeface? typeface;
         if (OperatingSystem.IsBrowser())
         {
             typeface = Typeface.GetObject(SkiaApi.sk_typeface_make_from_data(data.Handle));

@@ -30,9 +30,14 @@ public static class Program
         //初始化默认字体
         await using var fontDataStream =
             await BlazorApplication.HttpClient.GetStreamAsync("/fonts/MiSans-Regular.woff2");
-        using var fontData = SKData.Create(fontDataStream);
+        //因fontDataStream不支持同步复制(DotNet10)，所以先复制至MemoryStream
+        using var ms = new MemoryStream();
+        await fontDataStream.CopyToAsync(ms);
+        ms.Position = 0;
+        using var fontData = SKData.Create(ms);
         FontCollection.Instance.RegisterTypeface(fontData!, FontCollection.DefaultFamilyName, false);
 
+        //开始执行Blazor应用
         BlazorApplication.Run(() => new DemoRoute(), glHandle, width, height, ratio, routePath, isMacOS);
     }
 
