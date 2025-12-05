@@ -19,7 +19,9 @@ public sealed class LineManager
 
     public event Action<LineLengthChangeEventArgs>? LineLengthChanged;
     public event Action<LineCountChangeEventArgs>? LineCountChanged;
-    // public event Action<LineEventArgs>? LineDeleted;
+    public event Action<LineEventArgs>? LineDeleted;
+
+    internal void OnLineDeleted(LineSegment line) => LineDeleted?.Invoke(new LineEventArgs(_document, line));
 
     #endregion
 
@@ -47,21 +49,16 @@ public sealed class LineManager
         var lineStart = GetLineNumberByOffset(offset);
         var oldNumberOfLines = TotalNumberOfLines;
         var deferredEventList = new DeferredEventList();
-        RemoveInternal(deferredEventList, offset, length);
+        RemoveInternal(ref deferredEventList, offset, length);
         // var numberOfLinesAfterRemoving = TotalNumberOfLines;
         if (!string.IsNullOrEmpty(text))
         {
             InsertInternal(offset, text);
         }
 
-        //TODO:
         // Only fire events after RemoveInternal+InsertInternal finished completely:
         // Otherwise we would expose inconsistent state to the event handlers.
-        // if (deferredEventList.removedLines != null) {
-        //   foreach (LineSegment ls in deferredEventList.removedLines)
-        //   OnLineDeleted(new LineEventArgs(document, ls));
-        // }
-        //deferredEventList.RaiseEvents();
+        deferredEventList.RaiseEvents(this);
 
         if (TotalNumberOfLines != oldNumberOfLines)
         {
@@ -110,7 +107,7 @@ public sealed class LineManager
         }
     }
 
-    private void RemoveInternal(DeferredEventList deferredEventList, int offset, int length)
+    private void RemoveInternal(ref DeferredEventList deferredEventList, int offset, int length)
     {
         // Debug.Assert(length >= 0);
         if (length == 0) return;
@@ -120,7 +117,7 @@ public sealed class LineManager
         if (offset + length < startSegmentOffset + startSegment.TotalLength)
         {
             // just removing a part of this line segment
-            startSegment.RemovedLinePart(_document, deferredEventList, offset - startSegmentOffset, length);
+            startSegment.RemovedLinePart(_document, ref deferredEventList, offset - startSegmentOffset, length);
             SetSegmentLength(startSegment, startSegment.TotalLength - length);
             return;
         }
@@ -129,7 +126,7 @@ public sealed class LineManager
         // possibly remove lines in between if multiple delimiters were deleted
         int charactersRemovedInStartLine = startSegmentOffset + startSegment.TotalLength - offset;
         //Debug.Assert(charactersRemovedInStartLine > 0);
-        startSegment.RemovedLinePart(_document, deferredEventList,
+        startSegment.RemovedLinePart(_document, ref deferredEventList,
             offset - startSegmentOffset, charactersRemovedInStartLine);
 
         var endSegment = _lineCollection.GetNodeByOffset(offset + length);
@@ -143,7 +140,7 @@ public sealed class LineManager
 
         var endSegmentOffset = endSegment.Offset;
         var charactersLeftInEndLine = endSegmentOffset + endSegment.TotalLength - (offset + length);
-        endSegment.RemovedLinePart(_document, deferredEventList, 0,
+        endSegment.RemovedLinePart(_document, ref deferredEventList, 0,
             endSegment.TotalLength - charactersLeftInEndLine);
         startSegment.MergedWith(endSegment, offset - startSegmentOffset);
         SetSegmentLength(startSegment,
@@ -157,7 +154,7 @@ public sealed class LineManager
             segmentToRemove = tmp!;
             tmp = tmp!.Successor();
             _lineCollection.RemoveSegment(segmentToRemove);
-            segmentToRemove.Deleted(deferredEventList);
+            segmentToRemove.Deleted(ref deferredEventList);
         } while (segmentToRemove != endSegment);
     }
 

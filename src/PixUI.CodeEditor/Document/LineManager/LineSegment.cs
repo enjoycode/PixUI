@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using PixUI;
 
 namespace CodeEditor;
@@ -96,7 +97,7 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
     /// in that case, it contains the line's length before the deletion.</remarks>
     public int TotalLength { get; internal set; }
 
-    private IList<CodeToken>? _lineTokens;
+    private List<CodeToken>? _lineTokens;
     private int _tokenColumnIndex; //仅用于Tokenize时缓存
     private Paragraph? _cachedParagraph;
 
@@ -104,26 +105,24 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
 
     #region ====Anchors====
 
-    // Util.WeakCollection<TextAnchor> anchors;
-    //
-    // public TextAnchor CreateAnchor(int column)
-    // {
-    // 	if (column < 0 || column > Length)
-    // 		throw new ArgumentOutOfRangeException("column");
-    // 	TextAnchor anchor = new TextAnchor(this, column);
-    // 	AddAnchor(anchor);
-    // 	return anchor;
-    // }
-    //
-    // void AddAnchor(TextAnchor anchor)
-    // {
-    // 	Debug.Assert(anchor.Line == this);
-    // 	
-    // 	if (anchors == null)
-    // 		anchors = new Util.WeakCollection<TextAnchor>();
-    // 	
-    // 	anchors.Add(anchor);
-    // }
+    private WeakCollection<TextAnchor>? _anchors;
+
+    public TextAnchor CreateAnchor(int column)
+    {
+        if (column < 0 || column > Length)
+            throw new ArgumentOutOfRangeException(nameof(column));
+        var anchor = new TextAnchor(this, column);
+        AddAnchor(anchor);
+        return anchor;
+    }
+
+    private void AddAnchor(TextAnchor anchor)
+    {
+        Debug.Assert(anchor.Line == this);
+
+        _anchors ??= new WeakCollection<TextAnchor>();
+        _anchors.Add(anchor);
+    }
 
     #endregion
 
@@ -138,24 +137,25 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
 
         ClearFoldedLineCache(document);
 
-        //TODO:
         //Console.WriteLine("InsertedLinePart " + startColumn + ", " + length);
-        // if (anchors != null) {
-        // 	foreach (TextAnchor a in anchors) {
-        // 		if (a.MovementType == AnchorMovementType.BeforeInsertion
-        // 		    ? a.ColumnNumber > startColumn
-        // 		    : a.ColumnNumber >= startColumn)
-        // 		{
-        // 			a.ColumnNumber += length;
-        // 		}
-        // 	}
-        // }
+        if (_anchors != null)
+        {
+            foreach (var anchor in _anchors)
+            {
+                if (anchor.MovementType == AnchorMovementType.BeforeInsertion
+                        ? anchor.ColumnNumber > startColumn
+                        : anchor.ColumnNumber >= startColumn)
+                {
+                    anchor.ColumnNumber += length;
+                }
+            }
+        }
     }
 
     /// <summary>
     /// Is called when a part of the line is removed.
     /// </summary>
-    internal void RemovedLinePart(Document document, DeferredEventList deferredEventList,
+    internal void RemovedLinePart(Document document, ref DeferredEventList deferredEventList,
         int startColumn, int length)
     {
         if (length == 0) return;
@@ -163,43 +163,52 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
         ClearFoldedLineCache(document);
 
         //Console.WriteLine("RemovedLinePart " + startColumn + ", " + length);
-        //TODO: anchors
-        // if (anchors != null) {
-        // 	List<TextAnchor> deletedAnchors = null;
-        // 	foreach (TextAnchor a in anchors) {
-        // 		if (a.ColumnNumber > startColumn) {
-        // 			if (a.ColumnNumber >= startColumn + length) {
-        // 				a.ColumnNumber -= length;
-        // 			} else {
-        // 				if (deletedAnchors == null)
-        // 					deletedAnchors = new List<TextAnchor>();
-        // 				a.Delete(ref deferredEventList);
-        // 				deletedAnchors.Add(a);
-        // 			}
-        // 		}
-        // 	}
-        // 	if (deletedAnchors != null) {
-        // 		foreach (TextAnchor a in deletedAnchors) {
-        // 			anchors.Remove(a);
-        // 		}
-        // 	}
-        // }
+        if (_anchors != null)
+        {
+            List<TextAnchor>? deletedAnchors = null;
+            foreach (var anchor in _anchors)
+            {
+                if (anchor.ColumnNumber > startColumn)
+                {
+                    if (anchor.ColumnNumber >= startColumn + length)
+                    {
+                        anchor.ColumnNumber -= length;
+                    }
+                    else
+                    {
+                        deletedAnchors ??= new List<TextAnchor>();
+                        anchor.Delete(ref deferredEventList);
+                        deletedAnchors.Add(anchor);
+                    }
+                }
+            }
+
+            if (deletedAnchors != null)
+            {
+                foreach (var anchor in deletedAnchors)
+                {
+                    _anchors.Remove(anchor);
+                }
+            }
+        }
     }
 
     /// <summary>
     /// Is called when the LineSegment is deleted.
     /// </summary>
-    internal void Deleted(DeferredEventList deferredEventList)
+    internal void Deleted(ref DeferredEventList deferredEventList)
     {
         IsDeleted = true;
 
-        // TODO: anchors
-        // if (anchors != null) {
-        // 	foreach (TextAnchor a in anchors) {
-        // 		a.Delete(ref deferredEventList);
-        // 	}
-        // 	anchors = null;
-        // }
+        if (_anchors != null)
+        {
+            foreach (var anchor in _anchors)
+            {
+                anchor.Delete(ref deferredEventList);
+            }
+
+            _anchors = null;
+        }
     }
 
     /// <summary>
@@ -211,15 +220,17 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
     /// </summary>
     internal void MergedWith(LineSegment deletedLine, int firstLineLength)
     {
-        // TODO: anchors
-        // if (deletedLine.anchors != null) {
-        // 	foreach (TextAnchor a in deletedLine.anchors) {
-        // 		a.Line = this;
-        // 		AddAnchor(a);
-        // 		a.ColumnNumber += firstLineLength;
-        // 	}
-        // 	deletedLine.anchors = null;
-        // }
+        if (deletedLine._anchors != null)
+        {
+            foreach (var anchor in deletedLine._anchors)
+            {
+                anchor.Line = this;
+                AddAnchor(anchor);
+                anchor.ColumnNumber += firstLineLength;
+            }
+
+            deletedLine._anchors = null;
+        }
     }
 
     /// <summary>
@@ -227,29 +238,32 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
     /// </summary>
     internal void SplitTo(LineSegment followingLine)
     {
-        // TODO: anchors
-        // if (anchors != null) {
-        // 	List<TextAnchor>? movedAnchors = null;
-        // 	foreach (TextAnchor a in anchors) {
-        // 		if (a.MovementType == AnchorMovementType.BeforeInsertion
-        // 		    ? a.ColumnNumber > this.Length
-        // 		    : a.ColumnNumber >= this.Length)
-        // 		{
-        // 			a.Line = followingLine;
-        // 			followingLine.AddAnchor(a);
-        // 			a.ColumnNumber -= this.Length;
-        // 			
-        // 			if (movedAnchors == null)
-        // 				movedAnchors = new List<TextAnchor>();
-        // 			movedAnchors.Add(a);
-        // 		}
-        // 	}
-        // 	if (movedAnchors != null) {
-        // 		foreach (TextAnchor a in movedAnchors) {
-        // 			anchors.Remove(a);
-        // 		}
-        // 	}
-        // }
+        if (_anchors != null)
+        {
+            List<TextAnchor>? movedAnchors = null;
+            foreach (var anchor in _anchors)
+            {
+                if (anchor.MovementType == AnchorMovementType.BeforeInsertion
+                        ? anchor.ColumnNumber > Length
+                        : anchor.ColumnNumber >= Length)
+                {
+                    anchor.Line = followingLine;
+                    followingLine.AddAnchor(anchor);
+                    anchor.ColumnNumber -= Length;
+
+                    movedAnchors ??= new List<TextAnchor>();
+                    movedAnchors.Add(anchor);
+                }
+            }
+
+            if (movedAnchors != null)
+            {
+                foreach (var anchor in movedAnchors)
+                {
+                    _anchors.Remove(anchor);
+                }
+            }
+        }
     }
 
     #endregion

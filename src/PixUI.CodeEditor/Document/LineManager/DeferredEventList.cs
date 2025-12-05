@@ -5,30 +5,37 @@ namespace CodeEditor;
 /// <summary>
 /// A list of events that are fired after the line manager has finished working.
 /// </summary>
-internal sealed class DeferredEventList
+internal struct DeferredEventList
 {
-    internal List<LineSegment> removedLines;
-    internal List<TextAnchor>? textAnchor;
+    private List<LineSegment>? _removedLines;
+    private List<TextAnchor>? _textAnchors;
 
     public void AddRemovedLine(LineSegment line)
     {
-        removedLines ??= new List<LineSegment>();
-        removedLines.Add(line);
+        _removedLines ??= new List<LineSegment>();
+        _removedLines.Add(line);
     }
 
     public void AddDeletedAnchor(TextAnchor anchor)
     {
-        textAnchor ??= new List<TextAnchor>();
-        textAnchor.Add(anchor);
+        _textAnchors ??= new List<TextAnchor>();
+        _textAnchors.Add(anchor);
     }
 
-    public void RaiseEvents()
+    public void RaiseEvents(LineManager lineManager)
     {
-        // removedLines is raised by the LineManager
-        if (textAnchor == null) return;
-        foreach (var a in textAnchor)
+        if (_removedLines != null)
         {
-            a.RaiseDeleted();
+            foreach (var line in _removedLines)
+                lineManager.OnLineDeleted(line);
+        }
+
+        if (_textAnchors != null)
+        {
+            foreach (var anchor in _textAnchors)
+            {
+                anchor.RaiseDeleted();
+            }
         }
     }
 }

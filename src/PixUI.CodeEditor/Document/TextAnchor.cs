@@ -29,53 +29,37 @@ public enum AnchorMovementType
 /// </summary>
 public sealed class TextAnchor
 {
-    static Exception AnchorDeletedError()
-    {
-        return new InvalidOperationException("The text containing the anchor was deleted");
-    }
+    private static Exception AnchorDeletedError() =>
+        new InvalidOperationException("The text containing the anchor was deleted");
 
     internal TextAnchor(LineSegment lineSegment, int columnNumber)
     {
-        this.lineSegment = lineSegment;
-        this.columnNumber = columnNumber;
+        _lineSegment = lineSegment;
+        _columnNumber = columnNumber;
     }
 
-    private LineSegment lineSegment;
-    private int columnNumber;
+    private LineSegment? _lineSegment;
+    private int _columnNumber;
 
     public LineSegment Line
     {
-        get
-        {
-            if (lineSegment == null) throw AnchorDeletedError();
-            return lineSegment;
-        }
-        internal set { lineSegment = value; }
+        get => _lineSegment ?? throw AnchorDeletedError();
+        internal set => _lineSegment = value;
     }
 
-    public bool IsDeleted => lineSegment == null;
+    public bool IsDeleted => _lineSegment == null;
 
     public int LineNumber => Line.LineNumber;
 
     public int ColumnNumber
     {
-        get
-        {
-            if (lineSegment == null) throw AnchorDeletedError();
-            return columnNumber;
-        }
-        internal set { columnNumber = value; }
+        get => _lineSegment == null ? throw AnchorDeletedError() : _columnNumber;
+        internal set => _columnNumber = value;
     }
 
-    public TextLocation Location
-    {
-        get { return new TextLocation(this.ColumnNumber, this.LineNumber); }
-    }
+    public TextLocation Location => new(ColumnNumber, LineNumber);
 
-    public int Offset
-    {
-        get { return Line.Offset + columnNumber; }
-    }
+    public int Offset => Line.Offset + _columnNumber;
 
     /// <summary>
     /// Controls how the anchor moves.
@@ -88,7 +72,7 @@ public sealed class TextAnchor
     {
         // we cannot fire an event here because this method is called while the LineManager adjusts the
         // lineCollection, so an event handler could see inconsistent state
-        lineSegment = null;
+        _lineSegment = null;
         deferredEventList.AddDeletedAnchor(this);
     }
 
