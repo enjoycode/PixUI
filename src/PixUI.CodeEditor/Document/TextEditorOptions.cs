@@ -15,7 +15,7 @@ public sealed class TextEditorOptions
     public bool ShowTabs = false;
     public bool ShowEOLMarker = false;
     public bool ShowInvalidLines = false;
-    public bool IsIconBarVisible = false;
+    public bool EnableDebugging = true;
     public bool EnableFolding = true;
     public bool ShowHorizontalRuler = false;
     public bool ShowVerticalRuler = false;

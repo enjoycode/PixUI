@@ -35,13 +35,13 @@ internal sealed class GutterArea : EditorArea
 
     internal override Size Size => new Size(_numberWidth * 5, -1);
 
-    internal override void Paint(Canvas canvas, Rect rect, int[] viewLines)
+    internal override void Paint(Canvas canvas, int[] viewLines)
     {
-        if (rect.Width <= 0 || rect.Height <= 0) return;
+        if (Bounds.Width <= 0 || Bounds.Height <= 0) return;
 
         // background
         var paint = PixUI.Paint.Shared(Theme.LineBgColor);
-        canvas.DrawRect(rect, paint);
+        canvas.DrawRect(Bounds, paint);
 
         // line numbers
         var lineHeight = TextEditor.TextView.FontHeight;
@@ -55,18 +55,20 @@ internal sealed class GutterArea : EditorArea
 
     private void DrawLineNumber(Canvas canvas, int lineNumber, float yPos)
     {
+        var xPos = Bounds.Left + 2;
+
         //TODO:暂计算至千位
         var unitPlace = lineNumber % 10;
         var tenPlace = lineNumber / 10 % 10;
         var hundredPlace = lineNumber / 100 % 10;
         var thousandPlace = lineNumber / 1000 % 10;
 
-        canvas.DrawParagraph(_numberCache[unitPlace], 2 + _numberWidth * 3, yPos);
+        canvas.DrawParagraph(_numberCache[unitPlace], xPos + _numberWidth * 3, yPos);
         if (lineNumber >= 10)
-            canvas.DrawParagraph(_numberCache[tenPlace], 2 + _numberWidth * 2, yPos);
+            canvas.DrawParagraph(_numberCache[tenPlace], xPos + _numberWidth * 2, yPos);
         if (lineNumber >= 100)
-            canvas.DrawParagraph(_numberCache[hundredPlace], 2 + _numberWidth, yPos);
+            canvas.DrawParagraph(_numberCache[hundredPlace], xPos + _numberWidth, yPos);
         if (lineNumber >= 1000)
-            canvas.DrawParagraph(_numberCache[thousandPlace], 2, yPos);
+            canvas.DrawParagraph(_numberCache[thousandPlace], xPos, yPos);
     }
 }

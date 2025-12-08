@@ -32,5 +32,5 @@ internal abstract class EditorArea
     /// <param name="buttons"></param>
     internal virtual void HandlePointerDown(float x, float y, PointerButtons buttons) { }
 
-    internal abstract void Paint(Canvas canvas, Rect rect, int[] viewLines);
+    internal abstract void Paint(Canvas canvas, int[] viewLines);
 }

@@ -18,7 +18,7 @@ public sealed class TextEditor
         SelectionManager = new SelectionManager(this);
 
         TextView = new TextView(this);
-        LeftAreas = new EditorArea[] { new GutterArea(this), new FoldingArea(this) };
+        LeftAreas = [new IconBarArea(this), new GutterArea(this), new FoldingArea(this)];
 
         //TODO: Caret position changed to matching bracket
     }
@@ -51,9 +51,8 @@ public sealed class TextEditor
         }
     }
 
-    internal float MaxVScrollValue =>
-        (Document.GetVisibleLine(Document.TotalNumberOfLines - 1) + 1 +
-         TextView.VisibleLineCount * 2f / 3) * TextView.FontHeight; //TODO:减少范围
+    internal float MaxVScrollValue => (Document.GetVisibleLine(Document.TotalNumberOfLines - 1) + 1 /*+
+                                       TextView.VisibleLineCount * 1f / 10*/) * TextView.FontHeight;
 
     internal float MaxHScrollValue
     {
@@ -219,11 +218,11 @@ public sealed class TextEditor
         foreach (var area in LeftAreas)
         {
             if (!area.IsVisible) continue;
-            area.Paint(canvas, area.Bounds, lines);
+            area.Paint(canvas, lines);
         }
 
         // paint text area
-        TextView.Paint(canvas, TextView.Bounds, lines);
+        TextView.Paint(canvas, lines);
     }
 
     #endregion

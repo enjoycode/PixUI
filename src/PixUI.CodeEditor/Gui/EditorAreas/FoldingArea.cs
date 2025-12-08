@@ -31,7 +31,7 @@ internal sealed class FoldingArea : EditorArea
 
     internal override Size Size => new Size(TextEditor.TextView.FontHeight, -1);
 
-    internal override bool IsVisible => TextEditor.Document.TextEditorOptions.EnableFolding;
+    internal override bool IsVisible => Document.TextEditorOptions.EnableFolding;
 
     internal override void HandlePointerDown(float x, float y, PointerButtons buttons)
     {
@@ -65,13 +65,13 @@ internal sealed class FoldingArea : EditorArea
         Document.FoldingManager.RaiseFoldingsChanged(new FoldingChangeEventArgs(FoldingChangeType.FoldedStatus, null));
     }
 
-    internal override void Paint(Canvas canvas, Rect rect, int[] viewLines)
+    internal override void Paint(Canvas canvas, int[] viewLines)
     {
-        if (rect.Width <= 0 || rect.Height <= 0) return;
+        if (Bounds.Width <= 0 || Bounds.Height <= 0) return;
 
         //background
         var paint = PixUI.Paint.Shared(TextEditor.Theme.TextBgColor);
-        canvas.DrawRect(rect, paint);
+        canvas.DrawRect(Bounds, paint);
 
         if (viewLines.Length == 0)
             return;

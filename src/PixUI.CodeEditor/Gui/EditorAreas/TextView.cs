@@ -172,9 +172,9 @@ internal sealed class TextView : EditorArea //TODO: rename to TextArea
         }
     }
 
-    internal override void Paint(Canvas canvas, Rect rect, int[] viewLines)
+    internal override void Paint(Canvas canvas, int[] viewLines)
     {
-        if (rect.Width <= 0 || rect.Height <= 0) return;
+        if (Bounds.Width <= 0 || Bounds.Height <= 0) return;
 
         var horizontalDelta = TextEditor.VirtualTop.X;
         if (horizontalDelta > 0)
@@ -185,7 +185,7 @@ internal sealed class TextView : EditorArea //TODO: rename to TextArea
 
         // paint background
         var paint = PixUI.Paint.Shared(Theme.TextBgColor);
-        canvas.DrawRect(rect, paint);
+        canvas.DrawRect(Bounds, paint);
 
         // paint lines one by one
         for (var i = 0; i < viewLines.Length; i++)

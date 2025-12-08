@@ -16,10 +16,13 @@ public sealed class Document : IDisposable
         SyntaxParser.Document = this;
 
         _lineManager = new LineManager(this);
+        BookmarkManager = new BookmarkManager(this, _lineManager);
         FoldingManager = new FoldingManager(this);
         TextEditorOptions = new TextEditorOptions();
         UndoStack = new UndoStack();
     }
+
+    public void Dispose() => SyntaxParser.Dispose();
 
     #region ====Fields & Properties====
 
@@ -28,6 +31,7 @@ public sealed class Document : IDisposable
     public readonly ITextBuffer TextBuffer;
     public readonly ISyntaxParser SyntaxParser;
     private readonly LineManager _lineManager;
+    public readonly BookmarkManager BookmarkManager;
     public readonly FoldingManager FoldingManager;
     internal readonly TextEditorOptions TextEditorOptions;
     internal readonly UndoStack UndoStack;
@@ -165,8 +169,6 @@ public sealed class Document : IDisposable
     }
 
     #endregion
-
-    public void Dispose() => SyntaxParser.Dispose();
 
     #region ====Backup====
 
