@@ -50,14 +50,13 @@ internal sealed class EditorDecorator : FlowDecorator<CodeEditorWidget>
                     continue;
 
                 var startXPos = 0f;
-                var endXPos = 0f;
+                float endXPos;
                 if (i == startLine)
                 {
                     startXPos = textView.GetDrawingXPos(i, selection.StartPosition.Column);
-                    if (i == endLine)
-                        endXPos = textView.GetDrawingXPos(i, selection.EndPosition.Column);
-                    else
-                        endXPos = textView.Bounds.Width;
+                    endXPos = i == endLine
+                        ? textView.GetDrawingXPos(i, selection.EndPosition.Column)
+                        : textView.Bounds.Width;
                 }
                 else if (i == endLine)
                 {
