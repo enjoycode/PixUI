@@ -37,6 +37,13 @@ internal sealed class EditorDecorator : FlowDecorator<CodeEditorWidget>
         textEditor.Caret.Paint(canvas);
 
         // paint selection
+        PaintSelection(canvas, textEditor);
+
+        PaintHighlightedBookmark(canvas, textEditor);
+    }
+
+    private static void PaintSelection(Canvas canvas, TextEditor textEditor)
+    {
         var textView = textEditor.TextView;
         var paint = PixUI.Paint.Shared(textEditor.Theme.SelectionColor);
         foreach (var selection in textEditor.SelectionManager.SelectionCollection)
@@ -72,6 +79,25 @@ internal sealed class EditorDecorator : FlowDecorator<CodeEditorWidget>
                 canvas.DrawRect(Rect.FromLTWH(startXPos + textView.Bounds.Left, yPos,
                     endXPos - startXPos, textView.FontHeight), paint);
             }
+        }
+    }
+
+    private static void PaintHighlightedBookmark(Canvas canvas, TextEditor textEditor)
+    {
+        var textView = textEditor.TextView;
+        var bookmarks = textEditor.Document.BookmarkManager.Marks;
+        foreach (var bookmark in bookmarks)
+        {
+            if (!bookmark.IsHighlighted || !textEditor.Document.FoldingManager.IsLineVisible(bookmark.LineNumber))
+                continue;
+
+            var yPos = textView.Bounds.Top +
+                textEditor.Document.GetVisibleLine(bookmark.LineNumber) * textView.FontHeight - textEditor.VirtualTop.Y;
+            var rect = Rect.FromLTWH(textView.Bounds.Left + 1, yPos, textView.Bounds.Width - 2, textView.FontHeight);
+            var paint = PixUI.Paint.Shared(Colors.Yellow.WithAlpha(80));
+            canvas.DrawRect(rect, paint);
+            paint = PixUI.Paint.Shared(Colors.Red, PaintStyle.Stroke, 1);
+            canvas.DrawRect(rect, paint);
         }
     }
 }

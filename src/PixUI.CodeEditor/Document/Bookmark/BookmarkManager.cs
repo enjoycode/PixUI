@@ -25,7 +25,7 @@ public sealed class BookmarkManager
     /// <value>
     /// Contains all bookmarks
     /// </value>
-    public ReadOnlyCollection<Bookmark> Marks => new(_bookmarks);
+    public IList<Bookmark> Marks => _bookmarks;
 
     public Document Document => _document;
 
@@ -158,10 +158,7 @@ public sealed class BookmarkManager
         return last;
     }
 
-    private bool AcceptAnyMarkPredicate(Bookmark mark)
-    {
-        return true;
-    }
+    private static bool AcceptAnyMarkPredicate(Bookmark mark) => true;
 
     public Bookmark? GetNextMark(int curLineNr)
     {
@@ -229,11 +226,18 @@ public sealed class BookmarkManager
     #region ====Events====
 
     public event BookmarkEventHandler? Removed;
+
+    private void OnRemoved(BookmarkEventArgs e) => Removed?.Invoke(e);
+
     public event BookmarkEventHandler? Added;
 
-    private void OnRemoved(BookmarkEventArgs e) => Removed?.Invoke(this, e);
+    private void OnAdded(BookmarkEventArgs e) => Added?.Invoke(e);
 
-    private void OnAdded(BookmarkEventArgs e) => Added?.Invoke(this, e);
+    public event BookmarkEventHandler? IsEnabledChanged;
+    internal void OnIsEnabledChanged(BookmarkEventArgs e) => IsEnabledChanged?.Invoke(e);
+
+    public event BookmarkEventHandler? IsHighlightedChanged;
+    internal void OnIsHighlightedChanged(BookmarkEventArgs e) => IsHighlightedChanged?.Invoke(e);
 
     #endregion
 }

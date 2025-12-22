@@ -2,12 +2,12 @@ using System;
 
 namespace CodeEditor;
 
-public delegate void BookmarkEventHandler(object sender, BookmarkEventArgs e);
+public delegate void BookmarkEventHandler(BookmarkEventArgs e);
 
 /// <summary>
 /// Description of BookmarkEventHandler.
 /// </summary>
-public sealed class BookmarkEventArgs : EventArgs
+public readonly struct BookmarkEventArgs
 {
     public Bookmark Bookmark { get; }
 

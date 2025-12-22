@@ -17,6 +17,7 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>, I
 
         Document.DocumentChanged += _OnDocumentChanged;
         Document.FoldingManager.FoldingChanged += _OnFoldingChanged;
+        Document.BookmarkManager.IsHighlightedChanged += _OnBookmarkHighlightedChanged;
         TextEditor.Caret.PositionChanged += _OnCaretPositionChanged;
     }
 
@@ -259,6 +260,12 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>, I
         //暂全部刷新
         if (Widget != null!)
             Widget.RequestInvalidate(true, null /*TODO*/);
+    }
+
+    private void _OnBookmarkHighlightedChanged(BookmarkEventArgs e)
+    {
+        if (Widget != null!)
+            Widget.RequestInvalidate(false, null);
     }
 
     private void _OnCaretPositionChanged()

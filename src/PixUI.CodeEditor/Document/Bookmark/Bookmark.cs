@@ -16,6 +16,7 @@ public class Bookmark
     private TextAnchor? _anchor;
     private TextLocation _location;
     private bool _isEnabled;
+    private bool _isHighlighted;
 
     public Document Document
     {
@@ -32,7 +33,7 @@ public class Bookmark
 
                 _document = value;
                 CreateAnchor();
-                OnDocumentChanged(EventArgs.Empty);
+                //OnDocumentChanged(EventArgs.Empty);
             }
         }
     }
@@ -70,13 +71,20 @@ public class Bookmark
             if (_isEnabled != value)
             {
                 _isEnabled = value;
-                if (_document != null!)
-                {
-                    // document.RequestUpdate(new TextAreaUpdate(TextAreaUpdateType.SingleLine, LineNumber));
-                    // document.CommitUpdate();
-                }
+                Document.BookmarkManager.OnIsEnabledChanged(new BookmarkEventArgs(this));
+            }
+        }
+    }
 
-                OnIsEnabledChanged(EventArgs.Empty);
+    public bool IsHighlighted
+    {
+        get => _isHighlighted;
+        set
+        {
+            if (_isHighlighted != value)
+            {
+                _isHighlighted = value;
+                Document.BookmarkManager.OnIsHighlightedChanged(new BookmarkEventArgs(this));
             }
         }
     }
@@ -101,13 +109,8 @@ public class Bookmark
 
     #region ====Events====
 
-    public event EventHandler? DocumentChanged;
-
-    protected virtual void OnDocumentChanged(EventArgs e) => DocumentChanged?.Invoke(this, e);
-
-    public event EventHandler? IsEnabledChanged;
-
-    protected virtual void OnIsEnabledChanged(EventArgs e) => IsEnabledChanged?.Invoke(this, e);
+    // public event EventHandler? DocumentChanged;
+    // protected virtual void OnDocumentChanged(EventArgs e) => DocumentChanged?.Invoke(this, e);
 
     #endregion
 
