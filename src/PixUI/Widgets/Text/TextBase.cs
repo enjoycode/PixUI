@@ -11,9 +11,7 @@ public abstract class TextBase : Widget
     private State<Color>? _textColor;
     private int _maxLines = 1;
 
-    private Paragraph? _cachedParagraph;
-
-    protected Paragraph? CachedParagraph => _cachedParagraph;
+    protected Paragraph? CachedParagraph { get; private set; }
 
     public State<string> Text
     {
@@ -57,8 +55,8 @@ public abstract class TextBase : Widget
                 _maxLines = value;
                 if (IsMounted)
                 {
-                    _cachedParagraph?.Dispose();
-                    _cachedParagraph = null;
+                    CachedParagraph?.Dispose();
+                    CachedParagraph = null;
                     Relayout();
                 }
             }
@@ -76,8 +74,8 @@ public abstract class TextBase : Widget
     public void ClearCachedParagraph()
     {
         //TODO: fast update font size or color use skia paragraph
-        _cachedParagraph?.Dispose();
-        _cachedParagraph = null;
+        CachedParagraph?.Dispose();
+        CachedParagraph = null;
     }
 
     protected override void RepaintOnStateChanged(State state)
@@ -95,10 +93,10 @@ public abstract class TextBase : Widget
     protected void BuildParagraph(string text, float width)
     {
         //if (_cachedParagraph != null) return;
-        _cachedParagraph?.Dispose();
+        CachedParagraph?.Dispose();
 
         var color = _textColor?.Value ?? Colors.Black;
-        _cachedParagraph = BuildParagraphInternal(text, width, color);
+        CachedParagraph = BuildParagraphInternal(text, width, color);
     }
 
     protected Paragraph BuildParagraphInternal(string text, float width, in Color color)
@@ -127,15 +125,15 @@ public abstract class TextBase : Widget
         //https://bugs.chromium.org/p/skia/issues/list?q=Area=%22TextLayout%22
 
         //W = Math.Min(width, _cachedParagraph.LongestLine);
-        SetSize(Math.Min(maxSize.Width, _cachedParagraph!.MaxIntrinsicWidth),
-            Math.Min(maxSize.Height, _cachedParagraph.Height));
+        SetSize(Math.Min(maxSize.Width, CachedParagraph!.MaxIntrinsicWidth),
+            Math.Min(maxSize.Height, CachedParagraph.Height));
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
         if (string.IsNullOrEmpty(Text.Value) || Text.Value.Length == 0) return;
 
-        if (_cachedParagraph == null) //可能颜色改变后导致的缓存丢失，可以简单重建
+        if (CachedParagraph == null) //可能颜色改变后导致的缓存丢失，可以简单重建
         {
             var width = Width == null
                 ? CachedAvailableWidth
@@ -144,8 +142,8 @@ public abstract class TextBase : Widget
         }
 
         //非EditableText超出范围(overflow)裁截绘制区域
-        var paragraphWidth = _cachedParagraph!.MaxIntrinsicWidth;
-        var paragraphHeight = _cachedParagraph.Height;
+        var paragraphWidth = CachedParagraph!.MaxIntrinsicWidth;
+        var paragraphHeight = CachedParagraph.Height;
         var overflow = this is not EditableText && (paragraphWidth > W || paragraphHeight > H);
         if (overflow)
         {
@@ -153,7 +151,7 @@ public abstract class TextBase : Widget
             canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
         }
 
-        canvas.DrawParagraph(_cachedParagraph!, 0, 0);
+        canvas.DrawParagraph(CachedParagraph!, 0, 0);
         
         if (overflow)
             canvas.Restore();
