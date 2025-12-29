@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace PixUI;
 
@@ -86,11 +85,11 @@ internal sealed class InvalidQueue
     /// <returns>false=widget is not mounted and can't add to queue</returns>
     internal static bool Add(Widget widget, InvalidAction action, IDirtyArea? dirtyArea)
     {
-        //暂在这里判断Widget是否已挂载(TODO:另考虑Widget是否可见)
-        if (!widget.IsMounted) return false;
+        //暂在这里判断Widget是否已挂载
+        if (!widget.IsMounted || !widget.IsVisible) return false;
 
 #if DEBUG
-        if (Thread.CurrentThread.ManagedThreadId != UIApplication.Current.UIThread.ManagedThreadId)
+        if (Environment.CurrentManagedThreadId != UIApplication.Current.UIThread.ManagedThreadId)
             throw new InvalidOperationException("Only allow invalidate on ui thread.");
 #endif
 

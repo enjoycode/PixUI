@@ -41,6 +41,7 @@ public abstract class Widget : IDisposable
     private const int MountedMask = 1;
     private const int HasLayoutMask = 2; //TODO:待实现自动判断是否需要重新布局后移除
     private const int LayoutTightMask = 1 << 3;
+    private const int InvisibleMask = 1 << 4; //不可见状态
     private const int SuspendingMountMask = 1 << 20;
 
     private void SetFlagValue(bool value, int mask)
@@ -103,6 +104,25 @@ public abstract class Widget : IDisposable
     protected virtual void OnMounted() { }
 
     protected virtual void OnUnmounted() { }
+
+    /// <summary>
+    /// 是否可见状态，不可见状态的组件不会重新绘制
+    /// </summary>
+    public bool IsVisible
+    {
+        get => (_flag & InvisibleMask) != InvisibleMask;
+        set => SetFlagValue(!value, InvisibleMask);
+    }
+
+    public void SetVisibleWithChildren(bool visible)
+    {
+        IsVisible = visible;
+        VisitChildren(child =>
+        {
+            child.SetVisibleWithChildren(visible);
+            return false;
+        });
+    }
 
     #endregion
 
