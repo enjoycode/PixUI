@@ -45,13 +45,14 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         }
     }
 
-    public Text Label
+    public Widget Label
     {
         get => _row.Label!;
         set
         {
             _row.Label = value;
-            _row.Label.TextColor ??= _color;
+            if (_row.Label is Text text)
+                text.TextColor = _color;
         }
     }
 
@@ -364,7 +365,11 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
 
     public override string ToString()
     {
-        var labelText = _row.Label == null ? "" : _row.Label.Text.Value;
+        string labelText;
+        if (_row.Label is Text text)
+            labelText = text.Text.Value;
+        else
+            labelText = _row.Label?.ToString() ?? string.Empty;
         return $"TreeNode[\"{labelText}\"]";
     }
 

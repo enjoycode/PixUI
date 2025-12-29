@@ -14,7 +14,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
     private ExpandIcon? _expander;
     private Checkbox? _checkbox;
     private Icon? _icon;
-    private Text? _label;
+    private Widget? _label;
     private bool _isHover;
 
     public MouseRegion MouseRegion { get; }
@@ -47,7 +47,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         }
     }
 
-    internal Text? Label
+    internal Widget? Label
     {
         get => _label;
         set
@@ -319,7 +319,11 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
 
     public override string ToString()
     {
-        var labelText = _label == null ? "" : _label.Text.Value;
+        string labelText;
+        if (_label is Text text)
+            labelText = text.Text.Value;
+        else
+            labelText = _label?.ToString() ?? string.Empty;
         return $"TreeNodeRow[\"{labelText}\"]";
     }
 
