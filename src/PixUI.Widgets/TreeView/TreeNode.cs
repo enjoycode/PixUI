@@ -10,7 +10,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     internal TreeNode(T data, TreeController<T> controller)
     {
         Data = data;
-        _controller = controller;
+        Controller = controller;
         _row = new TreeNodeRow<T>();
         _row.Parent = this;
 
@@ -20,12 +20,11 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     #region ====Fields & Properties====
 
     public readonly T Data;
-    private readonly TreeController<T> _controller;
-    internal TreeController<T> Controller => _controller;
+    internal TreeController<T> Controller { get; }
 
     private readonly TreeNodeRow<T> _row;
     private List<TreeNode<T>>? _children;
-    public TreeNode<T>[]? Children => _children?.ToArray();
+    public List<TreeNode<T>>? Children => _children;
 
     public readonly State<bool> IsSelected = false;
     private readonly State<Color> _color; //for icon and label
@@ -59,8 +58,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     public bool IsLeaf { get; set; }
     public bool IsLazyLoad { get; set; }
     public bool IsExpanded { get; set; }
-
-
+    
     private int _animationFlag; //0=none,1=expand,-1=collapse
     private double _animationValue;
     private bool IsExpanding => _animationFlag == 1;
@@ -121,12 +119,12 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     {
         if (IsLeaf || _children != null) return;
 
-        var childrenList = _controller.ChildrenGetter(Data);
+        var childrenList = Controller.ChildrenGetter(Data);
         _children = new List<TreeNode<T>>(childrenList.Count);
         foreach (var child in childrenList)
         {
-            var node = new TreeNode<T>(child, _controller);
-            _controller.NodeBuilder(node);
+            var node = new TreeNode<T>(child, Controller);
+            Controller.NodeBuilder(node);
             node.TryBuildCheckbox();
             node.Parent = this;
             _children.Add(node);
@@ -147,7 +145,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         EnsureBuildChildren();
 
         var maxWidth = 0f;
-        var yPos = _controller.NodeHeight;
+        var yPos = Controller.NodeHeight;
         for (var i = 0; i < _children!.Count; i++)
         {
             var node = _children[i];
@@ -173,10 +171,10 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         }
         else
         {
-            SetChildrenVisible(true, false);
             var maxChildWidth = TryBuildAndLayoutChildren(); //先尝试布局子节点
             SetSize(Math.Max(W, maxChildWidth), H); //仅预设宽度
 
+            SetChildrenVisible(true, false);
             IsExpanded = true;
             _animationFlag = 1;
             _expandController?.Forward();
@@ -224,7 +222,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         result.Add(this);
 
         //先判断是否命中TreeNodeRow
-        if (y <= _controller.NodeHeight)
+        if (y <= Controller.NodeHeight)
         {
             HitTestChild(_row, x, y, result);
         }
@@ -254,17 +252,17 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
             if (IsCollapsing && _animationValue == 0) //已收缩需要恢复本身的宽度
             {
                 _animationFlag = 0;
-                SetSize(_row.W, _controller.NodeHeight);
+                SetSize(_row.W, Controller.NodeHeight);
             }
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             else if (IsExpanding && _animationValue == 1)
             {
                 _animationFlag = 0;
-                SetSize(W, _controller.NodeHeight + totalChildrenHeight); //宽度之前已预设
+                SetSize(W, Controller.NodeHeight + totalChildrenHeight); //宽度之前已预设
             }
             else
             {
-                SetSize(W, _controller.NodeHeight + expandedHeight); //宽度之前已预设
+                SetSize(W, Controller.NodeHeight + expandedHeight); //宽度之前已预设
             }
 
             return;
@@ -280,7 +278,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
 
         if (IsLeaf || !IsExpanded)
         {
-            SetSize(_row.W, _controller.NodeHeight);
+            SetSize(_row.W, Controller.NodeHeight);
             HasLayout = true;
             return;
         }
@@ -289,7 +287,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         if (!IsLeaf && IsExpanded)
         {
             var maxChildWidth = TryBuildAndLayoutChildren();
-            SetSize(Math.Max(_row.W, maxChildWidth), _controller.NodeHeight + _children!.Sum(t => t.H));
+            SetSize(Math.Max(_row.W, maxChildWidth), Controller.NodeHeight + _children!.Sum(t => t.H));
             HasLayout = true;
         }
     }
@@ -328,7 +326,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         if (IsExpanding || IsCollapsing) //need clip expanding area
         {
             canvas.Save();
-            canvas.ClipRect(Rect.FromLTWH(0, 0, _controller.TreeView!.W, H), ClipOp.Intersect, false);
+            canvas.ClipRect(Rect.FromLTWH(0, 0, Controller.TreeView!.W, H), ClipOp.Intersect, false);
         }
 
         _row.Paint(canvas, area);
@@ -338,7 +336,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
             for (var i = 0; i < _children!.Count; i++)
             {
                 PaintChildNode(_children[i], canvas, area);
-                if ((i + 1) * _controller.NodeHeight >= H)
+                if ((i + 1) * Controller.NodeHeight >= H)
                     break;
             }
 
@@ -508,8 +506,8 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         HasLayout = false;
         TryBuildExpandIcon();
         _expandController!.Forward(1f);
-        if (ReferenceEquals(Parent, _controller.TreeView))
-            _controller.TreeView!.Relayout();
+        if (ReferenceEquals(Parent, Controller.TreeView))
+            Controller.TreeView!.Relayout();
         else
             Relayout();
     }
@@ -528,7 +526,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         //同步数据
         if (syncDataSource)
         {
-            var dataChildren = _controller.ChildrenGetter(Data); //TODO: maybe null
+            var dataChildren = Controller.ChildrenGetter(Data); //TODO: maybe null
             dataChildren.Insert(insertIndex, child.Data);
         }
 
@@ -545,7 +543,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         //同步数据
         if (syncDataSource)
         {
-            var dataChildren = _controller.ChildrenGetter(Data);
+            var dataChildren = Controller.ChildrenGetter(Data);
             dataChildren.Remove(child.Data);
         }
 
