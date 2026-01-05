@@ -22,6 +22,14 @@ public sealed class TreeView<T> : Widget, IScrollable
     private readonly State<Color>? _fillColor;
 
     /// <summary>
+    /// 树子节点的延迟加载器
+    /// </summary>
+    public TreeLazyLoader<T> LazyLoader
+    {
+        init => _controller.LazyLoader = value;
+    }
+
+    /// <summary>
     /// 背景色
     /// </summary>
     public State<Color>? FillColor
@@ -35,7 +43,7 @@ public sealed class TreeView<T> : Widget, IScrollable
         get => _controller.AllowDrag;
         set => _controller.AllowDrag = value;
     }
-    
+
     public bool AllowDrop
     {
         get => _controller.AllowDrop;

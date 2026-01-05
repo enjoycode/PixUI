@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PixUI;
 
 public delegate void TreeNodeBuilder<T>(TreeNode<T> node);
+
+public delegate Task TreeLazyLoader<T>(TreeNode<T> node);
 
 public delegate IList<T> TreeChildrenGetter<T>(T data);
 
@@ -12,6 +15,7 @@ public sealed class TreeController<T>
     internal TreeView<T>? TreeView { get; private set; }
     internal TreeNodeBuilder<T> NodeBuilder { get; set; } = null!;
     internal TreeChildrenGetter<T> ChildrenGetter { get; set; } = null!;
+    internal TreeLazyLoader<T>? LazyLoader { get; set; }
     internal readonly List<TreeNode<T>> Nodes = new();
     internal readonly ScrollController ScrollController = new(ScrollDirection.Both);
 
@@ -20,6 +24,17 @@ public sealed class TreeController<T>
     internal float NodeHeight;
     internal float TotalWidth = 0;
     internal float TotalHeight = 0;
+
+    /// <summary>
+    /// 获取根节点只读列表
+    /// </summary>
+    public TreeNode<T>[] RootNodes => Nodes.ToArray();
+
+    internal void AttachTreeView(TreeView<T> treeView)
+    {
+        if (TreeView != null) throw new Exception("Can't attach twice");
+        TreeView = treeView;
+    }
 
     #region ----DragDrop----
 
@@ -34,17 +49,6 @@ public sealed class TreeController<T>
     public Action<TreeNode<T>, DragEvent>? OnDrop { get; set; }
 
     #endregion
-
-    /// <summary>
-    /// 获取根节点只读列表
-    /// </summary>
-    public TreeNode<T>[] RootNodes => Nodes.ToArray();
-
-    internal void AttachTreeView(TreeView<T> treeView)
-    {
-        if (TreeView != null) throw new Exception("Can't attach twice");
-        TreeView = treeView;
-    }
 
     #region ----Selection----
 
@@ -127,7 +131,7 @@ public sealed class TreeController<T>
     {
         if (NodeBuilder == null!) return;
         if (_dataSource == null || _dataSource.Count == 0) return;
-        if (Nodes.Count != 0) return; //has build
+        if (Nodes.Count != 0) return; //has built
 
         foreach (var item in _dataSource)
         {
@@ -183,7 +187,7 @@ public sealed class TreeController<T>
     public void ClearSelection()
     {
         if (_selectedNodes.Count == 0) return;
-        
+
         foreach (var oldSelectedNode in _selectedNodes)
         {
             oldSelectedNode.IsSelected.Value = false;
@@ -214,7 +218,8 @@ public sealed class TreeController<T>
     /// <param name="insertIndex"></param>
     /// <param name="syncDataSource">是否同步数据源</param>
     /// <returns></returns>
-    public TreeNode<T> InsertNode(T child, TreeNode<T>? parentNode = null, int insertIndex = -1, bool syncDataSource = true)
+    public TreeNode<T> InsertNode(T child, TreeNode<T>? parentNode = null, int insertIndex = -1,
+        bool syncDataSource = true)
     {
         var node = new TreeNode<T>(child, this);
         NodeBuilder(node);

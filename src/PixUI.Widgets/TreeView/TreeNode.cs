@@ -23,8 +23,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     internal TreeController<T> Controller { get; }
 
     private readonly TreeNodeRow<T> _row;
-    private List<TreeNode<T>>? _children;
-    public List<TreeNode<T>>? Children => _children;
+    public List<TreeNode<T>>? Children { get; private set; }
 
     public readonly State<bool> IsSelected = false;
     private readonly State<Color> _color; //for icon and label
@@ -56,9 +55,8 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     }
 
     public bool IsLeaf { get; set; }
-    public bool IsLazyLoad { get; set; }
     public bool IsExpanded { get; set; }
-    
+
     private int _animationFlag; //0=none,1=expand,-1=collapse
     private double _animationValue;
     private bool IsExpanding => _animationFlag == 1;
@@ -117,17 +115,17 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     /// </summary>
     public void EnsureBuildChildren()
     {
-        if (IsLeaf || _children != null) return;
+        if (IsLeaf || Children != null) return;
 
         var childrenList = Controller.ChildrenGetter(Data);
-        _children = new List<TreeNode<T>>(childrenList.Count);
+        Children = new List<TreeNode<T>>(childrenList.Count);
         foreach (var child in childrenList)
         {
             var node = new TreeNode<T>(child, Controller);
             Controller.NodeBuilder(node);
             node.TryBuildCheckbox();
             node.Parent = this;
-            _children.Add(node);
+            Children.Add(node);
         }
     }
 
@@ -137,18 +135,18 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     /// <returns>返回最宽的子级节点的宽度</returns>
     private float TryBuildAndLayoutChildren()
     {
-        if (_children != null && HasLayout && _children.All(t => t.HasLayout))
+        if (Children != null && HasLayout && Children.All(t => t.HasLayout))
         {
-            return TreeView<T>.CalcMaxChildWidth(_children);
+            return TreeView<T>.CalcMaxChildWidth(Children);
         }
 
         EnsureBuildChildren();
 
         var maxWidth = 0f;
         var yPos = Controller.NodeHeight;
-        for (var i = 0; i < _children!.Count; i++)
+        for (var i = 0; i < Children!.Count; i++)
         {
-            var node = _children[i];
+            var node = Children[i];
             node.Layout(float.PositiveInfinity, float.PositiveInfinity);
             node.SetPosition(0, yPos);
             yPos += node.H;
@@ -158,9 +156,20 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         return maxWidth;
     }
 
-    private void OnTapExpander(PointerEvent e)
+    private async void OnTapExpander(PointerEvent e)
     {
-        //TODO:先判断是否LazyLoad，是则异步加载后再处理
+        //先判断是否LazyLoad，是则异步加载后再处理
+        if (Controller.LazyLoader != null && Children == null)
+        {
+            try
+            {
+                await Controller.LazyLoader.Invoke(this);
+            }
+            catch (Exception ex)
+            {
+                Notification.Error($"Lazy load tree error: {ex.Message}");
+            }
+        }
 
         if (IsExpanded)
         {
@@ -188,9 +197,9 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
             _row.SetVisibleWithChildren(visible);
         }
 
-        if (!IsLeaf && _children != null)
+        if (!IsLeaf && Children != null)
         {
-            foreach (var child in _children)
+            foreach (var child in Children)
                 child.SetChildrenVisible(visible, true);
         }
     }
@@ -203,9 +212,9 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     {
         if (action(_row)) return;
 
-        if (!IsLeaf && IsExpanded && _children != null)
+        if (!IsLeaf && IsExpanded && Children != null)
         {
-            foreach (var child in _children)
+            foreach (var child in Children)
             {
                 if (action(child)) break;
             }
@@ -228,9 +237,9 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         }
         else
         {
-            if (!IsLeaf && _children != null)
+            if (!IsLeaf && Children != null)
             {
-                foreach (var child in _children)
+                foreach (var child in Children)
                 {
                     if (HitTestChild(child, x, y, result))
                         break;
@@ -247,7 +256,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         if (IsExpanding || IsCollapsing)
         {
             //根据动画值计算需要展开的高度
-            var totalChildrenHeight = _children!.Sum(t => t.H);
+            var totalChildrenHeight = Children!.Sum(t => t.H);
             var expandedHeight = (float)(totalChildrenHeight * _animationValue);
             if (IsCollapsing && _animationValue == 0) //已收缩需要恢复本身的宽度
             {
@@ -287,7 +296,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         if (!IsLeaf && IsExpanded)
         {
             var maxChildWidth = TryBuildAndLayoutChildren();
-            SetSize(Math.Max(_row.W, maxChildWidth), Controller.NodeHeight + _children!.Sum(t => t.H));
+            SetSize(Math.Max(_row.W, maxChildWidth), Controller.NodeHeight + Children!.Sum(t => t.H));
             HasLayout = true;
         }
     }
@@ -301,12 +310,12 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         affects.OldY += Y;
 
         //更新后续子节点的Y坐标
-        if (dy != 0 && _children != null)
-            TreeView<T>.UpdatePositionAfter(child, _children, dy);
+        if (dy != 0 && Children != null)
+            TreeView<T>.UpdatePositionAfter(child, Children, dy);
 
         //更新自身的宽高, 因节点展开时提前设置了新的宽度,所以展开时dx == 0
-        var newWidth = IsExpanded && _children != null
-            ? Math.Max(TreeView<T>.CalcMaxChildWidth(_children), _row.W)
+        var newWidth = IsExpanded && Children != null
+            ? Math.Max(TreeView<T>.CalcMaxChildWidth(Children), _row.W)
             : _row.W;
         var newHeight = oldHeight + dy;
         SetSize(newWidth, newHeight);
@@ -333,9 +342,9 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
 
         if (IsExpanding || IsCollapsing)
         {
-            for (var i = 0; i < _children!.Count; i++)
+            for (var i = 0; i < Children!.Count; i++)
             {
-                PaintChildNode(_children[i], canvas, area);
+                PaintChildNode(Children[i], canvas, area);
                 if ((i + 1) * Controller.NodeHeight >= H)
                     break;
             }
@@ -344,7 +353,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         }
         else if (!IsLeaf && IsExpanded)
         {
-            foreach (var child in _children!)
+            foreach (var child in Children!)
             {
                 PaintChildNode(child, canvas, area);
             }
@@ -411,7 +420,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
             var allChecked = true;
             var allUnchecked = true;
 
-            foreach (var child in parent._children!)
+            foreach (var child in parent.Children!)
             {
                 if (child._checkState!.Value == null)
                 {
@@ -449,9 +458,9 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
 
         node.EnsureBuildChildren(); //maybe not build
 
-        if (node._children != null && node._children.Count > 0)
+        if (node.Children != null && node.Children.Count > 0)
         {
-            foreach (var child in node._children)
+            foreach (var child in node.Children)
             {
                 child._checkState!.Value = newValue;
                 AutoCheckChildren(child, newValue);
@@ -474,8 +483,8 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
 
     public int IndexOf(TreeNode<T> child)
     {
-        if (_children != null)
-            return _children.IndexOf(child);
+        if (Children != null)
+            return Children.IndexOf(child);
         return -1;
     }
 
@@ -487,7 +496,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         {
             EnsureBuildChildren(); //可能收缩中还没有构建子节点
 
-            foreach (var child in _children!)
+            foreach (var child in Children!)
             {
                 var found = child.FindNode(predicate);
                 if (found != null) return found;
@@ -521,8 +530,8 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
 
         EnsureBuildChildren();
 
-        var insertIndex = index < 0 ? _children!.Count : index;
-        _children!.Insert(insertIndex, child);
+        var insertIndex = index < 0 ? Children!.Count : index;
+        Children!.Insert(insertIndex, child);
         //同步数据
         if (syncDataSource)
         {
@@ -539,7 +548,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     /// </summary>
     internal void RemoveChild(TreeNode<T> child, bool syncDataSource = true)
     {
-        _children!.Remove(child);
+        Children!.Remove(child);
         //同步数据
         if (syncDataSource)
         {
