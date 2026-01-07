@@ -4,6 +4,14 @@ public sealed class WasmApplication : UIApplication
 {
     private WasmApplication() { }
 
+    #region ====Platform Providers====
+
+    public override IPlatformCursors CursorsProvider { get; } = new WasmCursors();
+    public override IPlatformClipboard ClipboardProvider => throw new NotImplementedException("ClipboardProvider");
+    public override IPlatformFileDialog FileDialogProvider => throw new NotImplementedException("FileDialogProvider");
+
+    #endregion
+
     internal static WasmWindow Window { get; private set; } = null!;
 
     private static AppArgs _initArgs;
@@ -15,9 +23,6 @@ public sealed class WasmApplication : UIApplication
 
     public static void Run(Func<Widget> rootBuilder)
     {
-        Cursor.PlatformCursors = new WasmCursors();
-        //TODO: Clipboard.Init(new BlazorClipboard());
-
         var app = new WasmApplication();
         Current = app;
 

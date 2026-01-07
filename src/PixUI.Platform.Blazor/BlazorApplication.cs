@@ -8,10 +8,18 @@ public sealed class BlazorApplication : UIApplication
     {
         _isMacOS = isMacOS;
     }
-    
+
     internal static IJSRuntime JSRuntime = null!;
     internal static HttpClient HttpClient = null!;
     internal static BlazorWindow Window { get; private set; } = null!;
+
+    #region ====Platform Providers====
+
+    public override IPlatformCursors CursorsProvider { get; } = new BlazorCursors();
+    public override IPlatformClipboard ClipboardProvider { get; } = new BlazorClipboard();
+    public override IPlatformFileDialog FileDialogProvider => throw new NotImplementedException("FileDialogProvider");
+
+    #endregion
 
     private readonly bool _isMacOS;
 
@@ -23,14 +31,10 @@ public sealed class BlazorApplication : UIApplication
     protected override void ReplaceWebHistory(string fullPath, int index)
         => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("PixUI.ReplaceWebHistory", fullPath, index);
 
-    public static void Run(Func<Widget> rootBuilder, int glHandle, 
+    public static void Run(Func<Widget> rootBuilder, int glHandle,
         int width, int height, float ratio,
         string? routePath, bool isMacOS)
     {
-        //TODO: 其他平台支持
-        Cursor.PlatformCursors = new BlazorCursors();
-        Clipboard.Init(new BlazorClipboard());
-
         var app = new BlazorApplication(isMacOS);
         Current = app;
 

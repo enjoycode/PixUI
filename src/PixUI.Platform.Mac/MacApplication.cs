@@ -8,6 +8,14 @@ public sealed class MacApplication : UIApplication
 {
     private MacApplication() { }
 
+    #region ====Platform Providers====
+
+    public override IPlatformCursors CursorsProvider { get; } = new MacCursors();
+    public override IPlatformClipboard ClipboardProvider { get; } = new MacClipboard();
+    public override IPlatformFileDialog FileDialogProvider => throw new NotImplementedException("FileDialogProvider");
+
+    #endregion
+
     public override void PostInvalidateEvent()
         => NSRunLoop.Main.BeginInvokeOnMainThread(OnInvalidateRequest);
 
@@ -16,10 +24,6 @@ public sealed class MacApplication : UIApplication
 
     public static void Run(Widget child)
     {
-        // init platform supports
-        Cursor.PlatformCursors = new MacCursors();
-        Clipboard.Init(new MacClipboard());
-
         // create and run application
         var app = new MacApplication();
         Current = app;

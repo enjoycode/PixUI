@@ -1,24 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
 
 namespace PixUI.Platform.Win;
 
 public sealed class WinApplication : UIApplication
 {
-    private static readonly Thread _uiThread = Thread.CurrentThread;
+    #region ====Platform Providers====
+
+    public override IPlatformCursors CursorsProvider { get; } = new WinCursors();
+    public override IPlatformClipboard ClipboardProvider { get; } = new WinClipboard();
+    public override IPlatformFileDialog FileDialogProvider => throw new NotImplementedException("FileDialogProvider");
+
+    #endregion
 
     public static void Run(Widget child)
     {
         // Init SynchronizationContext
         SynchronizationContext.SetSynchronizationContext(new WinSynchronizationContext());
-        // init platform supports
-        Cursor.PlatformCursors = new WinCursors();
-        Clipboard.Init(new WinClipboard());
         // init for hidpi
         WinApi.Win32SetProcessDPIAware();
 
@@ -68,13 +65,12 @@ public sealed class WinApplication : UIApplication
                 WinApi.Win32TranslateMessage(ref msg);
                 WinApi.Win32DispatchMessage(ref msg);
             }
-
         } while (true);
 
         Console.WriteLine("Application exit.");
     }
 
-    public static bool InvokeRequired => Thread.CurrentThread != _uiThread;
+    public static bool InvokeRequired => Current.UIThread.ManagedThreadId != Environment.CurrentManagedThreadId;
 
     public override void BeginInvoke(Action action)
     {

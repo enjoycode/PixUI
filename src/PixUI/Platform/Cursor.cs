@@ -1,39 +1,31 @@
-using System;
-
 namespace PixUI;
 
 public abstract class Cursor
 {
-    public static IPlatformCursors PlatformCursors = null!;
-
     private static Cursor? _current;
 
     public static Cursor Current
     {
-        get
-        {
-            if (_current == null) return PlatformCursors.Arrow;
-            return _current;
-        }
+        get => _current ?? UIApplication.Current.CursorsProvider.Arrow;
         set
         {
             _current = value;
-            PlatformCursors.SetCursor(value);
+            UIApplication.Current.CursorsProvider.SetCursor(value);
         }
     }
 }
 
 public static class Cursors
 {
-    public static Cursor Arrow => Cursor.PlatformCursors.Arrow;
+    public static Cursor Arrow => UIApplication.Current.CursorsProvider.Arrow;
 
-    public static Cursor Hand => Cursor.PlatformCursors.Hand;
+    public static Cursor Hand => UIApplication.Current.CursorsProvider.Hand;
 
-    public static Cursor IBeam => Cursor.PlatformCursors.IBeam;
+    public static Cursor IBeam => UIApplication.Current.CursorsProvider.IBeam;
 
-    public static Cursor ResizeLR => Cursor.PlatformCursors.ResizeLR;
+    public static Cursor ResizeLR => UIApplication.Current.CursorsProvider.ResizeLR;
 
-    public static Cursor ResizeUD => Cursor.PlatformCursors.ResizeUD;
+    public static Cursor ResizeUD => UIApplication.Current.CursorsProvider.ResizeUD;
 }
 
 public interface IPlatformCursors

@@ -4,15 +4,8 @@ namespace PixUI;
 
 public static class Clipboard
 {
-    private static IPlatformClipboard _platformClipboard = null!;
-
-    public static void Init(IPlatformClipboard platformClipboard)
-    {
-        _platformClipboard = platformClipboard;
-    }
-
-    public static ValueTask WriteText(string text) => _platformClipboard.WriteText(text);
-    public static ValueTask<string?> ReadText() => _platformClipboard.ReadText();
+    public static ValueTask WriteText(string text) => UIApplication.Current.ClipboardProvider.WriteText(text);
+    public static ValueTask<string?> ReadText() => UIApplication.Current.ClipboardProvider.ReadText();
 }
 
 public interface IPlatformClipboard

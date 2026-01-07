@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
+using PixUI.Platform;
 
 namespace PixUI;
 
@@ -11,6 +12,14 @@ public abstract class UIApplication
     protected UIWindow MainWindow = null!; //目前仅支持单一Window
 
     public static UIApplication Current { get; protected set; } = null!;
+
+    #region ====Platform Providers====
+
+    public abstract IPlatformCursors CursorsProvider { get; }
+    public abstract IPlatformClipboard ClipboardProvider { get; }
+    public abstract IPlatformFileDialog FileDialogProvider { get; }
+
+    #endregion
 
     public virtual bool IsMacOS() => OperatingSystem.IsMacOS();
 
