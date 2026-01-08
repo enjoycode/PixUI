@@ -115,7 +115,8 @@ export let PixUI = {
         window.ondrop = async (ev) => {
             ev.preventDefault();
             for (const file of ev.dataTransfer.files) {
-                await DotNet.invokeMethodAsync(this._asmName, "OnDropFile", ev.x, ev.y, file.name, file.size, file.type, DotNet.createJSStreamReference(file))
+                await DotNet.invokeMethodAsync(this._asmName, "OnDropFile", ev.x, ev.y,
+                    file.name, file.size, file.type, DotNet.createJSStreamReference(file))
             }
         }
         window.onkeydown = ev => {
@@ -210,6 +211,40 @@ export let PixUI = {
         return await navigator.clipboard.readText()
     },
 
+    OpenFile: async function () {
+        const input = document.createElement('input')
+        input.type = 'file'
+        input.multiple = false //opts.multiple
+        // input.accept = (opts.accepts || [])
+        //     .map(e => [
+        //         ...(e.extensions || []).map(e => '.' + e),
+        //         ...e.mimeTypes || []]
+        //     )
+        //     .flat()
+        //     .join(',')
+
+        // See https://stackoverflow.com/questions/47664777/javascript-file-input-onchange-not-working-ios-safari-only
+        Object.assign(input.style, {
+            position: 'fixed',
+            top: '-100000px',
+            left: '-100000px'
+        })
+
+        document.body.appendChild(input)
+
+        await new Promise(resolve => {
+            input.addEventListener('change', resolve, {once: true})
+            input.click()
+        })
+        input.remove()
+
+        if (input.files && input.files[0]) {
+            return DotNet.createJSStreamReference(input.files[0])
+        } else {
+            return null
+        }
+    },
+
     Init: function () {
         this.CreateCanvas()
         this.CreateInput()
@@ -217,7 +252,7 @@ export let PixUI = {
 
     BeforeRunApp: function () {
         this._asmName = Blazor.runtime.getConfig().mainAssemblyName
-        
+
         let glHandle = this.GetGLContext()
         let routePath = document.location.hash.length > 0 ? document.location.hash.substring(1) : null
         let isMacOS = navigator.userAgent.includes("Mac")

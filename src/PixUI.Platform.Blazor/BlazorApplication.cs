@@ -17,7 +17,7 @@ public sealed class BlazorApplication : UIApplication
 
     public override IPlatformCursors CursorsProvider { get; } = new BlazorCursors();
     public override IPlatformClipboard ClipboardProvider { get; } = new BlazorClipboard();
-    public override IPlatformFileDialog FileDialogProvider => throw new NotImplementedException("FileDialogProvider");
+    public override IPlatformFileDialog FileDialogProvider { get; } = new BlazorFileDialog();
 
     #endregion
 

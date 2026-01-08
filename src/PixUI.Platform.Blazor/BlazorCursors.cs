@@ -14,17 +14,17 @@ public sealed class BlazorCursor : Cursor
 
 public sealed class BlazorCursors : IPlatformCursors
 {
-    private static readonly BlazorCursor _arrow = new("auto");
-    private static readonly BlazorCursor _hand = new("pointer");
-    private static readonly BlazorCursor _ibeam = new("text");
-    private static readonly BlazorCursor _resizeLR = new("ew-resize");
-    private static readonly BlazorCursor _resizeUD = new("ns-resize");
+    private static readonly BlazorCursor WArrow = new("auto");
+    private static readonly BlazorCursor WHand = new("pointer");
+    private static readonly BlazorCursor WIbeam = new("text");
+    private static readonly BlazorCursor WResizeLR = new("ew-resize");
+    private static readonly BlazorCursor WResizeUD = new("ns-resize");
 
-    public Cursor Arrow => _arrow;
-    public Cursor Hand => _hand;
-    public Cursor IBeam => _ibeam;
-    public Cursor ResizeLR => _resizeLR;
-    public Cursor ResizeUD => _resizeUD;
+    public Cursor Arrow => WArrow;
+    public Cursor Hand => WHand;
+    public Cursor IBeam => WIbeam;
+    public Cursor ResizeLR => WResizeLR;
+    public Cursor ResizeUD => WResizeUD;
 
     public void SetCursor(Cursor cursor) =>
         ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("PixUI.SetCursor", ((BlazorCursor)cursor).Name);

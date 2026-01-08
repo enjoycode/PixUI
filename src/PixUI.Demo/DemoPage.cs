@@ -133,7 +133,9 @@ public sealed class DemoPage : View
     {
         var fileStream =
             await FileDialog.OpenFileAsync(new OpenFileOptions() { Title = "打开文件" });
-        Console.WriteLine(fileStream);
+        if (fileStream != null)
+            Console.WriteLine($"打开文件: {fileStream.Length}");
+
         fileStream?.Close();
     }
 
