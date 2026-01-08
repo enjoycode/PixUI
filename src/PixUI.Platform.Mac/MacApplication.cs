@@ -12,7 +12,7 @@ public sealed class MacApplication : UIApplication
 
     public override IPlatformCursors CursorsProvider { get; } = new MacCursors();
     public override IPlatformClipboard ClipboardProvider { get; } = new MacClipboard();
-    public override IPlatformFileDialog FileDialogProvider => throw new NotImplementedException("FileDialogProvider");
+    public override IPlatformFileDialog FileDialogProvider { get; } = new MacFileDialog();
 
     #endregion
 

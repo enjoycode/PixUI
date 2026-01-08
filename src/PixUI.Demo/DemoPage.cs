@@ -1,4 +1,5 @@
 ﻿using System;
+using PixUI.Platform;
 
 namespace PixUI.Demo;
 
@@ -13,7 +14,7 @@ public sealed class DemoPage : View
 
     private readonly State<float> _numValue = 3f;
 
-    private readonly WidgetRef<Button> _buttonRef = new();
+    private Button _buttonRef = null!;
     private ListPopup<Person>? _listPopup;
 
     public DemoPage()
@@ -54,11 +55,12 @@ public sealed class DemoPage : View
                         new Text(_lastName) { FontSize = 20, TextColor = Colors.Red },
                         new Text(_fullName) { FontSize = 50, TextColor = Colors.Red },
                         new Button("Click Me", MaterialIcons.Search) { OnTap = OnButtonTap },
+                        new Button("OpenFile") { OnTap = OnOpenFile },
                         new ButtonGroup()
                         {
                             Children =
                             {
-                                new Button("Button1") { OnTap = OnButton1Tap, Ref = _buttonRef },
+                                new Button("Button1") { OnTap = OnButton1Tap }.RefBy(ref _buttonRef),
                                 new Button("Button2") { OnTap = OnButton2Tap },
                                 new Button("Button3") { OnTap = OnButton3Tap },
                             },
@@ -75,7 +77,7 @@ public sealed class DemoPage : View
                         },
                         new Select<string>(_selectedValue)
                         {
-                            Width = 200, Options = new[] { "无锡", "上海", "苏州" }
+                            Width = 200, Options = ["无锡", "上海", "苏州"]
                         },
                         new TextInput("Hello World!")
                         {
@@ -127,13 +129,21 @@ public sealed class DemoPage : View
         Notification.Error("Click Done!");
     }
 
+    private async void OnOpenFile(PointerEvent e)
+    {
+        var fileStream =
+            await FileDialog.OpenFileAsync(new OpenFileOptions() { Title = "打开文件" });
+        Console.WriteLine(fileStream);
+        fileStream?.Close();
+    }
+
     private void OnButton1Tap(PointerEvent e)
     {
-        _listPopup ??= new ListPopup<Person>(Overlay!, BuidPopupItem, 200, 25)
+        _listPopup ??= new ListPopup<Person>(Overlay!, BuildPopupItem, 200, 25)
             { OnSelectionChanged = OnListPopupSelectionChanged };
         _listPopup.DataSource ??= Person.GeneratePersons(10);
         if (!_listPopup.IsMounted)
-            _listPopup.Show(_buttonRef.Widget, new Offset(-4, -2), Popup.DefaultTransitionBuilder);
+            _listPopup.Show(_buttonRef, new Offset(-4, -2), Popup.DefaultTransitionBuilder);
         else
             _listPopup?.Hide();
     }
@@ -147,21 +157,21 @@ public sealed class DemoPage : View
 
     private void OnButton3Tap(PointerEvent e)
     {
-        var menuItems = new MenuItem[]
-        {
+        MenuItem[] menuItems =
+        [
             MenuItem.Item("Copy"),
             MenuItem.Item("Paste"),
             MenuItem.Divider(),
-            MenuItem.SubMenu("Actions", null, new MenuItem[]
-            {
+            MenuItem.SubMenu("Actions", null,
+            [
                 MenuItem.Item("Action1"),
-                MenuItem.SubMenu("Actions2", null, new MenuItem[]
-                {
+                MenuItem.SubMenu("Actions2", null,
+                [
                     MenuItem.Item("Action3"),
-                    MenuItem.Item("Action4"),
-                })
-            })
-        };
+                    MenuItem.Item("Action4")
+                ])
+            ])
+        ];
         ContextMenu.Show(menuItems);
     }
 
@@ -170,7 +180,7 @@ public sealed class DemoPage : View
         _lastName.Value = person == null ? "" : person.Name;
     }
 
-    private Widget BuidPopupItem(Person person, int index, State<bool> isHover,
+    private Widget BuildPopupItem(Person person, int index, State<bool> isHover,
         State<bool> isSelected)
     {
         var color = RxComputed<Color>.Make(isSelected,

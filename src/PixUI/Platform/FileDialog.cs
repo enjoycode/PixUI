@@ -5,18 +5,18 @@ namespace PixUI.Platform;
 
 public static class FileDialog
 {
-    public static Task<Stream> OpenFileAsync(OpenFileOptions options) =>
+    public static Task<Stream?> OpenFileAsync(OpenFileOptions options) =>
         UIApplication.Current.FileDialogProvider.OpenFileAsync(options);
 
-    public static Task<Stream> SaveFileAsync(SaveFileOptions options) =>
+    public static Task<Stream?> SaveFileAsync(SaveFileOptions options) =>
         UIApplication.Current.FileDialogProvider.SaveFileAsync(options);
 }
 
 public interface IPlatformFileDialog
 {
-    Task<Stream> OpenFileAsync(OpenFileOptions options);
+    Task<Stream?> OpenFileAsync(OpenFileOptions options);
 
-    Task<Stream> SaveFileAsync(SaveFileOptions options);
+    Task<Stream?> SaveFileAsync(SaveFileOptions options);
 }
 
 public readonly struct OpenFileOptions
