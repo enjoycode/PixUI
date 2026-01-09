@@ -211,17 +211,11 @@ export let PixUI = {
         return await navigator.clipboard.readText()
     },
 
-    OpenFile: async function () {
+    OpenFile: async function (multiple, accept) {
         const input = document.createElement('input')
         input.type = 'file'
-        input.multiple = false //opts.multiple
-        // input.accept = (opts.accepts || [])
-        //     .map(e => [
-        //         ...(e.extensions || []).map(e => '.' + e),
-        //         ...e.mimeTypes || []]
-        //     )
-        //     .flat()
-        //     .join(',')
+        input.multiple = multiple
+        input.accept = accept
 
         // See https://stackoverflow.com/questions/47664777/javascript-file-input-onchange-not-working-ios-safari-only
         Object.assign(input.style, {
@@ -238,11 +232,17 @@ export let PixUI = {
         })
         input.remove()
 
-        if (input.files && input.files[0]) {
-            return DotNet.createJSStreamReference(input.files[0])
-        } else {
-            return null
+        let results = []
+        if (input.files) {
+            for (let i = 0; i < input.files.length; i++) {
+                results.push({
+                    FileName: input.files[i].name,
+                    FileSize: input.files[i].size,
+                    FileStream: DotNet.createJSStreamReference(input.files[i])
+                })
+            }
         }
+        return results
     },
 
     SaveFile: async function (fileName, streamRef) {
@@ -250,7 +250,7 @@ export let PixUI = {
         //https://stackoverflow.com/questions/77427123/javascript-open-save-as-dialog-box-and-store-content
         const data = await streamRef.arrayBuffer()
         const blob = new Blob([data], {type: 'application/octet-stream; charset=utf-8'})
-        
+
         const link = document.createElement('a')
         link.download = fileName
         link.href = URL.createObjectURL(blob)

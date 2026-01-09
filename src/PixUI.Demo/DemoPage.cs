@@ -139,12 +139,12 @@ public sealed class DemoPage : View
 
     private async void OnOpenFile(PointerEvent e)
     {
-        var fileStream =
-            await FileDialog.OpenFileAsync(new OpenFileOptions() { Title = "打开文件" });
-        if (fileStream != null)
-            Console.WriteLine($"打开文件: {fileStream.Length}");
-
-        fileStream?.Close();
+        var files = await FileDialog.OpenFileAsync(new OpenFileOptions() { Title = "打开文件" });
+        foreach (var file in files)
+        {
+            Console.WriteLine($"打开文件: {file.FileName}");
+            await file.FileStream.DisposeAsync();
+        }
     }
 
     private async void OnSaveFile(PointerEvent e)
