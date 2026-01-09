@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using PixUI.Platform;
 
 namespace PixUI.Demo;
@@ -54,8 +55,15 @@ public sealed class DemoPage : View
                         new Text(_firstName) { FontSize = 20, TextColor = Colors.Red },
                         new Text(_lastName) { FontSize = 20, TextColor = Colors.Red },
                         new Text(_fullName) { FontSize = 50, TextColor = Colors.Red },
-                        new Button("Click Me", MaterialIcons.Search) { OnTap = OnButtonTap },
-                        new Button("OpenFile") { OnTap = OnOpenFile },
+                        new Row(VerticalAlignment.Middle, 5)
+                        {
+                            Children =
+                            [
+                                new Button("Click Me", MaterialIcons.Search) { OnTap = OnButtonTap },
+                                new Button("OpenFile") { OnTap = OnOpenFile },
+                                new Button("SaveFile") { OnTap = OnSaveFile },
+                            ]
+                        },
                         new ButtonGroup()
                         {
                             Children =
@@ -137,6 +145,21 @@ public sealed class DemoPage : View
             Console.WriteLine($"打开文件: {fileStream.Length}");
 
         fileStream?.Close();
+    }
+
+    private async void OnSaveFile(PointerEvent e)
+    {
+        var ms = new MemoryStream();
+        var textWriter = new StreamWriter(ms);
+        await textWriter.WriteLineAsync("Hello World!");
+        await textWriter.FlushAsync();
+        ms.Position = 0;
+
+        await FileDialog.SaveFileAsync(new SaveFileOptions()
+        {
+            FileName = "HelloWorld.txt",
+            FileStream = ms,
+        });
     }
 
     private void OnButton1Tap(PointerEvent e)

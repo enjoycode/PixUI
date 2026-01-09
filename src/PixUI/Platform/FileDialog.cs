@@ -8,7 +8,7 @@ public static class FileDialog
     public static Task<Stream?> OpenFileAsync(OpenFileOptions options) =>
         UIApplication.Current.FileDialogProvider.OpenFileAsync(options);
 
-    public static Task<Stream?> SaveFileAsync(SaveFileOptions options) =>
+    public static Task SaveFileAsync(SaveFileOptions options) =>
         UIApplication.Current.FileDialogProvider.SaveFileAsync(options);
 }
 
@@ -16,7 +16,7 @@ public interface IPlatformFileDialog
 {
     Task<Stream?> OpenFileAsync(OpenFileOptions options);
 
-    Task<Stream?> SaveFileAsync(SaveFileOptions options);
+    Task SaveFileAsync(SaveFileOptions options);
 }
 
 public readonly struct OpenFileOptions
@@ -31,4 +31,8 @@ public readonly struct SaveFileOptions
     public SaveFileOptions() { }
 
     public string Title { get; init; } = string.Empty;
+
+    public string FileName { get; init; } = string.Empty;
+
+    public Stream FileStream { get; init; } = Stream.Null;
 }

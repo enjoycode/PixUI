@@ -245,6 +245,19 @@ export let PixUI = {
         }
     },
 
+    SaveFile: async function (fileName, streamRef) {
+        //https://github.com/jimmywarting/native-file-system-adapter/blob/master/src/adapters/downloader.js
+        //https://stackoverflow.com/questions/77427123/javascript-open-save-as-dialog-box-and-store-content
+        const data = await streamRef.arrayBuffer()
+        const blob = new Blob([data], {type: 'application/octet-stream; charset=utf-8'})
+        
+        const link = document.createElement('a')
+        link.download = fileName
+        link.href = URL.createObjectURL(blob)
+        link.click()
+        setTimeout(() => URL.revokeObjectURL(link.href), 10000)
+    },
+
     Init: function () {
         this.CreateCanvas()
         this.CreateInput()

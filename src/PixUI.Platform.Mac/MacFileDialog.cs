@@ -27,7 +27,7 @@ internal sealed class MacFileDialog : IPlatformFileDialog
         return taskCompletionSource.Task;
     }
 
-    public Task<Stream?> SaveFileAsync(SaveFileOptions options)
+    public Task SaveFileAsync(SaveFileOptions options)
     {
         throw new NotImplementedException();
     }

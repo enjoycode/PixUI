@@ -24,8 +24,9 @@ internal sealed class BlazorFileDialog : IPlatformFileDialog
         }
     }
 
-    public Task<Stream?> SaveFileAsync(SaveFileOptions options)
+    public async Task SaveFileAsync(SaveFileOptions options)
     {
-        throw new NotImplementedException();
+        var streamRef = new DotNetStreamReference(options.FileStream, true);
+        await BlazorApplication.JSRuntime.InvokeVoidAsync("PixUI.SaveFile", options.FileName, streamRef);
     }
 }
