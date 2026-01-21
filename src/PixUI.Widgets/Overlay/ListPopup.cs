@@ -4,8 +4,7 @@ using System.Linq;
 
 namespace PixUI;
 
-public delegate Widget ListPopupItemBuilder<in T>(T data, int index, State<bool> isHover,
-    State<bool> isSelected);
+public delegate Widget ListPopupItemBuilder<in T>(T data, int index, State<bool> isHover, State<bool> isSelected);
 
 internal readonly struct ItemState
 {
@@ -16,49 +15,6 @@ internal readonly struct ItemState
     {
         HoverState = hoverState;
         SelectedState = selectedState;
-    }
-}
-
-internal sealed class ListPopupItemWidget : SingleChildWidget, IMouseRegion
-{
-    private readonly State<bool> _hoverState;
-    private readonly State<bool> _selectedState;
-
-    internal ListPopupItemWidget(int index, State<bool> hoverState, State<bool> selectedState,
-        Action<int> onSelect)
-    {
-        Bind(ref _hoverState!, hoverState, RepaintOnStateChanged);
-        _selectedState = selectedState;
-
-        MouseRegion = new MouseRegion(() => Cursors.Hand);
-        MouseRegion.HoverChanged += isHover => hoverState.Value = isHover;
-        MouseRegion.PointerTap += _ => onSelect(index);
-    }
-
-    public MouseRegion MouseRegion { get; private set; }
-
-    public override void Layout(float availableWidth, float availableHeight)
-    {
-        //始终为上级指定的宽高
-        var fixedWidth = Width!.Value;
-        var fixedHeight = Height!.Value;
-        if (Child != null)
-        {
-            Child.Layout(fixedWidth, fixedHeight);
-            Child.SetPosition(0, (fixedHeight - Child.H) / 2f); //暂上下居中
-        }
-
-        SetSize(fixedWidth, fixedHeight);
-    }
-
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
-    {
-        if (_selectedState.Value)
-            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(Theme.FocusedColor));
-        else if (_hoverState.Value)
-            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(Theme.AccentColor));
-
-        base.Paint(canvas, area);
     }
 }
 
@@ -123,7 +79,7 @@ public class ListPopup<T> : Popup
     {
         var states = _itemStates![index];
 
-        return new ListPopupItemWidget(index, states.HoverState, states.SelectedState, OnSelectByTap)
+        return new SelectableItemWidget(index, states.HoverState, states.SelectedState, OnSelectByTap)
         {
             Width = _child.Width, Height = _itemExtent,
             Child = _itemBuilder(data, index, states.HoverState, states.SelectedState)
