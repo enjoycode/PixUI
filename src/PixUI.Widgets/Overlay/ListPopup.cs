@@ -79,7 +79,7 @@ public class ListPopup<T> : Popup
     {
         var states = _itemStates![index];
 
-        return new SelectableItemWidget(index, states.HoverState, states.SelectedState, OnSelectByTap)
+        return new SelectableItem(index, states.HoverState, states.SelectedState, OnSelectByTap)
         {
             Width = _child.Width, Height = _itemExtent,
             Child = _itemBuilder(data, index, states.HoverState, states.SelectedState)

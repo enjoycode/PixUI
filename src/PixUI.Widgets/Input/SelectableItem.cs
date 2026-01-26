@@ -5,12 +5,12 @@ namespace PixUI;
 /// <summary>
 /// 可点击选择的组件
 /// </summary>
-public sealed class SelectableItemWidget : SingleChildWidget, IMouseRegion
+public sealed class SelectableItem : SingleChildWidget, IMouseRegion
 {
     private readonly State<bool> _hoverState;
     private readonly State<bool> _selectedState;
 
-    public SelectableItemWidget(int index, State<bool> hoverState, State<bool> selectedState, Action<int> onSelect)
+    public SelectableItem(int index, State<bool> hoverState, State<bool> selectedState, Action<int> onSelect)
     {
         Bind(ref _hoverState!, hoverState, RepaintOnStateChanged);
         _selectedState = selectedState;
