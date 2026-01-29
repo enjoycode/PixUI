@@ -4,7 +4,6 @@ using System.Diagnostics;
 
 namespace PixUI;
 
-[TSRename("StateBase")]
 public abstract class State : IDisposable
 {
     private List<Action<State>>? _bindings;

@@ -181,15 +181,7 @@ public sealed class ImmutableText
     }
 
     public override string ToString() => _root.ToString();
-
-    [TSRawScript(@"
-        public GetString(offset: number, length: number): string {
-            let data = new Uint16Array(length);
-            this.CopyTo(offset, data, length);
-            // @ts-ignore
-            return String.fromCharCode.apply(null, data);
-        }
-")]
+    
     public string GetString(int offset, int length)
     {
 #if __WEB__
@@ -314,14 +306,14 @@ public sealed class ImmutableText
         {
             var compositeTail = (CompositeNode)tail;
             // head too small, returns (head + tail/2) + (tail/2)
-            if (compositeTail.head.Length > compositeTail.tail.Length)
+            if (compositeTail.Head.Length > compositeTail.Tail.Length)
             {
                 // Rotates to concatenate with smaller part.
                 tail = compositeTail.RotateRight();
             }
 
-            head = ConcatNodes(head, compositeTail.head);
-            tail = compositeTail.tail;
+            head = ConcatNodes(head, compositeTail.Head);
+            tail = compositeTail.Tail;
         }
         else
         {
@@ -329,14 +321,14 @@ public sealed class ImmutableText
             {
                 var compositeHead = (CompositeNode)head;
                 // tail too small, returns (head/2) + (head/2 concat tail)
-                if (compositeHead.tail.Length > compositeHead.head.Length)
+                if (compositeHead.Tail.Length > compositeHead.Head.Length)
                 {
                     // Rotates to concatenate with smaller part.
                     head = compositeHead.RotateLeft();
                 }
 
-                tail = ConcatNodes(compositeHead.tail, tail);
-                head = compositeHead.head;
+                tail = ConcatNodes(compositeHead.Tail, tail);
+                head = compositeHead.Head;
             }
         }
 
@@ -357,15 +349,15 @@ public sealed class ImmutableText
             }
 
             var composite = (CompositeNode)node;
-            if (index < composite.head.Length)
+            if (index < composite.Head.Length)
             {
-                node = composite.head;
+                node = composite.Head;
             }
             else
             {
-                offset += composite.head.Length;
-                index -= composite.head.Length;
-                node = composite.tail;
+                offset += composite.Head.Length;
+                index -= composite.Head.Length;
+                node = composite.Tail;
             }
         }
     }

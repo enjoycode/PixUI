@@ -10,7 +10,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\ext\LiveCharts2\src\LiveChartsCore\LiveChartsCore.csproj" />
-      <ProjectReference Include="..\PixUI.TSAttributes\PixUI.TSAttributes.csproj" />
       <ProjectReference Include="..\PixUI\PixUI.csproj" />
     </ItemGroup>
 

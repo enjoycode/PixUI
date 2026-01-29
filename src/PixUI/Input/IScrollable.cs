@@ -2,7 +2,6 @@ using System;
 
 namespace PixUI;
 
-[TSInterfaceOf]
 public interface IScrollable
 {
     ScrollDirection ScrollDirection { get; }

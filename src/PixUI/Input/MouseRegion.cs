@@ -5,7 +5,6 @@ namespace PixUI;
 /// <summary>
 /// 实现此接口的Widget接收处理Mouse事件
 /// </summary>
-[TSInterfaceOf]
 public interface IMouseRegion
 {
     public MouseRegion MouseRegion { get; }

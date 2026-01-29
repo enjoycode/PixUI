@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 namespace PixUI;
 
 [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
-[TSType("PixUI.MatrixUtils")]
 public static class MatrixUtils
 {
 

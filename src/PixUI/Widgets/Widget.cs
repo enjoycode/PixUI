@@ -615,9 +615,6 @@ public abstract class Widget : IDisposable
 
     #endregion
 
-    [TSRawScript(@"public toString(): string {
-    return `${this.constructor.name}[${this.DebugLabel ?? ''}]`;
-}")]
     public override string ToString() => string.IsNullOrEmpty(DebugLabel)
         ? $"{GetType().Name}"
         : $"{GetType().Name}[\"{DebugLabel}\"]";

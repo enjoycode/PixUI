@@ -5,7 +5,6 @@ namespace PixUI;
 
 public delegate Task<Widget> RouteWidgetAsyncBuilder(string? arg);
 
-[TSType("PixUI.RouteWidgetAsyncBuilder"), TSRename("RouteWidgetAsyncBuilder")]
 public delegate Widget RouteWidgetBuilder(string? arg);
 
 public abstract class RouteBase
@@ -65,7 +64,6 @@ public class Route : RouteBase
 
     private readonly RouteWidgetBuilder _builder;
 
-    [TSRawScript("public BuildWidgetAsync(arg: string | null): Promise<PixUI.Widget> { return this._builder(arg); }")]
     public override ValueTask<Widget> BuildWidgetAsync(string? args) => new(_builder(args));
 }
 

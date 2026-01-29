@@ -1,7 +1,6 @@
 using System.Numerics;
 using Melville.Pdf.Model.Renderers.Colors;
 using Melville.Pdf.Model.Renderers.GraphicsStates;
-using PixUI;
 
 namespace PixUI.PdfViewer.Drawing;
 

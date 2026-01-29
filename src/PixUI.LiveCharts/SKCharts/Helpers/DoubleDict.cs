@@ -58,7 +58,6 @@ internal sealed class DoubleDict<T1, T2>
         return _keys.TryGetValue(key, out value!);
     }
 
-    [PixUI.TSRename("TryGetKey")]
     public bool TryGetValue(T2 key, out T1 value)
     {
         return _values.TryGetValue(key, out value!);

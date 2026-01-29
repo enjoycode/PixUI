@@ -1,6 +1,3 @@
-using System;
-using PixUI;
-
 namespace CodeEditor;
 
 internal abstract class Node
@@ -89,11 +86,6 @@ internal sealed class LeafNode : Node
 #endif
     }
 
-    [TSRawScript(@"
-        public toString(): string {
-            // @ts-ignore
-            return String.fromCharCode.apply(null, this._data);
-        }")]
     public override string ToString()
     {
 #if __WEB__
@@ -109,30 +101,30 @@ internal sealed class CompositeNode : Node
     public CompositeNode(Node head, Node tail)
     {
         _count = head.Length + tail.Length;
-        this.head = head;
-        this.tail = tail;
+        this.Head = head;
+        this.Tail = tail;
     }
 
     private readonly int _count;
-    internal readonly Node head;
-    internal readonly Node tail;
+    internal readonly Node Head;
+    internal readonly Node Tail;
 
     public override int Length => _count;
 
     public override char GetCharAt(int index)
     {
-        var headLength = head.Length;
+        var headLength = Head.Length;
         return index < headLength
-            ? head.GetCharAt(index)
-            : tail.GetCharAt(index - headLength);
+            ? Head.GetCharAt(index)
+            : Tail.GetCharAt(index - headLength);
     }
 
     internal Node RotateRight()
     {
         // See: http://en.wikipedia.org/wiki/Tree_rotation
-        if (head is CompositeNode p)
+        if (Head is CompositeNode p)
         {
-            return new CompositeNode(p.head, new CompositeNode(p.tail, tail));
+            return new CompositeNode(p.Head, new CompositeNode(p.Tail, Tail));
         }
 
         return this; // Head not a composite, cannot rotate.
@@ -141,56 +133,56 @@ internal sealed class CompositeNode : Node
     internal Node RotateLeft()
     {
         // See: http://en.wikipedia.org/wiki/Tree_rotation
-        if (tail is CompositeNode q)
+        if (Tail is CompositeNode q)
         {
-            return new CompositeNode(new CompositeNode(head, q.head), q.tail);
+            return new CompositeNode(new CompositeNode(Head, q.Head), q.Tail);
         }
 
         return this; // Tail not a composite, cannot rotate.
     }
 
 #if __WEB__
-        public override void CopyTo(int srcOffset, Uint16Array dest, int count)
+    public override void CopyTo(int srcOffset, Uint16Array dest, int count)
 #else
     public override void CopyTo(int srcOffset, Span<char> dest, int count)
 #endif
     {
-        var cesure = head.Length;
+        var cesure = Head.Length;
         if (srcOffset + count <= cesure)
         {
-            head.CopyTo(srcOffset, dest, count);
+            Head.CopyTo(srcOffset, dest, count);
         }
         else if (srcOffset >= cesure)
         {
-            tail.CopyTo(srcOffset - cesure, dest, count);
+            Tail.CopyTo(srcOffset - cesure, dest, count);
         }
         else
         {
             // Overlaps head and tail.
             var headChunkSize = cesure - srcOffset;
-            head.CopyTo(srcOffset, dest, headChunkSize);
+            Head.CopyTo(srcOffset, dest, headChunkSize);
 #if __WEB__
-                tail.CopyTo(0, dest.subarray(headChunkSize), count - headChunkSize);
+            Tail.CopyTo(0, dest.subarray(headChunkSize), count - headChunkSize);
 #else
-            tail.CopyTo(0, dest.Slice(headChunkSize), count - headChunkSize);
+            Tail.CopyTo(0, dest.Slice(headChunkSize), count - headChunkSize);
 #endif
         }
     }
 
     public override Node SubNode(int start, int end)
     {
-        var cesure = head.Length;
+        var cesure = Head.Length;
         if (end <= cesure)
-            return head.SubNode(start, end);
+            return Head.SubNode(start, end);
 
         if (start >= cesure)
-            return tail.SubNode(start - cesure, end - cesure);
+            return Tail.SubNode(start - cesure, end - cesure);
 
         if ((start == 0) && (end == _count))
             return this;
 
         // Overlaps head and tail.
-        return ImmutableText.ConcatNodes(head.SubNode(start, cesure),
-            tail.SubNode(0, end - cesure));
+        return ImmutableText.ConcatNodes(Head.SubNode(start, cesure),
+            Tail.SubNode(0, end - cesure));
     }
 }

@@ -1,7 +1,6 @@
 using System.Numerics;
 using Melville.Pdf.Model.Renderers;
 using Melville.Pdf.Model.Renderers.GraphicsStates;
-using PixUI;
 using Path = PixUI.Path;
 
 namespace PixUI.PdfViewer.Drawing;

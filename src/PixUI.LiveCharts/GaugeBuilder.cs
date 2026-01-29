@@ -415,7 +415,6 @@ public class GaugeBuilder : IGaugeBuilder<SkiaDrawingContext>
     /// <param name="seriesPaint">The series paint.</param>
     /// <param name="labelsPaint">The labels paint.</param>
     /// <returns></returns>
-    [TSRename("AddValue1")]
     public GaugeBuilder AddValue(
         ObservableValue value,
         string? seriesName,
@@ -437,7 +436,6 @@ public class GaugeBuilder : IGaugeBuilder<SkiaDrawingContext>
     /// <param name="seriesColor">Color of the series.</param>
     /// <param name="labelsColor">Color of the labels.</param>
     /// <returns></returns>
-    [TSRename("AddValue2")]
     public GaugeBuilder AddValue(ObservableValue value, string seriesName, SKColor seriesColor,
         SKColor? labelsColor = null)
     {
@@ -455,7 +453,6 @@ public class GaugeBuilder : IGaugeBuilder<SkiaDrawingContext>
     /// <param name="seriesColor">Color of the series.</param>
     /// <param name="labelsColor">Color of the labels.</param>
     /// <returns></returns>
-    [TSRename("AddValue3")]
     public GaugeBuilder AddValue(double value, string seriesName, SKColor seriesColor, SKColor? labelsColor = null)
     {
         return AddValue(new ObservableValue(value), seriesName, seriesColor, labelsColor);
@@ -466,7 +463,6 @@ public class GaugeBuilder : IGaugeBuilder<SkiaDrawingContext>
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns></returns>
-    [TSRename("AddValue4")]
     public GaugeBuilder AddValue(ObservableValue value)
     {
         return AddValue(value, null, null, null);
@@ -477,7 +473,6 @@ public class GaugeBuilder : IGaugeBuilder<SkiaDrawingContext>
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns></returns>
-    [TSRename("AddValue5")]
     public GaugeBuilder AddValue(double value)
     {
         return AddValue(new ObservableValue(value));
@@ -489,7 +484,6 @@ public class GaugeBuilder : IGaugeBuilder<SkiaDrawingContext>
     /// <param name="value">The value.</param>
     /// <param name="seriesName">The series name.</param>
     /// <returns></returns>
-    [TSRename("AddValue6")]
     public GaugeBuilder AddValue(ObservableValue value, string? seriesName)
     {
         return AddValue(value, seriesName, null, null);
@@ -501,7 +495,6 @@ public class GaugeBuilder : IGaugeBuilder<SkiaDrawingContext>
     /// <param name="value">The value.</param>
     /// <param name="seriesName">The series name.</param>
     /// <returns></returns>
-    [TSRename("AddValue7")]
     public GaugeBuilder AddValue(double value, string? seriesName)
     {
         return AddValue(new ObservableValue(value), seriesName);

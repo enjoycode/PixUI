@@ -34,7 +34,6 @@ public sealed class RxComputed<T> : State<T>
         return computed;
     }
 
-    [TSRename("Make1")]
     public static RxComputed<R> Make<TS, R>(State<TS> source, Func<TS, R> getter,
         Action<R>? setter = null /*, Func<bool>? notifier = null*/)
     {
@@ -50,7 +49,6 @@ public sealed class RxComputed<T> : State<T>
         return computed;
     }
 
-    [TSRename("Make2")]
     public static RxComputed<R> Make<T1, T2, R>(State<T1> s1, State<T2> s2,
         Func<T1, T2, R> getter, Action<R>? setter = null /*, Func<bool>? notifier = null*/)
     {

@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 
 namespace PixUI;
 
-[TSType("PixUI.WidgetList")]
 public sealed class WidgetList<T> : Collection<T> where T : Widget
 {
     private readonly Widget _parent;
