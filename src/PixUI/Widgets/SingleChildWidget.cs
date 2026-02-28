@@ -37,7 +37,7 @@ public abstract class SingleChildWidget : Widget
         }
     }
 
-    public sealed override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren(Func<Widget, bool> action)
     {
         if (_child != null)
             action(_child);

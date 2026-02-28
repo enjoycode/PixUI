@@ -3,7 +3,7 @@
     <PropertyGroup>
         <Nullable>enable</Nullable>
         <TargetFramework>net8.0</TargetFramework>
-        <LangVersion>10</LangVersion>
+        <LangVersion>13</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Configurations>Debug;Release;DebugWeb</Configurations>
         <Platforms>AnyCPU;ARM64</Platforms>
