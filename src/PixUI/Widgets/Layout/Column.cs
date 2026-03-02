@@ -18,7 +18,7 @@ public sealed class Column : MultiChildWidget<Widget>
 
     private HorizontalAlignment _alignment = HorizontalAlignment.Center;
     private float _spacing;
-    private float _totalFlex = 0;
+    private float _totalFlex;
 
     public HorizontalAlignment Alignment
     {
@@ -27,7 +27,7 @@ public sealed class Column : MultiChildWidget<Widget>
         {
             _alignment = value;
             if (IsMounted)
-                Invalidate(InvalidAction.Relayout);
+                Relayout();
         }
     }
 
