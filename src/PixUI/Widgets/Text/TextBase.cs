@@ -110,23 +110,32 @@ public abstract class TextBase : Widget
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
+        var availableSize = CacheAndGetMaxSize(availableWidth, availableHeight);
+        //如果指定了宽高，限制允许的Size
+        if (Width != null)
+            availableSize.Width = Math.Min(Width.Value, availableSize.Width);
+        if (Height != null)
+            availableSize.Height = Math.Min(Height.Value, availableSize.Height);
 
         if (string.IsNullOrEmpty(Text.Value) || Text.Value.Length == 0)
         {
-            SetSize(0, 0);
+            SetSize(Width == null ? 0 : availableSize.Width, Height == null ? 0 : availableSize.Height);
             return;
         }
 
-        BuildParagraph(Text.Value, maxSize.Width);
+        BuildParagraph(Text.Value, availableSize.Width);
 
         //TODO:wait skia fix bug
         //https://groups.google.com/g/skia-discuss/c/WXUVWrcgiko?pli=1
         //https://bugs.chromium.org/p/skia/issues/list?q=Area=%22TextLayout%22
 
         //W = Math.Min(width, _cachedParagraph.LongestLine);
-        SetSize(Math.Min(maxSize.Width, CachedParagraph!.MaxIntrinsicWidth),
-            Math.Min(maxSize.Height, CachedParagraph.Height));
+        var textWidth = CachedParagraph!.MaxIntrinsicWidth;
+        var textHeight = CachedParagraph.Height;
+        SetSize(
+            Width == null ? Math.Min(availableSize.Width, textWidth) : availableSize.Width,
+            Height == null ? Math.Min(availableSize.Height, textHeight) : availableSize.Height
+        );
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
@@ -152,7 +161,7 @@ public abstract class TextBase : Widget
         }
 
         canvas.DrawParagraph(CachedParagraph!, 0, 0);
-        
+
         if (overflow)
             canvas.Restore();
     }
