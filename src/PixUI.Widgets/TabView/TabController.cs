@@ -61,14 +61,15 @@ public sealed class TabController<T>
         TabSelectChanged?.Invoke(index);
     }
 
-    public void Add(T dataItem)
+    public void Add(T dataItem, bool selectNewItem = true)
     {
         DataSource.Add(dataItem);
         _tabBar?.OnAdd(dataItem);
         _tabBody?.OnAdd(dataItem);
         TabAdded?.Invoke(dataItem);
 
-        SelectAt(DataSource.Count - 1); //选中添加的
+        if (selectNewItem)
+            SelectAt(DataSource.Count - 1); //选中添加的
     }
 
     public void Remove(T dataItem)
