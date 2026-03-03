@@ -549,7 +549,7 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
 
     #region ====Clear Caches====
 
-    internal void ClearCachedParagraph()
+    public void ClearCachedParagraph()
     {
         _cachedParagraph?.Dispose();
         _cachedParagraph = null;
