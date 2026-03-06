@@ -272,7 +272,15 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>, I
     {
         if (!_caretChangedByTextInput)
         {
-            //TODO: set IME input rect
+            // set IME input rect
+            var caretPosX = TextEditor.Caret.CanvasPosX;
+            var caretPosY = TextEditor.Caret.CanvasPosY;
+            var editorWinPos = Widget.LocalToWindow(0, 0);
+            var inputRect = Rect.FromLTWH(editorWinPos.X + caretPosX, editorWinPos.Y + caretPosY,
+                Widget.LayoutBounds.Width - caretPosX, TextEditor.TextView.FontHeight);
+            Widget.Root?.Window.SetTextInputRect(inputRect);
+
+            // notify to completionContext
             _completionContext.OnCaretChangedByNoneTextInput();
         }
 
