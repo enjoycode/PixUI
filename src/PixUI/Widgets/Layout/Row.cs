@@ -22,8 +22,7 @@ public sealed class Row : MultiChildWidget<Widget>
         set
         {
             _alignment = value;
-            if (IsMounted)
-                Invalidate(InvalidAction.Relayout);
+            if (IsMounted) Relayout();
         }
     }
 
@@ -34,17 +33,14 @@ public sealed class Row : MultiChildWidget<Widget>
         {
             if (value < 0) throw new ArgumentOutOfRangeException();
             _spacing = value;
-            if (IsMounted)
-                Invalidate(InvalidAction.Relayout);
+            if (IsMounted) Relayout();
         }
     }
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
-
-        var remaingWidth = width;
+        var availableSize = CacheAndGetMaxSize(availableWidth, availableHeight);
+        var remainWidth = availableSize.Width;
         float maxHeightOfChild = 0;
 
         //先计算非Expanded的子级
@@ -52,8 +48,8 @@ public sealed class Row : MultiChildWidget<Widget>
         float totalFlex = 0;
         for (var i = 0; i < _children.Count; i++)
         {
-            if (i != 0 && remaingWidth >= _spacing)
-                remaingWidth = Math.Max(0, remaingWidth - _spacing);
+            if (i != 0 && remainWidth >= _spacing)
+                remainWidth = Math.Max(0, remainWidth - _spacing);
 
             var child = _children[i];
             if (child is Expanded expanded)
@@ -63,15 +59,15 @@ public sealed class Row : MultiChildWidget<Widget>
                 continue;
             }
 
-            if (remaingWidth <= 0)
+            if (remainWidth <= 0)
             {
                 child.Layout(0, 0);
             }
             else
             {
-                child.Layout(remaingWidth, height);
+                child.Layout(remainWidth, availableSize.Height);
                 maxHeightOfChild = Math.Max(maxHeightOfChild, child.H);
-                remaingWidth -= child.W;
+                remainWidth -= child.W;
             }
         }
 
@@ -82,13 +78,13 @@ public sealed class Row : MultiChildWidget<Widget>
             {
                 if (child is Expanded expanded)
                 {
-                    if (remaingWidth <= 0)
+                    if (remainWidth <= 0)
                     {
                         child.Layout(0, 0);
                     }
                     else
                     {
-                        child.Layout(remaingWidth * (expanded.Flex / totalFlex), height);
+                        child.Layout(remainWidth * (expanded.Flex / totalFlex), availableSize.Height);
                         maxHeightOfChild = Math.Max(maxHeightOfChild, child.H);
                     }
                 }
@@ -100,7 +96,7 @@ public sealed class Row : MultiChildWidget<Widget>
         for (var i = 0; i < _children.Count; i++)
         {
             if (i != 0) totalWidth += _spacing;
-            if (totalWidth >= width) break;
+            if (totalWidth >= availableSize.Width) break;
 
             var child = _children[i];
             var childY = _alignment switch
@@ -115,7 +111,7 @@ public sealed class Row : MultiChildWidget<Widget>
         }
 
         // 最高的子级 and 所有子级的宽度
-        SetSize(Math.Min(width, totalWidth), maxHeightOfChild);
+        SetSize(Math.Min(availableSize.Width, totalWidth), maxHeightOfChild);
     }
 
     protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
