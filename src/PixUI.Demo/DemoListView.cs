@@ -19,12 +19,12 @@ public sealed class DemoListView : View
                         new TextInput(_scrollTo) { Width = 100 },
                         new Button("ScrollTo")
                         {
-                            OnTap = e => listViewController.ScrollTo(
+                            OnTap = _ => listViewController.ScrollTo(
                                 int.Parse(_scrollTo.Value))
                         }
                     }
                 },
-                new Expanded { Child = ListView<Widget>.From(BuildList(), listViewController) },
+                new Expanded { Child = new ListView<Widget>(static (w, _) => w, BuildList(), listViewController) },
                 new Container()
                 {
                     Height = 100, FillColor = Colors.Red,

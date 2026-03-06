@@ -13,13 +13,16 @@ public sealed class PropertyPanel : SingleChildWidget
         _controller.NotifyStateValueChanged = OnNotifyStateValueChanged;
 
         _layoutGroup = new PropertyGroup(_layoutGroupTitle);
-        _listView = ListView<Widget>.From(new Widget[]
+        _listView = new ListView()
         {
-            _widgetGroup,
-            new IfConditional(_layoutGroupVisible, () => _layoutGroup),
-            new IfConditional(_propGroupVisible, () => _propGroup),
-            new IfConditional(_eventGroupVisible, () => _eventGroup)
-        });
+            Children =
+            [
+                _widgetGroup,
+                new IfConditional(_layoutGroupVisible, () => _layoutGroup),
+                new IfConditional(_propGroupVisible, () => _propGroup),
+                new IfConditional(_eventGroupVisible, () => _eventGroup)
+            ]
+        };
 
         Child = new Container
         {
@@ -36,7 +39,7 @@ public sealed class PropertyPanel : SingleChildWidget
     }
 
     private readonly DesignController _controller;
-    private readonly ListView<Widget> _listView;
+    private readonly ListView _listView;
     private readonly PropertyGroup _layoutGroup;
     private readonly PropertyGroup _widgetGroup = new("Widget");
     private readonly PropertyGroup _propGroup = new("Properties");

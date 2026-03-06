@@ -15,6 +15,8 @@ public readonly struct Color : IEquatable<Color>
 
     public static Color FromArgb(byte alpha, byte red, byte green, byte blue) =>
         new(red, green, blue, alpha);
+    
+    public static Color FromArgb(uint value) => new Color(value);
 
     public static Color FromHsl(double hue, double saturation = 1, double lightness = 0.5, byte alpha = 255)
     {

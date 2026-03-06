@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace PixUI;
 
-public sealed class ListViewController<T> : WidgetController<ListView<T>>
+public sealed class ListViewController<T> : WidgetController<ListViewBase<T>>
 {
     internal readonly ScrollController ScrollController;
     private IList<T>? _dataSource;
@@ -33,17 +33,34 @@ public sealed class ListViewController<T> : WidgetController<ListView<T>>
     {
         var toChild = Widget.GetChildAt(index);
 
-        //判断是否可见
-        var offsetY = ScrollController.OffsetY;
-        if (toChild.Y >= offsetY && toChild.Y + toChild.H <= Widget.H + offsetY)
-            return;
+        if (ScrollController.Direction == ScrollDirection.Vertical)
+        {
+            //判断是否可见
+            var offsetY = ScrollController.OffsetY;
+            if (toChild.Y >= offsetY && toChild.Y + toChild.H <= Widget.H + offsetY)
+                return;
 
-        var deltaY = toChild.Y >= offsetY
-            ? toChild.Y + toChild.H - Widget.H - offsetY
-            : toChild.Y - offsetY;
-        var offset = Widget.OnScroll(0, deltaY);
-        if (!offset.IsEmpty)
-            Widget.Root!.Window.AfterScrollDone(Widget, offset);
+            var deltaY = toChild.Y >= offsetY
+                ? toChild.Y + toChild.H - Widget.H - offsetY
+                : toChild.Y - offsetY;
+            var offset = Widget.OnScroll(0, deltaY);
+            if (!offset.IsEmpty)
+                Widget.Root!.Window.AfterScrollDone(Widget, offset);
+        }
+        else
+        {
+            //判断是否可见
+            var offsetX = ScrollController.OffsetX;
+            if (toChild.X >= offsetX && toChild.X + toChild.W <= Widget.W + offsetX)
+                return;
+
+            var deltaX = toChild.X >= offsetX
+                ? toChild.X + toChild.W - Widget.W - offsetX
+                : toChild.X - offsetX;
+            var offset = Widget.OnScroll(deltaX, 0);
+            if (!offset.IsEmpty)
+                Widget.Root!.Window.AfterScrollDone(Widget, offset);
+        }
     }
 
     /// <summary>
@@ -60,12 +77,9 @@ public sealed class ListViewController<T> : WidgetController<ListView<T>>
     }
 }
 
-public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
+public abstract class ListViewBase<T> : MultiChildWidget<Widget>, IScrollable
 {
-    public static ListView<Widget> From(IList<Widget> widgets, ListViewController<Widget>? controller = null) =>
-        new((w, _) => w, widgets, controller);
-
-    public ListView(Func<T, int, Widget> itemBuilder, IList<T>? dataSource = null,
+    protected ListViewBase(Func<T, int, Widget> itemBuilder, IList<T>? dataSource = null,
         ListViewController<T>? controller = null)
     {
         _itemBuilder = itemBuilder;
@@ -94,18 +108,31 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
+        var availableSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
-        float y = 0;
-        foreach (var child in _children)
+        if (Controller.ScrollController.Direction == ScrollDirection.Vertical)
         {
-            child.Layout(maxSize.Width, float.PositiveInfinity);
-            // child.W = width;
-            child.SetPosition(0, y);
-            y += child.H;
+            float y = 0;
+            foreach (var child in _children)
+            {
+                child.Layout(availableSize.Width, float.PositiveInfinity);
+                child.SetPosition(0, y);
+                y += child.H;
+            }
+        }
+        else
+        {
+            float x = 0;
+            foreach (var child in _children)
+            {
+                child.Layout(float.PositiveInfinity, availableSize.Height);
+                child.SetPosition(x, 0);
+                x += child.W;
+            }
         }
 
-        SetSize(maxSize.Width, maxSize.Height);
+
+        SetSize(availableSize.Width, availableSize.Height);
     }
 
     protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
@@ -143,14 +170,29 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
-        foreach (var child in _children)
+        if (Controller.ScrollController.Direction == ScrollDirection.Vertical)
         {
-            if (child.Y + child.H <= ScrollOffsetY) continue; //小于上边界
-            if (child.Y >= ScrollOffsetY + H) break; //大于下边界
+            foreach (var child in _children)
+            {
+                if (child.Y + child.H <= ScrollOffsetY) continue; //小于上边界
+                if (child.Y >= ScrollOffsetY + H) break; //大于下边界
 
-            child.BeforePaint(canvas);
-            child.Paint(canvas);
-            child.AfterPaint(canvas);
+                child.BeforePaint(canvas);
+                child.Paint(canvas);
+                child.AfterPaint(canvas);
+            }
+        }
+        else
+        {
+            foreach (var child in _children)
+            {
+                if (child.X + child.W <= ScrollOffsetX) continue; //小于左边界
+                if (child.X >= ScrollOffsetX + W) break; //大于右边界
+
+                child.BeforePaint(canvas);
+                child.Paint(canvas);
+                child.AfterPaint(canvas);
+            }
         }
     }
 
@@ -178,4 +220,16 @@ public sealed class ListView<T> : MultiChildWidget<Widget>, IScrollable
     }
 
     #endregion
+}
+
+public sealed class ListView<T> : ListViewBase<T>
+{
+    public ListView(Func<T, int, Widget> itemBuilder, IList<T>? dataSource = null,
+        ListViewController<T>? controller = null) : base(itemBuilder, dataSource, controller) { }
+}
+
+public sealed class ListView : ListViewBase<Widget>
+{
+    public ListView(Axis axis = Axis.Vertical) :
+        base(static (w, _) => w, null, new ListViewController<Widget>(axis)) { }
 }
