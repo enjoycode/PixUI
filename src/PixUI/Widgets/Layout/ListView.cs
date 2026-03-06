@@ -43,7 +43,7 @@ public sealed class ListViewController<T> : WidgetController<ListViewBase<T>>
             var deltaY = toChild.Y >= offsetY
                 ? toChild.Y + toChild.H - Widget.H - offsetY
                 : toChild.Y - offsetY;
-            var offset = Widget.OnScroll(0, deltaY);
+            var offset = ((IScrollable)Widget).OnScroll(0, deltaY);
             if (!offset.IsEmpty)
                 Widget.Root!.Window.AfterScrollDone(Widget, offset);
         }
@@ -57,7 +57,7 @@ public sealed class ListViewController<T> : WidgetController<ListViewBase<T>>
             var deltaX = toChild.X >= offsetX
                 ? toChild.X + toChild.W - Widget.W - offsetX
                 : toChild.X - offsetX;
-            var offset = Widget.OnScroll(deltaX, 0);
+            var offset = ((IScrollable)Widget).OnScroll(deltaX, 0);
             if (!offset.IsEmpty)
                 Widget.Root!.Window.AfterScrollDone(Widget, offset);
         }
@@ -71,7 +71,7 @@ public sealed class ListViewController<T> : WidgetController<ListViewBase<T>>
         if (ScrollController.OffsetX == 0 && ScrollController.OffsetY == 0)
             return;
 
-        var offset = Widget.OnScroll(-ScrollController.OffsetX, -ScrollController.OffsetY);
+        var offset = ((IScrollable)Widget).OnScroll(-ScrollController.OffsetX, -ScrollController.OffsetY);
         if (!offset.IsEmpty)
             Widget.Root!.Window.AfterScrollDone(Widget, offset);
     }
@@ -159,7 +159,10 @@ public abstract class ListViewBase<T> : MultiChildWidget<Widget>, IScrollable
             canvas.ClipRect(clipRect, ClipOp.Intersect, false);
         }
 
-        canvas.Translate(0, -ScrollOffsetY);
+        if (Controller.ScrollController.Direction == ScrollDirection.Vertical)
+            canvas.Translate(0, -Controller.ScrollController.OffsetY);
+        else
+            canvas.Translate(-Controller.ScrollController.OffsetX, 0);
     }
 
     protected internal override void AfterPaint(Canvas canvas)
@@ -172,10 +175,11 @@ public abstract class ListViewBase<T> : MultiChildWidget<Widget>, IScrollable
     {
         if (Controller.ScrollController.Direction == ScrollDirection.Vertical)
         {
+            var scrollOffsetY = Controller.ScrollController.OffsetY;
             foreach (var child in _children)
             {
-                if (child.Y + child.H <= ScrollOffsetY) continue; //小于上边界
-                if (child.Y >= ScrollOffsetY + H) break; //大于下边界
+                if (child.Y + child.H <= scrollOffsetY) continue; //小于上边界
+                if (child.Y >= scrollOffsetY + H) break; //大于下边界
 
                 child.BeforePaint(canvas);
                 child.Paint(canvas);
@@ -184,10 +188,11 @@ public abstract class ListViewBase<T> : MultiChildWidget<Widget>, IScrollable
         }
         else
         {
+            var scrollOffsetX = Controller.ScrollController.OffsetX;
             foreach (var child in _children)
             {
-                if (child.X + child.W <= ScrollOffsetX) continue; //小于左边界
-                if (child.X >= ScrollOffsetX + W) break; //大于右边界
+                if (child.X + child.W <= scrollOffsetX) continue; //小于左边界
+                if (child.X >= scrollOffsetX + W) break; //大于右边界
 
                 child.BeforePaint(canvas);
                 child.Paint(canvas);
@@ -198,20 +203,32 @@ public abstract class ListViewBase<T> : MultiChildWidget<Widget>, IScrollable
 
     #region ====IScrollable====
 
-    public float ScrollOffsetX => Controller.ScrollController.OffsetX;
-    public float ScrollOffsetY => Controller.ScrollController.OffsetY;
-    public ScrollDirection ScrollDirection => Controller.ScrollController.Direction;
-    public ScrollBarVisibility ShowScrollBar => ScrollBarVisibility.Never;
+    float IScrollable.ScrollOffsetX => Controller.ScrollController.OffsetX;
+    float IScrollable.ScrollOffsetY => Controller.ScrollController.OffsetY;
+    ScrollDirection IScrollable.ScrollDirection => Controller.ScrollController.Direction;
+    ScrollBarVisibility IScrollable.ShowScrollBar => ScrollBarVisibility.Never;
 
-    public Offset OnScroll(float dx, float dy)
+    Offset IScrollable.OnScroll(float dx, float dy)
     {
         if (_children.Count == 0) return Offset.Empty;
 
         var lastChild = _children[_children.Count - 1];
-        if (lastChild.Y + lastChild.H <= H) return Offset.Empty;
+        float maxOffsetX;
+        float maxOffsetY;
+        if (Controller.ScrollController.Direction == ScrollDirection.Vertical)
+        {
+            if (lastChild.Y + lastChild.H <= H) return Offset.Empty;
 
-        var maxOffsetX = 0f;
-        var maxOffsetY = lastChild.Y + lastChild.H - H;
+            maxOffsetX = 0f;
+            maxOffsetY = lastChild.Y + lastChild.H - H;
+        }
+        else
+        {
+            if (lastChild.X + lastChild.W <= W) return Offset.Empty;
+
+            maxOffsetX = lastChild.X + lastChild.W - W;
+            maxOffsetY = 0f;
+        }
 
         var offset = Controller.ScrollController.OnScroll(dx, dy, maxOffsetX, maxOffsetY);
         if (!offset.IsEmpty)

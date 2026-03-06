@@ -6,7 +6,7 @@ public sealed class DemoListView : View
 
     public DemoListView()
     {
-        var listViewController = new ListViewController<Widget>();
+        var listViewController = new ListViewController<Widget>(Axis.Horizontal);
 
         Child = new Column()
         {
@@ -42,6 +42,7 @@ public sealed class DemoListView : View
             list[i] = new Card()
             {
                 DebugLabel = $"Card{i.ToString()}",
+                Width = 100,
                 Child = new Container()
                 {
                     FillColor = Colors.Random(), Height = 192,
