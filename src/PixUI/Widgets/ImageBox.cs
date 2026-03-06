@@ -4,11 +4,19 @@ namespace PixUI;
 
 public sealed class ImageBox : Widget
 {
-    private readonly State<ImageSource> _imgSrc;
+    /*TODO: LoadingBuilder, ErrorBuilder*/
 
-    public ImageBox(State<ImageSource> imgSrc /*TODO: LoadingBuilder, ErrorBuilder*/)
+    private readonly State<ImageSource> _imgSrc = null!;
+
+    public required State<ImageSource> ImageSource
     {
-        Bind(ref _imgSrc!, imgSrc, RelayoutOnStateChanged);
+        get => _imgSrc;
+        init
+        {
+            _imgSrc = value;
+            _imgSrc.AddListener(OnImageSourceChanged);
+            _imgSrc.Value.OnLoaded = OnImageLoaded;
+        }
     }
 
     public override bool IsOpaque
@@ -21,12 +29,24 @@ public sealed class ImageBox : Widget
         }
     }
 
+    private void OnImageSourceChanged(State imgSrc)
+    {
+        _imgSrc.Value.OnLoaded = OnImageLoaded;
+        RelayoutOnStateChanged(imgSrc);
+    }
+
+    private void OnImageLoaded() => RelayoutOnStateChanged(_imgSrc);
+
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
+        var availableSize = CacheAndGetMaxSize(availableWidth, availableHeight);
+        if (Width != null)
+            availableSize.Width = Math.Min(availableWidth, Width.Value);
+        if (Height != null)
+            availableSize.Height = Math.Min(availableHeight, Height.Value);
 
-        //TODO:根据是否指定大小及加载状态及加载的图像大小来计算
-        SetSize(maxSize.Width, maxSize.Height);
+        //TODO:根据加载状态及加载的图像大小来计算
+        SetSize(availableSize.Width, availableSize.Height);
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
@@ -45,7 +65,6 @@ public sealed class ImageBox : Widget
         }
 
         //TODO:暂简单绘制，应根据大小及fit
-        // @ts-ignore //TODO:尝试忽略web端canvaskit的paint参数
         canvas.DrawImage(img, Rect.FromLTWH(0, 0, img.Width, img.Height),
             Rect.FromLTWH(0, 0, W, H));
     }

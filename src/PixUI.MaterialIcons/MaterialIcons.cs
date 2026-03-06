@@ -1,3 +1,5 @@
+// ReSharper disable InconsistentNaming
+
 namespace PixUI;
 
 public static class MaterialIcons
