@@ -32,7 +32,7 @@ public sealed class Radio : Toggleable
 
         var activeColor = Theme.AccentColor;
         var inactiveColor = new Color(0x52000000);
-        var color = Color.Lerp(inactiveColor, activeColor, _positionController.Value);
+        var color = Color.Lerp(inactiveColor, activeColor, PositionController.Value);
 
         // outer circle
         var paint = PixUI.Paint.Shared(color, PaintStyle.Stroke, 2);
@@ -40,11 +40,11 @@ public sealed class Radio : Toggleable
         canvas.DrawCircle(center.Dx, center.Dy, _kOuterRadius, paint);
 
         // inner circle
-        if (!_positionController.IsDismissed)
+        if (!PositionController.IsDismissed)
         {
             paint.Style = PaintStyle.Fill;
             canvas.DrawCircle(center.Dx, center.Dy,
-                (float)(_kInnerRadius * _positionController.Value), paint);
+                (float)(_kInnerRadius * PositionController.Value), paint);
         }
     }
 

@@ -11,18 +11,18 @@ public sealed class Checkbox : Toggleable
         InitState(
             RxComputed<bool?>.Make<bool, bool?>(value, v => v, v => value.Value = v ?? false),
             false);
-        _positionController.StatusChanged += OnPositionStatusChanged;
+        PositionController.StatusChanged += OnPositionStatusChanged;
     }
 
     public static Checkbox Tristate(State<bool?> value)
     {
-        var checkbox = new Checkbox(_notSetState);
+        var checkbox = new Checkbox(NotSetState);
         checkbox._previousValue = value.Value;
         checkbox.InitState(value, true); //replace to nullable state
         return checkbox;
     }
 
-    private static readonly State<bool> _notSetState = false;
+    private static readonly State<bool> NotSetState = false;
 
     private bool? _previousValue;
 
@@ -33,37 +33,37 @@ public sealed class Checkbox : Toggleable
     {
         //暂在动画完成后更新缓存的旧值
         if (status == AnimationStatus.Completed || status == AnimationStatus.Dismissed)
-            _previousValue = _value.Value;
+            _previousValue = Value.Value;
     }
 
     #region ====Widget Overrides====
 
-    private const float _kCheckboxSize = 30;
-    private const float _kEdgeSize = 18;
-    private const float _kStrokeWidth = 2.0f;
+    private const float K_CHECKBOX_SIZE = 30;
+    private const float K_EDGE_SIZE = 18;
+    private const float K_STROKE_WIDTH = 2.0f;
 
     public override void Layout(float availableWidth, float availableHeight)
     {
         var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
-        SetSize(Math.Min(maxSize.Width, _kCheckboxSize), Math.Min(maxSize.Height, _kCheckboxSize));
+        SetSize(Math.Min(maxSize.Width, K_CHECKBOX_SIZE), Math.Min(maxSize.Height, K_CHECKBOX_SIZE));
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
-        var origin = new Offset(W / 2f - _kEdgeSize / 2f, H / 2f - _kEdgeSize / 2f);
+        var origin = new Offset(W / 2f - K_EDGE_SIZE / 2f, H / 2f - K_EDGE_SIZE / 2f);
         var checkColor = Colors.White; //TODO:
 
-        var status = _positionController.Status;
+        var status = PositionController.Status;
         var tNormalized =
             status == AnimationStatus.Forward || status == AnimationStatus.Completed
-                ? _positionController.Value
-                : 1.0 - _positionController.Value;
+                ? PositionController.Value
+                : 1.0 - PositionController.Value;
 
         // Four cases: false to null, false to true, null to false, true to false
-        if (_previousValue == false || _value.Value == false)
+        if (_previousValue == false || Value.Value == false)
         {
-            var t = _value.Value == false ? 1.0f - tNormalized : tNormalized;
+            var t = Value.Value == false ? 1.0f - tNormalized : tNormalized;
             var outer = OuterRectAt(origin, (float)t);
             var color = ColorAt(t);
             var paint = PixUI.Paint.Shared(color);
@@ -77,9 +77,9 @@ public sealed class Checkbox : Toggleable
             {
                 DrawBox(canvas, outer, paint, /*_side*/ null, true);
                 var strokePaint =
-                    PixUI.Paint.Shared(checkColor, PaintStyle.Stroke, _kStrokeWidth);
+                    PixUI.Paint.Shared(checkColor, PaintStyle.Stroke, K_STROKE_WIDTH);
                 var tShrink = (t - 0.5) * 2.0;
-                if (_previousValue == null || _value.Value == null)
+                if (_previousValue == null || Value.Value == null)
                     DrawDash(canvas, origin, tShrink, strokePaint);
                 else
                     DrawCheck(canvas, origin, tShrink, strokePaint);
@@ -92,7 +92,7 @@ public sealed class Checkbox : Toggleable
             var paint = PixUI.Paint.Shared(ColorAt(1.0));
             DrawBox(canvas, outer, paint, /*_side*/ null, true);
 
-            var strokePaint = PixUI.Paint.Shared(checkColor, PaintStyle.Stroke, _kStrokeWidth);
+            var strokePaint = PixUI.Paint.Shared(checkColor, PaintStyle.Stroke, K_STROKE_WIDTH);
             if (tNormalized <= 0.5)
             {
                 var tShrink = 1.0 - tNormalized * 2.0;
@@ -104,7 +104,7 @@ public sealed class Checkbox : Toggleable
             else
             {
                 var tExpand = (tNormalized - 0.5) * 2.0;
-                if (_value.Value != null && _value.Value.Value)
+                if (Value.Value != null && Value.Value.Value)
                     DrawCheck(canvas, origin, tExpand, strokePaint);
                 else
                     DrawDash(canvas, origin, tExpand, strokePaint);
@@ -125,9 +125,9 @@ public sealed class Checkbox : Toggleable
         Debug.Assert(t >= 0 && t <= 1.0);
         // As t goes from 0.0 to 1.0, animate the two check mark strokes from the
         // short side to the long side.
-        var start = new Offset(_kEdgeSize * 0.15f, _kEdgeSize * 0.45f);
-        var mid = new Offset(_kEdgeSize * 0.4f, _kEdgeSize * 0.7f);
-        var end = new Offset(_kEdgeSize * 0.85f, _kEdgeSize * 0.25f);
+        var start = new Offset(K_EDGE_SIZE * 0.15f, K_EDGE_SIZE * 0.45f);
+        var mid = new Offset(K_EDGE_SIZE * 0.4f, K_EDGE_SIZE * 0.7f);
+        var end = new Offset(K_EDGE_SIZE * 0.85f, K_EDGE_SIZE * 0.25f);
 
 
         if (t < 0.5)
@@ -163,9 +163,9 @@ public sealed class Checkbox : Toggleable
 
         // As t goes from 0.0 to 1.0, animate the horizontal line from the
         // mid point outwards.
-        var start = new Offset(_kEdgeSize * 0.2f, _kEdgeSize * 0.5f);
-        var mid = new Offset(_kEdgeSize * 0.5f, _kEdgeSize * 0.5f);
-        var end = new Offset(_kEdgeSize * 0.8f, _kEdgeSize * 0.5f);
+        var start = new Offset(K_EDGE_SIZE * 0.2f, K_EDGE_SIZE * 0.5f);
+        var mid = new Offset(K_EDGE_SIZE * 0.5f, K_EDGE_SIZE * 0.5f);
+        var end = new Offset(K_EDGE_SIZE * 0.8f, K_EDGE_SIZE * 0.5f);
 
         var drawStart = Offset.Lerp(start, mid, 1.0 - t)!.Value;
         var drawEnd = Offset.Lerp(mid, end, t)!.Value;
@@ -182,7 +182,7 @@ public sealed class Checkbox : Toggleable
     private static Rect OuterRectAt(Offset origin, float t)
     {
         var inset = 1.0f - Math.Abs(t - 0.5f) * 2.0f;
-        var size = _kEdgeSize - inset * _kStrokeWidth;
+        var size = K_EDGE_SIZE - inset * K_STROKE_WIDTH;
         return Rect.FromLTWH(origin.Dx + inset, origin.Dy + inset, size, size);
     }
 

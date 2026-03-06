@@ -302,6 +302,14 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>, I
 
     public void ScrollTo(int line) => TextEditor.ScrollTo(line);
 
+    public void Replace(int offset, int length, string text)
+    {
+        ClearSelection();
+        Document.Replace(offset, length, text);
+        var caretPos = Document.OffsetToPosition(offset);
+        SetCaret(caretPos.Line, caretPos.Column);
+    }
+
     #endregion
 
     #region ====Static Helpers====

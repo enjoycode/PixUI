@@ -39,7 +39,7 @@ public sealed class Switch : Toggleable
         canvas.Save();
         canvas.Translate(0, (KSwitchHeight - KTrackHeight) / 2f);
 
-        var currentValue = _positionController.Value;
+        var currentValue = PositionController.Value;
         var currentReactionValue = 0f;
         var visualPosition = currentValue;
 

@@ -10,9 +10,9 @@ public abstract class Toggleable : Widget, IMouseRegion
         MouseRegion.PointerTap += OnTap;
     }
 
-    protected State<bool?> _value = null!;
+    protected State<bool?> Value = null!;
     private bool _triState;
-    protected AnimationController _positionController = null!;
+    protected AnimationController PositionController = null!;
     public MouseRegion MouseRegion { get; }
 
     public event Action<bool?>? ValueChanged;
@@ -20,9 +20,9 @@ public abstract class Toggleable : Widget, IMouseRegion
     protected void InitState(State<bool?> value, bool tristate)
     {
         _triState = tristate;
-        Bind(ref _value!, value, OnValueChanged);
-        _positionController = new AnimationController(100, value.Value != null && value.Value.Value ? 1 : 0);
-        _positionController.ValueChanged += OnPositionValueChanged;
+        Bind(ref Value!, value, OnValueChanged);
+        PositionController = new AnimationController(100, value.Value != null && value.Value.Value ? 1 : 0);
+        PositionController.ValueChanged += OnPositionValueChanged;
     }
 
     private void OnTap(PointerEvent e)
@@ -30,30 +30,30 @@ public abstract class Toggleable : Widget, IMouseRegion
         //TODO: skip on readonly
 
         //只切换true与false，中间状态只能程序改变
-        if (_value.Value == null || _value.Value == false)
-            _value.Value = true;
+        if (Value.Value == null || Value.Value == false)
+            Value.Value = true;
         else
-            _value.Value = false;
+            Value.Value = false;
     }
 
     private void AnimateToValue()
     {
         if (_triState)
         {
-            if (_value.Value == null || _value.Value == true)
+            if (Value.Value == null || Value.Value == true)
             {
-                _positionController.SetValue(0);
-                _positionController.Forward();
+                PositionController.SetValue(0);
+                PositionController.Forward();
             }
             else
-                _positionController.Reverse();
+                PositionController.Reverse();
         }
         else
         {
-            if (_value.Value != null && _value.Value == true)
-                _positionController.Forward();
+            if (Value.Value != null && Value.Value == true)
+                PositionController.Forward();
             else
-                _positionController.Reverse();
+                PositionController.Reverse();
         }
     }
 
@@ -64,7 +64,7 @@ public abstract class Toggleable : Widget, IMouseRegion
 
     private void OnValueChanged(State state)
     {
-        ValueChanged?.Invoke(_value.Value);
+        ValueChanged?.Invoke(Value.Value);
         AnimateToValue();
     }
 }
