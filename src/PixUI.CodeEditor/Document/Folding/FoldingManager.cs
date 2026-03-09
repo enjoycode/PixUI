@@ -5,19 +5,18 @@ using System.Linq;
 
 namespace CodeEditor;
 
-public sealed class FoldingManager : IDisposable
+public sealed class FoldingManager
 {
     public FoldingManager(Document document)
     {
         _document = document;
-        _document.DocumentChanged += OnDocumentChanged;
     }
 
     private readonly Document _document;
     private readonly TextSegmentTree<FoldingSegment> _foldings = new();
     private bool _isFirstUpdate = true;
 
-    private void OnDocumentChanged(DocumentEventArgs e)
+    internal void OnDocumentChanged(in DocumentEventArgs e)
     {
         _foldings.UpdateOffsets(e);
 
@@ -369,11 +368,6 @@ public sealed class FoldingManager : IDisposable
     }
 
     #endregion
-
-    public void Dispose()
-    {
-        _document.DocumentChanged -= OnDocumentChanged;
-    }
 }
 
 public readonly struct FoldingChangeEventArgs

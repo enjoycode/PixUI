@@ -84,14 +84,15 @@ public sealed class Document : IDisposable
         if (Readonly) return;
 
         SyntaxParser.BeginEdit(offset, 0, text.Length);
-
+        UndoStack.Push(new UndoableInsert(this, offset, text));
+        
         TextBuffer.Insert(offset, text);
         _lineManager.Insert(offset, text);
-        UndoStack.Push(new UndoableInsert(this, offset, text));
-
+        
         SyntaxParser.EndEdit(offset, 0, text.Length);
-
-        DocumentChanged?.Invoke(new DocumentEventArgs(this, offset, 0, text));
+        var docChangedEventArgs = new DocumentEventArgs(this, offset, 0, text);
+        FoldingManager.OnDocumentChanged(docChangedEventArgs);
+        DocumentChanged?.Invoke(docChangedEventArgs);
     }
 
     public void Remove(int offset, int length)
@@ -99,14 +100,15 @@ public sealed class Document : IDisposable
         if (Readonly) return;
 
         SyntaxParser.BeginEdit(offset, length, 0);
-
         UndoStack.Push(new UndoableDelete(this, offset, GetText(offset, length)));
+        
         TextBuffer.Remove(offset, length);
         _lineManager.Remove(offset, length);
 
         SyntaxParser.EndEdit(offset, length, 0);
-
-        DocumentChanged?.Invoke(new DocumentEventArgs(this, offset, length, ""));
+        var docChangedEventArgs = new DocumentEventArgs(this, offset, length, "");
+        FoldingManager.OnDocumentChanged(docChangedEventArgs);
+        DocumentChanged?.Invoke(docChangedEventArgs);
     }
 
     public void Replace(int offset, int length, string text)
@@ -114,14 +116,15 @@ public sealed class Document : IDisposable
         if (Readonly) return;
 
         SyntaxParser.BeginEdit(offset, length, text.Length);
-
         UndoStack.Push(new UndoableReplace(this, offset, GetText(offset, length), text));
+        
         TextBuffer.Replace(offset, length, text);
         _lineManager.Replace(offset, length, text);
 
         SyntaxParser.EndEdit(offset, length, text.Length);
-
-        DocumentChanged?.Invoke(new DocumentEventArgs(this, offset, length, text));
+        var docChangedEventArgs = new DocumentEventArgs(this, offset, length, text);
+        FoldingManager.OnDocumentChanged(docChangedEventArgs);
+        DocumentChanged?.Invoke(docChangedEventArgs);
     }
 
     public void StartUndoGroup() => UndoStack.StartUndoGroup();
@@ -140,13 +143,13 @@ public sealed class Document : IDisposable
     public LineSegment GetLineSegment(int lineNumber) => _lineManager.GetLineSegment(lineNumber);
 
     /// Get the first logical line for a given visible line.
-    /// example : lineNumber == 100 foldings are in the linetracker
+    /// example : lineNumber == 100 foldings are in the line tracker
     /// between 0..1 (2 folded, invisible lines) this method returns 102
     /// the 'logical' line number
     public int GetFirstLogicalLine(int lineNumber) => FoldingManager.GetFirstLogicalLine(lineNumber);
 
     /// Get the visible line for a given logical line.
-    /// example : lineNumber == 100 foldings are in the linetracker
+    /// example : lineNumber == 100 foldings are in the line tracker
     /// between 0..1 (2 folded, invisible lines) this method returns 98
     /// the 'visible' line number
     public int GetVisibleLine(int lineNumber) => FoldingManager.GetVisibleLine(lineNumber);

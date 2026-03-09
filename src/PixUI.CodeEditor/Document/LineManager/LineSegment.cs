@@ -135,7 +135,7 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
     {
         if (length == 0) return;
 
-        ClearFoldedLineCache(document);
+        //ClearFoldedLineCache(document);
 
         //Console.WriteLine("InsertedLinePart " + startColumn + ", " + length);
         if (_anchors != null)
@@ -160,7 +160,7 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
     {
         if (length == 0) return;
 
-        ClearFoldedLineCache(document);
+        //ClearFoldedLineCache(document);
 
         //Console.WriteLine("RemovedLinePart " + startColumn + ", " + length);
         if (_anchors != null)
@@ -556,16 +556,16 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
         CachedFolds = null;
     }
 
-    private void ClearFoldedLineCache(Document document)
-    {
-        var thisLine = LineNumber;
-        var visibleLine = document.GetVisibleLine(thisLine);
-        var logicalLine = document.GetFirstLogicalLine(visibleLine);
-        if (logicalLine != thisLine)
-        {
-            document.GetLineSegment(logicalLine).ClearCachedParagraph();
-        }
-    }
+    // private void ClearFoldedLineCache(Document document)
+    // {
+    //     var thisLine = LineNumber;
+    //     var visibleLine = document.GetVisibleLine(thisLine);
+    //     var logicalLine = document.GetFirstLogicalLine(visibleLine);
+    //     if (logicalLine != thisLine)
+    //     {
+    //         document.GetLineSegment(logicalLine).ClearCachedParagraph();
+    //     }
+    // }
 
     #endregion
 
