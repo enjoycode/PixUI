@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 
 namespace PixUI;
 
@@ -26,6 +27,19 @@ public static class DataGridExtensions
         return grid;
     }
 
+    public static DataGrid<T> AddTextColumnTo<T>(this DataGrid<T> grid, DataGridGroupColumn<T> group, string label,
+        Func<T, string> textGetter, ColumnWidth? width = null, CellStyle? cellStyle = null, bool autoMergeCell = false)
+    {
+        var column = new DataGridTextColumn<T>(label, textGetter) { AutoMergeCells = autoMergeCell };
+        if (width != null)
+            column.Width = width;
+        if (cellStyle != null)
+            column.CellStyle = cellStyle;
+
+        group.Add(column);
+        return grid;
+    }
+
     public static DataGrid<T> AddCheckboxColumn<T>(this DataGrid<T> grid, string label,
         Func<T, bool> cellValueGetter, Action<T, bool>? cellValueSetter = null, ColumnWidth? width = null)
     {
@@ -36,6 +50,71 @@ public static class DataGridExtensions
         return grid;
     }
 
+    public static DataGrid<T> AddCheckboxColumnTo<T>(this DataGrid<T> grid, DataGridGroupColumn<T> group, string label,
+        Func<T, bool> cellValueGetter, Action<T, bool>? cellValueSetter = null, ColumnWidth? width = null)
+    {
+        var column = new DataGridCheckboxColumn<T>(label, cellValueGetter, cellValueSetter);
+        if (width != null)
+            column.Width = width;
+        group.Add(column);
+        return grid;
+    }
+
+    public static DataGrid<T> AddTextInputColumn<T>(this DataGrid<T> grid, string label, Func<T, string> textGetter,
+        Action<T, string> textSetter, ColumnWidth? width = null)
+    {
+        var column = new DataGridHostColumn<T>(label, (item, _) => new TextInput(
+                new RxProxy<string>(() => textGetter(item), v => textSetter(item, v))
+            ) { Border = null }
+        );
+        if (width != null)
+            column.Width = width;
+        grid.Columns.Add(column);
+        return grid;
+    }
+
+    public static DataGrid<T> AddTextInputColumnTo<T>(this DataGrid<T> grid, DataGridGroupColumn<T> group, string label,
+        Func<T, string> textGetter, Action<T, string> textSetter, ColumnWidth? width = null)
+    {
+        var column = new DataGridHostColumn<T>(label, (item, _) => new TextInput(
+                new RxProxy<string>(() => textGetter(item), v => textSetter(item, v))
+            ) { Border = null }
+        );
+        if (width != null)
+            column.Width = width;
+        group.Add(column);
+        return grid;
+    }
+
+    public static DataGrid<T> AddNumberInputColumn<T, TNumber>(this DataGrid<T> grid, string label,
+        Func<T, TNumber> valueGetter,
+        Action<T, TNumber> valueSetter, ColumnWidth? width = null)
+        where TNumber : struct, INumber<TNumber>, IMinMaxValue<TNumber>
+    {
+        var column = new DataGridHostColumn<T>(label, (item, _) => new NumberInput<TNumber>(
+                new RxProxy<TNumber>(() => valueGetter(item), v => valueSetter(item, v))
+            ) { Border = null }
+        );
+        if (width != null)
+            column.Width = width;
+        grid.Columns.Add(column);
+        return grid;
+    }
+
+    public static DataGrid<T> AddNumberInputColumnTo<T, TNumber>(this DataGrid<T> grid, DataGridGroupColumn<T> group,
+        string label, Func<T, TNumber> valueGetter, Action<T, TNumber> valueSetter, ColumnWidth? width = null)
+        where TNumber : struct, INumber<TNumber>, IMinMaxValue<TNumber>
+    {
+        var column = new DataGridHostColumn<T>(label, (item, _) => new NumberInput<TNumber>(
+                new RxProxy<TNumber>(() => valueGetter(item), v => valueSetter(item, v))
+            ) { Border = null }
+        );
+        if (width != null)
+            column.Width = width;
+        group.Add(column);
+        return grid;
+    }
+
     public static DataGrid<T> AddIconColumn<T>(this DataGrid<T> grid, string label, Func<T, IconData?> cellValueGetter,
         ColumnWidth? width = null, Func<T, int, CellStyle>? cellStyleGetter = null)
     {
@@ -43,6 +122,18 @@ public static class DataGridExtensions
         if (cellStyleGetter != null)
             column.CellStyleGetter = cellStyleGetter;
         grid.Columns.Add(column);
+        return grid;
+    }
+
+    public static DataGrid<T> AddIconColumnTo<T>(this DataGrid<T> grid, DataGridGroupColumn<T> group,
+        string label, Func<T, IconData?> cellValueGetter,
+        ColumnWidth? width = null, Func<T, int, CellStyle>? cellStyleGetter = null)
+    {
+        var column = new DataGridIconColumn<T>(label, cellValueGetter, width);
+        if (cellStyleGetter != null)
+            column.CellStyleGetter = cellStyleGetter;
+
+        group.Add(column);
         return grid;
     }
 
@@ -77,41 +168,6 @@ public static class DataGridExtensions
     {
         groupColumn = new DataGridGroupColumn<T>(label);
         group.Add(groupColumn);
-        return grid;
-    }
-
-    public static DataGrid<T> AddTextColumnTo<T>(this DataGrid<T> grid, DataGridGroupColumn<T> group, string label,
-        Func<T, string> textGetter, ColumnWidth? width = null, CellStyle? cellStyle = null, bool autoMergeCell = false)
-    {
-        var column = new DataGridTextColumn<T>(label, textGetter) { AutoMergeCells = autoMergeCell };
-        if (width != null)
-            column.Width = width;
-        if (cellStyle != null)
-            column.CellStyle = cellStyle;
-
-        group.Add(column);
-        return grid;
-    }
-
-    public static DataGrid<T> AddIconColumnTo<T>(this DataGrid<T> grid, DataGridGroupColumn<T> group,
-        string label, Func<T, IconData?> cellValueGetter,
-        ColumnWidth? width = null, Func<T, int, CellStyle>? cellStyleGetter = null)
-    {
-        var column = new DataGridIconColumn<T>(label, cellValueGetter, width);
-        if (cellStyleGetter != null)
-            column.CellStyleGetter = cellStyleGetter;
-
-        group.Add(column);
-        return grid;
-    }
-
-    public static DataGrid<T> AddCheckboxColumnTo<T>(this DataGrid<T> grid, DataGridGroupColumn<T> group, string label,
-        Func<T, bool> cellValueGetter, Action<T, bool>? cellValueSetter = null, ColumnWidth? width = null)
-    {
-        var column = new DataGridCheckboxColumn<T>(label, cellValueGetter, cellValueSetter);
-        if (width != null)
-            column.Width = width;
-        group.Add(column);
         return grid;
     }
 }
