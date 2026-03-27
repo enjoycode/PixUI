@@ -28,6 +28,7 @@
         <EmccInitialHeapSize>128MB</EmccInitialHeapSize>
         <EmccExtraCFlags>-s USE_WEBGL2=1 -s MAX_WEBGL_VERSION=2</EmccExtraCFlags>
         <EmccExtraLDFlags>-lGL</EmccExtraLDFlags>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
