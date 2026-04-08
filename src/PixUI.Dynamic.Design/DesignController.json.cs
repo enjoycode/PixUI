@@ -181,7 +181,7 @@ partial class DesignController
         return next;
     }
 
-    public void Load(byte[] json)
+    public void Load(ReadOnlySpan<byte> json)
     {
 #if DEBUG
         var ts = Stopwatch.GetTimestamp();
