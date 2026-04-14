@@ -102,6 +102,41 @@ public abstract class Dialog : Popup
     }
 
     /// <summary>
+    /// 显示确认操作的对话框
+    /// </summary>
+    public static Task<string> ShowConfirmAsync(string title, string message, Size? size = null)
+    {
+        return ShowAsync(title,
+            _ => new Center()
+            {
+                Child = new Row()
+                {
+                    Children =
+                    [
+                        new Icon(MaterialIcons.Help) { Size = 25, Color = Colors.Red },
+                        new Text(message) { TextColor = Colors.Red }
+                    ]
+                }
+            },
+            dlg => new Container
+            {
+                Height = Button.DefaultHeight + 20 + 20,
+                Padding = EdgeInsets.All(20),
+                Child = new Row(VerticalAlignment.Middle, 20)
+                {
+                    Children =
+                    {
+                        new Expanded(),
+                        new Button(DialogResult.No) { Width = 80, OnTap = _ => dlg.Close(DialogResult.No) },
+                        new Button(DialogResult.Yes) { Width = 80, OnTap = _ => dlg.Close(DialogResult.Yes) }
+                    }
+                }
+            },
+            size ?? new(280, 180)
+        );
+    }
+
+    /// <summary>
     /// 显示不等待关闭
     /// </summary>
     public void Show()
