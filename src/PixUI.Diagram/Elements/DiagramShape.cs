@@ -13,12 +13,6 @@ public class DiagramShape : DiagramItem, IShape
 
     public string TypeName => "Shape";
 
-    public Point Position
-    {
-        get => _bounds.Location;
-        set => SetBounds(value.X, value.Y, _bounds.Width, _bounds.Height, BoundsSpecified.Location);
-    }
-
     public override Rect Bounds
     {
         get => _bounds;

@@ -26,7 +26,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
     internal DesignAdorners Adorners { get; }
 
     private Overlay? _cachedOverlay;
-    private readonly List<DiagramItem> _items = new();
+    private readonly List<DiagramItem> _items = [];
 
     public DiagramItem[] Items => _items.ToArray();
 
@@ -78,6 +78,17 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
         item.OnRemoveFromSurface(); //注意：必须先于下面代码
         item.Surface = null;
         _items.Remove(item);
+    }
+
+    public void ClearItems()
+    {
+        foreach (var item in _items)
+        {
+            item.OnRemoveFromSurface();
+            item.Surface = null;
+        }
+
+        _items.Clear();
     }
 
     #endregion

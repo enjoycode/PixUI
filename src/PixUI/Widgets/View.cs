@@ -2,20 +2,20 @@ namespace PixUI;
 
 public abstract class View : SingleChildWidget
 {
-    private State<Color>? _fillFillColor;
+    private State<Color>? _fillColor;
 
     public State<Color>? FillColor
     {
-        get => _fillFillColor;
-        set => Bind(ref _fillFillColor, value, RepaintOnStateChanged);
+        get => _fillColor;
+        set => Bind(ref _fillColor, value, RepaintOnStateChanged);
     }
 
-    public override bool IsOpaque => _fillFillColor != null && _fillFillColor.Value.IsOpaque;
+    public override bool IsOpaque => _fillColor != null && _fillColor.Value.IsOpaque;
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
-        if (_fillFillColor != null)
-            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(_fillFillColor.Value));
+        if (_fillColor != null)
+            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(_fillColor.Value));
 
         PaintChildren(canvas, area);
     }

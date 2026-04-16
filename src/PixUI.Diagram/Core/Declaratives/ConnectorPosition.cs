@@ -4,7 +4,7 @@
 /// Predefined positions of a connector in a shape.
 /// </summary>
 /// <seealso cref="IConnector"/>
-internal static class ConnectorPosition
+public static class ConnectorPosition
 {
     /// <summary>
     /// The connection's connector is calculated.
@@ -37,11 +37,11 @@ internal static class ConnectorPosition
     /// </summary>
     public const string Bottom = "Bottom";
 
-    private static readonly Dictionary<string, Point> knownConnectors;
+    private static readonly Dictionary<string, Point> KnownConnectors;
 
     static ConnectorPosition()
     {
-        knownConnectors = new Dictionary<string, Point>
+        KnownConnectors = new Dictionary<string, Point>
         {
             {
                 Auto, new Point(.5f, .5f)
@@ -73,7 +73,7 @@ internal static class ConnectorPosition
     /// </returns>
     public static bool IsCustom(this IConnector connector)
     {
-        return knownConnectors.All(c => connector.Name != c.Key);
+        return KnownConnectors.All(c => connector.Name != c.Key);
     }
 
     /// <summary>
@@ -85,7 +85,7 @@ internal static class ConnectorPosition
     public static Point GetKnownOffset(string name)
     {
         if (IsKnown(name))
-            return knownConnectors.First(c => c.Key == name).Value;
+            return KnownConnectors.First(c => c.Key == name).Value;
         throw new ArgumentException("UnknownConnector", nameof(name));
     }
 
@@ -96,6 +96,6 @@ internal static class ConnectorPosition
     /// <returns></returns>
     public static bool IsKnown(string name)
     {
-        return knownConnectors.Any(c => c.Key == name);
+        return KnownConnectors.Any(c => c.Key == name);
     }
 }

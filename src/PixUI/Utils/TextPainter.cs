@@ -5,11 +5,15 @@ public static class TextPainter
     public static Paragraph BuildParagraph(string text, float width, float fontSize, in Color color,
         FontStyle? fontStyle = null, int maxLines = 1, bool forceHeight = false)
     {
-        using var ts = new TextStyle { Color = color, FontSize = fontSize };
+        using var ts = new TextStyle();
+        ts.Color = color;
+        ts.FontSize = fontSize;
         if (fontStyle != null)
             ts.FontStyle = fontStyle.Value;
 
-        using var ps = new ParagraphStyle { MaxLines = (uint)maxLines, TextStyle = ts };
+        using var ps = new ParagraphStyle();
+        ps.MaxLines = (uint)maxLines;
+        ps.TextStyle = ts;
         if (forceHeight)
         {
             ts.Height = 1;
