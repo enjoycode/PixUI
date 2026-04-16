@@ -17,6 +17,7 @@ public sealed class DemoDiagram : View
         view.Surface.AddItem(shape2);
 
         var conn = new DiagramConnection();
+        conn.Title = "1:N";
         conn.ConnectionType = ConnectionType.Bezier;
         conn.BezierTension = 1;
         conn.Attach(shape1.Connectors["Right"], shape2.Connectors["Top"]);

@@ -1077,19 +1077,24 @@ public class DiagramConnection : DiagramItem, IConnection
         var endPoints = this.GetConnectionEndPoints(true);
 
         // the intermediate points in local coordinates
-        var points = new List<Point>();
+        List<Point> points;
         if (ConnectionType == ConnectionType.Bezier)
         {
-            throw new NotImplementedException();
-            //var bezierCurve = Utils.ApproximateBezierCurve(new[] { this.StartPoint, Utils.Lerp(this.StartPoint, this.ConnectionPoints[0], this.BezierTension), Utils.Lerp(this.EndPoint, this.ConnectionPoints[1], this.BezierTension), this.EndPoint }, 10);
-            //points = bezierCurve.Select(x => x = x.Substract(this.Bounds.TopLeft())).ToList();
+            var bezierCurve = Utils.ApproximateBezierCurve(
+            [
+                StartPoint,
+                Utils.Lerp(StartPoint, ConnectionPoints[0], BezierTension),
+                Utils.Lerp(EndPoint, ConnectionPoints[1], BezierTension),
+                EndPoint
+            ], 10);
+            points = bezierCurve.Select(x => x = x.Substract(Bounds.TopLeft())).ToList();
         }
         else
         {
             points = ConnectionPoints.Select(x => x = x.Substract(Bounds.TopLeft())).ToList();
         }
 
-        // the middlepoint in local coordinates; note that the Canvas wherein the label sits will move with the Bounds of this connection
+        // the middle point in local coordinates; note that the Canvas wherein the label sits will move with the Bounds of this connection
         var defaultEditingPoint = ConnectionUtilities.CalculateMiddlePointOfLine(endPoints, points);
 
         defaultEditingPoint = new Point(defaultEditingPoint.X - CachedTextSize.Width / 2f,

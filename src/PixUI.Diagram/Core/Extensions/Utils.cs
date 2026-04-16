@@ -507,4 +507,35 @@ internal static class Utils
         var rotation = Matrix3.CreateRotationDegrees(angle, pivot.X, pivot.Y);
         return points.Select(p => rotation.MapPoint(p.X, p.Y)).ToList();
     }
+
+    /// <summary>
+    /// Approximates the Bezier curve as segments represented by a series of points.
+    /// </summary>
+    /// <param name="bezierPoints">The Bezier points.</param>
+    /// <param name="quality">The quality of the approximation. The greater the value, the more accurate approximation (more approximated points).</param>
+    /// <returns></returns>
+    public static IEnumerable<Point> ApproximateBezierCurve(Point[] bezierPoints, int quality)
+    {
+        var epsilon = 1D / quality;
+
+        var x0 = bezierPoints[0].X;
+        var y0 = bezierPoints[0].Y;
+        var x1 = bezierPoints[1].X;
+        var y1 = bezierPoints[1].Y;
+        var x2 = bezierPoints[2].X;
+        var y2 = bezierPoints[2].Y;
+        var x3 = bezierPoints[3].X;
+        var y3 = bezierPoints[3].Y;
+
+        for (double t = 0; t <= 1.0; t += epsilon)
+        {
+            var q0 = Math.Pow(1 - t, 3);
+            var q1 = 3 * t * Math.Pow(1 - t, 2);
+            var q2 = 3 * Math.Pow(t, 2) * (1 - t);
+            var q3 = Math.Pow(t, 3);
+            var xt = (q0 * x0) + (q1 * x1) + (q2 * x2) + (q3 * x3);
+            var yt = (q0 * y0) + (q1 * y1) + (q2 * y2) + (q3 * y3);
+            yield return new Point((float)xt, (float)yt);
+        }
+    }
 }

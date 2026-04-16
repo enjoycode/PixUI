@@ -43,8 +43,7 @@ internal static class ConnectionUtilities
     /// <param name="connectionEnds">The connection end points.</param>
     /// <param name="connectionPoints">The points of interest (points where the line is curved/segmented).</param>
     /// <returns></returns>
-    internal static Point CalculateMiddlePointOfLine(Tuple<Point, Point> connectionEnds,
-        IList<Point> connectionPoints)
+    internal static Point CalculateMiddlePointOfLine(Tuple<Point, Point> connectionEnds, IList<Point> connectionPoints)
     {
         var points = new List<Point> { connectionEnds.Item1 };
         points.AddRange(connectionPoints);
@@ -77,8 +76,8 @@ internal static class ConnectionUtilities
                 a = nextPoint.X - currentPoint.X > 0 ? -a : a;
                 b = nextPoint.Y - currentPoint.Y > 0 ? -b : b;
 
-                var newEdittinPoint = new Point((float)(nextPoint.X + a), (float)(nextPoint.Y + b));
-                if (!double.IsNaN(newEdittinPoint.X) && !double.IsNaN(newEdittinPoint.Y)) return newEdittinPoint;
+                var newEditingPoint = new Point((float)(nextPoint.X + a), (float)(nextPoint.Y + b));
+                if (!double.IsNaN(newEditingPoint.X) && !double.IsNaN(newEditingPoint.Y)) return newEditingPoint;
             }
         }
 
