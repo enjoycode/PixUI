@@ -106,17 +106,15 @@ public class DiagramShape : DiagramItem, IShape
     /// <summary>
     /// Gets the connectors of this shape.
     /// </summary>
-    public ConnectorCollection Connectors { get; } = new();
+    public ConnectorCollection Connectors { get; } = [];
 
     public virtual bool CanConnect(bool isStartPoint, IConnection connection) => true;
 
-    public IEnumerable<IConnection> IncomingLinks => Surface == null
-        ? Enumerable.Empty<IConnection>()
-        : Surface.GetIncomingConnectionsForShape(this);
+    public IEnumerable<IConnection> IncomingLinks =>
+        Surface == null ? [] : Surface.GetIncomingConnectionsForShape(this);
 
-    public IEnumerable<IConnection> OutgoingLinks => Surface == null
-        ? Enumerable.Empty<IConnection>()
-        : Surface.GetOutgoingConnectionsForShape(this);
+    public IEnumerable<IConnection> OutgoingLinks =>
+        Surface == null ? [] : Surface.GetOutgoingConnectionsForShape(this);
 
     #endregion
 

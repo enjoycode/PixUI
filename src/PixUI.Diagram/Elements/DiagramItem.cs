@@ -206,8 +206,8 @@ public abstract class DiagramItem
                 break;
         }
 
-        SetBounds(newBounds.X, newBounds.Y, newBounds.Width, newBounds.Height,
-            BoundsSpecified.All); //TODO: fix BoundsSpecified
+        //TODO: fix BoundsSpecified
+        SetBounds(newBounds.X, newBounds.Y, newBounds.Width, newBounds.Height, BoundsSpecified.All);
     }
 
     /// <summary>

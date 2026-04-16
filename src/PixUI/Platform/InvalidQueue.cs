@@ -111,7 +111,7 @@ internal sealed class InvalidQueue
         {
             if (win.OverlayInvalidQueue.IsSuspended)
             {
-                Log.Debug("Add when queue is suspended");
+                Log.Debug($"Add [{widget}] when queue is suspended");
                 return false;
             }
 
@@ -123,7 +123,7 @@ internal sealed class InvalidQueue
         {
             if (win.WidgetsInvalidQueue.IsSuspended)
             {
-                Log.Debug("Add when queue is suspended");
+                Log.Debug($"Add [{widget}] when queue is suspended");
                 return false;
             }
 
