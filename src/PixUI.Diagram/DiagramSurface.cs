@@ -28,7 +28,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
     private Overlay? _cachedOverlay;
     private readonly List<DiagramItem> _items = [];
 
-    public DiagramItem[] Items => _items.ToArray();
+    public IReadOnlyList<DiagramItem> Items => _items;
 
     public MouseRegion MouseRegion { get; }
     public FocusNode FocusNode { get; }
