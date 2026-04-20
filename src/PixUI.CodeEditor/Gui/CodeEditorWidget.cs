@@ -51,9 +51,9 @@ public sealed class CodeEditorWidget : Widget, IMouseRegion, IFocusable, IScroll
     {
         // Focused.Value = focused;
         if (e.IsFocused)
-            Root!.Window.StartTextInput();
+            Root?.Window.StartTextInput();
         else
-            Root!.Window.StopTextInput();
+            Root?.Window.StopTextInput();
     }
 
     protected override void OnMounted()
