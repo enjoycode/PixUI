@@ -38,6 +38,26 @@ internal sealed class MacFileDialog : IPlatformFileDialog
 
     public Task SaveFileAsync(SaveFileOptions options)
     {
-        throw new NotImplementedException();
+        var taskCompletionSource = new TaskCompletionSource();
+        var dialog = NSSavePanel.SavePanel;
+        dialog.Title = options.Title;
+        dialog.NameFieldStringValue = options.FileName;
+        dialog.Begin(result =>
+        {
+            if (result == 1)
+            {
+                var filePath = dialog.Url.Path!;
+                using var fileStream = File.OpenWrite(filePath);
+                options.FileStream.CopyTo(fileStream);
+
+                taskCompletionSource.SetResult();
+            }
+            else
+            {
+                taskCompletionSource.SetResult();
+            }
+        });
+
+        return taskCompletionSource.Task;
     }
 }
