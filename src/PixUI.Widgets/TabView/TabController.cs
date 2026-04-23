@@ -77,6 +77,13 @@ public sealed class TabController<T>
         var index = DataSource.IndexOf(dataItem);
         if (index < 0) return;
 
+        RemoveAt(index);
+    }
+
+    public void RemoveAt(int index)
+    {
+        var dataItem = DataSource[index];
+
         var isSelected = index == SelectedIndex; //是否正在移除选中的
         if (index < SelectedIndex)
             SelectedIndex -= 1;
@@ -103,6 +110,15 @@ public sealed class TabController<T>
 
         //最后激发TabClosed事件
         TabClosed?.Invoke(dataItem);
+    }
+
+    public void RemoveAll(Func<T, bool> predicate)
+    {
+        for (var i = DataSource.Count - 1; i >= 0; i--)
+        {
+            if (predicate(DataSource[i]))
+                RemoveAt(i);
+        }
     }
 
     #endregion
