@@ -147,6 +147,15 @@ public sealed class TreeController<T>
 
     #region ====Operations====
 
+    internal TreeNode<T> MakeChildNode(TreeNode<T>? parentNode, T childData)
+    {
+        var node = new TreeNode<T>(childData, this);
+        NodeBuilder(node);
+        node.TryBuildCheckbox();
+        node.Parent = parentNode == null ? TreeView : parentNode;
+        return node;
+    }
+
     public TreeNode<T>? FindNode(Predicate<T> predicate)
     {
         foreach (var child in Nodes)
@@ -217,32 +226,29 @@ public sealed class TreeController<T>
     /// <param name="parentNode">上级节点</param>
     /// <param name="insertIndex"></param>
     /// <param name="syncDataSource">是否同步数据源</param>
-    /// <returns></returns>
     public TreeNode<T> InsertNode(T child, TreeNode<T>? parentNode = null, int insertIndex = -1,
         bool syncDataSource = true)
     {
-        var node = new TreeNode<T>(child, this);
-        NodeBuilder(node);
         if (parentNode == null)
         {
-            node.Parent = TreeView;
+            var node = MakeChildNode(null, child);
             var index = insertIndex < 0 ? Nodes.Count : insertIndex;
             Nodes.Insert(index, node);
             if (syncDataSource)
                 DataSource!.Insert(index, child);
             //强制重新布局
             TreeView!.Relayout();
-        }
-        else
-        {
-            node.Parent = parentNode;
-            parentNode.InsertChild(insertIndex, node, syncDataSource);
-            //强制重新布局
-            if (parentNode.IsExpanded)
-                parentNode.Relayout();
+            return node;
         }
 
-        return node;
+        parentNode.InsertChild(insertIndex, child, syncDataSource);
+        parentNode.EnsureBuildChildren(); //可能尚未构建子节点
+
+        //强制重新布局
+        if (parentNode.IsExpanded)
+            parentNode.Relayout();
+
+        return parentNode.Children![insertIndex < 0 ? parentNode.Children.Count - 1 : insertIndex];
     }
 
     /// <summary>

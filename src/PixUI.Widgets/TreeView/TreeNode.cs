@@ -21,13 +21,11 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
 
     public readonly T Data;
     internal TreeController<T> Controller { get; }
-
-    private readonly TreeNodeRow<T> _row;
     public List<TreeNode<T>>? Children { get; private set; }
 
+    private readonly TreeNodeRow<T> _row;
     public readonly State<bool> IsSelected = false;
     private readonly State<Color> _color; //for icon and label
-
     private State<bool?>? _checkState;
 
     private AnimationController? _expandController; //TODO:考虑提升至TreeController共用实例
@@ -121,10 +119,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         Children = new List<TreeNode<T>>(childrenList.Count);
         foreach (var child in childrenList)
         {
-            var node = new TreeNode<T>(child, Controller);
-            Controller.NodeBuilder(node);
-            node.TryBuildCheckbox();
-            node.Parent = this;
+            var node = Controller.MakeChildNode(this, child);
             Children.Add(node);
         }
     }
@@ -488,13 +483,13 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         return -1;
     }
 
-    internal TreeNode<T>? FindNode(Predicate<T> predicate)
+    public TreeNode<T>? FindNode(Predicate<T> predicate)
     {
         if (predicate(Data)) return this;
 
         if (!IsLeaf)
         {
-            EnsureBuildChildren(); //可能收缩中还没有构建子节点
+            EnsureBuildChildren(); //可能还没有构建子节点
 
             foreach (var child in Children!)
             {
@@ -524,20 +519,24 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     /// <summary>
     /// 插入子节点，并且根据需要同步数据源
     /// </summary>
-    internal void InsertChild(int index, TreeNode<T> child, bool syncDataSource = true)
+    internal void InsertChild(int index, T childData, bool syncDataSource = true)
     {
         if (IsLeaf) return;
 
-        EnsureBuildChildren();
-
-        var insertIndex = index < 0 ? Children!.Count : index;
-        Children!.Insert(insertIndex, child);
         //同步数据
         if (syncDataSource)
         {
             var dataChildren = Controller.ChildrenGetter(Data); //TODO: maybe null
-            dataChildren.Insert(insertIndex, child.Data);
+            var insertAt = index < 0 ? dataChildren.Count : index;
+            dataChildren.Insert(insertAt, childData);
         }
+
+        if (Children == null) //尚未构建子节点，不需要处理
+            return;
+
+        var insertIndex = index < 0 ? Children!.Count : index;
+        var childNode = Controller.MakeChildNode(this, childData);
+        Children.Insert(insertIndex, childNode);
 
         //Reset HasLayout
         HasLayout = false;
@@ -548,6 +547,9 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     /// </summary>
     internal void RemoveChild(TreeNode<T> child, bool syncDataSource = true)
     {
+        if (child.Parent != this)
+            throw new InvalidOperationException("child is not owned by this");
+
         Children!.Remove(child);
         //同步数据
         if (syncDataSource)
