@@ -4,9 +4,7 @@ namespace PixUI;
 
 public sealed class FormItem : Widget
 {
-#pragma warning disable CS8618, CS9264
     public FormItem()
-#pragma warning restore CS8618, CS9264
     {
         _label = "Label:";
         ColumnSpan = 1;
@@ -75,7 +73,7 @@ public sealed class FormItem : Widget
     private Color? _textColor;
     private float? _fontSize;
     private Paragraph? _cachedLabelParagraph;
-    private readonly Widget _child;
+    private readonly Widget _child = null!;
     private string _label;
 
     public Color? TextColor

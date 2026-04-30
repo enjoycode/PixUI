@@ -20,10 +20,9 @@ public sealed class Radio : Toggleable
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
-        SetSize(Math.Min(width, _kRadioSize), Math.Min(height, _kRadioSize));
+        SetSize(Math.Min(maxSize.Width, _kRadioSize), Math.Min(maxSize.Height, _kRadioSize));
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)

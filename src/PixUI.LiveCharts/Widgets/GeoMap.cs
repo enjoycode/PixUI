@@ -167,13 +167,12 @@ public sealed class GeoMap : Widget, IMouseRegion, IGeoMapView<SkiaDrawingContex
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
         var oldWidth = W;
         var oldHeight = H;
 
-        SetSize(width, height);
+        SetSize(maxSize.Width, maxSize.Height);
 
         if (HasLayout && (oldWidth != W || oldHeight != H))
             _core.Update();

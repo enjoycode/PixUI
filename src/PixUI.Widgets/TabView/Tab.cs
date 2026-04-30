@@ -9,7 +9,7 @@ public sealed class Tab : SingleChildWidget, IMouseRegion
         MouseRegion = new MouseRegion(() => Cursors.Hand, false);
         MouseRegion.HoverChanged += _OnHoverChanged;
 
-        IsSelected.AddListener(RepaintOnStateChanged);//TODO:待TabBar实现指示器后移除
+        IsSelected.AddListener(RepaintOnStateChanged); //TODO:待TabBar实现指示器后移除
     }
 
     public readonly State<bool> IsSelected = false;
@@ -44,8 +44,7 @@ public sealed class Tab : SingleChildWidget, IMouseRegion
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
         if (Child == null)
         {
@@ -53,17 +52,17 @@ public sealed class Tab : SingleChildWidget, IMouseRegion
             return;
         }
 
-        Child!.Layout(width, height);
+        Child!.Layout(maxSize.Width, maxSize.Height);
 
         if (TabBar.Scrollable)
         {
-            SetSize(Child.W, height);
-            Child.SetPosition(0, (height - Child.H) / 2);
+            SetSize(Child.W, maxSize.Height);
+            Child.SetPosition(0, (maxSize.Height - Child.H) / 2);
         }
         else
         {
-            SetSize(width, height);
-            Child.SetPosition((width - Child.W) / 2, (height - Child.H) / 2);
+            SetSize(maxSize.Width, maxSize.Height);
+            Child.SetPosition((maxSize.Width - Child.W) / 2, (maxSize.Height - Child.H) / 2);
         }
     }
 

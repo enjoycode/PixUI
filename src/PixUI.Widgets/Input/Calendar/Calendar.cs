@@ -41,14 +41,13 @@ public sealed class Calendar : Widget
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
-        SetSize(width, height);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
+        SetSize(maxSize.Width, maxSize.Height);
 
-        _naviBar.Layout(width, height);
+        _naviBar.Layout(maxSize.Width, maxSize.Height);
         _naviBar.SetPosition(0, 0);
 
-        _monthView.Layout(width, H - _naviBar.H);
+        _monthView.Layout(maxSize.Width, H - _naviBar.H);
         _monthView.SetPosition(0, _naviBar.H);
     }
 
@@ -141,9 +140,8 @@ internal sealed class CalendarNaviBar : Widget
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
-        SetSize(width, Math.Min(height, _btPrevYear.H));
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
+        SetSize(maxSize.Width, Math.Min(maxSize.Height, _btPrevYear.H));
 
         var offsetX = 5f;
         const float offsetY = 5f;
@@ -154,7 +152,7 @@ internal sealed class CalendarNaviBar : Widget
         offsetX += _btPrevMonth.W;
 
         var centerWidth = W - _btPrevYear.W * 4 - space * 2;
-        _title.Layout(centerWidth, height);
+        _title.Layout(centerWidth, maxSize.Height);
         _title.SetPosition(offsetX + (centerWidth - _title.W) / 2, offsetY + 4 /*基线偏移*/);
         offsetX += centerWidth;
 

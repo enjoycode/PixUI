@@ -4,13 +4,12 @@ public sealed class Stack : MultiChildWidget<Positioned>
 {
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
-        SetSize(width, height);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
+        SetSize(maxSize.Width, maxSize.Height);
 
         foreach (var child in _children)
         {
-            child.Layout(width, height);
+            child.Layout(maxSize.Width, maxSize.Height); //TODO: use float.MaxValue?
         }
     }
 

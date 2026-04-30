@@ -270,7 +270,8 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
     public void OnVisualElementPointerDown(IEnumerable<VisualElement<SkiaDrawingContext>> visualElements,
         LvcPoint pointer)
     {
-        VisualElementsPointerDown?.Invoke(this, new VisualElementsEventArgs<SkiaDrawingContext>(CoreChart, visualElements, pointer));
+        VisualElementsPointerDown?.Invoke(this,
+            new VisualElementsEventArgs<SkiaDrawingContext>(CoreChart, visualElements, pointer));
     }
 
     public abstract IEnumerable<ChartPoint> GetPointsAt(LvcPoint point,
@@ -319,13 +320,12 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
         var oldWidth = W;
         var oldHeight = H;
 
-        SetSize(width, height);
+        SetSize(maxSize.Width, maxSize.Height);
 
         if (core != null && !core._isFirstDraw && (oldWidth != W || oldHeight != H))
             core.Update();
@@ -364,7 +364,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
 
         EnsureDrawingContext(canvas);
         CoreCanvas.DrawFrame(_drawCtx!);
-        
+
         canvas.Restore();
     }
 

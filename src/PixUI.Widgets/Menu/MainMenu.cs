@@ -13,10 +13,10 @@ public sealed class MainMenu : Widget
         BuildMenuItemWidgets(items);
     }
 
-    private readonly IList<MenuItemWidget> _children;
+    private readonly List<MenuItemWidget> _children;
     private readonly MenuController _controller;
 
-    public Color BackgroudColor
+    public Color BackgroundColor
     {
         set => _controller.BackgroundColor = value;
     }
@@ -49,9 +49,8 @@ public sealed class MainMenu : Widget
     /// </summary>
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
-        SetSize(width, height);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
+        SetSize(maxSize.Width, maxSize.Height);
 
         if (HasLayout) return; //只布局一次，除非强制重布
         HasLayout = true;
@@ -59,7 +58,7 @@ public sealed class MainMenu : Widget
         var offsetX = 0f;
         foreach (var child in _children)
         {
-            child.Layout(float.PositiveInfinity, height);
+            child.Layout(float.PositiveInfinity, maxSize.Height);
             child.SetPosition(offsetX, 0);
             offsetX += child.W;
         }

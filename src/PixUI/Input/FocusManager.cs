@@ -110,7 +110,7 @@ public sealed class FocusManager
 
         if (found != null || start == null) return found;
         //继续向上
-        if (container.Parent != null && !(container.Parent is IRootWidget))
+        if (container.Parent != null && container.Parent is not IRootWidget)
             return FindFocusableForward(container.Parent!, container);
         return null;
     }
@@ -142,7 +142,7 @@ public sealed class FocusManager
 
         if (found != null || start == null) return found;
         //继续向上
-        if (container.Parent != null && !(container.Parent is IRootWidget))
+        if (container.Parent != null && container.Parent is not IRootWidget)
             return FindFocusableBackward(container.Parent!, container);
         return null;
     }

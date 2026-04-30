@@ -157,12 +157,11 @@ public sealed class MonthView : Widget, IMouseRegion
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
-        SetSize(width, height);
+        SetSize(maxSize.Width, maxSize.Height);
 
-        _cellSize = new Size(width / 7, (height - _headerHeight) / 6);
+        _cellSize = new Size(maxSize.Width / 7, (maxSize.Height - _headerHeight) / 6);
     }
 
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
