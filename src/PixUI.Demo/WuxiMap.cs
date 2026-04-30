@@ -1,14 +1,11 @@
 using System;
-using System.IO;
 using System.Text.Json;
 using LiveCharts.Drawing;
 using LiveCharts.Drawing.Geometries;
 using LiveCharts.Drawing.Segments;
 using LiveCharts.Painting;
-using LiveChartsCore;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Geo;
-using LiveChartsCore.Kernel;
 
 namespace PixUI.Demo;
 
@@ -74,15 +71,14 @@ public sealed class WuxiMap : Widget
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var width = CacheAndCheckAssignWidth(availableWidth);
-        var height = CacheAndCheckAssignHeight(availableHeight);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
         // var oldWidth = W;
         // var oldHeight = H;
 
-        SetSize(width, height);
+        SetSize(maxSize.Width, maxSize.Height);
 
-        _projector = Maps.BuildProjector(MapProjection.Mercator, new[] { W, H });
+        _projector = Maps.BuildProjector(MapProjection.Mercator, [W, H]);
 
         BuildShapes(_areasLayer, _projector);
         BuildShapes(_cityLayer, _projector);
