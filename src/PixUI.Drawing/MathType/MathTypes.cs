@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public partial struct Point
@@ -7,54 +6,54 @@ public partial struct Point
 
     public Point(float x, float y)
     {
-        this.x = x;
-        this.y = y;
+        X = x;
+        Y = y;
     }
 
     public readonly bool IsEmpty => this == Empty;
 
-    public readonly float Length => (float)Math.Sqrt(x * x + y * y);
+    public readonly float Length => (float)Math.Sqrt(X * X + Y * Y);
 
-    public readonly float LengthSquared => x * x + y * y;
+    public readonly float LengthSquared => X * X + Y * Y;
 
     public void Offset(float dx, float dy)
     {
-        x += dx;
-        y += dy;
+        X += dx;
+        Y += dy;
     }
 
     public PointI ToPoint() => new PointI((int)X, (int)Y); //TODO: rename to ToPointI
 
-    public readonly override string ToString() => $"{{X={x}, Y={y}}}";
+    public readonly override string ToString() => $"{{X={X}, Y={Y}}}";
 
     public static Point Normalize(Point point)
     {
-        var ls = point.x * point.x + point.y * point.y;
+        var ls = point.X * point.X + point.Y * point.Y;
         var invNorm = 1.0 / Math.Sqrt(ls);
-        return new Point((float)(point.x * invNorm), (float)(point.y * invNorm));
+        return new Point((float)(point.X * invNorm), (float)(point.Y * invNorm));
     }
 
     public static float Distance(Point point, Point other)
     {
-        var dx = point.x - other.x;
-        var dy = point.y - other.y;
+        var dx = point.X - other.X;
+        var dy = point.Y - other.Y;
         var ls = dx * dx + dy * dy;
         return (float)Math.Sqrt(ls);
     }
 
     public static float DistanceSquared(Point point, Point other)
     {
-        var dx = point.x - other.x;
-        var dy = point.y - other.y;
+        var dx = point.X - other.X;
+        var dy = point.Y - other.Y;
         return dx * dx + dy * dy;
     }
 
     public static Point Reflect(Point point, Point normal)
     {
-        var dot = point.x * point.x + point.y * point.y;
+        var dot = point.X * point.X + point.Y * point.Y;
         return new Point(
-            point.x - 2.0f * dot * normal.x,
-            point.y - 2.0f * dot * normal.y);
+            point.X - 2.0f * dot * normal.X,
+            point.Y - 2.0f * dot * normal.Y);
     }
 
     public static Point Add(Point pt, SizeI sz) => pt + sz;
@@ -68,16 +67,16 @@ public partial struct Point
     public static Point Subtract(Point pt, Point sz) => pt - sz;
 
     public static Point operator +(Point pt, SizeI sz) =>
-        new Point(pt.x + sz.Width, pt.y + sz.Height);
+        new Point(pt.X + sz.Width, pt.Y + sz.Height);
 
     public static Point operator +(Point pt, Size sz) =>
-        new Point(pt.x + sz.Width, pt.y + sz.Height);
+        new Point(pt.X + sz.Width, pt.Y + sz.Height);
 
     public static Point operator +(Point pt, PointI sz) =>
-        new Point(pt.x + sz.X, pt.y + sz.Y);
+        new Point(pt.X + sz.X, pt.Y + sz.Y);
 
     public static Point operator +(Point pt, Point sz) =>
-        new Point(pt.x + sz.X, pt.y + sz.Y);
+        new Point(pt.X + sz.X, pt.Y + sz.Y);
 
     public static Point operator -(Point pt, SizeI sz) =>
         new Point(pt.X - sz.Width, pt.Y - sz.Height);
@@ -98,64 +97,64 @@ public partial struct PointI
 
     public PointI(SizeI sz)
     {
-        x = sz.Width;
-        y = sz.Height;
+        X = sz.Width;
+        Y = sz.Height;
     }
 
     public PointI(int x, int y)
     {
-        this.x = x;
-        this.y = y;
+        X = x;
+        Y = y;
     }
 
     public readonly bool IsEmpty => this == Empty;
 
-    public readonly int Length => (int)Math.Sqrt(x * x + y * y);
+    public readonly int Length => (int)Math.Sqrt(X * X + Y * Y);
 
-    public readonly int LengthSquared => x * x + y * y;
+    public readonly int LengthSquared => X * X + Y * Y;
 
     public void Offset(PointI p)
     {
-        x += p.X;
-        y += p.Y;
+        X += p.X;
+        Y += p.Y;
     }
 
     public void Offset(int dx, int dy)
     {
-        x += dx;
-        y += dy;
+        X += dx;
+        Y += dy;
     }
 
-    public readonly override string ToString() => $"{{X={x},Y={y}}}";
+    public readonly override string ToString() => $"{{X={X},Y={Y}}}";
 
     public static PointI Normalize(PointI point)
     {
-        var ls = point.x * point.x + point.y * point.y;
+        var ls = point.X * point.X + point.Y * point.Y;
         var invNorm = 1.0 / Math.Sqrt(ls);
-        return new PointI((int)(point.x * invNorm), (int)(point.y * invNorm));
+        return new PointI((int)(point.X * invNorm), (int)(point.Y * invNorm));
     }
 
     public static float Distance(PointI point, PointI other)
     {
-        var dx = point.x - other.x;
-        var dy = point.y - other.y;
+        var dx = point.X - other.X;
+        var dy = point.Y - other.Y;
         var ls = dx * dx + dy * dy;
         return (float)Math.Sqrt(ls);
     }
 
     public static float DistanceSquared(PointI point, PointI other)
     {
-        var dx = point.x - other.x;
-        var dy = point.y - other.y;
+        var dx = point.X - other.X;
+        var dy = point.Y - other.Y;
         return dx * dx + dy * dy;
     }
 
     public static PointI Reflect(PointI point, PointI normal)
     {
-        var dot = point.x * point.x + point.y * point.y;
+        var dot = point.X * point.X + point.Y * point.Y;
         return new PointI(
-            (int)(point.x - 2.0f * dot * normal.x),
-            (int)(point.y - 2.0f * dot * normal.y));
+            (int)(point.X - 2.0f * dot * normal.X),
+            (int)(point.Y - 2.0f * dot * normal.Y));
     }
 
     public static PointI Ceiling(Point value)
@@ -225,14 +224,14 @@ public partial struct Point3
 
     public Point3(float x, float y, float z)
     {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        X = x;
+        Y = y;
+        Z = z;
     }
 
     public readonly bool IsEmpty => this == Empty;
 
-    public readonly override string ToString() => $"{{X={x}, Y={y}, Z={z}}}";
+    public readonly override string ToString() => $"{{X={X}, Y={Y}, Z={Z}}}";
 
     public static Point3 Add(Point3 pt, Point3 sz) => pt + sz;
 
@@ -251,35 +250,35 @@ public partial struct Size
 
     public Size(float width, float height)
     {
-        w = width;
-        h = height;
+        Width = width;
+        Height = height;
     }
 
     public Size(Point pt)
     {
-        w = pt.X;
-        h = pt.Y;
+        Width = pt.X;
+        Height = pt.Y;
     }
 
     public readonly bool IsEmpty => this == Empty;
 
     public readonly Point ToPoint() =>
-        new Point(w, h);
+        new Point(Width, Height);
 
     public readonly SizeI ToSizeI()
     {
         int w, h;
         checked
         {
-            w = (int)this.w;
-            h = (int)this.h;
+            w = (int)Width;
+            h = (int)Height;
         }
 
         return new SizeI(w, h);
     }
 
     public readonly override string ToString() =>
-        $"{{Width={w}, Height={h}}}";
+        $"{{Width={Width}, Height={Height}}}";
 
     public static Size Add(Size sz1, Size sz2) => sz1 + sz2;
 
@@ -304,22 +303,22 @@ public partial struct SizeI
 
     public SizeI(int width, int height)
     {
-        w = width;
-        h = height;
+        Width = width;
+        Height = height;
     }
 
     public SizeI(PointI pt)
     {
-        w = pt.X;
-        h = pt.Y;
+        Width = pt.X;
+        Height = pt.Y;
     }
 
     public readonly bool IsEmpty => this == Empty;
 
-    public readonly PointI ToPointI() => new PointI(w, h);
+    public readonly PointI ToPointI() => new PointI(Width, Height);
 
     public readonly override string ToString() =>
-        $"{{Width={w}, Height={h}}}";
+        $"{{Width={Width}, Height={Height}}}";
 
     public static SizeI Add(SizeI sz1, SizeI sz2) => sz1 + sz2;
 
@@ -343,64 +342,79 @@ public partial struct Rect
 
     public Rect(float left, float top, float right, float bottom)
     {
-        this.left = left;
-        this.right = right;
-        this.top = top;
-        this.bottom = bottom;
+        Left = left;
+        Right = right;
+        Top = top;
+        Bottom = bottom;
     }
 
-    public readonly float MidX => (left + right) / 2;
+    public readonly float MidX => (Left + Right) / 2;
 
-    public readonly float MidY => (top + bottom) / 2;
+    public readonly float MidY => (Top + Bottom) / 2;
 
     public float Width
     {
-        get => right - left;
-        set => right = value + left;
+        readonly get => Right - Left;
+        set => Right = value + Left;
     }
+
+    internal float HarfWidth => FloatUtils.MidPoint(-Left, Right);
 
     public float Height
     {
-        get => bottom - top;
-        set => bottom = top + value;
+        readonly get => Bottom - Top;
+        set => Bottom = Top + value;
     }
 
-    public readonly bool IsEmpty => this == Empty;
+    internal float HarfHeight => FloatUtils.MidPoint(-Top, Bottom);
+
+    public readonly bool IsEmpty => !(Left < Right && Top < Bottom);
 
     public Size Size
     {
-        get => new Size(Width, Height);
+        readonly get => new Size(Width, Height);
         set
         {
-            right = left + value.Width;
-            bottom = top + value.Height;
+            Right = Left + value.Width;
+            Bottom = Top + value.Height;
         }
     }
 
     public Point Location
     {
-        readonly get => new Point(left, top);
-        set => this = Rect.Create(value, Size);
+        readonly get => new Point(Left, Top);
+        set => this = Create(value, Size);
     }
 
-    public Point Center => new((left + right) / 2, (top + bottom) / 2);
+    public Point Center => new((Left + Right) / 2, (Top + Bottom) / 2);
 
     public readonly Rect Standardized
     {
         get
         {
-            if (left > right)
+            // return new Rect(Math.Min(Left, Right), Math.Min(Top, Bottom), 
+            //     Math.Max(Left, Right), Math.Max(Top, Bottom));
+            if (Left > Right)
             {
-                return top > bottom
-                    ? new Rect(right, bottom, left, top)
-                    : new Rect(right, top, left, bottom);
+                return Top > Bottom
+                    ? new Rect(Right, Bottom, Left, Top)
+                    : new Rect(Right, Top, Left, Bottom);
             }
 
-            return top > bottom
-                ? new Rect(left, bottom, right, top)
-                : new Rect(left, top, right, bottom);
+            return Top > Bottom
+                ? new Rect(Left, Bottom, Right, Top)
+                : new Rect(Left, Top, Right, Bottom);
         }
     }
+
+    public bool IsStandardized() => Left <= Right && Top <= Bottom;
+
+    /// <summary>
+    /// Returns true if all values in the rectangle are finite.
+    /// </summary>
+    /// <returns>true if no member is infinite or NaN</returns>
+    public readonly bool IsFinite() =>
+        float.IsFinite(Left) && float.IsFinite(Top) && float.IsFinite(Right) && float.IsFinite(Bottom);
 
     public readonly Rect AspectFit(Size size) => AspectResize(size, true);
 
@@ -448,20 +462,24 @@ public partial struct Rect
         return RectI.FromLTWH(x, y, w, h);
     }
 
-    public void Inflate(float x, float y)
+    public void Inflate(float dx, float dy)
     {
-        left -= x;
-        top -= y;
-        right += x;
-        bottom += y;
+        Left -= dx;
+        Top -= dy;
+        Right += dx;
+        Bottom += dy;
     }
 
-    public static Rect Inflate(Rect rect, float x, float y)
+    public static Rect Inflate(in Rect rect, float x, float y)
     {
         var res = rect;
         res.Inflate(x, y);
         return res;
     }
+
+    public void Deflate(float dx, float dy) => Inflate(-dx, -dy);
+    
+    public static Rect Deflate(in Rect rect, float dx, float dy) => Inflate(rect, -dx, -dy);
 
     public static Rect Intersect(Rect a, Rect b)
     {
@@ -471,20 +489,20 @@ public partial struct Rect
         }
 
         return new Rect(
-            Math.Max(a.left, b.left),
-            Math.Max(a.top, b.top),
-            Math.Min(a.right, b.right),
-            Math.Min(a.bottom, b.bottom));
+            Math.Max(a.Left, b.Left),
+            Math.Max(a.Top, b.Top),
+            Math.Min(a.Right, b.Right),
+            Math.Min(a.Bottom, b.Bottom));
     }
 
     public void Intersect(Rect rect) => this = Intersect(this, rect);
 
     public static Rect Union(Rect a, Rect b) =>
         new Rect(
-            Math.Min(a.left, b.left),
-            Math.Min(a.top, b.top),
-            Math.Max(a.right, b.right),
-            Math.Max(a.bottom, b.bottom));
+            Math.Min(a.Left, b.Left),
+            Math.Min(a.Top, b.Top),
+            Math.Max(a.Right, b.Right),
+            Math.Max(a.Bottom, b.Bottom));
 
     public void Union(Rect rect) => this = Union(this, rect);
 
@@ -494,27 +512,27 @@ public partial struct Rect
     public readonly bool Contains(Point point) => ContainsPoint(point.X, point.Y);
 
     public readonly bool ContainsPoint(float x, float y) =>
-        x >= left && x < right && y >= top && y < bottom;
+        x >= Left && x < Right && y >= Top && y < Bottom;
 
     public readonly bool ContainsRect(Rect rect) =>
-        left <= rect.left && right >= rect.right &&
-        top <= rect.top && bottom >= rect.bottom;
+        Left <= rect.Left && Right >= rect.Right &&
+        Top <= rect.Top && Bottom >= rect.Bottom;
 
     public readonly bool IntersectsWith(float x, float y, float w, float h) =>
-        left < (x + w) && right > x && top < (y + h) && bottom > y;
+        Left < (x + w) && Right > x && Top < (y + h) && Bottom > y;
 
     public readonly bool IntersectsWith(Rect rect) =>
         IntersectsWith(rect.Left, rect.Top, rect.Width, rect.Height);
 
     public readonly bool IntersectsWithInclusive(Rect rect) =>
-        left <= rect.right && right >= rect.left && top <= rect.bottom && bottom >= rect.top;
+        Left <= rect.Right && Right >= rect.Left && Top <= rect.Bottom && Bottom >= rect.Top;
 
     public void Offset(float x, float y)
     {
-        left += x;
-        top += y;
-        right += x;
-        bottom += y;
+        Left += x;
+        Top += y;
+        Right += x;
+        Bottom += y;
     }
 
     public void Offset(Point pos) => Offset(pos.X, pos.Y);
@@ -537,26 +555,26 @@ public partial struct RectI
 
     public RectI(int left, int top, int right, int bottom)
     {
-        this.left = left;
-        this.right = right;
-        this.top = top;
-        this.bottom = bottom;
+        Left = left;
+        Right = right;
+        Top = top;
+        Bottom = bottom;
     }
 
-    public readonly int MidX => left + (Width / 2);
+    public readonly int MidX => Left + (Width / 2);
 
-    public readonly int MidY => top + (Height / 2);
+    public readonly int MidY => Top + (Height / 2);
 
     public int Width
     {
-        get => right - left;
-        set => right = left + value;
+        readonly get => Right - Left;
+        set => Right = Left + value;
     }
 
     public int Height
     {
-        get => bottom - top;
-        set => bottom = top + value;
+        readonly get => Bottom - Top;
+        set => Bottom = Top + value;
     }
 
     public readonly bool IsEmpty => this == Empty;
@@ -566,43 +584,33 @@ public partial struct RectI
         readonly get => new SizeI(Width, Height);
         set
         {
-            right = left + value.Width;
-            bottom = top + value.Height;
+            Right = Left + value.Width;
+            Bottom = Top + value.Height;
         }
     }
 
     public PointI Location
     {
-        readonly get => new PointI(left, top);
-        set => this = RectI.Create(value, Size);
+        readonly get => new PointI(Left, Top);
+        set => this = Create(value, Size);
     }
 
     public readonly RectI Standardized
     {
         get
         {
-            if (left > right)
+            if (Left > Right)
             {
-                if (top > bottom)
-                {
-                    return new RectI(right, bottom, left, top);
-                }
-                else
-                {
-                    return new RectI(right, top, left, bottom);
-                }
+                if (Top > Bottom)
+                    return new RectI(Right, Bottom, Left, Top);
+
+                return new RectI(Right, Top, Left, Bottom);
             }
-            else
-            {
-                if (top > bottom)
-                {
-                    return new RectI(left, bottom, right, top);
-                }
-                else
-                {
-                    return new RectI(left, top, right, bottom);
-                }
-            }
+
+            if (Top > Bottom)
+                return new RectI(Left, Bottom, Right, Top);
+
+            return new RectI(Left, Top, Right, Bottom);
         }
     }
 
@@ -639,7 +647,7 @@ public partial struct RectI
 
     public static RectI Inflate(RectI rect, int x, int y)
     {
-        var r = new RectI(rect.left, rect.top, rect.right, rect.bottom);
+        var r = new RectI(rect.Left, rect.Top, rect.Right, rect.Bottom);
         r.Inflate(x, y);
         return r;
     }
@@ -649,10 +657,10 @@ public partial struct RectI
 
     public void Inflate(int width, int height)
     {
-        left -= width;
-        top -= height;
-        right += width;
-        bottom += height;
+        Left -= width;
+        Top -= height;
+        Right += width;
+        Bottom += height;
     }
 
     public static RectI Intersect(RectI a, RectI b)
@@ -661,10 +669,10 @@ public partial struct RectI
             return Empty;
 
         return new RectI(
-            Math.Max(a.left, b.left),
-            Math.Max(a.top, b.top),
-            Math.Min(a.right, b.right),
-            Math.Min(a.bottom, b.bottom));
+            Math.Max(a.Left, b.Left),
+            Math.Max(a.Top, b.Top),
+            Math.Min(a.Right, b.Right),
+            Math.Min(a.Bottom, b.Bottom));
     }
 
     public void Intersect(RectI rect) =>
@@ -733,29 +741,29 @@ public partial struct RectI
         this = Union(this, rect);
 
     public readonly bool Contains(int x, int y) =>
-        (x >= left) && (x < right) && (y >= top) && (y < bottom);
+        (x >= Left) && (x < Right) && (y >= Top) && (y < Bottom);
 
     public readonly bool Contains(PointI pt) =>
         Contains(pt.X, pt.Y);
 
     public readonly bool Contains(RectI rect) =>
-        (left <= rect.left) && (right >= rect.right) &&
-        (top <= rect.top) && (bottom >= rect.bottom);
+        (Left <= rect.Left) && (Right >= rect.Right) &&
+        (Top <= rect.Top) && (Bottom >= rect.Bottom);
 
     public readonly bool IntersectsWith(RectI rect) =>
-        (left < rect.right) && (right > rect.left) && (top < rect.bottom) &&
-        (bottom > rect.top);
+        (Left < rect.Right) && (Right > rect.Left) && (Top < rect.Bottom) &&
+        (Bottom > rect.Top);
 
     public readonly bool IntersectsWithInclusive(RectI rect) =>
-        (left <= rect.right) && (right >= rect.left) && (top <= rect.bottom) &&
-        (bottom >= rect.top);
+        (Left <= rect.Right) && (Right >= rect.Left) && (Top <= rect.Bottom) &&
+        (Bottom >= rect.Top);
 
     public void Offset(int x, int y)
     {
-        left += x;
-        top += y;
-        right += x;
-        bottom += y;
+        Left += x;
+        Top += y;
+        Right += x;
+        Bottom += y;
     }
 
     public void Offset(PointI pos) => Offset(pos.X, pos.Y);
@@ -775,4 +783,3 @@ public partial struct RectI
     public static RectI Create(int x, int y, int width, int height) =>
         new RectI(x, y, x + width, y + height);
 }
-#endif

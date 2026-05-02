@@ -1,37 +1,6 @@
-#if !__WEB__
 namespace PixUI;
 
-internal partial struct SKImageInfoNative
-{
-    // public static void UpdateNative(ref ImageInfo managed, ref SKImageInfoNative native)
-    // {
-    //     native.colorspace = managed.ColorSpace?.Handle ?? IntPtr.Zero;
-    //     native.width = managed.Width;
-    //     native.height = managed.Height;
-    //     native.colorType = managed.ColorType.ToNative();
-    //     native.alphaType = managed.AlphaType;
-    // }
-
-    public static SKImageInfoNative FromManaged(ref ImageInfo managed) => new SKImageInfoNative
-    {
-        colorspace = managed.ColorSpace?.Handle ?? IntPtr.Zero,
-        width = managed.Width,
-        height = managed.Height,
-        colorType = managed.ColorType.ToNative(),
-        alphaType = managed.AlphaType,
-    };
-
-    // public static ImageInfo ToManaged(ref SKImageInfoNative native) => new ImageInfo
-    // {
-    //     ColorSpace = ColorSpace.GetObject(native.colorspace),
-    //     Width = native.width,
-    //     Height = native.height,
-    //     ColorType = native.colorType.FromNative(),
-    //     AlphaType = native.alphaType,
-    // };
-}
-
-public readonly unsafe struct ImageInfo : IEquatable<ImageInfo>
+public readonly struct ImageInfo : IEquatable<ImageInfo>
 {
     // public static readonly ImageInfo Empty;
     private static readonly ColorType PlatformColorType;
@@ -42,7 +11,7 @@ public readonly unsafe struct ImageInfo : IEquatable<ImageInfo>
 
     static ImageInfo()
     {
-        PlatformColorType = ColorType.Bgra8888; //SkiaApi.sk_colortype_get_default_8888().FromNative();
+        PlatformColorType = ColorType.Bgra8888;
 
         //fixed (int* a = &PlatformColorAlphaShift)
         //fixed (int* r = &PlatformColorRedShift)
@@ -109,5 +78,3 @@ public readonly unsafe struct ImageInfo : IEquatable<ImageInfo>
         return hash.ToHashCode();
     }
 }
-
-#endif

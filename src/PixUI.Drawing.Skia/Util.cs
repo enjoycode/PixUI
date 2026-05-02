@@ -6,11 +6,6 @@ namespace PixUI;
 
 internal static unsafe class Utils
 {
-    internal const float NearlyZero = 1.0f / (1 << 12);
-        
-    internal static bool NearlyEqual (float a, float b, float tolerance) =>
-        Math.Abs (a - b) <= tolerance;
-        
     internal static Span<byte> AsSpan(this IntPtr ptr, int size) =>
         new Span<byte>((void*)ptr, size);
 

@@ -18,7 +18,7 @@ public interface ICanvas
     void DrawPath(IPath path, IPaint paint);
     void DrawString(string text, float x, float y, IFont font, Color color);
     void DrawParagraph(IParagraph paragraph, float x, float y);
-    void DrawGlyph(ushort glyphId, float posX, float posY, float originX, float originY, Font font, IPaint paint);
+    void DrawGlyph(ushort glyphId, float posX, float posY, float originX, float originY, IFont font, IPaint paint);
     void DrawImage(IImage image, float x, float y, IPaint? paint = null);
     void DrawImage(IImage image, Rect dest, IPaint? paint = null);
     void DrawImage(IImage image, Rect source, Rect dest, IPaint? paint = null);

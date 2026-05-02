@@ -98,13 +98,14 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
 
     public RRect? GetRoundRect()
     {
-        var rrect = new RRect();
-        var result = SkiaApi.sk_path_is_rrect(Handle, rrect.Handle);
-        if (result)
-            return rrect;
-
-        rrect.Dispose();
-        return null;
+        throw new NotImplementedException();
+        // var rrect = new RRect();
+        // var result = SkiaApi.sk_path_is_rrect(Handle, rrect.Handle);
+        // if (result)
+        //     return rrect;
+        //
+        // rrect.Dispose();
+        // return null;
     }
 
     public Point[]? GetLine()
@@ -279,10 +280,11 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
 
     public void AddRRect(RRect rect, bool isCCW = false)
     {
-        if (rect == null)
-            throw new ArgumentNullException(nameof(rect));
-        SkiaApi.sk_path_add_rrect(Handle, rect.Handle,
-            isCCW ? SKPathDirection.CounterClockwise : SKPathDirection.Clockwise);
+        throw new NotImplementedException();
+        // if (rect == null)
+        //     throw new ArgumentNullException(nameof(rect));
+        // SkiaApi.sk_path_add_rrect(Handle, rect.Handle,
+        //     isCCW ? SKPathDirection.CounterClockwise : SKPathDirection.Clockwise);
     }
 
     // public void AddRRect(RRect rect, SKPathDirection direction, uint startIndex)

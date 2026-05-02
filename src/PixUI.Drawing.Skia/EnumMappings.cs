@@ -10,7 +10,7 @@ public enum GRBackend
     Direct3D = 4,
 }
 
-public static partial class SkiaExtensions
+public static class SkiaExtensions
 {
     internal static GRBackendNative ToNative(this GRBackend backend) =>
         backend switch
@@ -34,32 +34,31 @@ public static partial class SkiaExtensions
             _ => throw new ArgumentOutOfRangeException(nameof(backend)),
         };
 
-    internal static SKColorTypeNative ToNative(this ColorType colorType) =>
-        colorType switch
-        {
-            // ColorType.Unknown => SKColorTypeNative.Unknown,
-            ColorType.Alpha8 => SKColorTypeNative.Alpha8,
-            ColorType.Rgb565 => SKColorTypeNative.Rgb565,
-            // ColorType.Argb4444 => SKColorTypeNative.Argb4444,
-            ColorType.Rgba8888 => SKColorTypeNative.Rgba8888,
-            // ColorType.Rgb888x => SKColorTypeNative.Rgb888x,
-            ColorType.Bgra8888 => SKColorTypeNative.Bgra8888,
-            ColorType.Rgba1010102 => SKColorTypeNative.Rgba1010102,
-            ColorType.Rgb101010x => SKColorTypeNative.Rgb101010x,
-            ColorType.Gray8 => SKColorTypeNative.Gray8,
-            // ColorType.RgbaF16Clamped => SKColorTypeNative.RgbaF16Norm,
-            ColorType.RgbaF16 => SKColorTypeNative.RgbaF16,
-            ColorType.RgbaF32 => SKColorTypeNative.RgbaF32,
-            // ColorType.Rg88 => SKColorTypeNative.R8g8Unorm,
-            // ColorType.AlphaF16 => SKColorTypeNative.A16Float,
-            // ColorType.RgF16 => SKColorTypeNative.R16g16Float,
-            // ColorType.Alpha16 => SKColorTypeNative.A16Unorm,
-            // ColorType.Rg1616 => SKColorTypeNative.R16g16Unorm,
-            // ColorType.Rgba16161616 => SKColorTypeNative.R16g16b16a16Unorm,
-            // ColorType.Bgra1010102 => SKColorTypeNative.Bgra1010102,
-            // ColorType.Bgr101010x => SKColorTypeNative.Bgr101010x,
-            _ => throw new ArgumentOutOfRangeException(nameof(colorType)),
-        };
+    internal static SKColorTypeNative ToNative(this ColorType colorType) => colorType switch
+    {
+        // ColorType.Unknown => SKColorTypeNative.Unknown,
+        ColorType.Alpha8 => SKColorTypeNative.Alpha8,
+        ColorType.Rgb565 => SKColorTypeNative.Rgb565,
+        // ColorType.Argb4444 => SKColorTypeNative.Argb4444,
+        ColorType.Rgba8888 => SKColorTypeNative.Rgba8888,
+        // ColorType.Rgb888x => SKColorTypeNative.Rgb888x,
+        ColorType.Bgra8888 => SKColorTypeNative.Bgra8888,
+        ColorType.Rgba1010102 => SKColorTypeNative.Rgba1010102,
+        ColorType.Rgb101010x => SKColorTypeNative.Rgb101010x,
+        ColorType.Gray8 => SKColorTypeNative.Gray8,
+        // ColorType.RgbaF16Clamped => SKColorTypeNative.RgbaF16Norm,
+        ColorType.RgbaF16 => SKColorTypeNative.RgbaF16,
+        ColorType.RgbaF32 => SKColorTypeNative.RgbaF32,
+        // ColorType.Rg88 => SKColorTypeNative.R8g8Unorm,
+        // ColorType.AlphaF16 => SKColorTypeNative.A16Float,
+        // ColorType.RgF16 => SKColorTypeNative.R16g16Float,
+        // ColorType.Alpha16 => SKColorTypeNative.A16Unorm,
+        // ColorType.Rg1616 => SKColorTypeNative.R16g16Unorm,
+        // ColorType.Rgba16161616 => SKColorTypeNative.R16g16b16a16Unorm,
+        // ColorType.Bgra1010102 => SKColorTypeNative.Bgra1010102,
+        // ColorType.Bgr101010x => SKColorTypeNative.Bgr101010x,
+        _ => throw new ArgumentOutOfRangeException(nameof(colorType)),
+    };
 
     internal static ColorType FromNative(this SKColorTypeNative colorType) =>
         colorType switch

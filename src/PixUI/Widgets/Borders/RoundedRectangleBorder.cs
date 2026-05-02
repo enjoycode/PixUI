@@ -50,13 +50,13 @@ public sealed class RoundedRectangleBorder : OutlinedBorder
         {
             var paint = PixUI.Paint.Shared();
             Side.ApplyPaint(paint);
-            using var rrect = BorderRadius.ToRRect(rect);
+            var rrect = BorderRadius.ToRRect(rect);
             canvas.DrawRRect(rrect, paint);
         }
         else
         {
-            using var outer = BorderRadius.ToRRect(rect);
-            using var inner = RRect.FromCopy(outer);
+            var outer = BorderRadius.ToRRect(rect);
+            var inner = outer;
             inner.Deflate(width, width);
             var paint = PixUI.Paint.Shared(Side.Color);
             canvas.DrawDRRect(outer, inner, paint);

@@ -47,24 +47,21 @@ public sealed unsafe class Canvas : SKObject
 
     public void DrawRRect(RRect rect, Paint paint)
     {
-        if (rect == null)
-            throw new ArgumentNullException(nameof(rect));
         if (paint == null)
             throw new ArgumentNullException(nameof(paint));
-        SkiaApi.sk_canvas_draw_rrect(Handle, rect.Handle, paint.Handle);
+
+        if (rect.IsEmpty())
+            return;
+        SkiaApi.sk_canvas_draw_rrect(Handle, new IntPtr(&rect), paint.Handle);
     }
 
     // ReSharper disable once InconsistentNaming
     public void DrawDRRect(RRect outer, RRect inner, Paint paint)
     {
-        if (outer == null)
-            throw new ArgumentNullException(nameof(outer));
-        if (inner == null)
-            throw new ArgumentNullException(nameof(inner));
         if (paint == null)
             throw new ArgumentNullException(nameof(paint));
 
-        SkiaApi.sk_canvas_draw_drrect(Handle, outer.Handle, inner.Handle, paint.Handle);
+        SkiaApi.sk_canvas_draw_drrect(Handle, new IntPtr(&outer), new IntPtr(&inner), paint.Handle);
     }
 
     public void DrawOval(float cx, float cy, float rx, float ry, Paint paint)
@@ -86,8 +83,7 @@ public sealed unsafe class Canvas : SKObject
         SkiaApi.sk_canvas_draw_circle(Handle, cx, cy, radius, paint.Handle);
     }
 
-    public void DrawArc(Rect oval, float startAngle, float sweepAngle, bool useCenter,
-        Paint paint)
+    public void DrawArc(Rect oval, float startAngle, float sweepAngle, bool useCenter, Paint paint)
     {
         if (paint == null)
             throw new ArgumentNullException(nameof(paint));
@@ -174,7 +170,7 @@ public sealed unsafe class Canvas : SKObject
         SkiaApi.sk_canvas_clip_rect_with_operation(Handle, &rect, op, antialias);
 
     public void ClipRRect(RRect rRect, ClipOp op = ClipOp.Intersect, bool antialias = false) =>
-        SkiaApi.sk_canvas_clip_rrect_with_operation(Handle, rRect.Handle, op, antialias);
+        SkiaApi.sk_canvas_clip_rrect_with_operation(Handle, new IntPtr(&rRect), op, antialias);
 
     public void ClipPath(Path path, ClipOp op, bool antialias)
     {

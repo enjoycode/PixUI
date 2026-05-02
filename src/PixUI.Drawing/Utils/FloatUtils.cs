@@ -1,17 +1,57 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace PixUI;
 
 public static class FloatUtils
 {
-    public static bool IsNear(this float a, float b)
+    internal const float NearlyZero = 1.0f / (1 << 12);
+
+    internal static bool NearlyEqual(float a, float b) =>
+        Math.Abs(a - b) <= NearlyZero;
+
+    internal static bool NearlyEqual(float a, float b, float tolerance) =>
+        Math.Abs(a - b) <= tolerance;
+
+    public static float Lerp(float a, float b, double t) //TODO: use float.Lerp()
+        => (float)(a * (1.0 - t) + b * t);
+
+    internal static float MidPoint(float a, float b)
     {
-        var diff = a - b;
-        return diff >= 0.0001f && diff <= 0.0001f;
+        // Use double math to avoid underflow and overflow.
+        return (float)(0.5 * ((double)a + b));
     }
 
-    public static float Lerp(float a, float b, double t)
-        => (float)(a * (1.0 - t) + b * t);
+    internal static float Ave(float a, float b) => (a + b) * 0.5f;
+
+    internal static float NextAfter(float x, float y)
+    {
+        if (float.IsNaN(x) || float.IsNaN(y)) return x + y;
+        if (x == y) return y; // nextafter(0, -0) = -0
+
+        FloatIntUnion u;
+        u.i = 0;
+        u.f = x; // shut up the compiler
+
+        if (x == 0)
+        {
+            u.i = 1;
+            return y > 0 ? u.f : -u.f;
+        }
+
+        if ((x > 0) == (y > x))
+            u.i++;
+        else
+            u.i--;
+        return u.f;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    private struct FloatIntUnion
+    {
+        [FieldOffset(0)] public int i;
+        [FieldOffset(0)] public float f;
+    }
 }
 
 public static class DoubleUtils
