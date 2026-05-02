@@ -1,5 +1,3 @@
-using System;
-
 #if !__WEB__
 namespace PixUI;
 

@@ -28,7 +28,6 @@ using LiveChartsCore.Kernel;
 using LiveChartsCore.Measure;
 using LiveCharts.Drawing;
 using LiveCharts.Painting;
-using PixUI;
 
 
 namespace LiveCharts;

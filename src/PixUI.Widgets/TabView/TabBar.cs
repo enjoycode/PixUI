@@ -61,7 +61,7 @@ public sealed class TabBar<T> : Widget, ITabBar
     internal void OnAdd(T dataItem)
     {
         _tabs.Add(BuildTab(dataItem));
-        Invalidate(InvalidAction.Relayout);
+        Relayout();
     }
 
     internal void OnRemoveAt(int index)
@@ -84,14 +84,14 @@ public sealed class TabBar<T> : Widget, ITabBar
         return tab;
     }
 
-    public override bool IsOpaque => BgColor != null && BgColor.Value.IsOpaque;
+    public override bool IsOpaque => BgColor is { IsOpaque: true };
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
         if (_tabs.Count == 0) return;
         foreach (var tab in _tabs)
         {
-            if (action(tab)) break;
+            if (visitor.Visit(tab)) break;
         }
     }
 

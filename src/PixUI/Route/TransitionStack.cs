@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 /// <summary>
@@ -18,11 +16,11 @@ internal sealed class TransitionStack : Widget
         _to.Parent = this;
     }
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
         // if (!IsMounted) return; //Do not do this, Unmount children when animation done need this.
-        if (action(_from)) return;
-        action(_to);
+        if (visitor.Visit(_from)) return;
+        visitor.Visit(_to);
     }
 
     public override void Layout(float availableWidth, float availableHeight)
@@ -45,7 +43,7 @@ internal sealed class TransitionStack : Widget
     public override void Paint(Canvas canvas, IDirtyArea? area = null)
     {
         if (!IsMounted) return; //maybe has remove from widget tree when animation done.
-        
+
         _from.BeforePaint(canvas);
         _from.Paint(canvas, null /*Paint all, area?.ToChild(_from)*/);
         _from.AfterPaint(canvas);

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace PixUI;
@@ -31,11 +30,11 @@ public abstract class MultiChildWidget<T> : Widget where T : Widget
 
     internal T GetChildAt(int index) => _children[index];
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
         foreach (var child in _children)
         {
-            if (action(child))
+            if (visitor.Visit(child))
                 break; //stop visit
         }
     }

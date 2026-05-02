@@ -1,6 +1,4 @@
 #if !__WEB__
-using System;
-
 namespace PixUI;
 
 public unsafe class GRBackendRenderTarget : SKObject, ISKSkipObjectRegistration

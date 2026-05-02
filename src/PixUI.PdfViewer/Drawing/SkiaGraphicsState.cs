@@ -4,7 +4,6 @@ using Melville.Pdf.LowLevel.Model.Objects;
 using Melville.Pdf.Model.Renderers.Colors;
 using Melville.Pdf.Model.Renderers.DocumentRenderers;
 using Melville.Pdf.Model.Renderers.GraphicsStates;
-using Melville.Pdf.Model.Renderers.Patterns.ShaderPatterns;
 using Melville.Pdf.Model.Renderers.Patterns.TilePatterns;
 
 namespace PixUI.PdfViewer.Drawing;

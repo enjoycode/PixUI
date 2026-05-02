@@ -66,10 +66,10 @@ public sealed class TabView<T> : Widget
 
     #region ====Widget Overrides====
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
-        if (action(_tabBar)) return;
-        action(_tabBody);
+        if (visitor.Visit(_tabBar)) return;
+        visitor.Visit(_tabBody);
     }
 
     public override void Layout(float availableWidth, float availableHeight)

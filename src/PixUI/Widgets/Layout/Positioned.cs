@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 public sealed class Positioned : Widget
@@ -65,9 +63,9 @@ public sealed class Positioned : Widget
         }
     }
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
-        if (_child != null) action(_child);
+        if (_child != null) visitor.Visit(_child);
     }
 
     public override void Layout(float availableWidth, float availableHeight)

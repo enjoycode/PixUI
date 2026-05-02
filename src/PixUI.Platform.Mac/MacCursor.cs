@@ -1,6 +1,3 @@
-using System;
-using AppKit;
-
 namespace PixUI.Platform.Mac;
 
 internal sealed class MacCursor : Cursor

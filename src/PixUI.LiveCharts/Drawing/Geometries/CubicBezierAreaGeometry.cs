@@ -20,8 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using LiveCharts.Drawing;
-using LiveCharts.Drawing.Geometries;
 using LiveChartsCore.Drawing.Segments;
 
 namespace LiveCharts.Drawing.Geometries;

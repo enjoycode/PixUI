@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI.Demo;
 
 public sealed class DemoDialog : Dialog

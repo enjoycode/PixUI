@@ -70,10 +70,10 @@ public sealed class EventEditor : Widget
 
     #region ====Widget Overrides====
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
-        if (action(_editButton)) return;
-        action(_deleteButton);
+        if (visitor.Visit(_editButton)) return;
+        visitor.Visit(_deleteButton);
     }
 
     public override void Layout(float availableWidth, float availableHeight)

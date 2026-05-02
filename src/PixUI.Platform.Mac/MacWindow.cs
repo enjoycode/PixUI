@@ -1,6 +1,3 @@
-using AppKit;
-using CoreGraphics;
-
 namespace PixUI.Platform.Mac;
 
 public sealed class MacWindow : NativeWindow

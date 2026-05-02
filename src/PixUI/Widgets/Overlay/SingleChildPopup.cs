@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 public sealed class SingleChildPopup : Popup
@@ -13,7 +11,7 @@ public sealed class SingleChildPopup : Popup
 
     private readonly Widget _child;
 
-    public override void VisitChildren(Func<Widget, bool> action) => action(_child);
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor) => visitor.Visit(_child);
 
     public override void Layout(float availableWidth, float availableHeight)
     {

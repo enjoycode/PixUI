@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PixUI;
+﻿namespace PixUI;
 
 /// <summary>
 /// 右键菜单

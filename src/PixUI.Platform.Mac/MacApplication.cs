@@ -1,7 +1,3 @@
-using System;
-using AppKit;
-using Foundation;
-
 namespace PixUI.Platform.Mac;
 
 public sealed class MacApplication : UIApplication

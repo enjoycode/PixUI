@@ -100,11 +100,11 @@ public sealed class TreeView<T> : Widget, IScrollable
 
     public override bool IsOpaque => _fillColor != null && _fillColor.Value.Alpha == 0xFF;
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
         foreach (var node in _controller.Nodes)
         {
-            if (action(node)) break;
+            if (visitor.Visit(node)) break;
         }
     }
 

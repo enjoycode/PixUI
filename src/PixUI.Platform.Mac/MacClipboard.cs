@@ -1,6 +1,3 @@
-using System.Threading.Tasks;
-using AppKit;
-
 namespace PixUI.Platform.Mac;
 
 internal sealed class MacClipboard : IPlatformClipboard

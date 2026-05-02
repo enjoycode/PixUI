@@ -85,11 +85,11 @@ public sealed class Collapse : Widget
 
     #region ====Widget Overrides====
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
-        if (action(_expandIcon)) return;
-        if (_title != null && action(_title)) return;
-        if (_body != null && !(_animationFlag == 0 && !IsExpanded)) action(_body);
+        if (visitor.Visit(_expandIcon)) return;
+        if (_title != null && visitor.Visit(_title)) return;
+        if (_body != null && !(_animationFlag == 0 && !IsExpanded)) visitor.Visit(_body);
     }
 
     public override void Layout(float availableWidth, float availableHeight)

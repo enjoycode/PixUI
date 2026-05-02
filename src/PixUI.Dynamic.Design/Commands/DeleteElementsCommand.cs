@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace PixUI.Dynamic.Design;
 
 public sealed class DeleteElementsCommand : DesignCommand

@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 
 namespace PixUI;
@@ -37,10 +36,10 @@ public abstract class SingleChildWidget : Widget
         }
     }
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
         if (_child != null)
-            action(_child);
+            visitor.Visit(_child);
     }
 
     /// <summary>

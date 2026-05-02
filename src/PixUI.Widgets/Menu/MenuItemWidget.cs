@@ -85,13 +85,13 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
         }
     }
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
         //need for lazy load icon font
         if (_icon != null)
-            action(_icon);
+            visitor.Visit(_icon);
         if (_expander != null)
-            action(_expander);
+            visitor.Visit(_expander);
     }
 
     protected internal override bool HitTest(float x, float y, HitTestResult result)

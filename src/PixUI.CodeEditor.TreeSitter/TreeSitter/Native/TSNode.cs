@@ -1,8 +1,5 @@
 #if !__WEB__
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using static CodeEditor.TreeSitterApi;

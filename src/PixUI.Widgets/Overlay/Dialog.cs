@@ -183,8 +183,8 @@ public abstract class Dialog : Popup
         base.OnMounted();
     }
 
-    public override void VisitChildren(Func<Widget, bool> action) => action(_child!);
-
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor) => visitor.Visit(_child!);
+    
     public override bool ContainsPoint(float x, float y) => true;
 
     protected internal override bool HitTest(float x, float y, HitTestResult result)

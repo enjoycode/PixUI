@@ -20,7 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Collections.Generic;
 using System.Linq;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Kernel.Sketches;
@@ -28,7 +27,6 @@ using LiveChartsCore.Measure;
 using LiveCharts.Drawing;
 using LiveCharts.Drawing.Geometries;
 using LiveCharts.Painting;
-using LiveCharts.SKCharts.Helpers;
 using LiveCharts.VisualElements;
 using LiveChartsCore;
 using LiveChartsCore.VisualElements;

@@ -203,15 +203,15 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
 
     #region ====Overrides====
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
-        if (action(_row)) return;
+        if (visitor.Visit(_row)) return;
 
         if (!IsLeaf && IsExpanded && Children != null)
         {
             foreach (var child in Children)
             {
-                if (action(child)) break;
+                if (visitor.Visit(child)) break;
             }
         }
     }

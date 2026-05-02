@@ -9,7 +9,6 @@ using LiveChartsCore.Drawing;
 using LiveChartsCore.Kernel;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.Measure;
-using LiveCharts;
 using LiveCharts.Drawing;
 using LiveCharts.Drawing.Geometries;
 using LiveCharts.Painting;

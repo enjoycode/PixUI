@@ -1,6 +1,4 @@
 #if !__WEB__
-using System;
-
 namespace PixUI;
 
 internal sealed unsafe class SKString : SKObject, ISKSkipObjectRegistration

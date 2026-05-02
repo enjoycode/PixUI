@@ -1,6 +1,4 @@
 #if !__WEB__
-using System;
-
 namespace PixUI;
 
 public partial struct Point

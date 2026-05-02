@@ -5,7 +5,6 @@ using LiveChartsCore.Measure;
 using LiveCharts;
 using LiveCharts.Drawing;
 using LiveCharts.Painting;
-using LiveCharts.Painting.ImageFilters;
 using LiveCharts.VisualElements;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Geo;

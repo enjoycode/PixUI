@@ -128,11 +128,11 @@ public sealed class DataGrid<T> : Widget, IDroppable
         _controller.Columns.OnMounted();
     }
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
-        if (Header != null && action(Header)) return;
-        if (action(Body)) return;
-        if (Footer != null) action(Footer);
+        if (Header != null && visitor.Visit(Header)) return;
+        if (visitor.Visit(Body)) return;
+        if (Footer != null) visitor.Visit(Footer);
     }
 
     public override void Layout(float availableWidth, float availableHeight)

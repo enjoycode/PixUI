@@ -35,7 +35,7 @@ public sealed class FocusManager
     {
         //TODO:考虑FocusedWidget==null时且为Tab从根节点开始查找Focusable
         if (FocusedWidget == null) return;
-        PropagateEvent<KeyEvent>(FocusedWidget, e,
+        PropagateEvent(FocusedWidget, e,
             (w, ke) => ((IFocusable)w).FocusNode.RaiseKeyDown(ke));
         //如果是Tab键跳转至下一个Focused
         if (!e.IsHandled && e.KeyCode == Keys.Tab)
@@ -52,14 +52,14 @@ public sealed class FocusManager
     internal void OnKeyUp(KeyEvent e)
     {
         if (FocusedWidget == null) return;
-        PropagateEvent<KeyEvent>(FocusedWidget, e,
+        PropagateEvent(FocusedWidget, e,
             (w, ke) => ((IFocusable)w).FocusNode.RaiseKeyUp(ke));
     }
 
     internal void OnTextInput(string text)
     {
-        var forcusable = FocusedWidget as IFocusable;
-        forcusable?.FocusNode.RaiseTextInput(text);
+        var focusable = FocusedWidget as IFocusable;
+        focusable?.FocusNode.RaiseTextInput(text);
     }
 
     private static void PropagateEvent<T>(Widget? widget, T theEvent, Action<Widget, T> handler)
@@ -77,74 +77,117 @@ public sealed class FocusManager
         }
     }
 
-    private static Widget? FindFocusableForward(Widget container, Widget? start)
+    private struct FindFocusableForwardVisitor : IChildrenVisitor
     {
-        //start == null 表示向下
-        Widget? found = null;
-        var hasStart = start == null;
-        container.VisitChildren(c =>
+        public FindFocusableForwardVisitor(Widget? start)
         {
-            if (!hasStart)
+            _start = start;
+            _hasStart = start == null;
+        }
+
+        private readonly Widget? _start;
+        private bool _hasStart;
+        public Widget? Found { get; private set; }
+
+        public bool Visit(Widget c)
+        {
+            if (!_hasStart)
             {
-                if (ReferenceEquals(c, start))
-                    hasStart = true;
+                if (ReferenceEquals(c, _start))
+                    _hasStart = true;
             }
             else
             {
                 if (c is IFocusable)
                 {
-                    found = c;
+                    Found = c;
                     return true;
                 }
 
                 var childFocused = FindFocusableForward(c, null);
                 if (childFocused != null)
                 {
-                    found = childFocused;
+                    Found = childFocused;
                     return true;
                 }
             }
 
             return false;
-        });
-
-        if (found != null || start == null) return found;
-        //继续向上
-        if (container.Parent != null && container.Parent is not IRootWidget)
-            return FindFocusableForward(container.Parent!, container);
-        return null;
+        }
     }
 
-    private static Widget? FindFocusableBackward(Widget container, Widget? start)
+    private static Widget? FindFocusableForward(Widget container, Widget? start)
     {
         //start == null 表示向下
-        Widget? found = null;
-        container.VisitChildren(c =>
+        while (true)
         {
-            if (start != null && ReferenceEquals(c, start))
+            var visitor = new FindFocusableForwardVisitor(start);
+            container.VisitChildren(ref visitor);
+
+            if (visitor.Found != null || start == null) return visitor.Found;
+            //继续向上
+            if (container.Parent != null && container.Parent is not IRootWidget)
+            {
+                start = container;
+                container = container.Parent!;
+                continue;
+            }
+
+            return null;
+        }
+    }
+
+    private struct FindFocusableBackwardVisitor : IChildrenVisitor
+    {
+        public FindFocusableBackwardVisitor(Widget? start)
+        {
+            _start = start;
+        }
+
+        private readonly Widget? _start;
+        public Widget? Found { get; private set; }
+
+        public bool Visit(Widget c)
+        {
+            if (_start != null && ReferenceEquals(c, _start))
                 return true;
 
             if (c is IFocusable)
             {
-                found = c; //Do not break, continue
+                Found = c; //Do not break, continue
             }
             else
             {
                 var childFocused = FindFocusableForward(c, null);
                 if (childFocused != null)
                 {
-                    found = childFocused; //Do not break, continue
+                    Found = childFocused; //Do not break, continue
                 }
             }
 
             return false;
-        });
+        }
+    }
 
-        if (found != null || start == null) return found;
-        //继续向上
-        if (container.Parent != null && container.Parent is not IRootWidget)
-            return FindFocusableBackward(container.Parent!, container);
-        return null;
+    private static Widget? FindFocusableBackward(Widget container, Widget? start)
+    {
+        //start == null 表示向下
+        while (true)
+        {
+            var visitor = new FindFocusableBackwardVisitor(start);
+            container.VisitChildren(ref visitor);
+
+            if (visitor.Found != null || start == null) return visitor.Found;
+            //继续向上
+            if (container.Parent != null && container.Parent is not IRootWidget)
+            {
+                start = container;
+                container = container.Parent!;
+                continue;
+            }
+
+            return null;
+        }
     }
 }
 

@@ -20,7 +20,7 @@ public sealed class ColorPickerPopup : Popup
     private readonly Card _child;
     private readonly Action _hideAction;
 
-    public override void VisitChildren(Func<Widget, bool> action) => action(_child);
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor) => visitor.Visit(_child);
 
     public override void Layout(float availableWidth, float availableHeight)
     {

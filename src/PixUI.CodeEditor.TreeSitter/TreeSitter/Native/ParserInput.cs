@@ -1,7 +1,5 @@
 #if !__WEB__
-using System;
 using System.Runtime.InteropServices;
-using CodeEditor;
 using PixUI;
 
 namespace CodeEditor;

@@ -1,5 +1,3 @@
-using System;
-
 namespace CodeEditor;
 
 public sealed class ImmutableTextBuffer : ITextBuffer

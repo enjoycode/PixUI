@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 public delegate Widget PopupTransitionBuilder(Animation<double> animation, Widget child, Offset? origin);
@@ -218,7 +216,7 @@ internal sealed class PopupProxy : Widget
 
     private readonly Popup _popup;
 
-    public override void VisitChildren(Func<Widget, bool> action) => action(_popup);
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor) => visitor.Visit(_popup);
 
     public override bool ContainsPoint(float x, float y) => _popup.ContainsPoint(x, y);
 

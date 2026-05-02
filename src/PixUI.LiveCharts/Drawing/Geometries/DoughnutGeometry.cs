@@ -21,7 +21,6 @@
 // SOFTWARE.
 
 using System;
-using LiveCharts.Drawing;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Motion;
 using PixUI;

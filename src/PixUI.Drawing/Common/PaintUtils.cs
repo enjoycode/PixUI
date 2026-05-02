@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 public static class PaintUtils

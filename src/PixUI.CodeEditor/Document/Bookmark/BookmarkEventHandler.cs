@@ -1,5 +1,3 @@
-using System;
-
 namespace CodeEditor;
 
 public delegate void BookmarkEventHandler(BookmarkEventArgs e);

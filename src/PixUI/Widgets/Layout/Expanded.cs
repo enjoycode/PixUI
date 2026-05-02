@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 public sealed class Expanded : SingleChildWidget

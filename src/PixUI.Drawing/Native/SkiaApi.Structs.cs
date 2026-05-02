@@ -1,5 +1,4 @@
 #if !__WEB__
-using System;
 using System.Runtime.InteropServices;
 
 namespace PixUI;

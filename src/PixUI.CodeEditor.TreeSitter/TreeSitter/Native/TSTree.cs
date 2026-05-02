@@ -1,5 +1,4 @@
 #if !__WEB__
-using System;
 using System.Diagnostics;
 using static CodeEditor.TreeSitterApi;
 

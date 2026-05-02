@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace PixUI;
 
-public abstract class Widget : IDisposable
+public abstract partial class Widget : IDisposable
 {
     /// <summary>
     /// 是否不透明的
@@ -117,11 +117,8 @@ public abstract class Widget : IDisposable
     public void SetVisibleWithChildren(bool visible)
     {
         IsVisible = visible;
-        VisitChildren(child =>
-        {
-            child.SetVisibleWithChildren(visible);
-            return false;
-        });
+        var visitor = new SetVisibleChildrenVisitor(visible);
+        VisitChildren(ref visitor);
     }
 
     #endregion
@@ -252,22 +249,15 @@ public abstract class Widget : IDisposable
     }
 
     /// <summary>
-    /// 遍历处理每个子级, 遍历子项时返回true停止
+    /// 遍历访问每个子组件
     /// </summary>
-    public virtual void VisitChildren(Func<Widget, bool> action) { }
+    public virtual void VisitChildren<TVisitor>(ref TVisitor visitor) where TVisitor : struct, IChildrenVisitor { }
 
     protected internal virtual int IndexOfChild(Widget child)
     {
-        var index = -1;
-        var found = -1;
-        VisitChildren(item =>
-        {
-            index++;
-            if (!ReferenceEquals(item, child)) return false;
-            found = index;
-            return true;
-        });
-        return found;
+        var visitor = new IndexOfChildrenVisitor(child);
+        VisitChildren(ref visitor);
+        return visitor.Index;
     }
 
     /// <summary>
@@ -303,7 +293,8 @@ public abstract class Widget : IDisposable
         if (result.Add(this))
             return true; //不再检测嵌套的子级
 
-        VisitChildren(child => HitTestChild(child, x, y, result));
+        var visitor = new HitTestChildrenVisitor(this, x, y, result);
+        VisitChildren(ref visitor);
 
         return true;
     }
@@ -355,11 +346,8 @@ public abstract class Widget : IDisposable
         if (IsMounted) return;
 
         IsMounted = true;
-        VisitChildren(static child =>
-        {
-            child.Mount();
-            return false;
-        });
+        var visitor = new MountChildrenVisitor();
+        VisitChildren(ref visitor);
         OnMounted();
     }
 
@@ -369,11 +357,8 @@ public abstract class Widget : IDisposable
         if (!IsMounted) return;
 
         IsMounted = false;
-        VisitChildren(static child =>
-        {
-            child.Unmount();
-            return false;
-        });
+        var visitor = new UnmountChildrenVisitor();
+        VisitChildren(ref visitor);
         OnUnmounted();
     }
 
@@ -381,17 +366,11 @@ public abstract class Widget : IDisposable
     {
         var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
-        var hasChildren = false;
         SetSize(0, 0);
-        VisitChildren(child =>
-        {
-            hasChildren = true;
-            child.Layout(maxSize.Width, maxSize.Height);
-            SetSize(Math.Max(W, child.W), Math.Max(H, child.H));
-            return false;
-        });
+        var visitor = new LayoutChildrenVisitor(this, maxSize);
+        VisitChildren(ref visitor);
 
-        if (!hasChildren)
+        if (!visitor.HasChildren)
             SetSize(maxSize.Width, maxSize.Height);
     }
 
@@ -532,11 +511,8 @@ public abstract class Widget : IDisposable
             return;
         }
 
-        VisitChildren(child =>
-        {
-            PaintChild(child, canvas, area);
-            return false;
-        });
+        var visitor = new PaintChildrenVisitor(canvas, area);
+        VisitChildren(ref visitor);
     }
 
     protected static void PaintChild(Widget child, Canvas canvas, IDirtyArea? area = null)

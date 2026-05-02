@@ -95,11 +95,11 @@ internal sealed class PopupMenuStack : Popup
 
     #region ====Overrides====
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
         foreach (var child in _children)
         {
-            if (action(child)) break;
+            if (visitor.Visit(child)) break;
         }
     }
 

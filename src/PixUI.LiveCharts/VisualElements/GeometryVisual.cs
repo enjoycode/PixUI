@@ -20,10 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
 using LiveChartsCore.Drawing;
-using LiveChartsCore.Kernel;
-using LiveChartsCore.Measure;
 using LiveCharts.Drawing;
 using LiveCharts.Drawing.Geometries;
 using LiveChartsCore.VisualElements;

@@ -1,6 +1,3 @@
-using AppKit;
-using Foundation;
-
 namespace PixUI.Platform.Mac;
 
 public sealed class AppDelegate : NSApplicationDelegate

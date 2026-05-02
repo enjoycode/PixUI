@@ -723,9 +723,9 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
         base.OnUnmounted();
     }
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
-        if (Child != null) action(Child);
+        if (Child != null) visitor.Visit(Child);
     }
 
     protected internal override bool HitTest(float x, float y, HitTestResult result)
@@ -735,7 +735,10 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
         result.Add(this);
 
         if (IsContainer) //如果非容器组件，不检测包装目标
-            VisitChildren(child => HitTestChild(child, x, y, result));
+        {
+            var visitor = new HitTestChildrenVisitor(this, x, y, result);
+            VisitChildren(ref visitor);
+        }
 
         return true;
     }

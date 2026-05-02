@@ -33,10 +33,10 @@ public sealed class Calendar : Widget
         set => _monthView.SelectedChangedByUser += value;
     }
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
-        if (action(_naviBar)) return;
-        action(_monthView);
+        if (visitor.Visit(_naviBar)) return;
+        visitor.Visit(_monthView);
     }
 
     public override void Layout(float availableWidth, float availableHeight)
@@ -129,13 +129,13 @@ internal sealed class CalendarNaviBar : Widget
         return button;
     }
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
-        if (action(_btPrevYear)) return;
-        if (action(_btPrevMonth)) return;
-        if (action(_btNextMonth)) return;
-        if (action(_btNextYear)) return;
-        action(_title);
+        if (visitor.Visit(_btPrevYear)) return;
+        if (visitor.Visit(_btPrevMonth)) return;
+        if (visitor.Visit(_btNextMonth)) return;
+        if (visitor.Visit(_btNextYear)) return;
+        visitor.Visit(_title);
     }
 
     public override void Layout(float availableWidth, float availableHeight)

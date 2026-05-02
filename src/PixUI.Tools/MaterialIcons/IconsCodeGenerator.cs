@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace PixUI.Tools.Icons;
 
 public static class IconsCodeGenerator

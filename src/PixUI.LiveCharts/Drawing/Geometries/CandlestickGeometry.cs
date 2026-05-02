@@ -21,8 +21,6 @@
 // SOFTWARE.
 
 using System;
-using LiveCharts.Drawing;
-using LiveCharts.Drawing.Geometries;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Motion;
 

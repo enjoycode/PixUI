@@ -41,11 +41,11 @@ internal sealed class PopupMenu : Widget
         }
     }
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
         foreach (var child in _children)
         {
-            if (action(child)) break;
+            if (visitor.Visit(child)) break;
         }
     }
 

@@ -114,13 +114,11 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
         base.OnUnmounted();
     }
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
-        if (_prefix != null && action(_prefix)) return;
-
-        if (action(_editor)) return;
-
-        if (_suffix != null) action(_suffix);
+        if (_prefix != null && visitor.Visit(_prefix)) return;
+        if (visitor.Visit(_editor)) return;
+        if (_suffix != null) visitor.Visit(_suffix);
     }
 
     public override void Layout(float availableWidth, float availableHeight)

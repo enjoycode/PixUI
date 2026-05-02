@@ -149,19 +149,13 @@ partial class DesignController
     public static IEnumerable<DesignElement> GetAllChildrenElements(DesignElement parentElement)
     {
         if (parentElement.Meta == null)
-            return Array.Empty<DesignElement>();
+            return [];
 
         var list = new List<DesignElement>();
         var start = parentElement.Meta.IsReversedWrapElement ? parentElement : parentElement.Child;
 
-        start?.VisitChildren(child =>
-        {
-            var childElement = GetChildElement(child);
-            if (childElement != null)
-                list.Add(childElement);
-
-            return false;
-        });
+        var visitor = new GetAllChildrenVisitor(list);
+        start?.VisitChildren(ref visitor);
 
         return list;
     }
@@ -171,14 +165,9 @@ partial class DesignController
         if (child is DesignElement designElement)
             return designElement;
 
-        DesignElement? next = null;
-        child.VisitChildren(nextChild =>
-        {
-            next = nextChild as DesignElement;
-            return true;
-        });
-
-        return next;
+        var visitor = new GetChildElementVisitor();
+        child.VisitChildren(ref visitor);
+        return visitor.Element;
     }
 
     public void Load(ReadOnlySpan<byte> json)
@@ -407,6 +396,36 @@ partial class DesignController
 
             var child = ReadWidget(ref reader, childrenSlot.PropertyName);
             childrenSlot.AddChild(parent, child);
+        }
+    }
+
+    private readonly struct GetAllChildrenVisitor : IChildrenVisitor
+    {
+        public GetAllChildrenVisitor(List<DesignElement> list)
+        {
+            _list = list;
+        }
+
+        private readonly List<DesignElement> _list;
+
+        public bool Visit(Widget child)
+        {
+            var childElement = GetChildElement(child);
+            if (childElement != null)
+                _list.Add(childElement);
+
+            return false;
+        }
+    }
+
+    private struct GetChildElementVisitor : IChildrenVisitor
+    {
+        public DesignElement? Element { get; private set; }
+
+        public bool Visit(Widget child)
+        {
+            Element = child as DesignElement;
+            return true;
         }
     }
 }

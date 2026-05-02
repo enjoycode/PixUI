@@ -1,4 +1,3 @@
-using System;
 using PixUI;
 
 namespace CodeEditor;

@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-
 #if !__WEB__
 namespace PixUI;
 

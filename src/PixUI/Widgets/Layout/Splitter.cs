@@ -49,7 +49,7 @@ public sealed class Splitter : Widget
     private readonly Widget? _panel2;
     private readonly Axis _orientation = Axis.Horizontal;
     private readonly State<bool>? _panel1Collapsed;
-    private readonly State<bool>? _paenl2Collapsed;
+    private readonly State<bool>? _panel2Collapsed;
     private float _barDistance = float.NaN;
 
     public Axis Orientation
@@ -111,11 +111,11 @@ public sealed class Splitter : Widget
 
     public State<bool>? Panel2Collapsed
     {
-        get => _paenl2Collapsed;
-        init => Bind(ref _paenl2Collapsed, value, RelayoutOnStateChanged);
+        get => _panel2Collapsed;
+        init => Bind(ref _panel2Collapsed, value, RelayoutOnStateChanged);
     }
 
-    private bool IsPanel2Collapsed => _paenl2Collapsed is { Value: true };
+    private bool IsPanel2Collapsed => _panel2Collapsed is { Value: true };
 
     public FixedPanel Fixed { get; init; } = FixedPanel.None;
 
@@ -150,11 +150,11 @@ public sealed class Splitter : Widget
         Relayout();
     }
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
-        if (Panel1 != null && action(Panel1)) return;
-        if (Panel2 != null && action(Panel2)) return;
-        action(_bar);
+        if (Panel1 != null && visitor.Visit(Panel1)) return;
+        if (Panel2 != null && visitor.Visit(Panel2)) return;
+        visitor.Visit(_bar);
     }
 
     public override void Layout(float availableWidth, float availableHeight)

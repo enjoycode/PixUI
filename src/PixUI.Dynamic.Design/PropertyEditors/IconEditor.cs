@@ -123,11 +123,11 @@ internal sealed class IconList : Widget, IScrollable
 
     #endregion
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
         foreach (var item in _items)
         {
-            if (action(item)) break;
+            if (visitor.Visit(item)) break;
         }
     }
 

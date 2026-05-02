@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 public enum Visibility
@@ -73,10 +71,10 @@ public sealed class Visible : SingleChildWidget
         _oldVisibility = currentVisibility;
     }
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
         if (Child != null && _visibility.Value == PixUI.Visibility.Visible)
-            action(Child);
+            visitor.Visit(Child);
     }
 
     public override void Layout(float availableWidth, float availableHeight)

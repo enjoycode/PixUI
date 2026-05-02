@@ -205,11 +205,11 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         x >= Controller.TreeView!.ScrollOffsetX &&
         x < Controller.TreeView!.W + Controller.TreeView!.ScrollOffsetX;
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
-        if (_checkbox != null) action(_checkbox);
-        if (_icon != null) action(_icon);
-        if (_label != null) action(_label);
+        if (_checkbox != null) visitor.Visit(_checkbox);
+        if (_icon != null) visitor.Visit(_icon);
+        if (_label != null) visitor.Visit(_label);
     }
 
     protected internal override bool HitTest(float x, float y, HitTestResult result)

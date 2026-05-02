@@ -48,20 +48,8 @@ public sealed class ButtonGroup : MultiChildWidget<Button>
         }
         else
         {
-            VisitChildren(child =>
-            {
-                if (child.W <= 0 || child.H <= 0)
-                    return false;
-                if (area != null && !area.IntersectsWith(child))
-                    return false; //脏区域与子组件没有相交部分，不用绘制
-
-                child.BeforePaint(canvas);
-                child.Paint(canvas, area?.ToChild(child));
-                child.AfterPaint(canvas);
-
-                PaintDebugger.PaintWidgetBorder(child, canvas);
-                return false;
-            });
+            var visitor = new PaintChildrenVisitor(canvas, area);
+            VisitChildren(ref visitor);
         }
 
         //画分隔条

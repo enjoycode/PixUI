@@ -283,11 +283,11 @@ public sealed class PropertyEditor : Widget
 
     #region ====Widget Overrides====
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
-        if (action(_targetEditor)) return;
-        if (_deleteButton != null && action(_deleteButton)) return;
-        if (_bindButton != null) action(_bindButton);
+        if (visitor.Visit(_targetEditor)) return;
+        if (_deleteButton != null && visitor.Visit(_deleteButton)) return;
+        if (_bindButton != null) visitor.Visit(_bindButton);
     }
 
     public override void Layout(float availableWidth, float availableHeight)

@@ -1,9 +1,5 @@
 #if !__WEB__
-using System;
-using System.IO;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Win32.SafeHandles;
 using static CodeEditor.TreeSitterApi;
 

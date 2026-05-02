@@ -22,7 +22,6 @@
 
 using System;
 using System.Collections.Generic;
-using LiveCharts.Drawing.Segments;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Geo;
 using LiveChartsCore.Motion;

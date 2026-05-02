@@ -1,6 +1,4 @@
-using AppKit;
 using CoreAnimation;
-using Foundation;
 using Metal;
 
 namespace PixUI.Platform.Mac;

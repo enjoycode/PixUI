@@ -163,10 +163,10 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
 
     #region ====Overrides====
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
-        if (_textWidget != null && action(_textWidget)) return;
-        if (_iconWidget != null) action(_iconWidget);
+        if (_textWidget != null && visitor.Visit(_textWidget)) return;
+        if (_iconWidget != null) visitor.Visit(_iconWidget);
     }
 
     /// <summary>

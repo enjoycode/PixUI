@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 /// <summary>
@@ -32,7 +30,7 @@ internal sealed class HostedCellWidget : Widget
 
     protected internal override float Y => _offsetYToBody;
 
-    public override void VisitChildren(Func<Widget, bool> action) => action(_hostedWidget);
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor) => visitor.Visit(_hostedWidget);
 
     public override void Layout(float availableWidth, float availableHeight)
     {

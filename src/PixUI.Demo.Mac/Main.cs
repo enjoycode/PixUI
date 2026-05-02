@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using PixUI.Platform.Mac;
-using UniformTypeIdentifiers;
+﻿using PixUI.Platform.Mac;
 
 namespace PixUI.Demo.Mac;
 

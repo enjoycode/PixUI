@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -74,7 +73,7 @@ public sealed class Notification : Popup
 
     private Notification(Overlay overlay) : base(overlay) { }
 
-    private readonly IList<NotificationEntry> _children = new List<NotificationEntry>();
+    private readonly List<NotificationEntry> _children = [];
 
     internal void RemoveEntry(NotificationEntry entry)
     {
@@ -91,11 +90,11 @@ public sealed class Notification : Popup
 
     #region ====Overrides====
 
-    public override void VisitChildren(Func<Widget, bool> action)
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
     {
         foreach (var child in _children)
         {
-            if (action(child)) break;
+            if (visitor.Visit(child)) break;
         }
     }
 
@@ -128,11 +127,12 @@ public sealed class Notification : Popup
 
     #region ====Static Show Methods====
 
-    private static readonly State<Color> _textColor = Colors.White;
-    private static readonly State<Color> _infoBgColor = new Color(0xFF0288D1);
-    private static readonly State<Color> _warnBgColor = new Color(0xFFED6C02);
-    private static readonly State<Color> _errorBgColor = new Color(0xFFD32F2F);
-    private static readonly State<Color> _successBgColor = new Color(0xFF2E7D32);
+    //TODO: use Theme's color
+    private static readonly State<Color> TextColor = Colors.White;
+    private static readonly State<Color> InfoBgColor = new Color(0xFF0288D1);
+    private static readonly State<Color> WarnBgColor = new Color(0xFFED6C02);
+    private static readonly State<Color> ErrorBgColor = new Color(0xFFD32F2F);
+    private static readonly State<Color> SuccessBgColor = new Color(0xFF2E7D32);
 
     private static void Show(IconData icon, string text, State<Color> textColor, State<Color> bgColor)
     {
@@ -163,16 +163,16 @@ public sealed class Notification : Popup
     }
 
     public static void Info(string message) =>
-        Show(MaterialIcons.Info, message, _textColor, _infoBgColor);
+        Show(MaterialIcons.Info, message, TextColor, InfoBgColor);
 
     public static void Success(string message) =>
-        Show(MaterialIcons.CheckCircle, message, _textColor, _successBgColor);
+        Show(MaterialIcons.CheckCircle, message, TextColor, SuccessBgColor);
 
     public static void Warn(string message) =>
-        Show(MaterialIcons.Warning, message, _textColor, _warnBgColor);
+        Show(MaterialIcons.Warning, message, TextColor, WarnBgColor);
 
     public static void Error(string message) =>
-        Show(MaterialIcons.Error, message, _textColor, _errorBgColor);
+        Show(MaterialIcons.Error, message, TextColor, ErrorBgColor);
 
     #endregion
 }

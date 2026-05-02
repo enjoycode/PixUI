@@ -1,6 +1,4 @@
 #if !__WEB__
-using System;
-
 namespace PixUI;
 
 public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegistration

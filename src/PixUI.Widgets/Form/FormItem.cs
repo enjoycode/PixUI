@@ -102,7 +102,7 @@ public sealed class FormItem : Widget
 
     #region ====Widget Overrides====
 
-    public override void VisitChildren(Func<Widget, bool> action) => action(Child);
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor) => visitor.Visit(Child);
 
     public override void Layout(float availableWidth, float availableHeight)
     {
