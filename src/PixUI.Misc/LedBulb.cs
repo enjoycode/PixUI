@@ -66,7 +66,7 @@ public sealed class LedBulb : Widget
         var reflectionColor = new Color(255, 255, 255, 180);
         var surroundColor = new Color(255, 255, 255, 0);
         using var gradient2 = Shader.CreateRadialGradient(whiteRect.Center, whiteRect.Width / 2f,
-            new[] { reflectionColor, surroundColor }, null, TileMode.Clamp);
+            [reflectionColor, surroundColor], null, TileMode.Clamp);
         paint = PixUI.Paint.Shared();
         paint.Shader = gradient2;
         paint.AntiAlias = true;

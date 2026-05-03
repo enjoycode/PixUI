@@ -1,7 +1,7 @@
 #if !__WEB__
 namespace PixUI;
 
-public sealed unsafe class SKShader : SKObject, ISKReferenceCounted
+public sealed unsafe class SKShader : SKObject, ISKReferenceCounted, IShader
 {
     private SKShader(IntPtr handle, bool owns) : base(handle, owns) { }
 

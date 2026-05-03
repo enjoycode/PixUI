@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI.Platform
 {
     public struct DisplayParams
@@ -13,4 +12,3 @@ namespace PixUI.Platform
         public GRContextOptions GrContextOptions;
     }
 }
-#endif

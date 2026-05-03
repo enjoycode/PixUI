@@ -30,10 +30,10 @@ namespace PixUI.Platform
             WindowContext = null;
         }
 
-        protected internal sealed override Canvas GetOnscreenCanvas()
+        protected internal sealed override ICanvas GetOnscreenCanvas()
             => WindowContext!.GetOnScreenCanvas();
 
-        protected internal sealed override Canvas GetOffscreenCanvas()
+        protected internal sealed override ICanvas GetOffscreenCanvas()
             => WindowContext!.GetOffScreenCanvas();
 
         protected internal sealed override void Present()

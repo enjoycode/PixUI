@@ -110,7 +110,7 @@ public class SVGPathGeometry : SizedGeometry, ISvgPath<SkiaDrawingContext>
 
         if (!Cache.TryGetValue(path, out var skPath))
         {
-            skPath = SKPath.ParseSvgPathData(path);
+            skPath = PixUI.Path.ParseSvgPathData(path);
             Cache[path] = skPath;
         }
 

@@ -34,13 +34,13 @@ public abstract class NativeWindowContext : IDisposable
     /// 获取OnScreen画布(用于画Overlay并显示)
     /// </summary>
     /// <returns>注意返回的是未缩放的，因为有些平台底层使用多个Buffer</returns>
-    public abstract Canvas GetOnScreenCanvas();
+    public abstract ICanvas GetOnScreenCanvas();
 
     /// <summary>
     /// 获取OffScreen画布(用于画Widgets)
     /// </summary>
     /// <returns>注意返回的是已经根据DevicePixelRatio缩放过的</returns>
-    public abstract Canvas GetOffScreenCanvas();
+    public abstract ICanvas GetOffScreenCanvas();
 
     public abstract void SwapBuffers();
 

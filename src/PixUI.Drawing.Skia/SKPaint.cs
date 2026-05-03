@@ -98,10 +98,10 @@ public sealed class SKPaint : SKObject, ISKSkipObjectRegistration, IPaint
         set => SkiaApi.sk_paint_set_stroke_join(Handle, value);
     }
 
-    public SKShader? Shader
+    public IShader? Shader
     {
         get => SKShader.GetObject(SkiaApi.sk_paint_get_shader(Handle));
-        set => SkiaApi.sk_paint_set_shader(Handle, value?.Handle ?? IntPtr.Zero);
+        set => SkiaApi.sk_paint_set_shader(Handle, (value as SKShader)?.Handle ?? IntPtr.Zero);
     }
 
     public SKMaskFilter? MaskFilter

@@ -98,12 +98,12 @@ public abstract class UIWindow
     /// <summary>
     /// 获取Onscreen画布, 用于绘制Overlay并显示
     /// </summary>
-    protected internal abstract Canvas GetOnscreenCanvas();
+    protected internal abstract ICanvas GetOnscreenCanvas();
 
     /// <summary>
     /// 获取Offscreen画布，用于绘布不常变化的Widgets
     /// </summary>
-    protected internal abstract Canvas GetOffscreenCanvas();
+    protected internal abstract ICanvas GetOffscreenCanvas();
 
 #if __WEB__
         protected internal abstract void FlushOffscreenSurface();

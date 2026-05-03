@@ -24,7 +24,17 @@ public interface IRender
 
     #endregion
 
+    #region ====Shader====
+
+    IShader? ShaderCreateRadialGradient(Point center, float radius, Color[] colors, float[]? colorPos, TileMode mode);
+
+    IShader? ShaderCreateLinearGradient(Point start, Point end, Color[] colors, float[]? colorPos, TileMode mode);
+
+    #endregion
+
     IPath MakePath();
+    
+    IPath PathFromSvgData(string svgPath);
 
     IPathEffect? PathEffectCreateDash(float[] intervals, float phase);
 }

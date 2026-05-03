@@ -9,6 +9,7 @@ public interface IPaint : IDisposable
     bool AntiAlias { get; set; }
     StrokeCap StrokeCap { get; set; }
     IPathEffect? PathEffect { get; set; }
+    IShader? Shader { get; set; }
     void Reset();
 }
 

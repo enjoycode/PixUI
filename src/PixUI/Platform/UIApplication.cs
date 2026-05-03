@@ -120,5 +120,5 @@ public sealed class PaintContext //TODO: remove this
 
     public UIWindow Window { get; internal set; } = null!;
 
-    public Canvas Canvas { get; internal set; } = null!;
+    public ICanvas Canvas { get; internal set; } = null!;
 }
