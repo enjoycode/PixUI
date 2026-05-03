@@ -22,6 +22,10 @@ public interface IRender
 
     IImage? ImageFromEncodedData(Stream data);
 
+    IImage ImageFromPicture(IPicture picture, SizeI size);
+
+    IPictureRecorder MakePictureRecorder();
+
     #endregion
 
     #region ====Shader====

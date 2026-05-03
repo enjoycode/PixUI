@@ -1,6 +1,6 @@
 namespace PixUI;
 
-public interface ICanvas
+public interface ICanvas : IDisposable
 {
     #region ====Draw Methods====
 

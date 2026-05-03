@@ -13,6 +13,10 @@ public sealed class SkiaRender : IRender
 
     public IImage? ImageFromEncodedData(Stream data) => SKImage.FromEncodedData(data);
 
+    public IImage ImageFromPicture(IPicture picture, SizeI size) => SKImage.FromPicture((SKPicture)picture, size);
+
+    public IPictureRecorder MakePictureRecorder() => new SKPictureRecorder();
+
     public IShader? ShaderCreateRadialGradient(Point center, float radius, Color[] colors, float[]? colorPos,
         TileMode mode)
         => SKShader.CreateRadialGradient(center, radius, colors, colorPos, mode);

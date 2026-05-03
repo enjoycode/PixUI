@@ -1,7 +1,7 @@
 #if !__WEB__
 namespace PixUI;
 
-public sealed unsafe class SKPictureRecorder : SKObject, ISKSkipObjectRegistration
+public sealed unsafe class SKPictureRecorder : SKObject, ISKSkipObjectRegistration, IPictureRecorder
 {
     internal SKPictureRecorder(IntPtr handle, bool owns) : base(handle, owns) { }
 
@@ -13,13 +13,13 @@ public sealed unsafe class SKPictureRecorder : SKObject, ISKSkipObjectRegistrati
 
     protected override void DisposeNative() => SkiaApi.sk_picture_recorder_delete(Handle);
 
-    public SKCanvas BeginRecording(Rect cullRect) =>
-        OwnedBy(SKCanvas.GetObject(SkiaApi.sk_picture_recorder_begin_recording(Handle, &cullRect), false), this);
+    public ICanvas BeginRecording(Rect cullRect) =>
+        OwnedBy(SKCanvas.GetObject(SkiaApi.sk_picture_recorder_begin_recording(Handle, &cullRect), false)!, this);
 
-    public SKPicture EndRecording() => SKPicture.GetObject(SkiaApi.sk_picture_recorder_end_recording(Handle))!;
+    public IPicture EndRecording() => SKPicture.GetObject(SkiaApi.sk_picture_recorder_end_recording(Handle))!;
 
     public SKCanvas RecordingCanvas =>
-        OwnedBy(SKCanvas.GetObject(SkiaApi.sk_picture_get_recording_canvas(Handle), false), this);
+        OwnedBy(SKCanvas.GetObject(SkiaApi.sk_picture_get_recording_canvas(Handle), false)!, this);
 }
 
 #endif

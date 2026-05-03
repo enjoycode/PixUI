@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace PixUI;
 
-public sealed unsafe class SKCanvas : SKObject
+public sealed unsafe class SKCanvas : SKObject, ICanvas
 {
     // private const int PatchCornerCount = 4;
     // private const int PatchCubicsCount = 12;

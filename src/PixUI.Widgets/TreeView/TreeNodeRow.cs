@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
@@ -119,7 +117,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
 
         var scale = Root!.Window.ScaleFactor;
         var rect = Rect.FromLTWH(0, 0, width * scale, H * scale);
-        using var recorder = new PictureRecorder();
+        using var recorder = PictureRecorder.Create();
         using var canvas = recorder.BeginRecording(rect);
         canvas.Scale(scale, scale);
         var paint = PixUI.Paint.Shared(Colors.Gray.WithAlpha(128));
@@ -156,7 +154,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
 
         var scale = Root!.Window.ScaleFactor;
         var rect = Rect.FromLTWH(0, 0, width * scale, height * scale);
-        using var recorder = new PictureRecorder();
+        using var recorder = PictureRecorder.Create();
         using var canvas = recorder.BeginRecording(rect);
         canvas.Scale(scale, scale);
         var paint = PixUI.Paint.Shared(Colors.Gray, PaintStyle.Stroke, 2);

@@ -1,7 +1,7 @@
 #if !__WEB__
 namespace PixUI;
 
-public sealed unsafe class SKPicture : SKObject, ISKReferenceCounted
+public sealed unsafe class SKPicture : SKObject, ISKReferenceCounted, IPicture
 {
     internal SKPicture(IntPtr h, bool owns) : base(h, owns) { }
 
