@@ -61,6 +61,6 @@ public class DashEffect : PathEffect
     /// <param name="drawingContext">The drawing context.</param>
     public override void CreateEffect(SkiaDrawingContext drawingContext)
     {
-        SKPathEffect = SKPathEffect.CreateDash(_dashArray, _phase);
+        SKPathEffect = PixUI.PathEffect.CreateDash(_dashArray, _phase);
     }
 }

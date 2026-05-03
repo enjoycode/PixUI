@@ -150,7 +150,7 @@ public class LinearGradientPaint : Paint
         var start = new SKPoint(xf + (xt - xf) * _startPoint.X, yf + (yt - yf) * _startPoint.Y);
         var end = new SKPoint(xf + (xt - xf) * _endPoint.X, yf + (yt - yf) * _endPoint.Y);
 
-        _skiaPaint.Shader = SKShader.CreateLinearGradient(
+        _skiaPaint.Shader = Shader.CreateLinearGradient(
             start,
             end,
             _gradientStops.Select(x => new SKColor(x.Red, x.Green, x.Blue, (byte)(255 * geometry.Opacity))).ToArray(),
@@ -174,7 +174,7 @@ public class LinearGradientPaint : Paint
         var start = new SKPoint(xf + (xt - xf) * _startPoint.X, yf + (yt - yf) * _startPoint.Y);
         var end = new SKPoint(xf + (xt - xf) * _endPoint.X, yf + (yt - yf) * _endPoint.Y);
 
-        _skiaPaint.Shader = SKShader.CreateLinearGradient(
+        _skiaPaint.Shader = Shader.CreateLinearGradient(
             start,
             end,
             _gradientStops,
@@ -185,7 +185,7 @@ public class LinearGradientPaint : Paint
     /// <inheritdoc cref="IPaint{TDrawingContext}.InitializeTask(TDrawingContext)" />
     public override void InitializeTask(SkiaDrawingContext drawingContext)
     {
-        _skiaPaint ??= new SKPaint();
+        _skiaPaint ??= PixUI.Paint.Create();
 
         var size = GetDrawRectangleSize(drawingContext);
 
@@ -198,7 +198,7 @@ public class LinearGradientPaint : Paint
         var start = new SKPoint(xf + (xt - xf) * _startPoint.X, yf + (yt - yf) * _startPoint.Y);
         var end = new SKPoint(xf + (xt - xf) * _endPoint.X, yf + (yt - yf) * _endPoint.Y);
 
-        _skiaPaint.Shader = SKShader.CreateLinearGradient(start, end, _gradientStops, _colorPos, _tileMode);
+        _skiaPaint.Shader = Shader.CreateLinearGradient(start, end, _gradientStops, _colorPos, _tileMode);
         _skiaPaint.AntiAlias = IsAntialias;
         _skiaPaint.Style = PaintStyle.Stroke;
         _skiaPaint.StrokeWidth = StrokeThickness;

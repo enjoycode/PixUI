@@ -43,7 +43,7 @@ public class Blur : ImageFilter
     /// <param name="sigmaX">The sigma x.</param>
     /// <param name="sigmaY">The sigma y.</param>
     /// <param name="input">The input.</param>
-    public Blur(float sigmaX, float sigmaY, SKImageFilter? input = null/*, SKImageFilter.CropRect? cropRect = null*/)
+    public Blur(float sigmaX, float sigmaY, SKImageFilter? input = null /*, SKImageFilter.CropRect? cropRect = null*/)
     {
         _sigmaX = sigmaX;
         _sigmaY = sigmaY;
@@ -58,7 +58,7 @@ public class Blur : ImageFilter
     /// <exception cref="System.NotImplementedException"></exception>
     public override ImageFilter Clone()
     {
-        return new Blur(_sigmaX, _sigmaY, _filter/*, _cropRect*/);
+        return new Blur(_sigmaX, _sigmaY, _filter /*, _cropRect*/);
     }
 
     /// <summary>
@@ -68,6 +68,6 @@ public class Blur : ImageFilter
     /// <returns></returns>
     public override void CreateFilter(SkiaDrawingContext drawingContext)
     {
-        SKImageFilter = SKImageFilter.CreateBlur(_sigmaX, _sigmaY, TileMode.Decal, _filter/*, _cropRect*/);
+        SKImageFilter = PixUI.ImageFilter.CreateBlur(_sigmaX, _sigmaY, TileMode.Decal, _filter /*, _cropRect*/);
     }
 }

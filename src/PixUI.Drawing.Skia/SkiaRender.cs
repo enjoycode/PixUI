@@ -31,6 +31,9 @@ public sealed class SkiaRender : IRender
         Color color, IImageFilter? input)
         => SKImageFilter.CreateDropShadow(dx, dy, sigmaX, sigmaY, color, input as SKImageFilter);
 
+    public IImageFilter? ImageFilterCreateBlur(float sigmaX, float sigmaY, TileMode tileMode, IImageFilter? input)
+        => SKImageFilter.CreateBlur(sigmaX, sigmaY, tileMode, input as SKImageFilter);
+
     public ITextStyle MakeTextStyle() => new SKTextStyle();
 
     public IParagraphStyle MakeParagraphStyle() => new SKParagraphStyle();

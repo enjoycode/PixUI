@@ -25,13 +25,14 @@ using System.Collections.Generic;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Geo;
 using LiveChartsCore.Motion;
+using PixUI;
 
 
 namespace LiveCharts.Drawing.Geometries;
 
 /// <inheritdoc cref="IPathGeometry{TDrawingContext, TPathArgs}" />
 [Obsolete]
-public class PathGeometry : Drawable/*, IPathGeometry<SkiaSharpDrawingContext, SKPath>*/
+public class PathGeometry : Drawable /*, IPathGeometry<SkiaSharpDrawingContext, SKPath>*/
 {
     /// <summary>
     /// The commands
@@ -57,7 +58,7 @@ public class PathGeometry : Drawable/*, IPathGeometry<SkiaSharpDrawingContext, S
 
         var toRemoveSegments = new List<IPathCommand<SKPath>>();
 
-        using var path = new SKPath();
+        using var path = Path.Create();
         var isValid = true;
 
         foreach (var segment in _commands)
@@ -98,14 +99,16 @@ public class PathGeometry : Drawable/*, IPathGeometry<SkiaSharpDrawingContext, S
     }
 
     /// <inheritdoc cref="IPathGeometry{TDrawingContext, TPathArgs}.AddAfter(LinkedListNode{IPathCommand{TPathArgs}}, IPathCommand{TPathArgs})" />
-    public LinkedListNode<IPathCommand<SKPath>> AddAfter(LinkedListNode<IPathCommand<SKPath>> node, IPathCommand<SKPath> command)
+    public LinkedListNode<IPathCommand<SKPath>> AddAfter(LinkedListNode<IPathCommand<SKPath>> node,
+        IPathCommand<SKPath> command)
     {
         IsValid = false;
         return _commands.AddAfter(node, command);
     }
 
     /// <inheritdoc cref="IPathGeometry{TDrawingContext, TPathArgs}.AddBefore(LinkedListNode{IPathCommand{TPathArgs}}, IPathCommand{TPathArgs})" />
-    public LinkedListNode<IPathCommand<SKPath>> AddBefore(LinkedListNode<IPathCommand<SKPath>> node, IPathCommand<SKPath> command)
+    public LinkedListNode<IPathCommand<SKPath>> AddBefore(LinkedListNode<IPathCommand<SKPath>> node,
+        IPathCommand<SKPath> command)
     {
         IsValid = false;
         return _commands.AddBefore(node, command);
@@ -138,7 +141,6 @@ public class PathGeometry : Drawable/*, IPathGeometry<SkiaSharpDrawingContext, S
     }
 
     /// <inheritdoc cref="IAnimatable.CompleteTransition(string[])" />
-
     public override void CompleteTransition(params string[]? propertyName)
     {
         foreach (var segment in _commands)
@@ -185,7 +187,7 @@ public class HeatPathShape : PathGeometry, IHeatPathShape
 
         var toRemoveSegments = new List<IPathCommand<SKPath>>();
 
-        using var path = new SKPath();
+        using var path = Path.Create();
         var isValid = true;
 
         foreach (var segment in _commands)
@@ -206,9 +208,9 @@ public class HeatPathShape : PathGeometry, IHeatPathShape
         if (IsClosed) path.Close();
 
         var originalColor = context.Paint.Color;
-#if !__WEB__        
+#if !__WEB__
         var originalStyle = context.Paint.Style; //TODO: CanvasKit暂不支持getStyle()
-#endif        
+#endif
 
         var fill = FillColor;
 
@@ -223,9 +225,9 @@ public class HeatPathShape : PathGeometry, IHeatPathShape
         if (fill != LvcColor.Empty)
         {
             context.Paint.Color = originalColor;
-#if !__WEB__            
+#if !__WEB__
             context.Paint.Style = originalStyle; //TODO: CanvasKit暂不支持getStyle()
-#endif            
+#endif
         }
 
         if (!isValid) IsValid = false;
@@ -242,4 +244,3 @@ public class HeatPathShape : PathGeometry, IHeatPathShape
         base.CompleteTransition(propertyName);
     }
 }
-

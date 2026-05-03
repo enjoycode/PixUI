@@ -99,7 +99,7 @@ public abstract class Paint : Animatable, IPaint<SkiaDrawingContext>
     /// Gets or sets the SKTypeface, if null, LiveCharts will build one based on the
     /// <see cref="FontFamily"/> and <see cref="SKFontStyle"/> properties. Default is null.
     /// </summary>
-    public Typeface? SKTypeface { get; set; }
+    public ITypeface? SKTypeface { get; set; }
 
     /// <summary>
     /// Gets a value indication whether the paint has a custom font.
@@ -269,7 +269,7 @@ public abstract class Paint : Animatable, IPaint<SkiaDrawingContext>
     /// Gets a <see cref="SKTypeface"/> from the <see cref="FontFamily"/> property.
     /// </summary>
     /// <returns></returns>
-    protected internal Typeface GetSKTypeface()
+    protected internal ITypeface GetSKTypeface()
     {
         // // return the defined typeface.
         // if (SKTypeface is not null) return SKTypeface;

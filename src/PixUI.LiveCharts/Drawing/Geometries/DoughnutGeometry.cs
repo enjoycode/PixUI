@@ -141,7 +141,7 @@ public class DoughnutGeometry : Geometry, IDoughnutGeometry<SkiaDrawingContext>
 
         if (CornerRadius > 0) throw new NotImplementedException($"{nameof(CornerRadius)} is not implemented.");
 
-        using var path = new SKPath();
+        using var path = Path.Create();
         var cx = CenterX;
         var cy = CenterY;
         var wedge = InnerRadius;
@@ -166,7 +166,6 @@ public class DoughnutGeometry : Geometry, IDoughnutGeometry<SkiaDrawingContext>
             (float)(cx + Math.Cos((sweepAngle + startAngle) * toRadians) * wedge),
             (float)(cy + Math.Sin((sweepAngle + startAngle) * toRadians) * wedge));
         path.ArcTo(
-            //new SKPoint { X = wedge, Y = wedge },
             wedge, wedge,
             0,
             //sweepAngle > 180 ? SKPathArcSize.Large : SKPathArcSize.Small,

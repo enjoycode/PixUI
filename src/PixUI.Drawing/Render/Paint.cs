@@ -7,7 +7,9 @@ public interface IPaint : IDisposable
     float StrokeWidth { get; set; }
     BlendMode BlendMode { get; set; }
     bool AntiAlias { get; set; }
+    float StrokeMiter { get; set; }
     StrokeCap StrokeCap { get; set; }
+    StrokeJoin StrokeJoin { get; set; }
     IPathEffect? PathEffect { get; set; }
     IShader? Shader { get; set; }
     IMaskFilter? MaskFilter { get; set; }
@@ -26,6 +28,14 @@ public static class Paint
     {
         var paint = Render.Provider.MakePaint();
         paint.Color = color;
+        return paint;
+    }
+
+    public static IPaint Create(Color color, PaintStyle style)
+    {
+        var paint = Render.Provider.MakePaint();
+        paint.Color = color;
+        paint.Style = style;
         return paint;
     }
 }

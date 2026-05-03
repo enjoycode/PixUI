@@ -79,7 +79,7 @@ public class SolidColorPaint : Paint
     /// <inheritdoc cref="IPaint{TDrawingContext}.InitializeTask(TDrawingContext)" />
     public override void InitializeTask(SkiaDrawingContext drawingContext)
     {
-        _skiaPaint ??= new SKPaint();
+        _skiaPaint ??= PixUI.Paint.Create();
 
         _skiaPaint.Color = Color;
         _skiaPaint.AntiAlias = IsAntialias;

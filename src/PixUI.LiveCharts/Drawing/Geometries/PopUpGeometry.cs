@@ -1,4 +1,5 @@
 using LiveChartsCore.Measure;
+using PixUI;
 
 namespace LiveCharts.Drawing.Geometries;
 
@@ -30,7 +31,7 @@ public class PopUpGeometry : SizedGeometry
 
     public override void OnDraw(SkiaDrawingContext context, SKPaint paint)
     {
-        using var path = new SKPath();
+        using var path = Path.Create();
 
         var wedge = (float)Wedge;
         var br = (float)BorderRadius;

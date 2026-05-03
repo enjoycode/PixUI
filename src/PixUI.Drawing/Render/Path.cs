@@ -14,6 +14,10 @@ public interface IPath : IDisposable
 
     void LineTo(float x, float y);
 
+    void ArcTo(Rect oval, float startAngle, float sweepAngle, bool forceMoveTo);
+
+    void ArcTo(float rx, float ry, float xAxisRotate, bool useSmallArc, bool isCCW, float x, float y);
+
     void CubicTo(float x0, float y0, float x1, float y1, float x2, float y2);
 
     void AddRect(Rect rect, bool isCCW = false);

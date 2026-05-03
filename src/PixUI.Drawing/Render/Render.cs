@@ -46,8 +46,10 @@ public interface IRender
 
     IMaskFilter? MaskFilterCreateBlur(BlurStyle blurStyle, float sigma);
 
-    IImageFilter? ImageFilterCreateDropShadow(float dx, float dy, float sigmaX, float sigmaY, 
+    IImageFilter? ImageFilterCreateDropShadow(float dx, float dy, float sigmaX, float sigmaY,
         Color color, IImageFilter? input);
+
+    IImageFilter? ImageFilterCreateBlur(float sigmaX, float sigmaY, TileMode tileMode, IImageFilter? input);
 
     IPath MakePath();
 

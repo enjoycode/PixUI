@@ -133,7 +133,7 @@ public class LabelGeometry : Geometry, ILabelGeometry<SkiaDrawingContext>
             if (isFirstLine && bg != LvcColor.Empty)
             {
                 var c = new SKColor(bg.R, bg.G, bg.B, (byte)(bg.A * Opacity));
-                using var bgPaint = new SKPaint { Color = c };
+                using var bgPaint = PixUI.Paint.Create(c);
 
                 context.Canvas.DrawRect(X + ao.X, Y + ao.Y - textBounds.Height, size.Width, size.Height, bgPaint);
             }
@@ -147,8 +147,8 @@ public class LabelGeometry : Geometry, ILabelGeometry<SkiaDrawingContext>
 #if DEBUG
             if (ShowDebugLines)
             {
-                using var r = new SKPaint { Color = new SKColor(255, 0, 0), Style = PaintStyle.Stroke };
-                using var b = new SKPaint { Color = new SKColor(0, 0, 255), Style = PaintStyle.Stroke };
+                using var r = PixUI.Paint.Create(new SKColor(255, 0, 0), PaintStyle.Stroke);
+                using var b = PixUI.Paint.Create(new SKColor(0, 0, 255), PaintStyle.Fill);
 
                 context.Canvas.DrawRect(X - 2.5f, Y - 2.5f, 5, 5, b);
 
@@ -181,16 +181,12 @@ public class LabelGeometry : Geometry, ILabelGeometry<SkiaDrawingContext>
         var skiaPaint = (Paint)paint;
         //var typeface = drawable.GetSKTypeface();
 
-        using var p = new SKPaint
-        {
-            Color = skiaPaint.Color,
-            AntiAlias = skiaPaint.IsAntialias,
-            Style = skiaPaint.IsStroke ? SKPaintStyle.Stroke : SKPaintStyle.Fill,
-            StrokeWidth = skiaPaint.StrokeThickness,
-            //TextSize = TextSize,
-            //Typeface = typeface
-        };
-
+        using var p = PixUI.Paint.Create();
+        p.Color = skiaPaint.Color;
+        p.AntiAlias = skiaPaint.IsAntialias;
+        p.Style = skiaPaint.IsStroke ? SKPaintStyle.Stroke : SKPaintStyle.Fill;
+        p.StrokeWidth = skiaPaint.StrokeThickness;
+        //TODO: TextSize and Typeface
 
         var w = 0f;
         _maxTextHeight = 0f;
@@ -200,7 +196,8 @@ public class LabelGeometry : Geometry, ILabelGeometry<SkiaDrawingContext>
         {
             var bounds = new SKRect();
             //_ = p.MeasureText(line, ref bounds);
-            using var ph = TextPainter.BuildParagraph(line, float.MaxValue, TextSize, skiaPaint.Color, forceHeight: true);
+            using var ph =
+                TextPainter.BuildParagraph(line, float.MaxValue, TextSize, skiaPaint.Color, forceHeight: true);
             bounds.Width = ph.MaxIntrinsicWidth;
             bounds.Height = ph.Height;
 
@@ -218,7 +215,7 @@ public class LabelGeometry : Geometry, ILabelGeometry<SkiaDrawingContext>
         // typeface.Dispose();
         return new LvcSize(w + Padding.Left + Padding.Right, h + Padding.Top + Padding.Bottom);
     }
-    
+
     internal IEnumerable<string> GetLines(SKPaint paint)
     {
         IEnumerable<string> lines = Text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);

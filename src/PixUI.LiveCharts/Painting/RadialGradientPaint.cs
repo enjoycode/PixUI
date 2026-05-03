@@ -106,7 +106,7 @@ public class RadialGradientPaint : Paint
     /// <inheritdoc cref="IPaint{TDrawingContext}.InitializeTask(TDrawingContext)" />
     public override void InitializeTask(SkiaDrawingContext drawingContext)
     {
-        _skiaPaint ??= new SKPaint();
+        _skiaPaint ??= PixUI.Paint.Create();
 
         var size = GetDrawRectangleSize(drawingContext);
         var center = new SKPoint(size.Left + _center.X * size.Width, size.Top + _center.Y * size.Height);
@@ -115,7 +115,7 @@ public class RadialGradientPaint : Paint
             : size.Left + size.Width;
         r *= _radius;
 
-        _skiaPaint.Shader = SKShader.CreateRadialGradient(
+        _skiaPaint.Shader = Shader.CreateRadialGradient(
                 center,
                 r,
                 _gradientStops,

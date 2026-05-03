@@ -63,7 +63,11 @@ public abstract class VectorGeometry<TSegment> : Drawable, IVectorGeometry<TSegm
     public VectorClosingMethod ClosingMethod { get; set; }
 
     /// <inheritdoc cref="IVectorGeometry{TSegment, TDrawingContext}.Pivot" />
-    public float Pivot { get => _pivotProperty.GetMovement(this); set => _pivotProperty.SetMovement(value, this); }
+    public float Pivot
+    {
+        get => _pivotProperty.GetMovement(this);
+        set => _pivotProperty.SetMovement(value, this);
+    }
 
     /// <inheritdoc cref="IVectorGeometry{TSegment, TDrawingContext}.AddLast(TSegment)" />
     public LinkedListNode<TSegment> AddLast(TSegment command)
@@ -138,7 +142,7 @@ public abstract class VectorGeometry<TSegment> : Drawable, IVectorGeometry<TSegm
 
         var toRemoveSegments = new List<TSegment>();
 
-        using var path = new SKPath();
+        using var path = PixUI.Path.Create();
         var isValid = true;
 
         var currentTime = CurrentTime;
@@ -182,8 +186,7 @@ public abstract class VectorGeometry<TSegment> : Drawable, IVectorGeometry<TSegm
     /// <param name="context">The context.</param>
     /// <param name="path">The path.</param>
     /// <param name="segment">The segment.</param>
-    protected virtual void OnOpen(SkiaDrawingContext context, SKPath path, TSegment segment)
-    { }
+    protected virtual void OnOpen(SkiaDrawingContext context, SKPath path, TSegment segment) { }
 
     /// <summary>
     /// Called to close the area.
@@ -191,8 +194,7 @@ public abstract class VectorGeometry<TSegment> : Drawable, IVectorGeometry<TSegm
     /// <param name="context">The context.</param>
     /// <param name="path">The path.</param>
     /// <param name="segment">The segment.</param>
-    protected virtual void OnClose(SkiaDrawingContext context, SKPath path, TSegment segment)
-    { }
+    protected virtual void OnClose(SkiaDrawingContext context, SKPath path, TSegment segment) { }
 
     /// <summary>
     /// Called to draw the segment.
@@ -200,6 +202,5 @@ public abstract class VectorGeometry<TSegment> : Drawable, IVectorGeometry<TSegm
     /// <param name="context">The context.</param>
     /// <param name="path">The path.</param>
     /// <param name="segment">The segment.</param>
-    protected virtual void OnDrawSegment(SkiaDrawingContext context, SKPath path, TSegment segment)
-    { }
+    protected virtual void OnDrawSegment(SkiaDrawingContext context, SKPath path, TSegment segment) { }
 }
