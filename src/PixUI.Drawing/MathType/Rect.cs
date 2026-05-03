@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace PixUI;
@@ -35,9 +36,9 @@ public partial struct Rect : IEquatable<Rect>
         }
     }
 
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public readonly bool Equals(Rect obj) =>
-        FloatUtils.NearlyEqual(Left, obj.Left) && FloatUtils.NearlyEqual(Top, obj.Top) &&
-        FloatUtils.NearlyEqual(Right, obj.Right) && FloatUtils.NearlyEqual(Bottom, obj.Bottom);
+        Left == obj.Left && Top == obj.Top && Right == obj.Right && Bottom == obj.Bottom;
 
     public readonly override bool Equals(object? obj) => obj is Rect f && Equals(f);
 

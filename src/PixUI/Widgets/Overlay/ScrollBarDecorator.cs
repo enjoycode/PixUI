@@ -112,8 +112,8 @@ public sealed class ScrollBarDecorator<T> : FlowDecorator<T> where T : Widget, I
             _totalTransform.Multiply(scale);
         }
 
-        if (_totalTransform.IsInvertible)
-            _totalTransform.Invert();
+        if (_totalTransform.TryInvert(out var inverse))
+            _totalTransform = inverse;
         else
             _totalTransform = Matrix3.Empty;
 

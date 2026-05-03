@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace PixUI;
@@ -57,7 +58,9 @@ public struct Radius : IEquatable<Radius>
 
     public static bool operator !=(Radius left, Radius right) => !left.Equals(right);
 
-    public bool Equals(Radius other) => FloatUtils.NearlyEqual(X, other.X) && FloatUtils.NearlyEqual(Y, other.Y);
+
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
+    public bool Equals(Radius other) => X == other.X && Y == other.Y;
 
     public override bool Equals(object? obj) => obj is Radius other && Equals(other);
 

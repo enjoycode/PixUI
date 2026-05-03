@@ -1,4 +1,6 @@
 #if !__WEB__
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace PixUI;
@@ -16,75 +18,78 @@ public struct Matrix4 : IEquatable<Matrix4>
 
     #region ====Fields====
 
-    public float M0 { get; private set; }
-    public float M1 { get; private set; }
-    public float M2 { get; private set; }
-    public float M3 { get; private set; }
-    public float M4 { get; private set; }
-    public float M5 { get; private set; }
-    public float M6 { get; private set; }
-    public float M7 { get; private set; }
-    public float M8 { get; private set; }
-    public float M9 { get; private set; }
+    public float M00 { get; private set; }
+    public float M01 { get; private set; }
+    public float M02 { get; private set; }
+    public float M03 { get; private set; }
+
     public float M10 { get; private set; }
     public float M11 { get; private set; }
     public float M12 { get; private set; }
     public float M13 { get; private set; }
-    public float M14 { get; private set; }
-    public float M15 { get; private set; }
+
+    public float M20 { get; private set; }
+    public float M21 { get; private set; }
+    public float M22 { get; private set; }
+    public float M23 { get; private set; }
+
+    public float M30 { get; private set; }
+    public float M31 { get; private set; }
+    public float M32 { get; private set; }
+    public float M33 { get; private set; }
 
     #endregion
 
     #region ====Ctor====
 
     public Matrix4(
-        float m0, float m1, float m2, float m3,
-        float m4, float m5, float m6, float m7,
-        float m8, float m9, float m10, float m11,
-        float m12, float m13, float m14, float m15)
+        float m00, float m01, float m02, float m03,
+        float m10, float m11, float m12, float m13,
+        float m20, float m21, float m22, float m23,
+        float m30, float m31, float m32, float m33)
     {
-        M0 = m0;
-        M1 = m1;
-        M2 = m2;
-        M3 = m3;
+        M00 = m00;
+        M01 = m01;
+        M02 = m02;
+        M03 = m03;
 
-        M4 = m4;
-        M5 = m5;
-        M6 = m6;
-        M7 = m7;
-
-        M8 = m8;
-        M9 = m9;
         M10 = m10;
         M11 = m11;
-
         M12 = m12;
         M13 = m13;
-        M14 = m14;
-        M15 = m15;
+
+        M20 = m20;
+        M21 = m21;
+        M22 = m22;
+        M23 = m23;
+
+        M30 = m30;
+        M31 = m31;
+        M32 = m32;
+        M33 = m33;
     }
 
     public Matrix4(Matrix3 src)
     {
-        M0 = src.M0;
-        M1 = src.M1;
-        M2 = 0;
-        M3 = src.M6;
+        M00 = src.ScaleX;
+        M01 = src.SkewX;
+        M02 = 0;
+        M03 = src.Persp0;
 
-        M4 = src.M3;
-        M5 = src.M4;
-        M6 = 0;
-        M7 = src.M7;
+        M10 = src.SkewY;
+        M11 = src.ScaleY;
+        M12 = 0;
+        M13 = src.Persp1;
 
-        M8 = 0;
-        M9 = 0;
-        M10 = 1;
-        M11 = 0;
+        M20 = 0;
+        M21 = 0;
+        M22 = 1;
+        M23 = 0;
 
-        M12 = src.M2;
-        M13 = src.M5;
-        M14 = 0;
-        M15 = src.M8;
+        M30 = src.TransX;
+        M31 = src.TransY;
+        M32 = 0;
+        M33 = src.Persp2;
     }
 
     #endregion
@@ -241,25 +246,25 @@ public struct Matrix4 : IEquatable<Matrix4>
         if (src.Length != 16)
             throw new ArgumentException("The source array must be 16 entries.", nameof(src));
 
-        M0 = src[0];
-        M1 = src[1];
-        M2 = src[2];
-        M3 = src[3];
+        M00 = src[0];
+        M01 = src[1];
+        M02 = src[2];
+        M03 = src[3];
 
-        M4 = src[4];
-        M5 = src[5];
-        M6 = src[6];
-        M7 = src[7];
+        M10 = src[4];
+        M11 = src[5];
+        M12 = src[6];
+        M13 = src[7];
 
-        M8 = src[8];
-        M9 = src[9];
-        M10 = src[10];
-        M11 = src[11];
+        M20 = src[8];
+        M21 = src[9];
+        M22 = src[10];
+        M23 = src[11];
 
-        M12 = src[12];
-        M13 = src[13];
-        M14 = src[14];
-        M15 = src[15];
+        M30 = src[12];
+        M31 = src[13];
+        M32 = src[14];
+        M33 = src[15];
     }
 
     public void SetRowMajor(ReadOnlySpan<float> src)
@@ -269,25 +274,25 @@ public struct Matrix4 : IEquatable<Matrix4>
         if (src.Length != 16)
             throw new ArgumentException("The source array must be 16 entries.", nameof(src));
 
-        M0 = src[0];
-        M4 = src[1];
-        M8 = src[2];
-        M12 = src[3];
+        M00 = src[0];
+        M10 = src[1];
+        M20 = src[2];
+        M30 = src[3];
 
-        M1 = src[4];
-        M5 = src[5];
-        M9 = src[6];
-        M13 = src[7];
+        M01 = src[4];
+        M11 = src[5];
+        M21 = src[6];
+        M31 = src[7];
 
-        M2 = src[8];
-        M6 = src[9];
-        M10 = src[10];
-        M14 = src[11];
+        M02 = src[8];
+        M12 = src[9];
+        M22 = src[10];
+        M32 = src[11];
 
-        M3 = src[12];
-        M7 = src[13];
-        M11 = src[14];
-        M15 = src[15];
+        M03 = src[12];
+        M13 = src[13];
+        M23 = src[14];
+        M33 = src[15];
     }
 
     public unsafe void SetColumn(int column, Vector4 arg)
@@ -323,25 +328,25 @@ public struct Matrix4 : IEquatable<Matrix4>
         if (src.Length != 9)
             throw new ArgumentException("The source array must be 9 entries.", nameof(src));
 
-        M0 = src[0];
-        M4 = src[1];
-        M8 = 0;
-        M12 = src[2];
+        M00 = src[0];
+        M10 = src[1];
+        M20 = 0;
+        M30 = src[2];
 
-        M1 = src[3];
-        M5 = src[4];
-        M9 = 0;
-        M13 = src[5];
+        M01 = src[3];
+        M11 = src[4];
+        M21 = 0;
+        M31 = src[5];
 
-        M2 = 0;
-        M6 = 0;
-        M10 = 1;
-        M14 = 0;
+        M02 = 0;
+        M12 = 0;
+        M22 = 1;
+        M32 = 0;
 
-        M3 = src[6];
-        M7 = src[7];
-        M11 = 0;
-        M15 = src[8];
+        M03 = src[6];
+        M13 = src[7];
+        M23 = 0;
+        M33 = src[8];
     }
 
     public void Set3x3RowMajor(ReadOnlySpan<float> src)
@@ -351,25 +356,25 @@ public struct Matrix4 : IEquatable<Matrix4>
         if (src.Length != 9)
             throw new ArgumentException("The source array must be 9 entries.", nameof(src));
 
-        M0 = src[0];
-        M1 = src[1];
-        M2 = 0;
-        M3 = src[2];
+        M00 = src[0];
+        M01 = src[1];
+        M02 = 0;
+        M03 = src[2];
 
-        M4 = src[3];
-        M5 = src[4];
-        M6 = 0;
-        M7 = src[5];
+        M10 = src[3];
+        M11 = src[4];
+        M12 = 0;
+        M13 = src[5];
 
-        M8 = 0;
-        M9 = 0;
-        M10 = 1;
-        M11 = 0;
+        M20 = 0;
+        M21 = 0;
+        M22 = 1;
+        M23 = 0;
 
-        M12 = src[6];
-        M13 = src[7];
-        M14 = 0;
-        M15 = src[8];
+        M30 = src[6];
+        M31 = src[7];
+        M32 = 0;
+        M33 = src[8];
     }
 
     public void SetTranslation(float dx, float dy, float dz) =>
@@ -413,45 +418,45 @@ public struct Matrix4 : IEquatable<Matrix4>
         var xz = x * z;
         var yz = y * z;
 
-        M0 = xx + ca * (1.0f - xx);
-        M1 = xy - ca * xy + sa * z;
-        M2 = xz - ca * xz - sa * y;
-        M3 = 0;
+        M00 = xx + ca * (1.0f - xx);
+        M01 = xy - ca * xy + sa * z;
+        M02 = xz - ca * xz - sa * y;
+        M03 = 0;
 
-        M4 = xy - ca * xy - sa * z;
-        M5 = yy + ca * (1.0f - yy);
-        M6 = yz - ca * yz + sa * x;
-        M7 = 0;
-
-        M8 = xz - ca * xz + sa * y;
-        M9 = yz - ca * yz - sa * x;
-        M10 = zz + ca * (1.0f - zz);
-        M11 = 0;
-
-        M12 = 0;
+        M10 = xy - ca * xy - sa * z;
+        M11 = yy + ca * (1.0f - yy);
+        M12 = yz - ca * yz + sa * x;
         M13 = 0;
-        M14 = 0;
-        M15 = 1;
+
+        M20 = xz - ca * xz + sa * y;
+        M21 = yz - ca * yz - sa * x;
+        M22 = zz + ca * (1.0f - zz);
+        M23 = 0;
+
+        M30 = 0;
+        M31 = 0;
+        M32 = 0;
+        M33 = 1;
     }
 
     public void SetConcat(Matrix4 a, Matrix4 b) =>
         this = new(
-            a.M0 * b.M0 + a.M1 * b.M4 + a.M2 * b.M8 + a.M3 * b.M12,
-            a.M0 * b.M1 + a.M1 * b.M5 + a.M2 * b.M9 + a.M3 * b.M13,
-            a.M0 * b.M2 + a.M1 * b.M6 + a.M2 * b.M10 + a.M3 * b.M14,
-            a.M0 * b.M3 + a.M1 * b.M7 + a.M2 * b.M11 + a.M3 * b.M15,
-            a.M4 * b.M0 + a.M5 * b.M4 + a.M6 * b.M8 + a.M7 * b.M12,
-            a.M4 * b.M1 + a.M5 * b.M5 + a.M6 * b.M9 + a.M7 * b.M13,
-            a.M4 * b.M2 + a.M5 * b.M6 + a.M6 * b.M10 + a.M7 * b.M14,
-            a.M4 * b.M3 + a.M5 * b.M7 + a.M6 * b.M11 + a.M7 * b.M15,
-            a.M8 * b.M0 + a.M9 * b.M4 + a.M10 * b.M8 + a.M11 * b.M12,
-            a.M8 * b.M1 + a.M9 * b.M5 + a.M10 * b.M9 + a.M11 * b.M13,
-            a.M8 * b.M2 + a.M9 * b.M6 + a.M10 * b.M10 + a.M11 * b.M14,
-            a.M8 * b.M3 + a.M9 * b.M7 + a.M10 * b.M11 + a.M11 * b.M15,
-            a.M12 * b.M0 + a.M13 * b.M4 + a.M14 * b.M8 + a.M15 * b.M12,
-            a.M12 * b.M1 + a.M13 * b.M5 + a.M14 * b.M9 + a.M15 * b.M13,
-            a.M12 * b.M2 + a.M13 * b.M6 + a.M14 * b.M10 + a.M15 * b.M14,
-            a.M12 * b.M3 + a.M13 * b.M7 + a.M14 * b.M11 + a.M15 * b.M15);
+            a.M00 * b.M00 + a.M01 * b.M10 + a.M02 * b.M20 + a.M03 * b.M30,
+            a.M00 * b.M01 + a.M01 * b.M11 + a.M02 * b.M21 + a.M03 * b.M31,
+            a.M00 * b.M02 + a.M01 * b.M12 + a.M02 * b.M22 + a.M03 * b.M32,
+            a.M00 * b.M03 + a.M01 * b.M13 + a.M02 * b.M23 + a.M03 * b.M33,
+            a.M10 * b.M00 + a.M11 * b.M10 + a.M12 * b.M20 + a.M13 * b.M30,
+            a.M10 * b.M01 + a.M11 * b.M11 + a.M12 * b.M21 + a.M13 * b.M31,
+            a.M10 * b.M02 + a.M11 * b.M12 + a.M12 * b.M22 + a.M13 * b.M32,
+            a.M10 * b.M03 + a.M11 * b.M13 + a.M12 * b.M23 + a.M13 * b.M33,
+            a.M20 * b.M00 + a.M21 * b.M10 + a.M22 * b.M20 + a.M23 * b.M30,
+            a.M20 * b.M01 + a.M21 * b.M11 + a.M22 * b.M21 + a.M23 * b.M31,
+            a.M20 * b.M02 + a.M21 * b.M12 + a.M22 * b.M22 + a.M23 * b.M32,
+            a.M20 * b.M03 + a.M21 * b.M13 + a.M22 * b.M23 + a.M23 * b.M33,
+            a.M30 * b.M00 + a.M31 * b.M10 + a.M32 * b.M20 + a.M33 * b.M30,
+            a.M30 * b.M01 + a.M31 * b.M11 + a.M32 * b.M21 + a.M33 * b.M31,
+            a.M30 * b.M02 + a.M31 * b.M12 + a.M32 * b.M22 + a.M33 * b.M32,
+            a.M30 * b.M03 + a.M31 * b.M13 + a.M32 * b.M23 + a.M33 * b.M33);
 
     #endregion
 
@@ -479,123 +484,123 @@ public struct Matrix4 : IEquatable<Matrix4>
 
     public void Translate(float x, float y = 0.0f, float z = 0.0f)
     {
-        M12 = M0 * x + M4 * y + M8 * z + M12;
-        M13 = M1 * x + M5 * y + M9 * z + M13;
-        M14 = M2 * x + M6 * y + M10 * z + M14;
-        M15 = M3 * x + M7 * y + M11 * z + M15;
+        M30 = M00 * x + M10 * y + M20 * z + M30;
+        M31 = M01 * x + M11 * y + M21 * z + M31;
+        M32 = M02 * x + M12 * y + M22 * z + M32;
+        M33 = M03 * x + M13 * y + M23 * z + M33;
     }
 
     public void Scale(float x, float y = 1.0f, float z = 1.0f)
     {
-        M0 *= x;
-        M1 *= x;
-        M2 *= x;
-        M3 *= x;
-        M4 *= y;
-        M5 *= y;
-        M6 *= y;
-        M7 *= y;
-        M8 *= z;
-        M9 *= z;
-        M10 *= z;
-        M11 *= z;
+        M00 *= x;
+        M01 *= x;
+        M02 *= x;
+        M03 *= x;
+        M10 *= y;
+        M11 *= y;
+        M12 *= y;
+        M13 *= y;
+        M20 *= z;
+        M21 *= z;
+        M22 *= z;
+        M23 *= z;
     }
 
     public void RotateX(float angle)
     {
         var cosAngle = (float)Math.Cos(angle);
         var sinAngle = (float)Math.Sin(angle);
-        var t1 = M4 * cosAngle + M8 * sinAngle;
-        var t2 = M5 * cosAngle + M9 * sinAngle;
-        var t3 = M6 * cosAngle + M10 * sinAngle;
-        var t4 = M7 * cosAngle + M11 * sinAngle;
-        var t5 = M4 * -sinAngle + M8 * cosAngle;
-        var t6 = M5 * -sinAngle + M9 * cosAngle;
-        var t7 = M6 * -sinAngle + M10 * cosAngle;
-        var t8 = M7 * -sinAngle + M11 * cosAngle;
-        M4 = t1;
-        M5 = t2;
-        M6 = t3;
-        M7 = t4;
-        M8 = t5;
-        M9 = t6;
-        M10 = t7;
-        M11 = t8;
+        var t1 = M10 * cosAngle + M20 * sinAngle;
+        var t2 = M11 * cosAngle + M21 * sinAngle;
+        var t3 = M12 * cosAngle + M22 * sinAngle;
+        var t4 = M13 * cosAngle + M23 * sinAngle;
+        var t5 = M10 * -sinAngle + M20 * cosAngle;
+        var t6 = M11 * -sinAngle + M21 * cosAngle;
+        var t7 = M12 * -sinAngle + M22 * cosAngle;
+        var t8 = M13 * -sinAngle + M23 * cosAngle;
+        M10 = t1;
+        M11 = t2;
+        M12 = t3;
+        M13 = t4;
+        M20 = t5;
+        M21 = t6;
+        M22 = t7;
+        M23 = t8;
     }
 
     public void RotateZ(float angle)
     {
         var cosAngle = (float)Math.Cos(angle);
         var sinAngle = (float)Math.Sin(angle);
-        var t1 = M0 * cosAngle + M4 * sinAngle;
-        var t2 = M1 * cosAngle + M5 * sinAngle;
-        var t3 = M2 * cosAngle + M6 * sinAngle;
-        var t4 = M3 * cosAngle + M7 * sinAngle;
-        var t5 = M0 * -sinAngle + M4 * cosAngle;
-        var t6 = M1 * -sinAngle + M5 * cosAngle;
-        var t7 = M2 * -sinAngle + M6 * cosAngle;
-        var t8 = M3 * -sinAngle + M7 * cosAngle;
-        M0 = t1;
-        M1 = t2;
-        M2 = t3;
-        M3 = t4;
-        M4 = t5;
-        M5 = t6;
-        M6 = t7;
-        M7 = t8;
+        var t1 = M00 * cosAngle + M10 * sinAngle;
+        var t2 = M01 * cosAngle + M11 * sinAngle;
+        var t3 = M02 * cosAngle + M12 * sinAngle;
+        var t4 = M03 * cosAngle + M13 * sinAngle;
+        var t5 = M00 * -sinAngle + M10 * cosAngle;
+        var t6 = M01 * -sinAngle + M11 * cosAngle;
+        var t7 = M02 * -sinAngle + M12 * cosAngle;
+        var t8 = M03 * -sinAngle + M13 * cosAngle;
+        M00 = t1;
+        M01 = t2;
+        M02 = t3;
+        M03 = t4;
+        M10 = t5;
+        M11 = t6;
+        M12 = t7;
+        M13 = t8;
     }
 
     public void Multiply(in Matrix4 arg)
     {
-        var aM0 = M0;
-        var aM4 = M4;
-        var aM8 = M8;
-        var aM12 = M12;
-        var aM1 = M1;
-        var aM5 = M5;
-        var aM9 = M9;
-        var aM13 = M13;
-        var aM2 = M2;
-        var aM6 = M6;
-        var aM10 = M10;
-        var aM14 = M14;
-        var aM3 = M3;
-        var aM7 = M7;
-        var aM11 = M11;
-        var aM15 = M15;
+        var aM0 = M00;
+        var aM4 = M10;
+        var aM8 = M20;
+        var aM12 = M30;
+        var aM1 = M01;
+        var aM5 = M11;
+        var aM9 = M21;
+        var aM13 = M31;
+        var aM2 = M02;
+        var aM6 = M12;
+        var aM10 = M22;
+        var aM14 = M32;
+        var aM3 = M03;
+        var aM7 = M13;
+        var aM11 = M23;
+        var aM15 = M33;
 
-        var bM0 = arg.M0;
-        var bM4 = arg.M4;
-        var bM8 = arg.M8;
-        var bM12 = arg.M12;
-        var bM1 = arg.M1;
-        var bM5 = arg.M5;
-        var bM9 = arg.M9;
-        var bM13 = arg.M13;
-        var bM2 = arg.M2;
-        var bM6 = arg.M6;
-        var bM10 = arg.M10;
-        var bM14 = arg.M14;
-        var bM3 = arg.M3;
-        var bM7 = arg.M7;
-        var bM11 = arg.M11;
-        var bM15 = arg.M15;
-        M0 = (aM0 * bM0) + (aM4 * bM1) + (aM8 * bM2) + (aM12 * bM3);
-        M4 = (aM0 * bM4) + (aM4 * bM5) + (aM8 * bM6) + (aM12 * bM7);
-        M8 = (aM0 * bM8) + (aM4 * bM9) + (aM8 * bM10) + (aM12 * bM11);
-        M12 = (aM0 * bM12) + (aM4 * bM13) + (aM8 * bM14) + (aM12 * bM15);
-        M1 = (aM1 * bM0) + (aM5 * bM1) + (aM9 * bM2) + (aM13 * bM3);
-        M5 = (aM1 * bM4) + (aM5 * bM5) + (aM9 * bM6) + (aM13 * bM7);
-        M9 = (aM1 * bM8) + (aM5 * bM9) + (aM9 * bM10) + (aM13 * bM11);
-        M13 = (aM1 * bM12) + (aM5 * bM13) + (aM9 * bM14) + (aM13 * bM15);
-        M2 = (aM2 * bM0) + (aM6 * bM1) + (aM10 * bM2) + (aM14 * bM3);
-        M6 = (aM2 * bM4) + (aM6 * bM5) + (aM10 * bM6) + (aM14 * bM7);
-        M10 = (aM2 * bM8) + (aM6 * bM9) + (aM10 * bM10) + (aM14 * bM11);
-        M14 = (aM2 * bM12) + (aM6 * bM13) + (aM10 * bM14) + (aM14 * bM15);
-        M3 = (aM3 * bM0) + (aM7 * bM1) + (aM11 * bM2) + (aM15 * bM3);
-        M7 = (aM3 * bM4) + (aM7 * bM5) + (aM11 * bM6) + (aM15 * bM7);
-        M11 = (aM3 * bM8) + (aM7 * bM9) + (aM11 * bM10) + (aM15 * bM11);
-        M15 = (aM3 * bM12) + (aM7 * bM13) + (aM11 * bM14) + (aM15 * bM15);
+        var bM0 = arg.M00;
+        var bM4 = arg.M10;
+        var bM8 = arg.M20;
+        var bM12 = arg.M30;
+        var bM1 = arg.M01;
+        var bM5 = arg.M11;
+        var bM9 = arg.M21;
+        var bM13 = arg.M31;
+        var bM2 = arg.M02;
+        var bM6 = arg.M12;
+        var bM10 = arg.M22;
+        var bM14 = arg.M32;
+        var bM3 = arg.M03;
+        var bM7 = arg.M13;
+        var bM11 = arg.M23;
+        var bM15 = arg.M33;
+        M00 = (aM0 * bM0) + (aM4 * bM1) + (aM8 * bM2) + (aM12 * bM3);
+        M10 = (aM0 * bM4) + (aM4 * bM5) + (aM8 * bM6) + (aM12 * bM7);
+        M20 = (aM0 * bM8) + (aM4 * bM9) + (aM8 * bM10) + (aM12 * bM11);
+        M30 = (aM0 * bM12) + (aM4 * bM13) + (aM8 * bM14) + (aM12 * bM15);
+        M01 = (aM1 * bM0) + (aM5 * bM1) + (aM9 * bM2) + (aM13 * bM3);
+        M11 = (aM1 * bM4) + (aM5 * bM5) + (aM9 * bM6) + (aM13 * bM7);
+        M21 = (aM1 * bM8) + (aM5 * bM9) + (aM9 * bM10) + (aM13 * bM11);
+        M31 = (aM1 * bM12) + (aM5 * bM13) + (aM9 * bM14) + (aM13 * bM15);
+        M02 = (aM2 * bM0) + (aM6 * bM1) + (aM10 * bM2) + (aM14 * bM3);
+        M12 = (aM2 * bM4) + (aM6 * bM5) + (aM10 * bM6) + (aM14 * bM7);
+        M22 = (aM2 * bM8) + (aM6 * bM9) + (aM10 * bM10) + (aM14 * bM11);
+        M32 = (aM2 * bM12) + (aM6 * bM13) + (aM10 * bM14) + (aM14 * bM15);
+        M03 = (aM3 * bM0) + (aM7 * bM1) + (aM11 * bM2) + (aM15 * bM3);
+        M13 = (aM3 * bM4) + (aM7 * bM5) + (aM11 * bM6) + (aM15 * bM7);
+        M23 = (aM3 * bM8) + (aM7 * bM9) + (aM11 * bM10) + (aM15 * bM11);
+        M33 = (aM3 * bM12) + (aM7 * bM13) + (aM11 * bM14) + (aM15 * bM15);
     }
 
     #endregion
@@ -612,22 +617,22 @@ public struct Matrix4 : IEquatable<Matrix4>
     /// </summary>
     public float CopyInverse(in Matrix4 arg)
     {
-        var a00 = arg.M0;
-        var a01 = arg.M1;
-        var a02 = arg.M2;
-        var a03 = arg.M3;
-        var a10 = arg.M4;
-        var a11 = arg.M5;
-        var a12 = arg.M6;
-        var a13 = arg.M7;
-        var a20 = arg.M8;
-        var a21 = arg.M9;
-        var a22 = arg.M10;
-        var a23 = arg.M11;
-        var a30 = arg.M12;
-        var a31 = arg.M13;
-        var a32 = arg.M14;
-        var a33 = arg.M15;
+        var a00 = arg.M00;
+        var a01 = arg.M01;
+        var a02 = arg.M02;
+        var a03 = arg.M03;
+        var a10 = arg.M10;
+        var a11 = arg.M11;
+        var a12 = arg.M12;
+        var a13 = arg.M13;
+        var a20 = arg.M20;
+        var a21 = arg.M21;
+        var a22 = arg.M22;
+        var a23 = arg.M23;
+        var a30 = arg.M30;
+        var a31 = arg.M31;
+        var a32 = arg.M32;
+        var a33 = arg.M33;
         var b00 = a00 * a11 - a01 * a10;
         var b01 = a00 * a12 - a02 * a10;
         var b02 = a00 * a13 - a03 * a10;
@@ -648,22 +653,22 @@ public struct Matrix4 : IEquatable<Matrix4>
         }
 
         var invDet = 1.0f / det;
-        M0 = (a11 * b11 - a12 * b10 + a13 * b09) * invDet;
-        M1 = (-a01 * b11 + a02 * b10 - a03 * b09) * invDet;
-        M2 = (a31 * b05 - a32 * b04 + a33 * b03) * invDet;
-        M3 = (-a21 * b05 + a22 * b04 - a23 * b03) * invDet;
-        M4 = (-a10 * b11 + a12 * b08 - a13 * b07) * invDet;
-        M5 = (a00 * b11 - a02 * b08 + a03 * b07) * invDet;
-        M6 = (-a30 * b05 + a32 * b02 - a33 * b01) * invDet;
-        M7 = (a20 * b05 - a22 * b02 + a23 * b01) * invDet;
-        M8 = (a10 * b10 - a11 * b08 + a13 * b06) * invDet;
-        M9 = (-a00 * b10 + a01 * b08 - a03 * b06) * invDet;
-        M10 = (a30 * b04 - a31 * b02 + a33 * b00) * invDet;
-        M11 = (-a20 * b04 + a21 * b02 - a23 * b00) * invDet;
-        M12 = (-a10 * b09 + a11 * b07 - a12 * b06) * invDet;
-        M13 = (a00 * b09 - a01 * b07 + a02 * b06) * invDet;
-        M14 = (-a30 * b03 + a31 * b01 - a32 * b00) * invDet;
-        M15 = (a20 * b03 - a21 * b01 + a22 * b00) * invDet;
+        M00 = (a11 * b11 - a12 * b10 + a13 * b09) * invDet;
+        M01 = (-a01 * b11 + a02 * b10 - a03 * b09) * invDet;
+        M02 = (a31 * b05 - a32 * b04 + a33 * b03) * invDet;
+        M03 = (-a21 * b05 + a22 * b04 - a23 * b03) * invDet;
+        M10 = (-a10 * b11 + a12 * b08 - a13 * b07) * invDet;
+        M11 = (a00 * b11 - a02 * b08 + a03 * b07) * invDet;
+        M12 = (-a30 * b05 + a32 * b02 - a33 * b01) * invDet;
+        M13 = (a20 * b05 - a22 * b02 + a23 * b01) * invDet;
+        M20 = (a10 * b10 - a11 * b08 + a13 * b06) * invDet;
+        M21 = (-a00 * b10 + a01 * b08 - a03 * b06) * invDet;
+        M22 = (a30 * b04 - a31 * b02 + a33 * b00) * invDet;
+        M23 = (-a20 * b04 + a21 * b02 - a23 * b00) * invDet;
+        M30 = (-a10 * b09 + a11 * b07 - a12 * b06) * invDet;
+        M31 = (a00 * b09 - a01 * b07 + a02 * b06) * invDet;
+        M32 = (-a30 * b03 + a31 * b01 - a32 * b00) * invDet;
+        M33 = (a20 * b03 - a21 * b01 + a22 * b00) * invDet;
         return det;
     }
 
@@ -680,10 +685,10 @@ public struct Matrix4 : IEquatable<Matrix4>
 
     public void Transpose() =>
         this = new Matrix4(
-            M0, M4, M8, M12,
-            M1, M5, M9, M13,
-            M2, M6, M10, M14,
-            M3, M7, M11, M15);
+            M00, M10, M20, M30,
+            M01, M11, M21, M31,
+            M02, M12, M22, M32,
+            M03, M13, M23, M33);
 
     #endregion
 
@@ -720,10 +725,10 @@ public struct Matrix4 : IEquatable<Matrix4>
             var c2 = current[2];
             var c3 = current[3];
 
-            working[0] = M0 * c0 + M4 * c1 + M8 * c2 + M12 * c3;
-            working[1] = M1 * c0 + M5 * c1 + M9 * c2 + M13 * c3;
-            working[2] = M2 * c0 + M6 * c1 + M10 * c2 + M14 * c3;
-            working[3] = M3 * c0 + M7 * c1 + M11 * c2 + M15 * c3;
+            working[0] = M00 * c0 + M10 * c1 + M20 * c2 + M30 * c3;
+            working[1] = M01 * c0 + M11 * c1 + M21 * c2 + M31 * c3;
+            working[2] = M02 * c0 + M12 * c1 + M22 * c2 + M32 * c3;
+            working[3] = M03 * c0 + M13 * c1 + M23 * c2 + M33 * c3;
 
             working.CopyTo(destination);
         }
@@ -768,8 +773,8 @@ public struct Matrix4 : IEquatable<Matrix4>
         {
             var s = src[i];
             dst[i] = new Point(
-                M0 * s.X + M4 * s.Y + M12,
-                M1 * s.X + M5 * s.Y + M13);
+                M00 * s.X + M10 * s.Y + M30,
+                M01 * s.X + M11 * s.Y + M31);
         }
     }
 
@@ -806,10 +811,10 @@ public struct Matrix4 : IEquatable<Matrix4>
             var c0 = current[0];
             var c1 = current[1];
 
-            working[0] = M0 * c0 + M4 * c1 + M12;
-            working[1] = M1 * c0 + M5 * c1 + M13;
-            working[2] = M2 * c0 + M6 * c1 + M14;
-            working[3] = M3 * c0 + M7 * c1 + M15;
+            working[0] = M00 * c0 + M10 * c1 + M30;
+            working[1] = M01 * c0 + M11 * c1 + M31;
+            working[2] = M02 * c0 + M12 * c1 + M32;
+            working[3] = M03 * c0 + M13 * c1 + M33;
 
             working.CopyTo(destination);
         }
@@ -821,10 +826,10 @@ public struct Matrix4 : IEquatable<Matrix4>
 
     public readonly double GetDeterminant()
     {
-        float a = M0, b = M1, c = M2, d = M3;
-        float e = M4, f = M5, g = M6, h = M7;
-        float i = M8, j = M9, k = M10, l = M11;
-        float m = M12, n = M13, o = M14, p = M15;
+        float a = M00, b = M01, c = M02, d = M03;
+        float e = M10, f = M11, g = M12, h = M13;
+        float i = M20, j = M21, k = M22, l = M23;
+        float m = M30, n = M31, o = M32, p = M33;
 
         var kp_lo = k * p - l * o;
         var jp_ln = j * p - l * n;
@@ -901,32 +906,32 @@ public struct Matrix4 : IEquatable<Matrix4>
     #region ====Overrides====
 
     public readonly bool Equals(Matrix4 obj) =>
-        M0 == obj.M0 && M1 == obj.M1 && M2 == obj.M2 && M3 == obj.M3 &&
-        M4 == obj.M4 && M5 == obj.M5 && M6 == obj.M6 && M7 == obj.M7 &&
-        M8 == obj.M8 && M9 == obj.M9 && M10 == obj.M10 && M11 == obj.M11 &&
-        M12 == obj.M12 && M13 == obj.M13 && M14 == obj.M14 && M15 == obj.M15;
+        M00 == obj.M00 && M01 == obj.M01 && M02 == obj.M02 && M03 == obj.M03 &&
+        M10 == obj.M10 && M11 == obj.M11 && M12 == obj.M12 && M13 == obj.M13 &&
+        M20 == obj.M20 && M21 == obj.M21 && M22 == obj.M22 && M23 == obj.M23 &&
+        M30 == obj.M30 && M31 == obj.M31 && M32 == obj.M32 && M33 == obj.M33;
 
     public readonly override bool Equals(object obj) => obj is Matrix4 f && Equals(f);
 
     public override int GetHashCode()
     {
         var hash = new HashCode();
-        hash.Add(M0);
-        hash.Add(M1);
-        hash.Add(M2);
-        hash.Add(M3);
-        hash.Add(M4);
-        hash.Add(M5);
-        hash.Add(M6);
-        hash.Add(M7);
-        hash.Add(M8);
-        hash.Add(M9);
+        hash.Add(M00);
+        hash.Add(M01);
+        hash.Add(M02);
+        hash.Add(M03);
         hash.Add(M10);
         hash.Add(M11);
         hash.Add(M12);
         hash.Add(M13);
-        hash.Add(M14);
-        hash.Add(M15);
+        hash.Add(M20);
+        hash.Add(M21);
+        hash.Add(M22);
+        hash.Add(M23);
+        hash.Add(M30);
+        hash.Add(M31);
+        hash.Add(M32);
+        hash.Add(M33);
         return hash.ToHashCode();
     }
 
@@ -935,7 +940,30 @@ public struct Matrix4 : IEquatable<Matrix4>
     public static bool operator !=(Matrix4 left, Matrix4 right) => !left.Equals(right);
 
     public override string ToString() =>
-        $"[{M0,10:F2}, {M1,10:F2}, {M2,10:F2}, {M3,10:F2}]\n[{M4,10:F2}, {M5,10:F2}, {M6,10:F2}, {M7,10:F2}]\n[{M8,10:F2}, {M9,10:F2}, {M10,10:F2}, {M11,10:F2}]\n[{M12,10:F2}, {M13,10:F2}, {M14,10:F2}, {M15,10:F2}]\n";
+        $"[{M00,10:F2}, {M01,10:F2}, {M02,10:F2}, {M03,10:F2}]\n[{M10,10:F2}, {M11,10:F2}, {M12,10:F2}, {M13,10:F2}]\n[{M20,10:F2}, {M21,10:F2}, {M22,10:F2}, {M23,10:F2}]\n[{M30,10:F2}, {M31,10:F2}, {M32,10:F2}, {M33,10:F2}]\n";
+
+    #endregion
+
+    #region ====Type Casting====
+
+    public Matrix3 ToMatrix3() => new Matrix3(
+        M00, M10, M30,
+        M01, M11, M31,
+        M03, M13, M33
+    );
+
+    public static implicit operator Matrix4(Matrix3 matrix) => new(
+        matrix.ScaleX, matrix.SkewY, 0, matrix.Persp0,
+        matrix.SkewX, matrix.ScaleY, 0, matrix.Persp1,
+        0, 0, 1, 0,
+        matrix.TransX, matrix.TransY, 0, matrix.Persp2
+    );
+
+    public static implicit operator Matrix4x4(Matrix4 matrix) =>
+        Unsafe.As<Matrix4, Matrix4x4>(ref matrix);
+
+    public static implicit operator Matrix4(Matrix4x4 matrix) =>
+        Unsafe.As<Matrix4x4, Matrix4>(ref matrix);
 
     #endregion
 }

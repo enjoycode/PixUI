@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace PixUI;
@@ -9,17 +10,14 @@ public partial struct Size : IEquatable<Size>
 
     public float Height { get; set; }
 
-    public readonly bool Equals(Size obj) =>
-        FloatUtils.NearlyEqual(Width, obj.Width) && FloatUtils.NearlyEqual(Height, obj.Height);
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
+    public readonly bool Equals(Size obj) => Width == obj.Width && Height == obj.Height;
 
-    public readonly override bool Equals(object? obj) =>
-        obj is Size f && Equals(f);
+    public readonly override bool Equals(object? obj) => obj is Size f && Equals(f);
 
-    public static bool operator ==(Size left, Size right) =>
-        left.Equals(right);
+    public static bool operator ==(Size left, Size right) => left.Equals(right);
 
-    public static bool operator !=(Size left, Size right) =>
-        !left.Equals(right);
+    public static bool operator !=(Size left, Size right) => !left.Equals(right);
 
     public readonly override int GetHashCode()
     {

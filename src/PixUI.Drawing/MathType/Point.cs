@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace PixUI;
@@ -9,7 +10,8 @@ public partial struct Point : IEquatable<Point>
 
     public float Y { get; set; }
 
-    public readonly bool Equals(Point obj) => FloatUtils.NearlyEqual(X, obj.X) && FloatUtils.NearlyEqual(Y, obj.Y);
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
+    public readonly bool Equals(Point obj) => X == obj.X && Y == obj.Y;
 
     public readonly override bool Equals(object? obj) => obj is Point f && Equals(f);
 
@@ -53,8 +55,8 @@ public partial struct Point3 : IEquatable<Point3>
 
     public float Z { get; set; }
 
-    public readonly bool Equals(Point3 obj) =>
-        FloatUtils.NearlyEqual(X, obj.X) && FloatUtils.NearlyEqual(Y, obj.Y) && FloatUtils.NearlyEqual(Z, obj.Z);
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
+    public readonly bool Equals(Point3 obj) => X == obj.X && Y == obj.Y && Z == obj.Z;
 
     public readonly override bool Equals(object? obj) => obj is Point3 f && Equals(f);
 

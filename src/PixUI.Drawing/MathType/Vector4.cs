@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace PixUI;
@@ -26,9 +27,8 @@ public readonly struct Vector4 : IEquatable<Vector4>
 
     #region ====IEquatable====
 
-    public readonly bool Equals(Vector4 other) =>
-        FloatUtils.NearlyEqual(X, other.X) && FloatUtils.NearlyEqual(Y, other.Y) &&
-        FloatUtils.NearlyEqual(Z, other.Z) && FloatUtils.NearlyEqual(W, other.W);
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
+    public readonly bool Equals(Vector4 other) => X == other.X && Y == other.Y && Z == other.Z && W == other.W;
 
     public readonly override bool Equals(object? obj) => obj is Vector4 f && Equals(f);
 

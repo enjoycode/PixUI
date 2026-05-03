@@ -32,7 +32,7 @@ public readonly struct ImageInfo : IEquatable<ImageInfo>
 
     public AlphaType AlphaType { get; init; } = AlphaType.Premul;
 
-    public ColorSpace? ColorSpace { get; init; } = null;
+    public IColorSpace? ColorSpace { get; init; } = null;
 
     public int BytesPerPixel => ColorType.GetBytesPerPixel();
 

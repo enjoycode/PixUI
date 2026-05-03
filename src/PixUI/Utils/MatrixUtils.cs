@@ -12,22 +12,22 @@ public static class MatrixUtils
     /// </summary>
     public static Offset? GetAsTranslation(in Matrix4 transform)
     {
-        if (transform.M0 == 1 &&
-            transform.M1 == 0 &&
-            transform.M2 == 0 &&
-            transform.M3 == 0 &&
-            transform.M4 == 0 &&
-            transform.M5 == 1 &&
-            transform.M6 == 0 &&
-            transform.M7 == 0 &&
-            transform.M8 == 0 &&
-            transform.M9 == 0 &&
-            transform.M10 == 1 &&
-            transform.M11 == 0 &&
-            transform.M14 == 0 &&
-            transform.M15 == 1)
+        if (transform.M00 == 1 &&
+            transform.M01 == 0 &&
+            transform.M02 == 0 &&
+            transform.M03 == 0 &&
+            transform.M10 == 0 &&
+            transform.M11 == 1 &&
+            transform.M12 == 0 &&
+            transform.M13 == 0 &&
+            transform.M20 == 0 &&
+            transform.M21 == 0 &&
+            transform.M22 == 1 &&
+            transform.M23 == 0 &&
+            transform.M32 == 0 &&
+            transform.M33 == 1)
         {
-            return new Offset(transform.M12, transform.M13);
+            return new Offset(transform.M30, transform.M31);
         }
 
         return null;
@@ -49,9 +49,9 @@ public static class MatrixUtils
         // Directly simulate the transform of the vector (x, y, 0, 1),
         // dropping the resulting Z coordinate, and normalizing only if needed.
             
-        var rx = transform.M0 * x + transform.M4 * y + transform.M12;
-        var ry = transform.M1 * x + transform.M5 * y + transform.M13;
-        var rw = transform.M3 * x + transform.M7 * y + transform.M15;
+        var rx = transform.M00 * x + transform.M10 * y + transform.M30;
+        var ry = transform.M01 * x + transform.M11 * y + transform.M31;
+        var rw = transform.M03 * x + transform.M13 * y + transform.M33;
 
         return rw == 1.0 ? new Offset(rx, ry) : new Offset(rx / rw, ry / rw);
     }

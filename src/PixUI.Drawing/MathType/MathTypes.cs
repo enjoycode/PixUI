@@ -478,7 +478,7 @@ public partial struct Rect
     }
 
     public void Deflate(float dx, float dy) => Inflate(-dx, -dy);
-    
+
     public static Rect Deflate(in Rect rect, float dx, float dy) => Inflate(rect, -dx, -dy);
 
     public static Rect Intersect(Rect a, Rect b)
@@ -506,8 +506,7 @@ public partial struct Rect
 
     public void Union(Rect rect) => this = Union(this, rect);
 
-    public static implicit operator Rect(RectI r) =>
-        new Rect(r.Left, r.Top, r.Right, r.Bottom);
+    public static implicit operator Rect(RectI r) => new Rect(r.Left, r.Top, r.Right, r.Bottom);
 
     public readonly bool Contains(Point point) => ContainsPoint(point.X, point.Y);
 

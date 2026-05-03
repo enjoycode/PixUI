@@ -53,25 +53,25 @@ public class SKMatrixMotionProperty : MotionProperty<SKMatrix>
     protected override SKMatrix OnGetMovement(float progress)
     {
         return new SKMatrix( //TODO: check
-            fromValue.M0 + progress * (toValue.M0 - fromValue.M0),
-            fromValue.M1 + progress * (toValue.M1 - fromValue.M1),
-            fromValue.M2 + progress * (toValue.M2 - fromValue.M2),
-            fromValue.M3 + progress * (toValue.M3 - fromValue.M3),
+            fromValue.M00 + progress * (toValue.M00 - fromValue.M00),
+            fromValue.M01 + progress * (toValue.M01 - fromValue.M01),
+            fromValue.M02 + progress * (toValue.M02 - fromValue.M02),
+            fromValue.M03 + progress * (toValue.M03 - fromValue.M03),
             
-            fromValue.M4 + progress * (toValue.M4 - fromValue.M4),
-            fromValue.M5 + progress * (toValue.M5 - fromValue.M5),
-            fromValue.M6 + progress * (toValue.M6 - fromValue.M6),
-            fromValue.M7 + progress * (toValue.M7 - fromValue.M7),
-            
-            fromValue.M8 + progress * (toValue.M8 - fromValue.M8),
-            fromValue.M9 + progress * (toValue.M9 - fromValue.M9),
             fromValue.M10 + progress * (toValue.M10 - fromValue.M10),
             fromValue.M11 + progress * (toValue.M11 - fromValue.M11),
-            
             fromValue.M12 + progress * (toValue.M12 - fromValue.M12),
             fromValue.M13 + progress * (toValue.M13 - fromValue.M13),
-            fromValue.M14 + progress * (toValue.M14 - fromValue.M14),
-            fromValue.M15 + progress * (toValue.M15 - fromValue.M15)
+            
+            fromValue.M20 + progress * (toValue.M20 - fromValue.M20),
+            fromValue.M21 + progress * (toValue.M21 - fromValue.M21),
+            fromValue.M22 + progress * (toValue.M22 - fromValue.M22),
+            fromValue.M23 + progress * (toValue.M23 - fromValue.M23),
+            
+            fromValue.M30 + progress * (toValue.M30 - fromValue.M30),
+            fromValue.M31 + progress * (toValue.M31 - fromValue.M31),
+            fromValue.M32 + progress * (toValue.M32 - fromValue.M32),
+            fromValue.M33 + progress * (toValue.M33 - fromValue.M33)
             // fromValue.ScaleX + progress * (toValue.ScaleX - fromValue.ScaleX),
             // fromValue.SkewX + progress * (toValue.SkewX - fromValue.SkewX),
             // fromValue.TransX + progress * (toValue.TransX - fromValue.TransX),

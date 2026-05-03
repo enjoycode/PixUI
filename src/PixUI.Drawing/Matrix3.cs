@@ -1,4 +1,4 @@
-#if !__WEB__
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace PixUI;
@@ -13,85 +13,50 @@ public unsafe struct Matrix3 : IEquatable<Matrix3>
 
     public Matrix3(
         float scaleX, float skewX, float transX,
-        float skewY, float scaleY, float m5,
+        float skewY, float scaleY, float transY,
         float persp0, float persp1, float persp2)
     {
-        this.M0 = scaleX;
-        this.M1 = skewX;
-        this.M2 = transX;
-        this.M3 = skewY;
-        this.M4 = scaleY;
-        this.M5 = m5;
-        this.M6 = persp0;
-        this.M7 = persp1;
-        this.M8 = persp2;
+        ScaleX = scaleX;
+        SkewX = skewX;
+        TransX = transX;
+        SkewY = skewY;
+        ScaleY = scaleY;
+        TransY = transY;
+        Persp0 = persp0;
+        Persp1 = persp1;
+        Persp2 = persp2;
     }
-
 
     public const float DegreesToRadians = (float)Math.PI / 180.0f;
 
-    public readonly static Matrix3 Empty;
-    public readonly static Matrix3 Identity = new() { M0 = 1, M4 = 1, M8 = 1 };
+    public static readonly Matrix3 Empty;
+    public static readonly Matrix3 Identity = new() { ScaleX = 1, ScaleY = 1, Persp2 = 1 };
 
     #region ====Fields====
 
     //[ScaleX, SkewX,  TransX]
     //[SkewY,  ScaleY, TransY]
     //[Persp0, Persp1, Persp2]
+    
+    public float ScaleX { get; private set; }
+    public float SkewX { get; private set; }
+    public float TransX { get; private set; }
+    public float SkewY { get; private set; }
+    public float ScaleY { get; private set; }
+    public float TransY { get; private set; }
+    public float Persp0 { get; private set; }
+    public float Persp1 { get; private set; }
+    public float Persp2 { get; private set; }
 
-    /// <summary>
-    /// ScaleX
-    /// </summary>
-    public float M0 { get; private set; }
-
-    /// <summary>
-    /// SkewX
-    /// </summary>
-    public float M1 { get; private set; }
-
-    /// <summary>
-    /// TransX
-    /// </summary>
-    public float M2 { get; private set; }
-
-    /// <summary>
-    /// SkewY
-    /// </summary>
-    public float M3 { get; private set; }
-
-    /// <summary>
-    /// ScaleY
-    /// </summary>
-    public float M4 { get; private set; }
-
-    /// <summary>
-    /// TransY
-    /// </summary>
-    public float M5 { get; private set; }
-
-    /// <summary>
-    /// Persp0
-    /// </summary>
-    public float M6 { get; private set; }
-
-    /// <summary>
-    /// Persp1
-    /// </summary>
-    public float M7 { get; private set; }
-
-    /// <summary>
-    /// Persp2
-    /// </summary>
-    public float M8 { get; private set; }
+    private int Type;
 
     #endregion
 
     public readonly bool IsIdentity => Equals(Identity);
 
-
     #region ====Create Methods====
 
-    public static Matrix3 CreateIdentity() => new() { M0 = 1, M4 = 1, M8 = 1 };
+    public static Matrix3 CreateIdentity() => new() { ScaleX = 1, ScaleY = 1, Persp2 = 1 };
 
     public static Matrix3 CreateTranslation(float x, float y)
     {
@@ -100,11 +65,11 @@ public unsafe struct Matrix3 : IEquatable<Matrix3>
 
         return new Matrix3
         {
-            M0 = 1,
-            M4 = 1,
-            M2 = x,
-            M5 = y,
-            M8 = 1,
+            ScaleX = 1,
+            ScaleY = 1,
+            TransX = x,
+            TransY = y,
+            Persp2 = 1,
         };
     }
 
@@ -115,9 +80,9 @@ public unsafe struct Matrix3 : IEquatable<Matrix3>
 
         return new Matrix3
         {
-            M0 = x,
-            M4 = y,
-            M8 = 1,
+            ScaleX = x,
+            ScaleY = y,
+            Persp2 = 1,
         };
     }
 
@@ -131,11 +96,11 @@ public unsafe struct Matrix3 : IEquatable<Matrix3>
 
         return new Matrix3
         {
-            M0 = x,
-            M4 = y,
-            M2 = tx,
-            M5 = ty,
-            M8 = 1,
+            ScaleX = x,
+            ScaleY = y,
+            TransX = tx,
+            TransY = ty,
+            Persp2 = 1,
         };
     }
 
@@ -188,11 +153,11 @@ public unsafe struct Matrix3 : IEquatable<Matrix3>
 
         return new Matrix3
         {
-            M0 = 1,
-            M1 = x,
-            M3 = y,
-            M4 = 1,
-            M8 = 1,
+            ScaleX = 1,
+            SkewX = x,
+            SkewY = y,
+            ScaleY = 1,
+            Persp2 = 1,
         };
     }
 
@@ -203,91 +168,77 @@ public unsafe struct Matrix3 : IEquatable<Matrix3>
 
         return new Matrix3
         {
-            M0 = sx,
-            M1 = 0,
-            M2 = tx,
+            ScaleX = sx,
+            SkewX = 0,
+            TransX = tx,
 
-            M3 = 0,
-            M4 = sy,
-            M5 = ty,
+            SkewY = 0,
+            ScaleY = sy,
+            TransY = ty,
 
-            M6 = 0,
-            M7 = 0,
-            M8 = 1,
+            Persp0 = 0,
+            Persp1 = 0,
+            Persp2 = 1,
         };
     }
 
     #endregion
 
-    public readonly bool IsInvertible
-    {
-        get
-        {
-            fixed (Matrix3* t = &this)
-            {
-                return SkiaApi.sk_matrix_try_invert(t, null);
-            }
-        }
-    }
+    public readonly bool IsInvertible => TryInvert(out _);
 
     public readonly bool TryInvert(out Matrix3 inverse)
     {
-        fixed (Matrix3* i = &inverse)
-        fixed (Matrix3* t = &this)
-        {
-            return SkiaApi.sk_matrix_try_invert(t, i);
-        }
+        //TODO: use Matrix4 logic now
+        Matrix4 matrix4 = this;
+        var result = Matrix4.TryInvert(matrix4);
+        inverse = result?.ToMatrix3() ?? Empty;
+        return result.HasValue;
     }
 
     public void Invert()
     {
-        if (TryInvert(out var matrix))
-            this = matrix;
+        if (TryInvert(out var inverse))
+            this = inverse;
     }
 
     // *Concat
     public void Multiply(in Matrix3 arg)
     {
-        var m00 = M0;
-        var m01 = M3;
-        var m02 = M6;
-        var m10 = M1;
-        var m11 = M4;
-        var m12 = M7;
-        var m20 = M2;
-        var m21 = M5;
-        var m22 = M8;
-        var n00 = arg.M0;
-        var n01 = arg.M3;
-        var n02 = arg.M6;
-        var n10 = arg.M1;
-        var n11 = arg.M4;
-        var n12 = arg.M7;
-        var n20 = arg.M2;
-        var n21 = arg.M5;
-        var n22 = arg.M8;
-        M0 = (m00 * n00) + (m01 * n10) + (m02 * n20);
-        M3 = (m00 * n01) + (m01 * n11) + (m02 * n21);
-        M6 = (m00 * n02) + (m01 * n12) + (m02 * n22);
-        M1 = (m10 * n00) + (m11 * n10) + (m12 * n20);
-        M4 = (m10 * n01) + (m11 * n11) + (m12 * n21);
-        M7 = (m10 * n02) + (m11 * n12) + (m12 * n22);
-        M2 = (m20 * n00) + (m21 * n10) + (m22 * n20);
-        M5 = (m20 * n01) + (m21 * n11) + (m22 * n21);
-        M8 = (m20 * n02) + (m21 * n12) + (m22 * n22);
+        var m00 = ScaleX;
+        var m01 = SkewY;
+        var m02 = Persp0;
+        var m10 = SkewX;
+        var m11 = ScaleY;
+        var m12 = Persp1;
+        var m20 = TransX;
+        var m21 = TransY;
+        var m22 = Persp2;
+        var n00 = arg.ScaleX;
+        var n01 = arg.SkewY;
+        var n02 = arg.Persp0;
+        var n10 = arg.SkewX;
+        var n11 = arg.ScaleY;
+        var n12 = arg.Persp1;
+        var n20 = arg.TransX;
+        var n21 = arg.TransY;
+        var n22 = arg.Persp2;
+        ScaleX = (m00 * n00) + (m01 * n10) + (m02 * n20);
+        SkewY = (m00 * n01) + (m01 * n11) + (m02 * n21);
+        Persp0 = (m00 * n02) + (m01 * n12) + (m02 * n22);
+        SkewX = (m10 * n00) + (m11 * n10) + (m12 * n20);
+        ScaleY = (m10 * n01) + (m11 * n11) + (m12 * n21);
+        Persp1 = (m10 * n02) + (m11 * n12) + (m12 * n22);
+        TransX = (m20 * n00) + (m21 * n10) + (m22 * n20);
+        TransY = (m20 * n01) + (m21 * n11) + (m22 * n21);
+        Persp2 = (m20 * n02) + (m21 * n12) + (m22 * n22);
     }
 
     // MapPoints
 
     public readonly Point MapPoint(float x, float y)
     {
-        Point result;
-        fixed (Matrix3* t = &this)
-        {
-            SkiaApi.sk_matrix_map_xy(t, x, y, &result);
-        }
-
-        return result;
+        //TODO: reuse Matrix4 logic now
+        return ((Matrix4)this).MapPoint(x, y);
     }
 
     public readonly PointI MapPointI(int x, int y)
@@ -296,96 +247,32 @@ public unsafe struct Matrix3 : IEquatable<Matrix3>
         return new PointI((int)pt.X, (int)pt.Y);
     }
 
-    public readonly void MapPointsI(PointI[] points)
-    {
-        for (var i = 0; i < points.Length; i++)
-        {
-            points[i] = MapPointI(points[i].X, points[i].Y);
-        }
-    }
-
-    // MapVectors
-
-    public readonly Point MapVector(Point vector) =>
-        MapVector(vector.X, vector.Y);
-
-    public readonly Point MapVector(float x, float y)
-    {
-        Point result;
-        fixed (Matrix3* t = &this)
-        {
-            SkiaApi.sk_matrix_map_vector(t, x, y, &result);
-        }
-
-        return result;
-    }
-
-    public readonly void MapVectors(Point[] result, Point[] vectors)
-    {
-        if (result == null)
-            throw new ArgumentNullException(nameof(result));
-        if (vectors == null)
-            throw new ArgumentNullException(nameof(vectors));
-        if (result.Length != vectors.Length)
-            throw new ArgumentException("Buffers must be the same size.");
-
-        fixed (Matrix3* t = &this)
-        fixed (Point* rp = result)
-        fixed (Point* pp = vectors)
-        {
-            SkiaApi.sk_matrix_map_vectors(t, rp, pp, result.Length);
-        }
-    }
-
-    public readonly Point[] MapVectors(Point[] vectors)
-    {
-        if (vectors == null)
-            throw new ArgumentNullException(nameof(vectors));
-
-        var res = new Point[vectors.Length];
-        MapVectors(res, vectors);
-        return res;
-    }
-
-    // MapRadius
-
-    public readonly float MapRadius(float radius)
-    {
-        fixed (Matrix3* t = &this)
-        {
-            return SkiaApi.sk_matrix_map_radius(t, radius);
-        }
-    }
-
-    // private
-
     private static void SetSinCos(ref Matrix3 matrix, float sin, float cos)
     {
-        matrix.M0 = cos;
-        matrix.M1 = -sin;
-        matrix.M2 = 0;
-        matrix.M3 = sin;
-        matrix.M4 = cos;
-        matrix.M5 = 0;
-        matrix.M6 = 0;
-        matrix.M7 = 0;
-        matrix.M8 = 1;
+        matrix.ScaleX = cos;
+        matrix.SkewX = -sin;
+        matrix.TransX = 0;
+        matrix.SkewY = sin;
+        matrix.ScaleY = cos;
+        matrix.TransY = 0;
+        matrix.Persp0 = 0;
+        matrix.Persp1 = 0;
+        matrix.Persp2 = 1;
     }
 
-    private static void SetSinCos(ref Matrix3 matrix, float sin, float cos, float pivotx,
-        float pivoty)
+    private static void SetSinCos(ref Matrix3 matrix, float sin, float cos, float pivotX, float pivotY)
     {
         float oneMinusCos = 1 - cos;
 
-        matrix.M0 = cos;
-        matrix.M1 = -sin;
-        matrix.M2 = Dot(sin, pivoty, oneMinusCos, pivotx);
-        matrix.M3 = sin;
-        matrix.M4 = cos;
-        matrix.M5 = Dot(-sin, pivotx, oneMinusCos, pivoty);
-        matrix.M6 = 0;
-        matrix.M7 = 0;
-        matrix.M8 = 1;
+        matrix.ScaleX = cos;
+        matrix.SkewX = -sin;
+        matrix.TransX = Dot(sin, pivotY, oneMinusCos, pivotX);
+        matrix.SkewY = sin;
+        matrix.ScaleY = cos;
+        matrix.TransY = Dot(-sin, pivotX, oneMinusCos, pivotY);
+        matrix.Persp0 = 0;
+        matrix.Persp1 = 0;
+        matrix.Persp2 = 1;
     }
 
     private static float Dot(float a, float b, float c, float d) =>
@@ -396,12 +283,13 @@ public unsafe struct Matrix3 : IEquatable<Matrix3>
 
     #region ====Overrides====
 
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public readonly bool Equals(Matrix3 obj) =>
-        M0 == obj.M0 && M1 == obj.M1 && M2 == obj.M2 &&
-        M3 == obj.M3 && M4 == obj.M4 && M5 == obj.M5 &&
-        M6 == obj.M6 && M7 == obj.M7 && M8 == obj.M8;
+        ScaleX == obj.ScaleX && SkewX == obj.SkewX && TransX == obj.TransX &&
+        SkewY == obj.SkewY && ScaleY == obj.ScaleY && TransY == obj.TransY &&
+        Persp0 == obj.Persp0 && Persp1 == obj.Persp1 && Persp2 == obj.Persp2;
 
-    public readonly override bool Equals(object obj) => obj is PixUI.Matrix3 f && Equals(f);
+    public readonly override bool Equals(object? obj) => obj is Matrix3 f && Equals(f);
 
     public static bool operator ==(Matrix3 left, Matrix3 right) => left.Equals(right);
 
@@ -410,18 +298,17 @@ public unsafe struct Matrix3 : IEquatable<Matrix3>
     public readonly override int GetHashCode()
     {
         var hash = new HashCode();
-        hash.Add(M0);
-        hash.Add(M1);
-        hash.Add(M2);
-        hash.Add(M3);
-        hash.Add(M4);
-        hash.Add(M5);
-        hash.Add(M6);
-        hash.Add(M7);
-        hash.Add(M8);
+        hash.Add(ScaleX);
+        hash.Add(SkewX);
+        hash.Add(TransX);
+        hash.Add(SkewY);
+        hash.Add(ScaleY);
+        hash.Add(TransY);
+        hash.Add(Persp0);
+        hash.Add(Persp1);
+        hash.Add(Persp2);
         return hash.ToHashCode();
     }
 
     #endregion
 }
-#endif
