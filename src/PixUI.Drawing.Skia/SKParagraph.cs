@@ -1,8 +1,6 @@
-using System.Runtime.InteropServices;
-
 namespace PixUI;
 
-public sealed class SKParagraph : SKObject
+public sealed class SKParagraph : SKObject, IParagraph
 {
     internal SKParagraph(IntPtr handle, bool owns) : base(handle, owns) { }
 
@@ -57,23 +55,4 @@ public sealed class SKParagraph : SKObject
 
     internal void Paint(SKCanvas canvas, float x, float y) =>
         SkiaApi.sk_paragraph_paint(Handle, canvas.Handle, x, y);
-}
-
-public struct PositionWithAffinity
-{
-    public readonly int Position;
-    public readonly Affinity Affinity;
-
-    internal PositionWithAffinity(int pos, int affinity)
-    {
-        Position = pos;
-        Affinity = (Affinity)affinity;
-    }
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct TextBox
-{
-    public Rect Rect;
-    public TextDirection Direction;
 }
