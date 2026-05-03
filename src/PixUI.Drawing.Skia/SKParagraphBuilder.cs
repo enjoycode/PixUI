@@ -1,6 +1,6 @@
 namespace PixUI;
 
-public sealed class SKParagraphBuilder : SKObject
+public sealed class SKParagraphBuilder : SKObject, IParagraphBuilder
 {
     private SKParagraphBuilder(IntPtr handle, bool owns) : base(handle, owns) { }
 
@@ -10,8 +10,8 @@ public sealed class SKParagraphBuilder : SKObject
 
     protected override void DisposeNative() => SkiaApi.sk_paragraph_builder_delete(Handle);
 
-    public void PushStyle(SKTextStyle textStyle) =>
-        SkiaApi.sk_paragraph_builder_push_style(Handle, textStyle.Handle);
+    public void PushStyle(ITextStyle textStyle) =>
+        SkiaApi.sk_paragraph_builder_push_style(Handle, ((SKTextStyle)textStyle).Handle);
 
     public void Pop() => SkiaApi.sk_paragraph_builder_pop(Handle);
 
@@ -24,7 +24,7 @@ public sealed class SKParagraphBuilder : SKObject
         }
     }
 
-    public SKParagraph Build()
+    public IParagraph Build()
     {
         var para = SkiaApi.sk_paragraph_builder_build(Handle);
         return new SKParagraph(para, true);

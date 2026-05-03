@@ -137,7 +137,7 @@ public sealed class WuxiMap : Widget
         }
     }
 
-    protected override void BeforePaint(Canvas canvas, bool onlyTransform = false, IDirtyArea? dirtyArea = null)
+    protected override void BeforePaint(ICanvas canvas, bool onlyTransform = false, IDirtyArea? dirtyArea = null)
     {
         canvas.Save();
         canvas.Translate(X, Y);
@@ -145,18 +145,16 @@ public sealed class WuxiMap : Widget
         canvas.Concat(_matrix);
     }
 
-    protected override void AfterPaint(Canvas canvas) => canvas.Restore();
+    protected override void AfterPaint(ICanvas canvas) => canvas.Restore();
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         const float s = 4;
-        using var fillPaint = new Paint()
-        {
-            Color = new Color(0xFF295EBC),
-            Style = PaintStyle.Fill,
-            ImageFilter = ImageFilter.CreateDropShadow(s / _scale, s / _scale,
-                s * 2 / _scale, s * 2 / _scale, Colors.Black, null)
-        };
+        using var fillPaint = PixUI.Paint.Create();
+        fillPaint.Color = new Color(0xFF295EBC);
+        fillPaint.Style = PaintStyle.Fill;
+        fillPaint.ImageFilter = ImageFilter.CreateDropShadow(s / _scale, s / _scale,
+            s * 2 / _scale, s * 2 / _scale, Colors.Black, null);
         var strokePaint = PixUI.Paint.Shared(Colors.Black, PaintStyle.Stroke, 2f / _scale);
 
         PaintLayer(_cityLayer, canvas, strokePaint, fillPaint);

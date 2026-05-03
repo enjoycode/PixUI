@@ -72,7 +72,7 @@ public sealed class FormItem : Widget
 
     private Color? _textColor;
     private float? _fontSize;
-    private Paragraph? _cachedLabelParagraph;
+    private IParagraph? _cachedLabelParagraph;
     private readonly Widget _child = null!;
     private string _label;
 

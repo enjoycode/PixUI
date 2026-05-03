@@ -1,7 +1,6 @@
-#if !__WEB__
 namespace PixUI;
 
-public sealed class SKTextStyle : SKObject
+public sealed class SKTextStyle : SKObject, ITextStyle
 {
     private SKTextStyle(IntPtr handle, bool owns) : base(handle, owns) { }
 
@@ -84,5 +83,3 @@ public sealed class SKTextStyle : SKObject
         }
     }
 }
-
-#endif

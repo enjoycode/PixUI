@@ -1,7 +1,6 @@
-#if !__WEB__
 namespace PixUI;
 
-public sealed class SKParagraphStyle : SKObject
+public sealed class SKParagraphStyle : SKObject, IParagraphStyle
 {
     private SKParagraphStyle(IntPtr handle, bool owns) : base(handle, owns) { }
 
@@ -27,10 +26,9 @@ public sealed class SKParagraphStyle : SKObject
         set => SkiaApi.sk_paragraph_style_set_height(Handle, value);
     }
 
-    public SKTextStyle? TextStyle
+    public ITextStyle? TextStyle
     {
         get => throw new NotImplementedException();
-        set => SkiaApi.sk_paragraph_style_set_text_style(Handle, value!.Handle);
+        set => SkiaApi.sk_paragraph_style_set_text_style(Handle, (value as SKTextStyle)?.Handle ?? IntPtr.Zero);
     }
 }
-#endif

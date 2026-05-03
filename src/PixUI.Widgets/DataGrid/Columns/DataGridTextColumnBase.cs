@@ -12,9 +12,9 @@ public abstract class DataGridTextColumnBase<T> : DataGridColumn<T>
 
     protected readonly Func<T, int, string> _cellValueGetter;
 
-    private readonly List<CellCache<Paragraph>> _cellParagraphs = new();
+    private readonly List<CellCache<IParagraph>> _cellParagraphs = new();
 
-    protected internal override void PaintCell(ICanvas canvas, DataGridController<T> controller, 
+    protected internal override void PaintCell(ICanvas canvas, DataGridController<T> controller,
         int rowIndex, Rect cellRect)
     {
         //先画背景
@@ -31,10 +31,10 @@ public abstract class DataGridTextColumnBase<T> : DataGridColumn<T>
     /// <summary>
     /// 从缓存中获取承载的Widget,没有则新建并加入缓存
     /// </summary>
-    private Paragraph GetCellParagraph(int rowIndex, in Rect cellRect, string cellValue,
+    private IParagraph GetCellParagraph(int rowIndex, in Rect cellRect, string cellValue,
         CellStyle style, CellStyle defaultStyle)
     {
-        var pattern = new CellCache<Paragraph>(rowIndex, null);
+        var pattern = new CellCache<IParagraph>(rowIndex, null);
         var index = _cellParagraphs.BinarySearch(pattern, CellCacheComparerForParagraph.Instance);
         if (index >= 0)
             return _cellParagraphs[index].CachedItem!;
@@ -42,7 +42,7 @@ public abstract class DataGridTextColumnBase<T> : DataGridColumn<T>
         index = ~index;
         //没找到开始新建
         var ph = DataGridPainter.BuildCellParagraph(cellRect, style, defaultStyle, cellValue, 1);
-        var cellCachedWidget = new CellCache<Paragraph>(rowIndex, ph);
+        var cellCachedWidget = new CellCache<IParagraph>(rowIndex, ph);
         _cellParagraphs.Insert(index, cellCachedWidget);
         return ph;
     }
@@ -54,7 +54,7 @@ public abstract class DataGridTextColumnBase<T> : DataGridColumn<T>
 
     protected internal override void ClearCacheAt(int rowIndex)
     {
-        var pattern = new CellCache<Paragraph>(rowIndex, null);
+        var pattern = new CellCache<IParagraph>(rowIndex, null);
         var index = _cellParagraphs.BinarySearch(pattern, CellCacheComparerForParagraph.Instance);
         if (index >= 0)
             _cellParagraphs.RemoveAt(index);
@@ -71,5 +71,5 @@ public abstract class DataGridTextColumnBase<T> : DataGridColumn<T>
 
 internal static class CellCacheComparerForParagraph
 {
-    internal static readonly CellCacheComparer<Paragraph> Instance = new();
+    internal static readonly CellCacheComparer<IParagraph> Instance = new();
 }

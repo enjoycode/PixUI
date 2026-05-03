@@ -42,8 +42,8 @@ public sealed class MonthView : Widget, IMouseRegion
     private readonly float _headerHeight = 26;
 
     private Size _cellSize;
-    private Paragraph[]? _numberCache;
-    private Paragraph[]? _weekCache;
+    private IParagraph[]? _numberCache;
+    private IParagraph[]? _weekCache;
 
     /// <summary>
     /// 用户改变选择事件(点击或键盘)
@@ -110,14 +110,16 @@ public sealed class MonthView : Widget, IMouseRegion
         }
     }
 
-    private Paragraph[] GenerateNumberCache()
+    private static IParagraph[] GenerateNumberCache()
     {
-        var cache = new Paragraph[31];
-        using var ts = new TextStyle() { Color = Colors.Black };
+        var cache = new IParagraph[31];
+        using var ts = TextStyle.Create();
+        ts.Color = Colors.Black;
         for (var i = 1; i <= cache.Length; i++)
         {
-            using var ps = new ParagraphStyle() { MaxLines = 1 };
-            using var pb = new ParagraphBuilder(ps);
+            using var ps = ParagraphStyle.Create();
+            ps.MaxLines = 1;
+            using var pb = ParagraphBuilder.Create(ps);
             pb.PushStyle(ts);
             pb.AddText(i.ToString());
             var ph = pb.Build();
@@ -128,14 +130,16 @@ public sealed class MonthView : Widget, IMouseRegion
         return cache;
     }
 
-    private Paragraph[] GenerateWeekCache()
+    private static IParagraph[] GenerateWeekCache()
     {
-        var cache = new Paragraph[7];
-        using var ts = new TextStyle() { Color = Colors.Black };
+        var cache = new IParagraph[7];
+        using var ts = TextStyle.Create();
+        ts.Color = Colors.Black;
         for (var i = 0; i < cache.Length; i++)
         {
-            using var ps = new ParagraphStyle() { MaxLines = 1 };
-            using var pb = new ParagraphBuilder(ps);
+            using var ps = ParagraphStyle.Create();
+            ps.MaxLines = 1;
+            using var pb = ParagraphBuilder.Create(ps);
             pb.PushStyle(ts);
             var name = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetShortestDayName((DayOfWeek)i);
             pb.AddText(name);

@@ -2,10 +2,10 @@ namespace PixUI;
 
 public static class DataGridPainter
 {
-    public static Paragraph BuildCellParagraph(Rect rect, CellStyle style, CellStyle defaultStyle,
+    public static IParagraph BuildCellParagraph(Rect rect, CellStyle style, CellStyle defaultStyle,
         string text, int maxLines)
     {
-        using var ts = new TextStyle();
+        using var ts = TextStyle.Create();
         ts.Color = style.TextColor ?? (defaultStyle.TextColor ?? Colors.Black);
         ts.FontSize = style.FontSize;
         ts.FontStyle = new FontStyle(style.FontWeight, FontSlant.Upright);
@@ -18,12 +18,12 @@ public static class DataGridPainter
             _ => TextAlign.Left
         };
 
-        using var ps = new ParagraphStyle();
+        using var ps = ParagraphStyle.Create();
         ps.MaxLines = (uint)maxLines;
         ps.TextStyle = ts;
         ps.Height = 1;
         ps.TextAlign = textAlign;
-        using var pb = new ParagraphBuilder(ps);
+        using var pb = ParagraphBuilder.Create(ps);
 
         pb.PushStyle(ts);
         pb.AddText(text);
@@ -36,7 +36,7 @@ public static class DataGridPainter
     /// <summary>
     /// 根据上下对齐方式画文本, 左右对齐已在Paragraph内处理
     /// </summary>
-    public static void PaintCellParagraph(ICanvas canvas, Rect rect, CellStyle style, Paragraph paragraph)
+    public static void PaintCellParagraph(ICanvas canvas, Rect rect, CellStyle style, IParagraph paragraph)
     {
         if (style.VerticalAlignment == VerticalAlignment.Middle)
         {

@@ -27,6 +27,13 @@ public sealed class SkiaRender : IRender
     public IMaskFilter? MaskFilterCreateBlur(BlurStyle blurStyle, float sigma)
         => SKMaskFilter.CreateBlur(blurStyle, sigma);
 
+    public ITextStyle MakeTextStyle() => new SKTextStyle();
+
+    public IParagraphStyle MakeParagraphStyle() => new SKParagraphStyle();
+
+    public IParagraphBuilder MakeParagraphBuilder(IParagraphStyle paragraphStyle) =>
+        new SKParagraphBuilder((SKParagraphStyle)paragraphStyle);
+
     public IPath MakePath() => new SKPath();
 
     public IPath PathFromSvgData(string svgPath) => SKPath.ParseSvgPathData(svgPath);

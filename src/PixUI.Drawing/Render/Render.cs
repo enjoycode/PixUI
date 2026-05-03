@@ -36,6 +36,14 @@ public interface IRender
 
     #endregion
 
+    #region ====Paragraph====
+
+    ITextStyle MakeTextStyle();
+    IParagraphStyle MakeParagraphStyle();
+    IParagraphBuilder MakeParagraphBuilder(IParagraphStyle paragraphStyle);
+
+    #endregion
+
     IMaskFilter? MaskFilterCreateBlur(BlurStyle blurStyle, float sigma);
 
     IPath MakePath();

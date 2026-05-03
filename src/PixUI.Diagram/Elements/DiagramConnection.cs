@@ -23,7 +23,7 @@ public class DiagramConnection : DiagramItem, IConnection
     private PathFigure? _sourceCap, _targetCap;
 
     private string _title = string.Empty;
-    private Paragraph? _cachedLayout;
+    private IParagraph? _cachedLayout;
 
     public string TypeName => "Connection";
 
@@ -42,7 +42,7 @@ public class DiagramConnection : DiagramItem, IConnection
         }
     }
 
-    private Paragraph? CachedLayout
+    private IParagraph? CachedLayout
     {
         get
         {
@@ -51,9 +51,11 @@ public class DiagramConnection : DiagramItem, IConnection
 
             if (_cachedLayout == null)
             {
-                using var ps = new ParagraphStyle();
-                using var pb = new ParagraphBuilder(ps);
-                pb.PushStyle(new TextStyle() { Color = ForeColor }); //TODO: fix font
+                using var ps = ParagraphStyle.Create();
+                using var pb = ParagraphBuilder.Create(ps);
+                using var ts = TextStyle.Create(); //TODO: fix font
+                ts.Color = ForeColor;
+                pb.PushStyle(ts);
                 pb.AddText(Title);
                 _cachedLayout = pb.Build();
                 _cachedLayout.Layout(float.MaxValue);
