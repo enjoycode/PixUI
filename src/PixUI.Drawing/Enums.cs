@@ -268,3 +268,9 @@ public enum PlaceholderAlignment
     Bottom,
     Middle
 }
+
+public enum PathDirection
+{
+    Clockwise = 0,
+    CounterClockwise = 1,
+}

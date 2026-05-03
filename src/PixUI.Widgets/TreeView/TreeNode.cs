@@ -319,7 +319,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         Parent!.OnChildSizeChanged(this, newWidth - oldWidth, newHeight - oldHeight, affects);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (area is RepaintChild repaintChild)
         {
@@ -355,7 +355,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         }
     }
 
-    private static void PaintChildNode(Widget child, Canvas canvas, IDirtyArea? area)
+    private static void PaintChildNode(Widget child, ICanvas canvas, IDirtyArea? area)
     {
         //TODO:判断是否可见
         canvas.Translate(child.X, child.Y);

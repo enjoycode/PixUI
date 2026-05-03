@@ -34,7 +34,7 @@ public sealed class Switch : Toggleable
         SetSize(Math.Min(max.Width, KSwitchWidth), Math.Min(max.Height, KSwitchHeight));
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         canvas.Save();
         canvas.Translate(0, (KSwitchHeight - KTrackHeight) / 2f);
@@ -71,7 +71,7 @@ public sealed class Switch : Toggleable
         var thumbBounds = new Rect(thumbLeft, thumbCenterY - KThumbRadius, thumbRight,
             thumbCenterY + KThumbRadius);
 
-        var clipPath = new Path();
+        using var clipPath = Path.Create();
         clipPath.AddRRect(trackRRect);
         canvas.ClipPath(clipPath, ClipOp.Intersect, true);
 
@@ -80,7 +80,7 @@ public sealed class Switch : Toggleable
         canvas.Restore();
     }
 
-    private static void PaintThumb(Canvas canvas, Rect rect)
+    private static void PaintThumb(ICanvas canvas, Rect rect)
     {
         var shortestSide = Math.Min(rect.Width, rect.Height);
         var rrect = RRect.FromRectAndRadius(rect, shortestSide / 2f, shortestSide / 2f);

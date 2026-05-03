@@ -135,7 +135,7 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
         SetSize(offsetX + _controller.ItemPadding.Right, availableHeight);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (MenuItem.Type == MenuItemType.Divider)
         {
@@ -156,7 +156,7 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
         PaintChild(_expander, canvas, area);
     }
 
-    private static void PaintChild(Widget? child, Canvas canvas, IDirtyArea? area)
+    private static void PaintChild(Widget? child, ICanvas canvas, IDirtyArea? area)
     {
         if (child == null) return;
 

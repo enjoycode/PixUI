@@ -146,7 +146,7 @@ public sealed class TabBar<T> : Widget, ITabBar
         }
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (BgColor != null)
             canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(BgColor.Value));

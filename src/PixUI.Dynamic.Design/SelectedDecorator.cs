@@ -7,7 +7,7 @@ internal sealed class SelectedDecorator : FlowDecorator<DesignElement>
 {
     public SelectedDecorator(DesignElement target) : base(target, true) { }
 
-    protected override void PaintCore(Canvas canvas)
+    protected override void PaintCore(ICanvas canvas)
     {
         var scaleRatio = Target.Controller.Zoom.Value / 100f;
         var borderSize = 3f;
@@ -24,7 +24,7 @@ internal sealed class SelectedDecorator : FlowDecorator<DesignElement>
         DrawAnchor(canvas, paint, Target.GetAnchorRect(AnchorPosition.BottomMiddle));
     }
 
-    private static void DrawAnchor(Canvas canvas, Paint paint, Rect rect)
+    private static void DrawAnchor(ICanvas canvas, IPaint paint, Rect rect)
     {
         //canvas.DrawRect(rect, paint);
         var radius = rect.Width / 2;

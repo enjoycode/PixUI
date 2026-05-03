@@ -8,7 +8,7 @@ public enum PathConvexity
     Concave = 2,
 }
 
-public unsafe class SKPath : SKObject, ISKSkipObjectRegistration
+public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
 {
     private SKPath(IntPtr handle, bool owns) : base(handle, owns) { }
 
@@ -121,10 +121,10 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration
     public Rect GetRect() =>
         GetRect(out var isClosed, out var direction);
 
-    public Rect GetRect(out bool isClosed, out SKPathDirection direction)
+    public Rect GetRect(out bool isClosed, out PathDirection direction)
     {
         byte c;
-        fixed (SKPathDirection* d = &direction)
+        fixed (PathDirection* d = &direction)
         {
             Rect rect;
             var result = SkiaApi.sk_path_is_rect(Handle, &rect, &c, d);
@@ -241,7 +241,7 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration
     public void ArcTo(float rx, float ry, float xAxisRotate, bool useSmallArc, bool isCCW, float x, float y) =>
         SkiaApi.sk_path_arc_to(Handle, rx, ry, xAxisRotate,
             useSmallArc ? SKPathArcSize.Small : SKPathArcSize.Large,
-            isCCW ? SKPathDirection.CounterClockwise : SKPathDirection.Clockwise, x, y);
+            isCCW ? PathDirection.CounterClockwise : PathDirection.Clockwise, x, y);
 
     public void ArcTo(Rect oval, float startAngle, float sweepAngle, bool forceMoveTo) =>
         SkiaApi.sk_path_arc_to_with_oval(Handle, &oval, startAngle, sweepAngle, forceMoveTo);
@@ -253,11 +253,11 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration
         SkiaApi.sk_path_arc_to_with_points(Handle, x1, y1, x2, y2, radius);
 
     public void RArcTo(Point r, float xAxisRotate, SKPathArcSize largeArc,
-        SKPathDirection sweep, Point xy) =>
+        PathDirection sweep, Point xy) =>
         SkiaApi.sk_path_rarc_to(Handle, r.X, r.Y, xAxisRotate, largeArc, sweep, xy.X, xy.Y);
 
     public void RArcTo(float rx, float ry, float xAxisRotate, SKPathArcSize largeArc,
-        SKPathDirection sweep, float x, float y) =>
+        PathDirection sweep, float x, float y) =>
         SkiaApi.sk_path_rarc_to(Handle, rx, ry, xAxisRotate, largeArc, sweep, x, y);
 
     public void Close() => SkiaApi.sk_path_close(Handle);
@@ -267,7 +267,7 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration
     public void Reset() => SkiaApi.sk_path_reset(Handle);
 
     public void AddRect(Rect rect, bool isCCW = false) =>
-        SkiaApi.sk_path_add_rect(Handle, &rect, isCCW ? SKPathDirection.CounterClockwise : SKPathDirection.Clockwise);
+        SkiaApi.sk_path_add_rect(Handle, &rect, isCCW ? PathDirection.CounterClockwise : PathDirection.Clockwise);
 
     // public void AddRect(Rect rect, SKPathDirection direction, uint startIndex)
     // {
@@ -294,7 +294,7 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration
     //     SkiaApi.sk_path_add_rrect_start(Handle, rect.Handle, direction, startIndex);
     // }
 
-    public void AddOval(Rect rect, SKPathDirection direction = SKPathDirection.Clockwise) =>
+    public void AddOval(Rect rect, PathDirection direction = PathDirection.Clockwise) =>
         SkiaApi.sk_path_add_oval(Handle, &rect, direction);
 
     public void AddArc(Rect oval, float startAngle, float sweepAngle) =>
@@ -377,10 +377,10 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration
         SkiaApi.sk_path_add_path_reverse(Handle, other.Handle);
     }
 
-    public void AddRRect(Rect rect, float rx, float ry, SKPathDirection dir = SKPathDirection.Clockwise) =>
+    public void AddRRect(Rect rect, float rx, float ry, PathDirection dir = PathDirection.Clockwise) =>
         SkiaApi.sk_path_add_rounded_rect(Handle, &rect, rx, ry, dir);
 
-    public void AddCircle(float x, float y, float radius, SKPathDirection dir = SKPathDirection.Clockwise) =>
+    public void AddCircle(float x, float y, float radius, PathDirection dir = PathDirection.Clockwise) =>
         SkiaApi.sk_path_add_circle(Handle, x, y, radius, dir);
 
     public void AddPoly(Point[] points, bool close = true)

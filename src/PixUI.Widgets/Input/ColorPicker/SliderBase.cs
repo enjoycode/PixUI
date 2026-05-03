@@ -84,15 +84,15 @@ public abstract class SliderBase : Widget, IMouseRegion
         SetSize(maxSize.Width, SLIDER_HEIGHT + H_PADDING * 2);
     }
 
-    protected virtual void DrawBackground(Canvas canvas)
+    protected virtual void DrawBackground(ICanvas canvas)
     {
         var paint = PixUI.Paint.Shared(Colors.DarkGray);
         var sliderRect = GetSliderRect();
-        using var rRect = RRect.FromRectAndRadius(sliderRect, SLIDER_HEIGHT / 2f, SLIDER_HEIGHT / 2f);
+        var rRect = RRect.FromRectAndRadius(sliderRect, SLIDER_HEIGHT / 2f, SLIDER_HEIGHT / 2f);
         canvas.DrawRRect(rRect, paint);
     }
 
-    protected virtual void DrawThumb(Canvas canvas)
+    protected virtual void DrawThumb(ICanvas canvas)
     {
         var cx = GetPositionForValue() + V_PADDING;
         var cy = H / 2;
@@ -100,7 +100,7 @@ public abstract class SliderBase : Widget, IMouseRegion
         DragThumb.Draw(canvas, cx, cy, Colors.Red);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         DrawBackground(canvas);
         DrawThumb(canvas);

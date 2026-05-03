@@ -169,7 +169,7 @@ public sealed class DataGrid<T> : Widget, IDroppable
         _controller.CalcColumnsWidth(maxSize);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         var size = new Size(W, H);
         //clip first

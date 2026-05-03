@@ -91,7 +91,7 @@ internal sealed class ConnectionSelectionAdorner : DesignAdorner, ISelectionAdor
         }
     }
 
-    protected internal override void OnRender(Canvas canvas)
+    protected internal override void OnRender(ICanvas canvas)
     {
         var connection = (DiagramConnection)Target;
         if (connection.ConnectionType == ConnectionType.Bezier)
@@ -106,7 +106,7 @@ internal sealed class ConnectionSelectionAdorner : DesignAdorner, ISelectionAdor
         }
     }
 
-    private static void DrawEditPoint(Canvas g, Rect rect)
+    private static void DrawEditPoint(ICanvas g, Rect rect)
     {
         var paint = Paint.Shared(Colors.White);
         g.DrawRect(rect, paint);
@@ -115,7 +115,7 @@ internal sealed class ConnectionSelectionAdorner : DesignAdorner, ISelectionAdor
         g.DrawRect(rect, paint);
     }
 
-    private static void DrawBezierConnectionHandles(Canvas canvas, DiagramConnection connection)
+    private static void DrawBezierConnectionHandles(ICanvas canvas, DiagramConnection connection)
     {
         var startBezierPoint = connection.StartPoint.Substract(connection.Position);
         var endBezierPoint = connection.EndPoint.Substract(connection.Position);

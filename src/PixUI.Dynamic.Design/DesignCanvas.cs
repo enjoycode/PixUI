@@ -26,7 +26,7 @@ public sealed class DesignCanvas : View, IDynamicContext
 
     DynamicState? IDynamicContext.FindState(string name) => _designController.FindState(name);
 
-    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
+    protected internal override void BeforePaint(ICanvas canvas, bool onlyTransform = false,
         IDirtyArea? dirtyArea = null)
     {
         canvas.Save();
@@ -35,7 +35,7 @@ public sealed class DesignCanvas : View, IDynamicContext
         canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
     }
 
-    protected internal override void AfterPaint(Canvas canvas)
+    protected internal override void AfterPaint(ICanvas canvas)
     {
         canvas.Restore();
     }

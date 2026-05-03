@@ -2,7 +2,7 @@ using System;
 
 namespace PixUI;
 
-public static class PaintDebugger
+public static class PaintDebugger //TODO: remove it
 {
     public static event Action? EnableChanged;
 
@@ -14,7 +14,7 @@ public static class PaintDebugger
         EnableChanged?.Invoke();
     }
 
-    internal static void PaintWidgetBorder(Widget widget, Canvas canvas)
+    internal static void PaintWidgetBorder(Widget widget, ICanvas canvas)
     {
         if (!_enable) return;
 

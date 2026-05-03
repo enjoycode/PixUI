@@ -67,7 +67,7 @@ public sealed class DesignAdorners : FlowDecorator<DiagramSurface>
         return true;
     }
 
-    protected override void PaintCore(Canvas canvas)
+    protected override void PaintCore(ICanvas canvas)
     {
         if (_creationModel == CreationMode.None && _adorners.Count == 0)
             return;
@@ -105,7 +105,7 @@ public sealed class DesignAdorners : FlowDecorator<DiagramSurface>
         canvas.Restore();
     }
 
-    private void DrawShapeConnectors(Canvas canvas)
+    private void DrawShapeConnectors(ICanvas canvas)
     {
         if (_nearestShapes == null) return;
 

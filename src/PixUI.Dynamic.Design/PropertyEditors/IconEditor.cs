@@ -164,7 +164,7 @@ internal sealed class IconList : Widget, IScrollable
         _scrollController.OffsetY = 0; //reset scroll offset
     }
 
-    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
+    protected internal override void BeforePaint(ICanvas canvas, bool onlyTransform = false,
         IDirtyArea? dirtyArea = null)
     {
         canvas.Save();
@@ -173,7 +173,7 @@ internal sealed class IconList : Widget, IScrollable
         canvas.Translate(0, -ScrollOffsetY);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         foreach (var child in _items)
         {
@@ -186,7 +186,7 @@ internal sealed class IconList : Widget, IScrollable
         }
     }
 
-    protected internal override void AfterPaint(Canvas canvas) => canvas.Restore();
+    protected internal override void AfterPaint(ICanvas canvas) => canvas.Restore();
 }
 
 internal sealed class IconItem : Widget, IMouseRegion
@@ -224,7 +224,7 @@ internal sealed class IconItem : Widget, IMouseRegion
         SetSize(50, 50);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (_isHover)
         {

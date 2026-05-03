@@ -49,7 +49,7 @@ public sealed class CircularProgressPainter : IDisposable
     /// <summary>
     /// 画至目标Widget的中心位置
     /// </summary>
-    public void PaintToWidget(Widget target, Canvas canvas, float indicatorSize = 36f)
+    public void PaintToWidget(Widget target, ICanvas canvas, float indicatorSize = 36f)
     {
         var dx = (target.W - indicatorSize) / 2.0f;
         var dy = (target.H - indicatorSize) / 2.0f;
@@ -58,7 +58,7 @@ public sealed class CircularProgressPainter : IDisposable
         canvas.Translate(-dx, -dy);
     }
 
-    public void Paint(Canvas canvas, float indicatorSize)
+    public void Paint(ICanvas canvas, float indicatorSize)
     {
         var headValue = _strokeHeadTween.Evaluate(_controller);
         var tailValue = _strokeTailTween.Evaluate(_controller);
@@ -70,7 +70,7 @@ public sealed class CircularProgressPainter : IDisposable
             rotationValue, 6, valueColor);
     }
 
-    private static void PaintInternal(Canvas canvas, float size, float? value,
+    private static void PaintInternal(ICanvas canvas, float size, float? value,
         double headValue, double tailValue, double offsetValue, double rotationValue,
         float strokeWidth, Color valueColor, Color? bgColor = null)
     {

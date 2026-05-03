@@ -202,7 +202,7 @@ internal sealed class SelectText : TextBase, IMouseRegion, IFocusable
         SetSize(maxSize.Width, Math.Min(maxSize.Height, fontHeight));
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (Text.Value.Length == 0) return;
         canvas.DrawParagraph(CachedParagraph!, 0, 2 /*offset*/);

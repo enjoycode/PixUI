@@ -66,7 +66,7 @@ public sealed class Tab : SingleChildWidget, IMouseRegion
         }
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         //根据状态画背景色
         if (IsSelected.Value)

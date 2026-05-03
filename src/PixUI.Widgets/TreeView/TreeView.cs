@@ -150,7 +150,7 @@ public sealed class TreeView<T> : Widget, IScrollable
         }
     }
 
-    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
+    protected internal override void BeforePaint(ICanvas canvas, bool onlyTransform = false,
         IDirtyArea? dirtyArea = null)
     {
         if (!onlyTransform)
@@ -167,9 +167,9 @@ public sealed class TreeView<T> : Widget, IScrollable
         }
     }
 
-    protected internal override void AfterPaint(Canvas canvas) => canvas.Restore();
+    protected internal override void AfterPaint(ICanvas canvas) => canvas.Restore();
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         // draw background color if has
         if (_fillColor != null)

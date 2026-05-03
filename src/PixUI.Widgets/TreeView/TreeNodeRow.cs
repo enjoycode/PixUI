@@ -108,7 +108,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
 
     public void OnDrop(DragEvent dragEvent, Point local) => Controller.OnDrop?.Invoke(TreeNode, dragEvent);
 
-    private Image BuildDragHintImage()
+    private IImage BuildDragHintImage()
     {
         const float padding = 5f;
         var width = padding;
@@ -148,7 +148,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         return Image.FromPicture(image, new SizeI((int)(width * scale), (int)(H * scale)));
     }
 
-    private Image BuildDropHintImage(DropPosition position)
+    private IImage BuildDropHintImage(DropPosition position)
     {
         var scrollX = Controller.TreeView!.ScrollOffsetX;
         var width = Controller.TreeView!.W + scrollX;
@@ -269,7 +269,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         SetSize(indentation, Controller.NodeHeight);
     }
 
-    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
+    protected internal override void BeforePaint(ICanvas canvas, bool onlyTransform = false,
         IDirtyArea? dirtyArea = null)
     {
         canvas.Translate(X, Y);
@@ -282,7 +282,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         }
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (_isHover)
         {
@@ -306,7 +306,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         PaintChild(_label, canvas);
     }
 
-    private static void PaintChild(Widget? child, Canvas canvas)
+    private static void PaintChild(Widget? child, ICanvas canvas)
     {
         if (child == null) return;
 

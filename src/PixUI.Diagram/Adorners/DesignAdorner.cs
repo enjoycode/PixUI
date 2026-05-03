@@ -20,7 +20,7 @@ public class DesignAdorner
     /// <summary>
     /// 注意：坐标系已转为目标DiagramItem的坐标系
     /// </summary>
-    protected internal virtual void OnRender(Canvas canvas) { }
+    protected internal virtual void OnRender(ICanvas canvas) { }
 
     protected internal virtual void OnMouseDown(PointerEvent e) { }
 

@@ -46,10 +46,10 @@ public sealed class DropFileInput : SingleChildWidget, IDroppable
 
     void IDroppable.OnDrop(DragEvent dragEvent, Point local) => _onDrop?.Invoke(dragEvent.TransferItem);
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         //Draw background
-        using var rect = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, W, H), 5, 5);
+        var rect = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, W, H), 5, 5);
         var paint = PixUI.Paint.Shared(new Color(0xFFF2F2F2));
         canvas.DrawRRect(rect, paint);
 

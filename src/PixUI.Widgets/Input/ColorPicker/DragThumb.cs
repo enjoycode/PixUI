@@ -4,7 +4,7 @@ internal static class DragThumb
 {
     public const float THUMB_RADIUS = 8f;
     
-    public static void Draw(Canvas canvas, float cx, float cy, Color color)
+    public static void Draw(ICanvas canvas, float cx, float cy, Color color)
     {
         var paint = Paint.Shared(Colors.White);
         paint.AntiAlias = true;

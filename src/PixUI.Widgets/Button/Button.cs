@@ -211,7 +211,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         }
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         PaintShape(canvas);
 
@@ -235,7 +235,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
             PaintMask(canvas, Colors.Gray.WithAlpha(128));
     }
 
-    private void PaintShape(Canvas canvas)
+    private void PaintShape(ICanvas canvas)
     {
         if (Style == ButtonStyle.Transparent) return;
 
@@ -252,7 +252,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
                 break;
             case ButtonShape.Standard:
             {
-                using var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, W, H),
+                var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, W, H),
                     StandardRadius, StandardRadius);
                 canvas.DrawRRect(rrect, paint);
                 break;
@@ -262,7 +262,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         }
     }
 
-    private void PaintMask(Canvas canvas, Color color)
+    private void PaintMask(ICanvas canvas, Color color)
     {
         var paint = PixUI.Paint.Shared(color);
         paint.AntiAlias = Shape != ButtonShape.Square;
@@ -283,14 +283,14 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         {
             case ButtonShape.Standard:
             {
-                using var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(x, y, w, h),
+                var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(x, y, w, h),
                     StandardRadius, StandardRadius);
                 canvas.DrawRRect(rrect, paint);
                 break;
             }
             case ButtonShape.Pills:
             {
-                using var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(x, y, w, h),
+                var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(x, y, w, h),
                     h / 2f, h / 2f);
                 canvas.DrawRRect(rrect, paint);
                 break;

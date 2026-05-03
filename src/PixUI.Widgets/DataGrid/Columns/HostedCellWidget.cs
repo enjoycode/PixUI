@@ -42,7 +42,7 @@ internal sealed class HostedCellWidget : Widget
         _hostedWidget.SetPosition((maxSize.Width - _hostedWidget.W) / 2, 0);
     }
 
-    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
+    protected internal override void BeforePaint(ICanvas canvas, bool onlyTransform = false,
         IDirtyArea? dirtyArea = null)
     {
         //这里需要重写处理滚动量,不用考虑列是否冻结，因取X值时会抵消横向滚动量
@@ -50,7 +50,7 @@ internal sealed class HostedCellWidget : Widget
         canvas.Translate(-_dataGridBody.ScrollOffsetX, -_dataGridBody.ScrollOffsetY);
     }
 
-    protected internal override void AfterPaint(Canvas canvas)
+    protected internal override void AfterPaint(ICanvas canvas)
     {
         canvas.Translate(_dataGridBody.ScrollOffsetX, _dataGridBody.ScrollOffsetY);
         base.AfterPaint(canvas);

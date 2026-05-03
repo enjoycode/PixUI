@@ -125,7 +125,7 @@ public class DynamicView : SingleChildWidget
         return base.HitTest(x, y, result);
     }
 
-    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
+    protected internal override void BeforePaint(ICanvas canvas, bool onlyTransform = false,
         IDirtyArea? dirtyArea = null)
     {
         base.BeforePaint(canvas, onlyTransform, dirtyArea);
@@ -136,7 +136,7 @@ public class DynamicView : SingleChildWidget
         }
     }
 
-    protected internal override void AfterPaint(Canvas canvas)
+    protected internal override void AfterPaint(ICanvas canvas)
     {
         canvas.Restore();
         base.AfterPaint(canvas);

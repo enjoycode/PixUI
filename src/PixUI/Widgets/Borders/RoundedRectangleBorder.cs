@@ -10,19 +10,19 @@ public sealed class RoundedRectangleBorder : OutlinedBorder
         BorderRadius = borderRadius ?? BorderRadius.Empty;
     }
 
-    public override Path GetOuterPath(in Rect rect)
+    public override IPath GetOuterPath(in Rect rect)
     {
         var rrect = BorderRadius.ToRRect(rect);
         rrect.Deflate(Side.Width, Side.Width);
-        var path = new Path();
+        var path = Path.Create();
         path.AddRRect(rrect);
         return path;
     }
 
-    public override Path GetInnerPath(in Rect rect)
+    public override IPath GetInnerPath(in Rect rect)
     {
         var rrect = BorderRadius.ToRRect(rect);
-        var path = new Path();
+        var path = Path.Create();
         path.AddRRect(rrect);
         return path;
     }
@@ -40,7 +40,7 @@ public sealed class RoundedRectangleBorder : OutlinedBorder
         throw new System.NotImplementedException();
     }
 
-    public override void Paint(Canvas canvas, in Rect rect, in Color? fillColor = null)
+    public override void Paint(ICanvas canvas, in Rect rect, in Color? fillColor = null)
     {
         if (Side.Style == BorderStyle.None)
             return;

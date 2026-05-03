@@ -36,7 +36,7 @@ public static class DataGridPainter
     /// <summary>
     /// 根据上下对齐方式画文本, 左右对齐已在Paragraph内处理
     /// </summary>
-    public static void PaintCellParagraph(Canvas canvas, Rect rect, CellStyle style, Paragraph paragraph)
+    public static void PaintCellParagraph(ICanvas canvas, Rect rect, CellStyle style, Paragraph paragraph)
     {
         if (style.VerticalAlignment == VerticalAlignment.Middle)
         {
@@ -56,7 +56,7 @@ public static class DataGridPainter
         }
     }
 
-    public static void PaintCellBorder(Canvas canvas, in Rect cellRect, Color borderColor /*TODO: use CellStyle*/)
+    public static void PaintCellBorder(ICanvas canvas, in Rect cellRect, Color borderColor /*TODO: use CellStyle*/)
     {
         var paint = PixUI.Paint.Shared(borderColor, PaintStyle.Stroke, 1);
         canvas.DrawRect(cellRect, paint);

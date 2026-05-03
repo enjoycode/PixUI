@@ -35,12 +35,12 @@ public sealed class OutlineInputBorder : InputBorder
     public BorderRadius BorderRadius { get; private set; }
     public float GapPadding { get; private set; }
 
-    public override Path GetOuterPath(in Rect rect)
+    public override IPath GetOuterPath(in Rect rect)
     {
         throw new NotImplementedException();
     }
 
-    public override Path GetInnerPath(in Rect rect)
+    public override IPath GetInnerPath(in Rect rect)
     {
         throw new NotImplementedException();
     }
@@ -63,9 +63,9 @@ public sealed class OutlineInputBorder : InputBorder
     public override ShapeBorder Clone()
         => new OutlineInputBorder(BorderSide, BorderRadius, GapPadding);
 
-    public override void Paint(Canvas canvas, in Rect rect, in Color? fillColor = null)
+    public override void Paint(ICanvas canvas, in Rect rect, in Color? fillColor = null)
     {
-        using var outer = BorderRadius.ToRRect(rect);
+        var outer = BorderRadius.ToRRect(rect);
         outer.Deflate(BorderSide.Width / 2f, BorderSide.Width / 2f);
 
         if (fillColor != null)
@@ -84,12 +84,12 @@ public sealed class UnderlineInputBorder : InputBorder
 
     public UnderlineInputBorder(BorderSide? borderSide) : base(borderSide) { }
 
-    public override Path GetOuterPath(in Rect rect)
+    public override IPath GetOuterPath(in Rect rect)
     {
         throw new NotImplementedException();
     }
 
-    public override Path GetInnerPath(in Rect rect)
+    public override IPath GetInnerPath(in Rect rect)
     {
         throw new NotImplementedException();
     }
@@ -107,7 +107,7 @@ public sealed class UnderlineInputBorder : InputBorder
         }
     }
 
-    public override void Paint(Canvas canvas, in Rect rect, in Color? fillColor = null)
+    public override void Paint(ICanvas canvas, in Rect rect, in Color? fillColor = null)
     {
         if (fillColor != null)
             canvas.DrawRect(rect, PixUI.Paint.Shared(fillColor));

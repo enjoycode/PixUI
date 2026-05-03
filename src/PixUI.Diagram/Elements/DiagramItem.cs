@@ -74,7 +74,7 @@ public abstract class DiagramItem
 
     #region ====Paint Methods====
 
-    public abstract void Paint(Canvas canvas);
+    public abstract void Paint(ICanvas canvas);
 
     protected internal virtual void Invalidate()
     {

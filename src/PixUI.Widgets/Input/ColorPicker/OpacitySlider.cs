@@ -13,10 +13,10 @@ public sealed class OpacitySlider : SliderBase
 
     private readonly State<Color> _hsl;
 
-    protected override void DrawBackground(Canvas canvas)
+    protected override void DrawBackground(ICanvas canvas)
     {
         var sliderRect = GetSliderRect();
-        using var rRect = RRect.FromRectAndRadius(sliderRect, SLIDER_HEIGHT / 2f, SLIDER_HEIGHT / 2f);
+        var rRect = RRect.FromRectAndRadius(sliderRect, SLIDER_HEIGHT / 2f, SLIDER_HEIGHT / 2f);
 
         canvas.Save();
         canvas.ClipRRect(rRect, ClipOp.Intersect, true);
@@ -39,7 +39,7 @@ public sealed class OpacitySlider : SliderBase
     /// <summary>
     /// 画棋盘格子
     /// </summary>
-    internal static void DrawChessBoards(Canvas canvas, Rect rect)
+    internal static void DrawChessBoards(ICanvas canvas, Rect rect)
     {
         var x = rect.X;
         var y = rect.Y;

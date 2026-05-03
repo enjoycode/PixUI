@@ -31,7 +31,7 @@ public sealed class LedBulb : Widget
         SetSize(maxSize.Width, maxSize.Height);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         // Is the bulb on or off
         var lightColor = _on.Value ? Color.Value : DarkColor.WithAlpha(150);

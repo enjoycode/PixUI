@@ -85,11 +85,11 @@ internal sealed class PopupMenu : Widget
         SetSize(maxChildWidth, offsetY);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         //画背景及阴影
-        using var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, W, H), 4f, 4f);
-        using var path = new Path();
+        var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, W, H), 4f, 4f);
+        using var path = Path.Create();
         path.AddRRect(rrect);
         canvas.DrawShadow(path, Colors.Black, 5, false, Root!.Window.ScaleFactor);
         var paint = PixUI.Paint.Shared(_controller.BackgroundColor);

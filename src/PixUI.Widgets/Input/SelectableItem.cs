@@ -35,7 +35,7 @@ public sealed class SelectableItem : SingleChildWidget, IMouseRegion
         SetSize(fixedWidth, fixedHeight);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         //TODO: 根据样式属性绘制选择状态及Hover状态
         if (_selectedState.Value)

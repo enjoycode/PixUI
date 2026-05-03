@@ -5,21 +5,23 @@ namespace PixUI.PdfViewer.Drawing;
 
 internal interface ISkiaBrushCreator : IDisposable
 {
-    Paint CreateBrush(SkiaGraphicsState topState);
+    IPaint CreateBrush(SkiaGraphicsState topState);
 }
 
 internal class SolidColorBrushCreator : ISkiaBrushCreator
 {
-    private readonly Paint _value;
+    private readonly IPaint _value;
 
     public SolidColorBrushCreator(DeviceColor color)
     {
-        _value = new Paint() { Color = color.AsSkColor(), AntiAlias = true };
+        _value = Paint.Create();
+        _value.AntiAlias = true;
+        _value.Color = color.AsSkColor();
     }
 
     public void Dispose() => _value.Dispose();
 
-    public Paint CreateBrush(SkiaGraphicsState topState) => _value;
+    public IPaint CreateBrush(SkiaGraphicsState topState) => _value;
 }
 
 internal abstract class IntermediateBrushHolder<T> : ISkiaBrushCreator where T : IDisposable
@@ -46,7 +48,7 @@ internal abstract class IntermediateBrushHolder<T> : ISkiaBrushCreator where T :
         return product;
     }
 
-    public abstract Paint CreateBrush(SkiaGraphicsState topState);
+    public abstract IPaint CreateBrush(SkiaGraphicsState topState);
 }
 
 internal class SurfacePatternHolder : IntermediateBrushHolder<SKSurface>
@@ -58,7 +60,7 @@ internal class SurfacePatternHolder : IntermediateBrushHolder<SKSurface>
         this._patternTransform = patternTransform;
     }
 
-    public override Paint CreateBrush(SkiaGraphicsState topState)
+    public override IPaint CreateBrush(SkiaGraphicsState topState)
     {
         throw new NotImplementedException();
         // return RegisterForDispose(new Paint()

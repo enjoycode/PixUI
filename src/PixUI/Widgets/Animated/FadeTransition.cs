@@ -9,7 +9,7 @@ public sealed class FadeTransition : SingleChildWidget
         _opacity = opacity;
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (_opacity.Value == 0 || Child == null)
             return;

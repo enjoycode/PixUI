@@ -163,7 +163,7 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
         SetSize(width, height);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         var bounds = Rect.FromLTWH(0, 0, W, H);
 

@@ -103,10 +103,10 @@ public sealed class ColorPicker : InputBase<EditableText>
             SetSize(SIZE, SIZE);
         }
 
-        public override void Paint(Canvas canvas, IDirtyArea? area = null)
+        public override void Paint(ICanvas canvas, IDirtyArea? area = null)
         {
             var rect = Rect.FromLTWH(0, 0, W, H);
-            using var roundRect = RRect.FromRectAndRadius(rect, RADIUS, RADIUS);
+            var roundRect = RRect.FromRectAndRadius(rect, RADIUS, RADIUS);
             canvas.Save();
             canvas.ClipRRect(roundRect, ClipOp.Intersect, true);
 

@@ -10,7 +10,6 @@ public enum SKPaintHinting
 
 public sealed class SKPaint : SKObject, ISKSkipObjectRegistration, IPaint
 {
-
     #region ====Shared====
 
     private static SKPaint? _shared; //Do not create instance, web has not init CanvasKit
@@ -28,7 +27,7 @@ public sealed class SKPaint : SKObject, ISKSkipObjectRegistration, IPaint
     }
 
     #endregion
-    
+
     // private SKFont font;
     // private bool lcdRenderText;
 
@@ -123,10 +122,10 @@ public sealed class SKPaint : SKObject, ISKSkipObjectRegistration, IPaint
         set => SkiaApi.sk_paint_set_imagefilter(Handle, value?.Handle ?? IntPtr.Zero);
     }
 
-    public SKPathEffect? PathEffect
+    public IPathEffect? PathEffect
     {
         get => SKPathEffect.GetObject(SkiaApi.sk_paint_get_path_effect(Handle));
-        set => SkiaApi.sk_paint_set_path_effect(Handle, value?.Handle ?? IntPtr.Zero);
+        set => SkiaApi.sk_paint_set_path_effect(Handle, (value as SKPathEffect)?.Handle ?? IntPtr.Zero);
     }
 
     #endregion
@@ -137,7 +136,7 @@ public sealed class SKPaint : SKObject, ISKSkipObjectRegistration, IPaint
     {
         if (ReferenceEquals(this, _shared))
             return; // never dispose shared instance
-        
+
         base.Dispose(disposing);
     }
 

@@ -128,7 +128,7 @@ public sealed class FormItem : Widget
         _cachedLabelParagraph = TextPainter.BuildParagraph(Label, float.PositiveInfinity, fontSize, textColor);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         //TODO: 考虑画边框
 

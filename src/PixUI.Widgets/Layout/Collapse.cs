@@ -141,7 +141,7 @@ public sealed class Collapse : Widget
         SetSize(maxSize.Width, IsExpanded ? TitleHeight + _body?.H ?? 0 : TitleHeight);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         var needClip = IsExpanding || IsCollapsing;
         if (needClip)

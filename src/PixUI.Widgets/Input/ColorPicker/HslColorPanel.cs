@@ -62,7 +62,7 @@ public sealed class HslColorPanel : Widget, IMouseRegion
 
     #endregion
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         // Draw background
         var noSlColor = Color.FromHsl(_hue.Value);
@@ -83,7 +83,7 @@ public sealed class HslColorPanel : Widget, IMouseRegion
         DrawThumb(canvas);
     }
 
-    private void DrawThumb(Canvas canvas)
+    private void DrawThumb(ICanvas canvas)
     {
         var saturation = _s;
         var lightness = _l;

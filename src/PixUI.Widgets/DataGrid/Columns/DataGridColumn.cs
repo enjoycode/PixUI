@@ -97,7 +97,7 @@ public abstract class DataGridColumn<T>
     /// <summary>
     ///  画标题，允许子类特殊绘制(如CheckBoxColumn)
     /// </summary>
-    protected internal virtual void PaintHeader(Canvas canvas, Rect cellRect, DataGridTheme theme)
+    protected internal virtual void PaintHeader(ICanvas canvas, Rect cellRect, DataGridTheme theme)
     {
         var cellStyle = HeaderCellStyle ?? theme.DefaultHeaderCellStyle;
 
@@ -122,7 +122,7 @@ public abstract class DataGridColumn<T>
     /// <param name="rowIndex"></param>
     /// <param name="cellRect"></param>
     /// <returns>单元格样式，优先级: CellStyleGetter > Column.CellStyle > Default</returns>
-    protected CellStyle PaintCellBackground(Canvas canvas, DataGridController<T> controller, int rowIndex,
+    protected CellStyle PaintCellBackground(ICanvas canvas, DataGridController<T> controller, int rowIndex,
         in Rect cellRect)
     {
         var theme = controller.Theme;
@@ -157,7 +157,7 @@ public abstract class DataGridColumn<T>
     /// <param name="controller"></param>
     /// <param name="rowIndex"></param>
     /// <param name="cellRect"></param>
-    protected internal virtual void PaintCell(Canvas canvas, DataGridController<T> controller,
+    protected internal virtual void PaintCell(ICanvas canvas, DataGridController<T> controller,
         int rowIndex, Rect cellRect) { }
 
     /// <summary>

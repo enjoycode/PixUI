@@ -113,7 +113,7 @@ public sealed class Notification : Popup
         //do nothing,加入前已经手动布局过
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         foreach (var child in _children)
         {

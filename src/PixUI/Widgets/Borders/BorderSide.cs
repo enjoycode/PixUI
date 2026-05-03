@@ -26,7 +26,7 @@ public readonly struct BorderSide : IEquatable<BorderSide>
         Style = style;
     }
 
-    internal void ApplyPaint(Paint paint)
+    internal void ApplyPaint(IPaint paint)
     {
         paint.Style = PaintStyle.Stroke;
         paint.Color = Style == BorderStyle.Solid ? Color : Color.Empty;
@@ -47,10 +47,6 @@ public readonly struct BorderSide : IEquatable<BorderSide>
         var colorB = b.Style == BorderStyle.Solid ? b.Color : b.Color.WithAlpha(0);
         return new BorderSide(Color.Lerp(colorA, colorB, t)!.Value, width);
     }
-
-#if __WEB__
-    public BorderSide Clone() => new BorderSide(Color, Width, Style);
-#endif
 
     #region ====IEquatable====
 

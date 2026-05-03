@@ -1,7 +1,7 @@
 #if !__WEB__
 namespace PixUI;
 
-public unsafe class SKPathEffect : SKObject, ISKReferenceCounted
+public unsafe class SKPathEffect : SKObject, ISKReferenceCounted, IPathEffect
 {
     private SKPathEffect(IntPtr handle, bool owns) : base(handle, owns) { }
 

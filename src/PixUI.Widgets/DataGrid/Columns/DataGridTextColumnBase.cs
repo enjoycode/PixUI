@@ -14,7 +14,7 @@ public abstract class DataGridTextColumnBase<T> : DataGridColumn<T>
 
     private readonly List<CellCache<Paragraph>> _cellParagraphs = new();
 
-    protected internal override void PaintCell(Canvas canvas, DataGridController<T> controller, 
+    protected internal override void PaintCell(ICanvas canvas, DataGridController<T> controller, 
         int rowIndex, Rect cellRect)
     {
         //先画背景

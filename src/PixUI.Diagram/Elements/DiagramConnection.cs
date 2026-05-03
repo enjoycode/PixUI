@@ -1161,7 +1161,7 @@ public class DiagramConnection : DiagramItem, IConnection
 
     protected override void SetBounds(float x, float y, float width, float height, BoundsSpecified specified) { }
 
-    public override void Paint(Canvas canvas)
+    public override void Paint(ICanvas canvas)
     {
         if (_isDirty)
         {
@@ -1180,7 +1180,7 @@ public class DiagramConnection : DiagramItem, IConnection
 
     #region ====Paint Methods====
 
-    private void DrawConnectionLine(Canvas canvas)
+    private void DrawConnectionLine(ICanvas canvas)
     {
         using var path = GetPath();
 
@@ -1192,7 +1192,7 @@ public class DiagramConnection : DiagramItem, IConnection
         //canvas.DrawRectangle(Colors.Red, 1f, Rect.FromLTWH(0, 0, Bounds.Width, Bounds.Height));
     }
 
-    private void DrawConnectionCap(Canvas canvas, PathFigure? capFigure)
+    private void DrawConnectionCap(ICanvas canvas, PathFigure? capFigure)
     {
         if (capFigure == null)
             return;
@@ -1210,22 +1210,22 @@ public class DiagramConnection : DiagramItem, IConnection
             canvas.FillPath(BackColor, path);
     }
 
-    private Path GetPath(bool transforms = false)
+    private IPath GetPath(bool transforms = false)
     {
         if (Geometry is PathGeometry geo)
             return GetPathCore(geo, transforms);
 
-        return new Path();
+        return Path.Create();
     }
 
-    private Path GetPathCore(PathGeometry? geometry, bool transforms = false)
+    private IPath GetPathCore(PathGeometry? geometry, bool transforms = false)
     {
-        if (geometry == null) return new Path();
+        if (geometry == null) return Path.Create();
 
         var segment = geometry.Figures[0].Segments[0];
         if (segment is LineSegment lineSegment)
         {
-            var path = new Path();
+            var path = Path.Create();
             var lastFigure = geometry.Figures.Last();
 
             foreach (var figure in geometry.Figures)
@@ -1245,7 +1245,7 @@ public class DiagramConnection : DiagramItem, IConnection
 
                     if (seg is BezierSegment bSeg)
                     {
-                        using var arcPath = new Path();
+                        using var arcPath = Path.Create();
                         arcPath.AddBezier(startPoint, bSeg.Point1, bSeg.Point2, bSeg.Point3);
                         arcPath.Points.ForEach(p => points.Add(new Point(p.X, p.Y)));
                     }
@@ -1275,7 +1275,7 @@ public class DiagramConnection : DiagramItem, IConnection
         {
             var points = polyLineSegment.Points;
 
-            var path = new Path();
+            var path = Path.Create();
 
             Point[] arrayPoints = new Point[points.Count + 1];
             arrayPoints[0] = geometry.Figures[0].StartPoint;
@@ -1297,7 +1297,7 @@ public class DiagramConnection : DiagramItem, IConnection
 
         if (segment is BezierSegment bezierSegment)
         {
-            var path = new Path();
+            var path = Path.Create();
             var arrayPoints = new Point[4];
             arrayPoints[0] = geometry.Figures[0].StartPoint;
             arrayPoints[1] = new Point(bezierSegment.Point1.X, bezierSegment.Point1.Y);
@@ -1316,12 +1316,12 @@ public class DiagramConnection : DiagramItem, IConnection
             return path;
         }
 
-        return new Path();
+        return Path.Create();
     }
 
-    private static Path GetPathFromCap(PathFigure figure)
+    private static IPath GetPathFromCap(PathFigure figure)
     {
-        var path = new Path();
+        var path = Path.Create();
         var start = new Point(figure.StartPoint.X, figure.StartPoint.Y);
         foreach (var segment in figure.Segments)
         {
@@ -1345,7 +1345,7 @@ public class DiagramConnection : DiagramItem, IConnection
         return path;
     }
 
-    private static void GetPathFromLineSegment(Path path, LineSegment lineSegment, bool transforms,
+    private static void GetPathFromLineSegment(IPath path, LineSegment lineSegment, bool transforms,
         PathFigure figure, ref Point start)
     {
         Point[] points = new Point[2];
@@ -1362,7 +1362,7 @@ public class DiagramConnection : DiagramItem, IConnection
         start = points[1];
     }
 
-    private static void GetPathFromArcSegment(Path path, ArcSegment arcSegment, Point startPoint)
+    private static void GetPathFromArcSegment(IPath path, ArcSegment arcSegment, Point startPoint)
     {
         var endPoint = arcSegment.Point;
         var dist = (float)Math.Sqrt(Math.Pow(startPoint.X - endPoint.X, 2) +
@@ -1373,7 +1373,7 @@ public class DiagramConnection : DiagramItem, IConnection
         path.AddEllipse(Rect.FromLTWH(location.X, location.Y, dist, dist));
     }
 
-    private void DrawConnectionText(Canvas canvas)
+    private void DrawConnectionText(ICanvas canvas)
     {
         if (string.IsNullOrEmpty(Title))
             return;

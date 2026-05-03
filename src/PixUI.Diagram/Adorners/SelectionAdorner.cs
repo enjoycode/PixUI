@@ -32,7 +32,7 @@ internal sealed class SelectionAdorner : DesignAdorner, ISelectionAdorner
 
     public SelectionAdorner(DesignAdorners owner, DiagramItem target) : base(owner, target) { }
 
-    protected internal override void OnRender(Canvas canvas)
+    protected internal override void OnRender(ICanvas canvas)
     {
         //画外边框
         var outBorder = Rect.FromLTWH(-3, -3, Target.Bounds.Width + 6, Target.Bounds.Height + 6);
@@ -52,7 +52,7 @@ internal sealed class SelectionAdorner : DesignAdorner, ISelectionAdorner
         DrawAnchor(canvas, BottomCenter);
     }
 
-    private static void DrawAnchor(Canvas canvas, Rect rect)
+    private static void DrawAnchor(ICanvas canvas, Rect rect)
     {
         var paint = Paint.Shared(Colors.White);
         canvas.DrawRect(rect, paint);

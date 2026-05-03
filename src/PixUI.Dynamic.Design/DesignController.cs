@@ -21,7 +21,7 @@ public sealed partial class DesignController
     public DesignElement RootElement { get; internal set; } = null!;
 
     private DynamicBackground? _background;
-    private Image? _cachedBgImage;
+    private IImage? _cachedBgImage;
 
     public DynamicBackground? Background
     {
@@ -40,7 +40,7 @@ public sealed partial class DesignController
         }
     }
 
-    internal Image? BackgroundImage => _cachedBgImage;
+    internal IImage? BackgroundImage => _cachedBgImage;
 
     /// <summary>
     /// 当前工具箱选择的项

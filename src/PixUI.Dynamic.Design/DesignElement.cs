@@ -770,7 +770,7 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
         TryNotifyParentIfSizeChanged(oldWidth, oldHeight, affects);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         DrawBackground(canvas);
 
@@ -780,7 +780,7 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
             DrawPlaceholder(canvas);
     }
 
-    private void DrawBackground(Canvas canvas)
+    private void DrawBackground(ICanvas canvas)
     {
         if (!IsRoot) return;
 
@@ -790,7 +790,7 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
         }
     }
 
-    private void DrawPlaceholder(Canvas canvas)
+    private void DrawPlaceholder(ICanvas canvas)
     {
         using var dash = PathEffect.CreateDash(new[] { 5f, 5f }, 10);
         var paint = PixUI.Paint.Shared(Colors.Gray, PaintStyle.Stroke);

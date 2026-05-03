@@ -49,7 +49,7 @@ public sealed class Checkbox : Toggleable
         SetSize(Math.Min(maxSize.Width, K_CHECKBOX_SIZE), Math.Min(maxSize.Height, K_CHECKBOX_SIZE));
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         var origin = new Offset(W / 2f - K_EDGE_SIZE / 2f, H / 2f - K_EDGE_SIZE / 2f);
         var checkColor = Colors.White; //TODO:
@@ -112,7 +112,7 @@ public sealed class Checkbox : Toggleable
         }
     }
 
-    private void DrawBox(Canvas canvas, in Rect outer, Paint paint, BorderSide? side, bool fill)
+    private void DrawBox(ICanvas canvas, in Rect outer, IPaint paint, BorderSide? side, bool fill)
     {
         if (fill)
             canvas.DrawPath(_shape.GetOuterPath(outer), paint);
@@ -120,7 +120,7 @@ public sealed class Checkbox : Toggleable
             _shape.CopyWith(side).Paint(canvas, outer);
     }
 
-    private static void DrawCheck(Canvas canvas, Offset origin, double t, Paint paint)
+    private static void DrawCheck(ICanvas canvas, Offset origin, double t, IPaint paint)
     {
         Debug.Assert(t >= 0 && t <= 1.0);
         // As t goes from 0.0 to 1.0, animate the two check mark strokes from the
@@ -157,7 +157,7 @@ public sealed class Checkbox : Toggleable
         }
     }
 
-    private static void DrawDash(Canvas canvas, Offset origin, double t, Paint paint)
+    private static void DrawDash(ICanvas canvas, Offset origin, double t, IPaint paint)
     {
         Debug.Assert(t >= 0 && t <= 1.0);
 

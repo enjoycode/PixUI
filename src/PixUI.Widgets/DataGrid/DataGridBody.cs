@@ -96,7 +96,7 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
         SetSize(availableWidth, availableHeight);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (_controller.DataView == null || _controller.DataView.Count == 0)
         {
@@ -118,7 +118,7 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
         //draw shadow for scroll vertical
         if (_controller.ScrollController.OffsetY > 0)
         {
-            using var shadowPath = new Path();
+            using var shadowPath = Path.Create();
             var headerHeight = _controller.TotalHeaderHeight;
             shadowPath.AddRect(Rect.FromLTWH(0, -headerHeight, Math.Min(W, totalColumnsWidth), headerHeight));
             canvas.DrawShadow(shadowPath, Colors.Black, 5.0f, false, Root!.Window.ScaleFactor);
@@ -129,7 +129,7 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
         PaintHighlight(canvas);
     }
 
-    private void PaintRows(Canvas canvas, float totalColumnsWidth, IList<DataGridColumn<T>> visibleColumns)
+    private void PaintRows(ICanvas canvas, float totalColumnsWidth, IList<DataGridColumn<T>> visibleColumns)
     {
         // var headerHeight = _controller.TotalHeaderHeight;
         var deltaY = _controller.ScrollDeltaY;
@@ -169,7 +169,7 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
         }
     }
 
-    private void PaintColumnCells(Canvas canvas, DataGridColumn<T> col, int startRow, float deltaY, float maxHeight)
+    private void PaintColumnCells(ICanvas canvas, DataGridColumn<T> col, int startRow, float deltaY, float maxHeight)
     {
         var rowHeight = Theme.RowHeight;
         var offsetY = 0f;
@@ -216,7 +216,7 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
         }
     }
 
-    private void PaintHighlight(Canvas canvas)
+    private void PaintHighlight(ICanvas canvas)
     {
         if (Theme.HighlightingCurrentRow)
         {

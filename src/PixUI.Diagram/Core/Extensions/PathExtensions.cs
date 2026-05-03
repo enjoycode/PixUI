@@ -4,7 +4,7 @@ namespace PixUI.Diagram;
 
 internal static class PathExtensions
 {
-    public static void AddLine(this Path path, Point a, Point b)
+    public static void AddLine(this IPath path, Point a, Point b)
     {
         if (!path.TryGetLastPoint(out var lastPoint) || !IsNear(lastPoint.X, a.X) || !IsNear(lastPoint.Y, a.Y))
             path.MoveTo(a.X, a.Y);
@@ -12,7 +12,7 @@ internal static class PathExtensions
         path.LineTo(b.X, b.Y);
     }
 
-    public static void AddBezier(this Path path, Point pt1, Point pt2, Point pt3, Point pt4)
+    public static void AddBezier(this IPath path, Point pt1, Point pt2, Point pt3, Point pt4)
     {
         var hasLastPoint = path.TryGetLastPoint(out var lastPoint);
         if (!hasLastPoint || !IsNear(lastPoint.X, pt1.X) || !IsNear(lastPoint.Y, pt2.Y))
@@ -20,9 +20,9 @@ internal static class PathExtensions
         path.CubicTo(pt2.X, pt2.Y, pt3.X, pt3.Y, pt4.X, pt4.Y);
     }
 
-    public static void AddEllipse(this Path path, Rect rect) => path.AddOval(rect);
+    public static void AddEllipse(this IPath path, Rect rect) => path.AddOval(rect);
 
-    public static void AddLines(this Path path, Point[] points)
+    public static void AddLines(this IPath path, Point[] points)
     {
         var hasLastPt = path.TryGetLastPoint(out var lastPt);
         if (!hasLastPt || !IsNear(lastPt.X, points[0].X) || !IsNear(lastPt.Y, points[0].Y))

@@ -40,7 +40,7 @@ internal sealed class TransitionStack : Widget
         //do nothing
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (!IsMounted) return; //maybe has remove from widget tree when animation done.
 

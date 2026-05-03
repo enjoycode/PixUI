@@ -2822,13 +2822,13 @@ public unsafe partial class SkiaApi
 	// void sk_path_add_circle(sk_path_t*, float x, float y, float radius, sk_path_direction_t dir)
 		
 	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
-	internal static extern void sk_path_add_circle (sk_path_t param0, Single x, Single y, Single radius, SKPathDirection dir);
+	internal static extern void sk_path_add_circle (sk_path_t param0, Single x, Single y, Single radius, PathDirection dir);
 		
 
 	// void sk_path_add_oval(sk_path_t*, const sk_rect_t*, sk_path_direction_t)
 		
 	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
-	internal static extern void sk_path_add_oval (sk_path_t param0, Rect* param1, SKPathDirection param2);
+	internal static extern void sk_path_add_oval (sk_path_t param0, Rect* param1, PathDirection param2);
 		
 
 	// void sk_path_add_path(sk_path_t* cpath, sk_path_t* other, sk_path_add_mode_t add_mode)
@@ -2864,37 +2864,37 @@ public unsafe partial class SkiaApi
 	// void sk_path_add_rect(sk_path_t*, const sk_rect_t*, sk_path_direction_t)
 		
 	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
-	internal static extern void sk_path_add_rect (sk_path_t param0, Rect* param1, SKPathDirection param2);
+	internal static extern void sk_path_add_rect (sk_path_t param0, Rect* param1, PathDirection param2);
 		
 
 	// void sk_path_add_rect_start(sk_path_t* cpath, const sk_rect_t* crect, sk_path_direction_t cdir, uint32_t startIndex)
 		
 	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
-	internal static extern void sk_path_add_rect_start (sk_path_t cpath, Rect* crect, SKPathDirection cdir, UInt32 startIndex);
+	internal static extern void sk_path_add_rect_start (sk_path_t cpath, Rect* crect, PathDirection cdir, UInt32 startIndex);
 		
 
 	// void sk_path_add_rounded_rect(sk_path_t*, const sk_rect_t*, float, float, sk_path_direction_t)
 		
 	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
-	internal static extern void sk_path_add_rounded_rect (sk_path_t param0, Rect* param1, Single param2, Single param3, SKPathDirection param4);
+	internal static extern void sk_path_add_rounded_rect (sk_path_t param0, Rect* param1, Single param2, Single param3, PathDirection param4);
 		
 
 	// void sk_path_add_rrect(sk_path_t*, const sk_rrect_t*, sk_path_direction_t)
 		
 	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
-	internal static extern void sk_path_add_rrect (sk_path_t param0, sk_rrect_t param1, SKPathDirection param2);
+	internal static extern void sk_path_add_rrect (sk_path_t param0, sk_rrect_t param1, PathDirection param2);
 		
 
 	// void sk_path_add_rrect_start(sk_path_t*, const sk_rrect_t*, sk_path_direction_t, uint32_t)
 		
 	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
-	internal static extern void sk_path_add_rrect_start (sk_path_t param0, sk_rrect_t param1, SKPathDirection param2, UInt32 param3);
+	internal static extern void sk_path_add_rrect_start (sk_path_t param0, sk_rrect_t param1, PathDirection param2, UInt32 param3);
 		
 
 	// void sk_path_arc_to(sk_path_t*, float rx, float ry, float xAxisRotate, sk_path_arc_size_t largeArc, sk_path_direction_t sweep, float x, float y)
 		
 	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
-	internal static extern void sk_path_arc_to (sk_path_t param0, Single rx, Single ry, Single xAxisRotate, SKPathArcSize largeArc, SKPathDirection sweep, Single x, Single y);
+	internal static extern void sk_path_arc_to (sk_path_t param0, Single rx, Single ry, Single xAxisRotate, SKPathArcSize largeArc, PathDirection sweep, Single x, Single y);
 		
 
 	// void sk_path_arc_to_with_oval(sk_path_t*, const sk_rect_t* oval, float startAngle, float sweepAngle, bool forceMoveTo)
@@ -3047,7 +3047,7 @@ public unsafe partial class SkiaApi
 		
 	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
 	[return: MarshalAs (UnmanagedType.I1)]
-	internal static extern bool sk_path_is_rect (sk_path_t cpath, Rect* rect, Byte* isClosed, SKPathDirection* direction);
+	internal static extern bool sk_path_is_rect (sk_path_t cpath, Rect* rect, Byte* isClosed, PathDirection* direction);
 		
 
 	// bool sk_path_is_rrect(sk_path_t* cpath, sk_rrect_t* bounds)
@@ -3121,7 +3121,7 @@ public unsafe partial class SkiaApi
 	// void sk_path_rarc_to(sk_path_t*, float rx, float ry, float xAxisRotate, sk_path_arc_size_t largeArc, sk_path_direction_t sweep, float x, float y)
 		
 	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
-	internal static extern void sk_path_rarc_to (sk_path_t param0, Single rx, Single ry, Single xAxisRotate, SKPathArcSize largeArc, SKPathDirection sweep, Single x, Single y);
+	internal static extern void sk_path_rarc_to (sk_path_t param0, Single rx, Single ry, Single xAxisRotate, SKPathArcSize largeArc, PathDirection sweep, Single x, Single y);
 		
 
 	// float sk_path_rawiter_conic_weight(sk_path_rawiterator_t* iterator)

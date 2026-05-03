@@ -27,15 +27,15 @@ public sealed class ButtonGroup : MultiChildWidget<Button>
         SetSize(xPos, _buttonHeight.Value);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (W == 0 || H == 0 || canvas.IsClipEmpty)
             return;
 
         //clip to round rectangle
-        using var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, W, H),
+        var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, W, H),
             Button.StandardRadius, Button.StandardRadius);
-        using var path = new Path();
+        using var path = Path.Create();
         path.AddRRect(rrect);
         canvas.Save();
         canvas.ClipPath(path, ClipOp.Intersect, true);
