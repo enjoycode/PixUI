@@ -10,6 +10,7 @@ public interface IPaint : IDisposable
     StrokeCap StrokeCap { get; set; }
     IPathEffect? PathEffect { get; set; }
     IShader? Shader { get; set; }
+    IMaskFilter? MaskFilter { get; set; }
     void Reset();
 }
 

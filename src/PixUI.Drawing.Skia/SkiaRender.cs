@@ -20,6 +20,9 @@ public sealed class SkiaRender : IRender
     public IShader? ShaderCreateLinearGradient(Point start, Point end, Color[] colors, float[]? colorPos, TileMode mode)
         => SKShader.CreateLinearGradient(start, end, colors, colorPos, mode);
 
+    public IMaskFilter? MaskFilterCreateBlur(BlurStyle blurStyle, float sigma)
+        => SKMaskFilter.CreateBlur(blurStyle, sigma);
+
     public IPath MakePath() => new SKPath();
 
     public IPath PathFromSvgData(string svgPath) => SKPath.ParseSvgPathData(svgPath);

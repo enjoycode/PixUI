@@ -93,15 +93,13 @@ public sealed class Switch : Toggleable
         var shadowColor = new Color(0x26000000);
         var blurRadius = 8.0f;
         paint.Color = shadowColor;
-        paint.MaskFilter = MaskFilter.CreateBlur(BlurStyle.Normal,
-            MaskFilter.ConvertRadiusToSigma(blurRadius));
+        paint.MaskFilter = MaskFilter.CreateBlur(BlurStyle.Normal, MaskFilter.ConvertRadiusToSigma(blurRadius));
         canvas.DrawRRect(rrect, paint);
 
         shadowColor = new Color(0x0F000000);
         blurRadius = 1f;
         paint.Color = shadowColor;
-        paint.MaskFilter = MaskFilter.CreateBlur(BlurStyle.Normal,
-            MaskFilter.ConvertRadiusToSigma(blurRadius));
+        paint.MaskFilter = MaskFilter.CreateBlur(BlurStyle.Normal, MaskFilter.ConvertRadiusToSigma(blurRadius));
         canvas.DrawRRect(rrect, paint);
         rrect.Shift(0, -3);
 

@@ -6,6 +6,8 @@ public interface IPath : IDisposable
 
     Rect Bounds { get; }
 
+    bool GetTightBounds(out Rect result);
+
     bool TryGetLastPoint(out Point point);
 
     void MoveTo(float x, float y);

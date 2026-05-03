@@ -32,8 +32,10 @@ public interface IRender
 
     #endregion
 
+    IMaskFilter? MaskFilterCreateBlur(BlurStyle blurStyle, float sigma);
+
     IPath MakePath();
-    
+
     IPath PathFromSvgData(string svgPath);
 
     IPathEffect? PathEffectCreateDash(float[] intervals, float phase);
