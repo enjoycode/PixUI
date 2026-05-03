@@ -475,13 +475,13 @@ public abstract partial class Widget : IDisposable
     /// <param name="canvas"></param>
     /// <param name="onlyTransform">用于脏区域绘制时仅转换坐标矩阵，不需要重复裁剪</param>
     /// <param name="dirtyArea">用于脏区域绘制时裁剪区域</param>
-    protected internal virtual void BeforePaint(Canvas canvas, bool onlyTransform = false,
+    protected internal virtual void BeforePaint(ICanvas canvas, bool onlyTransform = false,
         IDirtyArea? dirtyArea = null)
     {
         canvas.Translate(X, Y);
         if (dirtyArea != null)
         {
-            Debug.Assert(onlyTransform == false);
+            Debug.Assert(!onlyTransform);
             //这里不需要保存画布状态,InvalidQueue会恢复
             dirtyArea.ApplyClip(canvas);
         }
@@ -490,12 +490,12 @@ public abstract partial class Widget : IDisposable
     /// <summary>
     /// 绘制完成后恢复坐标，并且根据需要恢复矩阵转换或裁剪区域
     /// </summary>
-    protected internal virtual void AfterPaint(Canvas canvas)
+    protected internal virtual void AfterPaint(ICanvas canvas)
     {
         canvas.Translate(-X, -Y);
     }
 
-    public virtual void Paint(Canvas canvas, IDirtyArea? area = null)
+    public virtual void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (W == 0 || H == 0 || canvas.IsClipEmpty)
             return;
@@ -503,7 +503,7 @@ public abstract partial class Widget : IDisposable
         PaintChildren(canvas, area);
     }
 
-    protected void PaintChildren(Canvas canvas, IDirtyArea? area = null)
+    protected void PaintChildren(ICanvas canvas, IDirtyArea? area = null)
     {
         if (area is RepaintChild repaintChild)
         {
@@ -515,7 +515,7 @@ public abstract partial class Widget : IDisposable
         VisitChildren(ref visitor);
     }
 
-    protected static void PaintChild(Widget child, Canvas canvas, IDirtyArea? area = null)
+    protected static void PaintChild(Widget child, ICanvas canvas, IDirtyArea? area = null)
     {
         if (child.W <= 0 || child.H <= 0)
             return;
@@ -525,8 +525,6 @@ public abstract partial class Widget : IDisposable
         child.BeforePaint(canvas);
         child.Paint(canvas, area?.ToChild(child));
         child.AfterPaint(canvas);
-
-        PaintDebugger.PaintWidgetBorder(child, canvas);
     }
 
     #endregion

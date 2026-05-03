@@ -1,11 +1,10 @@
-#if !__WEB__
 namespace PixUI;
 
-public sealed unsafe class Font : SKObject
+public sealed unsafe class SKFont : SKObject, IFont
 {
-    private Font(IntPtr handle, bool owns) : base(handle, owns) { }
+    private SKFont(IntPtr handle, bool owns) : base(handle, owns) { }
 
-    public Font(Typeface typeface, float sizeInPoints, float scaleX = 1, float skewX = 0)
+    public SKFont(SKTypeface typeface, float sizeInPoints, float scaleX = 1, float skewX = 0)
         : this(SkiaApi.sk_font_new_with_values(typeface.Handle, sizeInPoints, scaleX, skewX), true)
     {
         if (Handle == IntPtr.Zero)
@@ -64,9 +63,9 @@ public sealed unsafe class Font : SKObject
         set => SkiaApi.sk_font_set_hinting(Handle, value);
     }
 
-    public Typeface? Typeface
+    public SKTypeface? Typeface
     {
-        get => Typeface.GetObject(SkiaApi.sk_font_get_typeface(Handle));
+        get => SKTypeface.GetObject(SkiaApi.sk_font_get_typeface(Handle));
         set => SkiaApi.sk_font_set_typeface(Handle, value?.Handle ?? IntPtr.Zero);
     }
 
@@ -167,4 +166,3 @@ public sealed unsafe class Font : SKObject
         return res;
     }
 }
-#endif

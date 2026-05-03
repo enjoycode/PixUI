@@ -101,7 +101,7 @@ public sealed class ScrollBarDecorator<T> : FlowDecorator<T> where T : Widget, I
         return false;
     }
 
-    protected override void PaintCore(Canvas canvas)
+    protected override void PaintCore(ICanvas canvas)
     {
         //TODO:新版skia直接使用Matrix4
         _totalTransform = canvas.GetTotalMatrix();
@@ -232,7 +232,7 @@ public sealed class ScrollBar : Widget, IMouseRegion
             SetSize(Size, availableHeight);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         // draw background
         Color bgColor = 0x555F6368;
@@ -258,7 +258,7 @@ public sealed class ScrollBar : Widget, IMouseRegion
 
         paint = PixUI.Paint.Shared(Colors.Gray);
         paint.AntiAlias = true;
-        using var thumb = RRect.FromRectAndRadius(_thumbRect, (Size - 2) / 2, (Size - 2) / 2);
+        var thumb = RRect.FromRectAndRadius(_thumbRect, (Size - 2) / 2, (Size - 2) / 2);
         canvas.DrawRRect(thumb, paint);
     }
 }

@@ -46,7 +46,7 @@ public sealed class Caret
         (_decorator?.Parent as Overlay)?.Remove(_decorator!);
     }
 
-    public void NotifyPositionChanged() => _decorator?.Invalidate(InvalidAction.Repaint);
+    public void NotifyPositionChanged() => _decorator?.Repaint();
 
     public void StartBlinking()
     {
@@ -73,7 +73,7 @@ internal sealed class CaretDecorator : FlowDecorator<Widget>
         _owner = owner;
     }
 
-    protected override void PaintCore(Canvas canvas)
+    protected override void PaintCore(ICanvas canvas)
     {
         var paint = PixUI.Paint.Shared();
         if (_owner.ColorBuilder == null)

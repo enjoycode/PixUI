@@ -18,7 +18,7 @@ public sealed class ImageSource
     /// <summary>
     /// 加载完的图像，如果错误返回null
     /// </summary>
-    public Image? Image { get; private set; }
+    public IImage? Image { get; private set; }
 
     /// <summary>
     /// 是否已加载，仅用于异步加载后回调
@@ -30,7 +30,7 @@ public sealed class ImageSource
         var imgSrc = new ImageSource
         {
             Loading = false,
-            Image = Image.FromEncodedData(data)
+            Image = PixUI.Image.FromEncodedData(data)
         };
         return imgSrc;
     }
@@ -48,7 +48,7 @@ public sealed class ImageSource
         {
             using var httpClient = new HttpClient();
             await using var response = await httpClient.GetStreamAsync(url);
-            imageSource.Image = Image.FromEncodedData(response);
+            imageSource.Image = PixUI.Image.FromEncodedData(response);
             imageSource.Loading = false;
             imageSource.OnLoaded?.Invoke();
         }

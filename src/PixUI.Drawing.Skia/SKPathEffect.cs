@@ -1,43 +1,43 @@
 #if !__WEB__
 namespace PixUI;
 
-public unsafe class PathEffect : SKObject, ISKReferenceCounted
+public unsafe class SKPathEffect : SKObject, ISKReferenceCounted
 {
-    private PathEffect(IntPtr handle, bool owns) : base(handle, owns) { }
+    private SKPathEffect(IntPtr handle, bool owns) : base(handle, owns) { }
 
-    internal static PathEffect? GetObject(IntPtr handle) =>
-        GetOrAddObject(handle, (h, o) => new PathEffect(h, o));
+    internal static SKPathEffect? GetObject(IntPtr handle) =>
+        GetOrAddObject(handle, (h, o) => new SKPathEffect(h, o));
 
-    public static PathEffect? CreateDiscrete(float segLength, float deviation, uint seedAssist)
+    public static SKPathEffect? CreateDiscrete(float segLength, float deviation, uint seedAssist)
     {
         return GetObject(SkiaApi.sk_path_effect_create_discrete(segLength, deviation, seedAssist));
     }
 
-    public static PathEffect? CreateCorner(float radius)
+    public static SKPathEffect? CreateCorner(float radius)
     {
         return GetObject(SkiaApi.sk_path_effect_create_corner(radius));
     }
 
-    public static PathEffect? Create1DPath(Path path, float advance, float phase, Path1DPathEffectStyle style)
+    public static SKPathEffect? Create1DPath(SKPath path, float advance, float phase, Path1DPathEffectStyle style)
     {
         if (path == null)
             throw new ArgumentNullException(nameof(path));
         return GetObject(SkiaApi.sk_path_effect_create_1d_path(path.Handle, advance, phase, style));
     }
 
-    public static PathEffect? Create2DLine(float width, Matrix3 matrix)
+    public static SKPathEffect? Create2DLine(float width, Matrix3 matrix)
     {
         return GetObject(SkiaApi.sk_path_effect_create_2d_line(width, &matrix));
     }
 
-    public static PathEffect? Create2DPath(Matrix3 matrix, Path path)
+    public static SKPathEffect? Create2DPath(Matrix3 matrix, SKPath path)
     {
         if (path == null)
             throw new ArgumentNullException(nameof(path));
         return GetObject(SkiaApi.sk_path_effect_create_2d_path(&matrix, path.Handle));
     }
 
-    public static PathEffect? CreateDash(float[] intervals, float phase)
+    public static SKPathEffect? CreateDash(float[] intervals, float phase)
     {
         if (intervals == null)
             throw new ArgumentNullException(nameof(intervals));

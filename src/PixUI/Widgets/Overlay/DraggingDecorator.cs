@@ -4,7 +4,7 @@ internal sealed class DraggingDecorator : Widget
 {
     protected internal override bool HitTest(float x, float y, HitTestResult result) => false;
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (DragDropManager.DragEvent == null) return;
 
@@ -35,7 +35,7 @@ internal sealed class DraggingDecorator : Widget
         canvas.Restore();
     }
 
-    private static void DrawDefaultDropHint(Canvas canvas, DragEvent e)
+    private static void DrawDefaultDropHint(ICanvas canvas, DragEvent e)
     {
         //TODO: 暂简单实现
         const float ident = 2f;

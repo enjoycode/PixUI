@@ -21,14 +21,14 @@ public enum DropPosition
 
 public sealed class DragEvent : IDisposable
 {
-    private Image? _dragHintImage;
-    private Image? _dropHintImage;
+    private IImage? _dragHintImage;
+    private IImage? _dropHintImage;
     
     public DropEffect DropEffect { get; set; }
     public DropPosition DropPosition { get; set; }
     public IDataTransferItem TransferItem { get; set; } = null!;
 
-    public Image DragHintImage
+    public IImage DragHintImage
     {
         get => _dragHintImage!;
         set
@@ -38,7 +38,7 @@ public sealed class DragEvent : IDisposable
         }
     }
 
-    public Image? DropHintImage
+    public IImage? DropHintImage
     {
         get => _dropHintImage;
         set

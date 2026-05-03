@@ -49,7 +49,7 @@ public sealed class ImageBox : Widget
         SetSize(availableSize.Width, availableSize.Height);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (_imgSrc.Value.Loading)
         {

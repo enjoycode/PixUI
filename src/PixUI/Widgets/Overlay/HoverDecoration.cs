@@ -58,7 +58,7 @@ internal sealed class HoverDecorator : FlowDecorator<Widget>
         _shape = owner.ShapeBuilder();
     }
 
-    protected override void PaintCore(Canvas canvas)
+    protected override void PaintCore(ICanvas canvas)
     {
         Rect bounds;
         if (_owner.BoundsGetter == null)

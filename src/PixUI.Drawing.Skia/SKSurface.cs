@@ -8,8 +8,8 @@ public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegi
     internal static SKSurface? GetObject(IntPtr handle) =>
         handle == IntPtr.Zero ? null : new SKSurface(handle, true);
 
-    public Canvas Canvas =>
-        OwnedBy(Canvas.GetObject(this, SkiaApi.sk_surface_get_canvas(Handle), false, unrefExisting: false), this);
+    public SKCanvas Canvas =>
+        OwnedBy(SKCanvas.GetObject(this, SkiaApi.sk_surface_get_canvas(Handle), false, unrefExisting: false), this);
 
     #region ====Static Create====
 
@@ -38,7 +38,7 @@ public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegi
 
     public static SKSurface? Create(GRRecordingContext context, GRBackendRenderTarget renderTarget,
         GRSurfaceOrigin origin, ColorType colorType,
-        ColorSpace? colorspace, SKSurfaceProperties? props)
+        SKColorSpace? colorspace, SKSurfaceProperties? props)
     {
         if (context == null)
             throw new ArgumentNullException(nameof(context));
@@ -63,13 +63,13 @@ public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegi
 
     #endregion
 
-    public Image Snapshot() =>
-        Image.GetObject(SkiaApi.sk_surface_new_image_snapshot(Handle))!;
+    public SKImage Snapshot() =>
+        SKImage.GetObject(SkiaApi.sk_surface_new_image_snapshot(Handle))!;
 
-    public Image Snapshot(RectI bounds) =>
-        Image.GetObject(SkiaApi.sk_surface_new_image_snapshot_with_crop(Handle, &bounds))!;
+    public SKImage Snapshot(RectI bounds) =>
+        SKImage.GetObject(SkiaApi.sk_surface_new_image_snapshot_with_crop(Handle, &bounds))!;
 
-    public void Draw(Canvas canvas, float x, float y, Paint? paint)
+    public void Draw(SKCanvas canvas, float x, float y, SKPaint? paint)
         => SkiaApi.sk_surface_draw(Handle, canvas.Handle, x, y, paint?.Handle ?? IntPtr.Zero);
 }
 #endif

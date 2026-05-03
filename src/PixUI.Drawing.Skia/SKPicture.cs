@@ -1,9 +1,9 @@
 #if !__WEB__
 namespace PixUI;
 
-public sealed unsafe class Picture : SKObject, ISKReferenceCounted
+public sealed unsafe class SKPicture : SKObject, ISKReferenceCounted
 {
-    internal Picture(IntPtr h, bool owns) : base(h, owns) { }
+    internal SKPicture(IntPtr h, bool owns) : base(h, owns) { }
 
     protected override void Dispose(bool disposing) =>
         base.Dispose(disposing);
@@ -57,7 +57,7 @@ public sealed unsafe class Picture : SKObject, ISKReferenceCounted
 
     // Deserialize
 
-    public static Picture? Deserialize(IntPtr data, int length)
+    public static SKPicture? Deserialize(IntPtr data, int length)
     {
         if (data == IntPtr.Zero)
             throw new ArgumentNullException(nameof(data));
@@ -68,7 +68,7 @@ public sealed unsafe class Picture : SKObject, ISKReferenceCounted
         return GetObject(SkiaApi.sk_picture_deserialize_from_memory((void*)data, (IntPtr)length));
     }
 
-    public static Picture? Deserialize(ReadOnlySpan<byte> data)
+    public static SKPicture? Deserialize(ReadOnlySpan<byte> data)
     {
         if (data.Length == 0)
             return null;
@@ -79,7 +79,7 @@ public sealed unsafe class Picture : SKObject, ISKReferenceCounted
         }
     }
 
-    public static Picture? Deserialize(SKData data)
+    public static SKPicture? Deserialize(SKData data)
     {
         if (data == null)
             throw new ArgumentNullException(nameof(data));
@@ -87,7 +87,7 @@ public sealed unsafe class Picture : SKObject, ISKReferenceCounted
         return GetObject(SkiaApi.sk_picture_deserialize_from_data(data.Handle));
     }
 
-    public static Picture? Deserialize(Stream stream)
+    public static SKPicture? Deserialize(Stream stream)
     {
         if (stream == null)
             throw new ArgumentNullException(nameof(stream));
@@ -96,7 +96,7 @@ public sealed unsafe class Picture : SKObject, ISKReferenceCounted
         return Deserialize(managed);
     }
 
-    public static Picture? Deserialize(SKStream stream)
+    public static SKPicture? Deserialize(SKStream stream)
     {
         if (stream == null)
             throw new ArgumentNullException(nameof(stream));
@@ -106,7 +106,7 @@ public sealed unsafe class Picture : SKObject, ISKReferenceCounted
 
     //
 
-    internal static Picture? GetObject(IntPtr handle, bool owns = true, bool unrefExisting = true) =>
-        GetOrAddObject(handle, owns, unrefExisting, (h, o) => new Picture(h, o));
+    internal static SKPicture? GetObject(IntPtr handle, bool owns = true, bool unrefExisting = true) =>
+        GetOrAddObject(handle, owns, unrefExisting, (h, o) => new SKPicture(h, o));
 }
 #endif

@@ -1,12 +1,11 @@
-#if !__WEB__
 namespace PixUI;
 
-public unsafe class ColorSpace : SKObject, ISKNonVirtualReferenceCounted
+public unsafe class SKColorSpace : SKObject, ISKNonVirtualReferenceCounted
 {
-    public static readonly ColorSpace SRGB;
+    public static readonly SKColorSpace SRGB;
     // private static readonly ColorSpace srgbLinear;
 
-    static ColorSpace()
+    static SKColorSpace()
     {
         SRGB = new SKColorSpaceStatic(SkiaApi.sk_colorspace_new_srgb());
         // srgbLinear = new SKColorSpaceStatic(SkiaApi.sk_colorspace_new_srgb_linear());
@@ -18,7 +17,7 @@ public unsafe class ColorSpace : SKObject, ISKNonVirtualReferenceCounted
         //            are initialized before any access is made to them
     }
 
-    internal ColorSpace(IntPtr handle, bool owns) : base(handle, owns) { }
+    internal SKColorSpace(IntPtr handle, bool owns) : base(handle, owns) { }
 
     void ISKNonVirtualReferenceCounted.ReferenceNative() =>
         SkiaApi.sk_colorspace_ref(Handle);
@@ -36,7 +35,7 @@ public unsafe class ColorSpace : SKObject, ISKNonVirtualReferenceCounted
     //
     // public bool IsNumericalTransferFunction => GetNumericalTransferFunction(out _);
 
-    public static bool Equal(ColorSpace left, ColorSpace right)
+    public static bool Equal(SKColorSpace left, SKColorSpace right)
     {
         if (left == null)
             throw new ArgumentNullException(nameof(left));
@@ -128,15 +127,14 @@ public unsafe class ColorSpace : SKObject, ISKNonVirtualReferenceCounted
     // public ColorSpace ToSrgbGamma() =>
     //     GetObject(SkiaApi.sk_colorspace_make_srgb_gamma(Handle));
 
-    internal static ColorSpace GetObject(IntPtr handle, bool owns = true,
+    internal static SKColorSpace GetObject(IntPtr handle, bool owns = true,
         bool unrefExisting = true) =>
-        GetOrAddObject(handle, owns, unrefExisting, (h, o) => new ColorSpace(h, o));
+        GetOrAddObject(handle, owns, unrefExisting, (h, o) => new SKColorSpace(h, o));
 
-    private sealed class SKColorSpaceStatic : ColorSpace
+    private sealed class SKColorSpaceStatic : SKColorSpace
     {
         internal SKColorSpaceStatic(IntPtr x) : base(x, false) { }
 
         protected override void Dispose(bool disposing) { }
     }
 }
-#endif

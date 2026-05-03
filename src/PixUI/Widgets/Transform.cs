@@ -106,7 +106,7 @@ public class Transform : SingleChildWidget
         return hitChild;
     }
 
-    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
+    protected internal override void BeforePaint(ICanvas canvas, bool onlyTransform = false,
         IDirtyArea? dirtyArea = null)
     {
         if (Child == null) return;
@@ -119,13 +119,13 @@ public class Transform : SingleChildWidget
         canvas.Concat(EffectiveTransform); //canvas.Transform(EffectiveTransform);
     }
 
-    protected internal override void AfterPaint(Canvas canvas)
+    protected internal override void AfterPaint(ICanvas canvas)
     {
         if (Child == null) return;
         canvas.Restore();
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (Child == null) return;
 

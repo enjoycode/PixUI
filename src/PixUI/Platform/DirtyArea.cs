@@ -29,7 +29,7 @@ public interface IDirtyArea
     /// <summary>
     /// 裁剪重绘脏区域
     /// </summary>
-    void ApplyClip(Canvas canvas);
+    void ApplyClip(ICanvas canvas);
 }
 
 /// <summary>
@@ -71,7 +71,7 @@ public sealed class RepaintArea : IDirtyArea
         return new RepaintArea(childRect);
     }
 
-    public void ApplyClip(Canvas canvas) => canvas.ClipRect(_rect, ClipOp.Intersect, false);
+    public void ApplyClip(ICanvas canvas) => canvas.ClipRect(_rect, ClipOp.Intersect, false);
 
     public override string ToString() => $"RepaintArea[{_rect}]";
 }
@@ -137,12 +137,12 @@ internal sealed class RepaintChild : IDirtyArea
         return _current < 0 ? _lastDirtyArea : this;
     }
 
-    public void ApplyClip(Canvas canvas)
+    public void ApplyClip(ICanvas canvas)
     {
         //do nothing now
     }
 
-    public Widget Repaint(Canvas canvas)
+    public Widget Repaint(ICanvas canvas)
     {
         var child = Child;
         child.BeforePaint(canvas, true);

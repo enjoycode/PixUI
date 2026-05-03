@@ -28,7 +28,7 @@ public sealed class Root : SingleChildWidget, IRootWidget
         //do nothing
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         canvas.Clear(Window.BackgroundColor);
         base.Paint(canvas, area);

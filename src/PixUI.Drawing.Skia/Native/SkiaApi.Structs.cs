@@ -1,4 +1,5 @@
 #if !__WEB__
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace PixUI;
@@ -1032,12 +1033,13 @@ public unsafe partial struct SKColorSpaceXyz : IEquatable<PixUI.SKColorSpaceXyz>
     // public float fM22
     private Single fM22;
 
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public readonly bool Equals(PixUI.SKColorSpaceXyz obj) =>
         fM00 == obj.fM00 && fM01 == obj.fM01 && fM02 == obj.fM02 && fM10 == obj.fM10 &&
         fM11 == obj.fM11 && fM12 == obj.fM12 && fM20 == obj.fM20 && fM21 == obj.fM21 &&
         fM22 == obj.fM22;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is PixUI.SKColorSpaceXyz f && Equals(f);
 
     public static bool operator ==(PixUI.SKColorSpaceXyz left,

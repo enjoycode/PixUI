@@ -48,7 +48,7 @@ public abstract class SKObject : SKNativeObject
         //TODO:
         // SkiaSharpVersion.CheckNativeLibraryCompatible (true);
 
-        ColorSpace.EnsureStaticInstanceAreInitialized();
+        SKColorSpace.EnsureStaticInstanceAreInitialized();
         // SKData.EnsureStaticInstanceAreInitialized ();
         // SKFontManager.EnsureStaticInstanceAreInitialized ();
         // SKTypeface.EnsureStaticInstanceAreInitialized ();

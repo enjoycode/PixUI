@@ -1,19 +1,18 @@
-#if !__WEB__
 namespace PixUI;
 
-public sealed unsafe class ColorFilter : SKObject, ISKReferenceCounted
+public sealed unsafe class SKColorFilter : SKObject, ISKReferenceCounted
 {
-    private ColorFilter(IntPtr handle, bool owns) : base (handle, owns) { }
+    private SKColorFilter(IntPtr handle, bool owns) : base (handle, owns) { }
         
-    internal static ColorFilter? GetObject (IntPtr handle) =>
-        GetOrAddObject (handle, (h, o) => new ColorFilter (h, o))!;
+    internal static SKColorFilter? GetObject (IntPtr handle) =>
+        GetOrAddObject (handle, (h, o) => new SKColorFilter (h, o))!;
         
     //TODO: others to fit CanvasKit
         
-    public static ColorFilter? CreateBlendMode(Color c, BlendMode mode) 
+    public static SKColorFilter? CreateBlendMode(Color c, BlendMode mode) 
         => GetObject (SkiaApi.sk_colorfilter_new_mode((uint)c, mode));
         
-    public static ColorFilter? CreateCompose(ColorFilter outer, ColorFilter inner)
+    public static SKColorFilter? CreateCompose(SKColorFilter outer, SKColorFilter inner)
     {
         if (outer == null)
             throw new ArgumentNullException(nameof(outer));
@@ -22,9 +21,9 @@ public sealed unsafe class ColorFilter : SKObject, ISKReferenceCounted
         return GetObject (SkiaApi.sk_colorfilter_new_compose(outer.Handle, inner.Handle));
     }
         
-    public static ColorFilter? CreateLumaColor() => GetObject (SkiaApi.sk_colorfilter_new_luma_color());
+    public static SKColorFilter? CreateLumaColor() => GetObject (SkiaApi.sk_colorfilter_new_luma_color());
         
-    public static ColorFilter? CreateColorMatrix(float[] matrix)
+    public static SKColorFilter? CreateColorMatrix(float[] matrix)
     {
         if (matrix == null)
             throw new ArgumentNullException(nameof(matrix));
@@ -35,5 +34,3 @@ public sealed unsafe class ColorFilter : SKObject, ISKReferenceCounted
         }
     }
 }
-
-#endif

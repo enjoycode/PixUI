@@ -85,7 +85,7 @@ internal sealed class FocusedDecorator : FlowDecorator<Widget>
 
     internal void Reset() => _controller?.Reset();
 
-    protected override void PaintCore(Canvas canvas)
+    protected override void PaintCore(ICanvas canvas)
     {
         var widget = _owner.Widget;
         var bounds = Rect.FromLTWH(0, 0, widget.W, widget.H);

@@ -1,9 +1,8 @@
-#if !__WEB__
 using System.Diagnostics.CodeAnalysis;
 
 namespace PixUI;
 
-public sealed unsafe class Canvas : SKObject
+public sealed unsafe class SKCanvas : SKObject
 {
     // private const int PatchCornerCount = 4;
     // private const int PatchCubicsCount = 12;
@@ -12,40 +11,40 @@ public sealed unsafe class Canvas : SKObject
 
     public readonly SKSurface? Surface;
 
-    private Canvas(SKSurface surface, IntPtr handle, bool owns) : base(handle, owns)
+    private SKCanvas(SKSurface surface, IntPtr handle, bool owns) : base(handle, owns)
     {
         Surface = surface;
     }
 
-    private Canvas(IntPtr handle, bool owns) : base(handle, owns) { }
+    private SKCanvas(IntPtr handle, bool owns) : base(handle, owns) { }
 
     protected override void DisposeNative() => SkiaApi.sk_canvas_destroy(Handle);
 
-    internal static Canvas? GetObject(SKSurface surface, IntPtr handle, bool owns = true,
+    internal static SKCanvas? GetObject(SKSurface surface, IntPtr handle, bool owns = true,
         bool unrefExisting = true) =>
-        GetOrAddObject(handle, owns, unrefExisting, (h, o) => new Canvas(surface, h, o));
+        GetOrAddObject(handle, owns, unrefExisting, (h, o) => new SKCanvas(surface, h, o));
 
-    internal static Canvas? GetObject(IntPtr handle, bool owns = true, bool unrefExisting = true) =>
-        GetOrAddObject(handle, owns, unrefExisting, (h, o) => new Canvas(h, o));
+    internal static SKCanvas? GetObject(IntPtr handle, bool owns = true, bool unrefExisting = true) =>
+        GetOrAddObject(handle, owns, unrefExisting, (h, o) => new SKCanvas(h, o));
 
 
     #region ====Draw Methods====
 
-    public void DrawLine(float x0, float y0, float x1, float y1, Paint paint) =>
+    public void DrawLine(float x0, float y0, float x1, float y1, SKPaint paint) =>
         SkiaApi.sk_canvas_draw_line(Handle, x0, y0, x1, y1, paint.Handle);
 
-    public void DrawLine(Point x, Point y, Paint paint) =>
+    public void DrawLine(Point x, Point y, SKPaint paint) =>
         SkiaApi.sk_canvas_draw_line(Handle, x.X, x.Y, y.X, y.Y, paint.Handle);
 
-    public void DrawRect(Rect rect, Paint paint) => SkiaApi.sk_canvas_draw_rect(Handle, &rect, paint.Handle);
+    public void DrawRect(Rect rect, SKPaint paint) => SkiaApi.sk_canvas_draw_rect(Handle, &rect, paint.Handle);
 
-    public void DrawRect(float x, float y, float w, float h, Paint paint) =>
+    public void DrawRect(float x, float y, float w, float h, SKPaint paint) =>
         DrawRect(Rect.FromLTWH(x, y, w, h), paint);
 
-    public void DrawRect(RectI rect, Paint paint) =>
+    public void DrawRect(RectI rect, SKPaint paint) =>
         DrawRect(rect.Left, rect.Top, rect.Width, rect.Height, paint);
 
-    public void DrawRRect(RRect rect, Paint paint)
+    public void DrawRRect(RRect rect, SKPaint paint)
     {
         if (paint == null)
             throw new ArgumentNullException(nameof(paint));
@@ -56,7 +55,7 @@ public sealed unsafe class Canvas : SKObject
     }
 
     // ReSharper disable once InconsistentNaming
-    public void DrawDRRect(RRect outer, RRect inner, Paint paint)
+    public void DrawDRRect(RRect outer, RRect inner, SKPaint paint)
     {
         if (paint == null)
             throw new ArgumentNullException(nameof(paint));
@@ -64,26 +63,26 @@ public sealed unsafe class Canvas : SKObject
         SkiaApi.sk_canvas_draw_drrect(Handle, new IntPtr(&outer), new IntPtr(&inner), paint.Handle);
     }
 
-    public void DrawOval(float cx, float cy, float rx, float ry, Paint paint)
+    public void DrawOval(float cx, float cy, float rx, float ry, SKPaint paint)
     {
         DrawOval(new Rect(cx - rx, cy - ry, cx + rx, cy + ry), paint);
     }
 
-    public void DrawOval(Rect rect, Paint paint)
+    public void DrawOval(Rect rect, SKPaint paint)
     {
         if (paint == null)
             throw new ArgumentNullException(nameof(paint));
         SkiaApi.sk_canvas_draw_oval(Handle, &rect, paint.Handle);
     }
 
-    public void DrawCircle(float cx, float cy, float radius, Paint paint)
+    public void DrawCircle(float cx, float cy, float radius, SKPaint paint)
     {
         if (paint == null)
             throw new ArgumentNullException(nameof(paint));
         SkiaApi.sk_canvas_draw_circle(Handle, cx, cy, radius, paint.Handle);
     }
 
-    public void DrawArc(Rect oval, float startAngle, float sweepAngle, bool useCenter, Paint paint)
+    public void DrawArc(Rect oval, float startAngle, float sweepAngle, bool useCenter, SKPaint paint)
     {
         if (paint == null)
             throw new ArgumentNullException(nameof(paint));
@@ -93,7 +92,7 @@ public sealed unsafe class Canvas : SKObject
             sweepAngle * toDegrees, useCenter, paint.Handle);
     }
 
-    public void DrawPath(Path path, Paint paint)
+    public void DrawPath(SKPath path, SKPaint paint)
     {
         if (paint == null)
             throw new ArgumentNullException(nameof(paint));
@@ -102,22 +101,22 @@ public sealed unsafe class Canvas : SKObject
         SkiaApi.sk_canvas_draw_path(Handle, path.Handle, paint.Handle);
     }
 
-    public void DrawString(string text, float x, float y, Font font, Color color)
+    public void DrawString(string text, float x, float y, SKFont font, Color color)
     {
         fixed (char* ptr = text)
         {
             SkiaApi.sk_canvas_draw_simple_text(Handle, ptr, new IntPtr(text.Length * 2), SKTextEncoding.Utf16,
-                x, y, font.Handle, PixUI.Paint.Shared(color).Handle);
+                x, y, font.Handle, PixUI.SKPaint.Shared(color).Handle);
         }
     }
 
-    public void DrawParagraph(Paragraph paragraph, float x, float y)
+    public void DrawParagraph(SKParagraph paragraph, float x, float y)
     {
         paragraph.Paint(this, x, y);
     }
 
     public void DrawGlyph(ushort glyphId, float posX, float posY, float originX, float originY,
-        Font font, Paint paint)
+        SKFont font, SKPaint paint)
     {
         var pos = new Point(posX, posY);
         var origin = new Point(originX, originY);
@@ -125,7 +124,7 @@ public sealed unsafe class Canvas : SKObject
             font.Handle, paint.Handle);
     }
 
-    public void DrawImage(Image image, float x, float y, Paint? paint = null)
+    public void DrawImage(SKImage image, float x, float y, SKPaint? paint = null)
     {
         if (image == null)
             throw new ArgumentNullException(nameof(image));
@@ -133,11 +132,11 @@ public sealed unsafe class Canvas : SKObject
             paint?.Handle ?? IntPtr.Zero);
     }
 
-    public void DrawImage(Image image, Rect dest, Paint? paint = null) =>
+    public void DrawImage(SKImage image, Rect dest, SKPaint? paint = null) =>
         DrawImage(image, Rect.FromLTWH(0, 0, image.Width, image.Height), dest, paint);
 
 
-    public void DrawImage(Image image, Rect source, Rect dest, Paint? paint = null)
+    public void DrawImage(SKImage image, Rect source, Rect dest, SKPaint? paint = null)
     {
         if (image == null)
             throw new ArgumentNullException(nameof(image));
@@ -145,7 +144,7 @@ public sealed unsafe class Canvas : SKObject
             paint?.Handle ?? IntPtr.Zero);
     }
 
-    public void DrawShadow(Path path, Color color, float elevation, bool transparentOccluder,
+    public void DrawShadow(SKPath path, Color color, float elevation, bool transparentOccluder,
         float devicePixelRatio)
         => SkiaApi.sk_canvas_draw_shadow(Handle, path.Handle, (uint)color, elevation,
             transparentOccluder, devicePixelRatio);
@@ -172,7 +171,7 @@ public sealed unsafe class Canvas : SKObject
     public void ClipRRect(RRect rRect, ClipOp op = ClipOp.Intersect, bool antialias = false) =>
         SkiaApi.sk_canvas_clip_rrect_with_operation(Handle, new IntPtr(&rRect), op, antialias);
 
-    public void ClipPath(Path path, ClipOp op, bool antialias)
+    public void ClipPath(SKPath path, ClipOp op, bool antialias)
     {
         if (path == null)
             throw new ArgumentNullException(nameof(path));
@@ -260,7 +259,7 @@ public sealed unsafe class Canvas : SKObject
 
     public int Save() => SkiaApi.sk_canvas_save(Handle);
 
-    public int SaveLayer(Paint? paint = null, Rect? bounds = null)
+    public int SaveLayer(SKPaint? paint = null, Rect? bounds = null)
     {
         if (bounds == null)
             return SkiaApi.sk_canvas_save_layer(Handle, null, paint?.Handle ?? IntPtr.Zero);
@@ -285,4 +284,3 @@ public sealed unsafe class Canvas : SKObject
 
     #endregion
 }
-#endif

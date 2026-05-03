@@ -1,9 +1,8 @@
-#if !__WEB__
 namespace PixUI;
 
-public sealed class Image : SKObject, ISKReferenceCounted
+public sealed class SKImage : SKObject, ISKReferenceCounted, IImage
 {
-    private Image(IntPtr x, bool owns) : base(x, owns) { }
+    private SKImage(IntPtr x, bool owns) : base(x, owns) { }
 
     public int Width => SkiaApi.sk_image_get_width(Handle);
 
@@ -16,10 +15,10 @@ public sealed class Image : SKObject, ISKReferenceCounted
     public bool IsTextureBacked => SkiaApi.sk_image_is_texture_backed(Handle);
     public bool IsLazyGenerated => SkiaApi.sk_image_is_lazy_generated(Handle);
 
-    internal static Image? GetObject(IntPtr handle) =>
-        GetOrAddObject(handle, (h, o) => new Image(h, o));
+    internal static SKImage? GetObject(IntPtr handle) =>
+        GetOrAddObject(handle, (h, o) => new SKImage(h, o));
 
-    public static Image? FromEncodedData(SKData data)
+    public static SKImage? FromEncodedData(SKData data)
     {
         if (data == null)
             throw new ArgumentNullException(nameof(data));
@@ -28,7 +27,7 @@ public sealed class Image : SKObject, ISKReferenceCounted
         return GetObject(handle);
     }
 
-    public static Image? FromEncodedData(byte[] data)
+    public static SKImage? FromEncodedData(byte[] data)
     {
         if (data == null)
             throw new ArgumentNullException(nameof(data));
@@ -39,16 +38,16 @@ public sealed class Image : SKObject, ISKReferenceCounted
         return FromEncodedData(skdata)!;
     }
 
-    public static Image? FromEncodedData(Stream data)
+    public static SKImage? FromEncodedData(Stream data)
     {
         using var skdata = SKData.Create(data);
         return skdata == null ? null : FromEncodedData(skdata);
     }
 
-    public static unsafe Image FromPicture(Picture picture, SizeI dimensions) =>
+    public static unsafe SKImage FromPicture(SKPicture picture, SizeI dimensions) =>
         FromPicture(picture, dimensions, null, null);
 
-    private static unsafe Image FromPicture(Picture picture, SizeI dimensions, Matrix3* matrix, Paint? paint)
+    private static unsafe SKImage FromPicture(SKPicture picture, SizeI dimensions, Matrix3* matrix, SKPaint? paint)
     {
         if (picture == null)
             throw new ArgumentNullException(nameof(picture));
@@ -65,14 +64,13 @@ public sealed class Image : SKObject, ISKReferenceCounted
 
     #region ====ToShader====
 
-    public Shader? ToShader() => ToShader(TileMode.Clamp, TileMode.Clamp);
+    public SKShader? ToShader() => ToShader(TileMode.Clamp, TileMode.Clamp);
 
-    public unsafe Shader? ToShader(TileMode tileX, TileMode tileY) =>
-        Shader.GetObject(SkiaApi.sk_image_make_shader(Handle, tileX, tileY, null));
+    public unsafe SKShader? ToShader(TileMode tileX, TileMode tileY) =>
+        SKShader.GetObject(SkiaApi.sk_image_make_shader(Handle, tileX, tileY, null));
 
-    public unsafe Shader? ToShader(TileMode tileX, TileMode tileY, Matrix3 localMatrix) =>
-        Shader.GetObject(SkiaApi.sk_image_make_shader(Handle, tileX, tileY, &localMatrix));
+    public unsafe SKShader? ToShader(TileMode tileX, TileMode tileY, Matrix3 localMatrix) =>
+        SKShader.GetObject(SkiaApi.sk_image_make_shader(Handle, tileX, tileY, &localMatrix));
 
     #endregion
 }
-#endif

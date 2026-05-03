@@ -1,16 +1,16 @@
 #if !__WEB__
 namespace PixUI;
 
-public sealed unsafe class Shader : SKObject, ISKReferenceCounted
+public sealed unsafe class SKShader : SKObject, ISKReferenceCounted
 {
-    private Shader(IntPtr handle, bool owns) : base(handle, owns) { }
+    private SKShader(IntPtr handle, bool owns) : base(handle, owns) { }
 
-    internal static Shader? GetObject(IntPtr handle) =>
-        GetOrAddObject(handle, (h, o) => new Shader(h, o));
+    internal static SKShader? GetObject(IntPtr handle) =>
+        GetOrAddObject(handle, (h, o) => new SKShader(h, o));
 
     //TODO: others，另外注意参数需与CanvasKit一致
 
-    public static Shader? CreateLinearGradient(Point start, Point end, Color[] colors, float[]? colorPos,
+    public static SKShader? CreateLinearGradient(Point start, Point end, Color[] colors, float[]? colorPos,
         TileMode mode)
     {
         if (colors == null)
@@ -27,7 +27,7 @@ public sealed unsafe class Shader : SKObject, ISKReferenceCounted
         }
     }
 
-    public static Shader? CreateRadialGradient(Point center, float radius, Color[] colors, float[]? colorPos,
+    public static SKShader? CreateRadialGradient(Point center, float radius, Color[] colors, float[]? colorPos,
         TileMode mode)
     {
         if (colors == null)
@@ -43,16 +43,16 @@ public sealed unsafe class Shader : SKObject, ISKReferenceCounted
         }
     }
 
-    public static Shader? CreateImage(Image src) => CreateImage(src, TileMode.Clamp, TileMode.Clamp);
+    public static SKShader? CreateImage(SKImage src) => CreateImage(src, TileMode.Clamp, TileMode.Clamp);
 
-    public static Shader? CreateImage(Image src, TileMode tmx, TileMode tmy)
+    public static SKShader? CreateImage(SKImage src, TileMode tmx, TileMode tmy)
     {
         if (src == null)
             throw new ArgumentNullException(nameof(src));
         return src.ToShader(tmx, tmy);
     }
 
-    public static Shader? CreateImage(Image src, TileMode tmx, TileMode tmy, Matrix3 localMatrix)
+    public static SKShader? CreateImage(SKImage src, TileMode tmx, TileMode tmy, Matrix3 localMatrix)
     {
         if (src == null)
             throw new ArgumentNullException(nameof(src));

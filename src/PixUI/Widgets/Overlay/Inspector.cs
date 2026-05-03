@@ -51,7 +51,7 @@ public sealed class Inspector : Widget
         //do nothing
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         var path = new List<Widget>();
         var temp = _target;

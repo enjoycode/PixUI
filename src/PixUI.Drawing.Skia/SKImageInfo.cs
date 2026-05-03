@@ -13,7 +13,8 @@ internal partial struct SKImageInfoNative
 
     public static SKImageInfoNative FromManaged(ref ImageInfo managed) => new SKImageInfoNative
     {
-        colorspace = managed.ColorSpace?.Handle ?? IntPtr.Zero,
+        //TODO: colorspace = (managed.ColorSpace as ColorSpace)?.Handle ?? IntPtr.Zero,
+        colorspace = IntPtr.Zero,
         width = managed.Width,
         height = managed.Height,
         colorType = managed.ColorType.ToNative(),

@@ -1,13 +1,13 @@
 #if !__WEB__
 namespace PixUI;
 
-public sealed class TextStyle : SKObject
+public sealed class SKTextStyle : SKObject
 {
-    private TextStyle(IntPtr handle, bool owns) : base(handle, owns) { }
+    private SKTextStyle(IntPtr handle, bool owns) : base(handle, owns) { }
 
-    public TextStyle() : this(SkiaApi.sk_text_style_new(), true)
+    public SKTextStyle() : this(SkiaApi.sk_text_style_new(), true)
     {
-        SetFontFamilies(new[] { FontCollection.DefaultFamilyName });
+        SetFontFamilies([FontCollection.DefaultFamilyName]);
     }
 
     protected override void DisposeNative() => SkiaApi.sk_text_style_delete(Handle);

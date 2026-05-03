@@ -8,11 +8,11 @@ public enum PathConvexity
     Concave = 2,
 }
 
-public unsafe class Path : SKObject, ISKSkipObjectRegistration
+public unsafe class SKPath : SKObject, ISKSkipObjectRegistration
 {
-    private Path(IntPtr handle, bool owns) : base(handle, owns) { }
+    private SKPath(IntPtr handle, bool owns) : base(handle, owns) { }
 
-    public Path() : this(SkiaApi.sk_path_new(), true)
+    public SKPath() : this(SkiaApi.sk_path_new(), true)
     {
         if (Handle == IntPtr.Zero)
             throw new InvalidOperationException("Unable to create a new SKPath instance.");
@@ -20,7 +20,7 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
 
     protected override void DisposeNative() => SkiaApi.sk_path_delete(Handle);
 
-    public Path Clone() => new Path(SkiaApi.sk_path_clone(this.Handle), true);
+    public SKPath Clone() => new SKPath(SkiaApi.sk_path_clone(this.Handle), true);
 
     public SKPathFillType FillType
     {
@@ -328,7 +328,7 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
     public void Transform(Matrix3 matrix) =>
         SkiaApi.sk_path_transform(Handle, &matrix);
 
-    public void Transform(Matrix3 matrix, Path destination)
+    public void Transform(Matrix3 matrix, SKPath destination)
     {
         if (destination == null)
             throw new ArgumentNullException(nameof(destination));
@@ -336,7 +336,7 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
         SkiaApi.sk_path_transform_to_dest(Handle, &matrix, destination.Handle);
     }
 
-    public void AddPath(Path other, float dx, float dy,
+    public void AddPath(SKPath other, float dx, float dy,
         SKPathAddMode mode = SKPathAddMode.Append)
     {
         if (other == null)
@@ -345,7 +345,7 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
         SkiaApi.sk_path_add_path_offset(Handle, other.Handle, dx, dy, mode);
     }
 
-    public void AddPath(Path other, ref Matrix3 matrix,
+    public void AddPath(SKPath other, ref Matrix3 matrix,
         SKPathAddMode mode = SKPathAddMode.Append)
     {
         if (other == null)
@@ -357,7 +357,7 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
         }
     }
 
-    public void AddPath(Path other, SKPathAddMode mode = SKPathAddMode.Append)
+    public void AddPath(SKPath other, SKPathAddMode mode = SKPathAddMode.Append)
     {
         if (other == null)
             throw new ArgumentNullException(nameof(other));
@@ -365,11 +365,11 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
         SkiaApi.sk_path_add_path(Handle, other.Handle, mode);
     }
 
-    public void AddPath(Path other, bool connect) =>
+    public void AddPath(SKPath other, bool connect) =>
         AddPath(other, connect ? SKPathAddMode.Extend : SKPathAddMode.Append);
 
 
-    public void AddPathReverse(Path other)
+    public void AddPathReverse(SKPath other)
     {
         if (other == null)
             throw new ArgumentNullException(nameof(other));
@@ -399,7 +399,7 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
     public RawIterator CreateRawIterator() =>
         new RawIterator(this);
 
-    public bool Op(Path other, PathOp op)
+    public bool Op(SKPath other, PathOp op)
     {
         if (other == null)
             throw new ArgumentNullException(nameof(other));
@@ -407,7 +407,7 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
         return SkiaApi.sk_pathop_op(Handle, other.Handle, op, Handle);
     }
 
-    public bool Simplify(Path result)
+    public bool Simplify(SKPath result)
     {
         if (result == null)
             throw new ArgumentNullException(nameof(result));
@@ -415,9 +415,9 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
         return SkiaApi.sk_pathop_simplify(Handle, result.Handle);
     }
 
-    public Path? Simplify()
+    public SKPath? Simplify()
     {
-        var result = new Path();
+        var result = new SKPath();
         if (Simplify(result))
         {
             return result;
@@ -438,7 +438,7 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
         }
     }
 
-    public bool ToWinding(Path result)
+    public bool ToWinding(SKPath result)
     {
         if (result == null)
             throw new ArgumentNullException(nameof(result));
@@ -446,9 +446,9 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
         return SkiaApi.sk_pathop_as_winding(Handle, result.Handle);
     }
 
-    public Path? ToWinding()
+    public SKPath? ToWinding()
     {
-        var result = new Path();
+        var result = new SKPath();
         if (ToWinding(result))
         {
             return result;
@@ -465,9 +465,9 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
         return (string)str;
     }
 
-    public static Path ParseSvgPathData(string svgPath)
+    public static SKPath ParseSvgPathData(string svgPath)
     {
-        var path = new Path();
+        var path = new SKPath();
         var success = SkiaApi.sk_path_parse_svg_string(path.Handle, svgPath);
         if (!success)
         {
@@ -502,14 +502,14 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
         }
     }
 
-    internal static Path? GetObject(IntPtr handle, bool owns = true) =>
-        handle == IntPtr.Zero ? null : new Path(handle, owns);
+    internal static SKPath? GetObject(IntPtr handle, bool owns = true) =>
+        handle == IntPtr.Zero ? null : new SKPath(handle, owns);
 
     public sealed class Iterator : SKObject, ISKSkipObjectRegistration
     {
-        private readonly Path path;
+        private readonly SKPath path;
 
-        internal Iterator(Path path, bool forceClose)
+        internal Iterator(SKPath path, bool forceClose)
             : base(SkiaApi.sk_path_create_iter(path.Handle, forceClose ? 1 : 0), true)
         {
             this.path = path;
@@ -546,9 +546,9 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
 
     public sealed class RawIterator : SKObject, ISKSkipObjectRegistration
     {
-        private readonly Path path;
+        private readonly SKPath path;
 
-        internal RawIterator(Path path)
+        internal RawIterator(SKPath path)
             : base(SkiaApi.sk_path_create_rawiter(path.Handle), true)
         {
             this.path = path;
@@ -586,10 +586,10 @@ public unsafe class Path : SKObject, ISKSkipObjectRegistration
         public OpBuilder()
             : base(SkiaApi.sk_opbuilder_new(), true) { }
 
-        public void Add(Path path, PathOp op) =>
+        public void Add(SKPath path, PathOp op) =>
             SkiaApi.sk_opbuilder_add(Handle, path.Handle, op);
 
-        public bool Resolve(Path result)
+        public bool Resolve(SKPath result)
         {
             if (result == null)
                 throw new ArgumentNullException(nameof(result));

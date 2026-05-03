@@ -13,11 +13,11 @@ public sealed unsafe class SKDocument : SKObject, ISKReferenceCounted, ISKSkipOb
     public void Abort() =>
         SkiaApi.sk_document_abort(Handle);
 
-    public Canvas BeginPage(float width, float height) =>
-        OwnedBy(Canvas.GetObject(SkiaApi.sk_document_begin_page(Handle, width, height, null), false), this);
+    public SKCanvas BeginPage(float width, float height) =>
+        OwnedBy(SKCanvas.GetObject(SkiaApi.sk_document_begin_page(Handle, width, height, null), false), this);
 
-    public Canvas BeginPage(float width, float height, Rect content) =>
-        OwnedBy(Canvas.GetObject(SkiaApi.sk_document_begin_page(Handle, width, height, &content), false), this);
+    public SKCanvas BeginPage(float width, float height, Rect content) =>
+        OwnedBy(SKCanvas.GetObject(SkiaApi.sk_document_begin_page(Handle, width, height, &content), false), this);
 
     public void EndPage() =>
         SkiaApi.sk_document_end_page(Handle);

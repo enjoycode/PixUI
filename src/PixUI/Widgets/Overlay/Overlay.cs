@@ -59,7 +59,7 @@ public sealed class Overlay : Widget, IRootWidget
         //do nothing, children will layout on Show()
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         foreach (var entry in _children)
         {

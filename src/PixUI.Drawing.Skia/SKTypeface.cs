@@ -1,12 +1,11 @@
-#if !__WEB__
 namespace PixUI;
 
-public sealed class Typeface : SKObject, ISKReferenceCounted
+public sealed class SKTypeface : SKObject, ISKReferenceCounted, ITypeface
 {
-    internal static Typeface? GetObject(IntPtr handle) =>
-        GetOrAddObject(handle, (h, o) => new Typeface(h, o));
+    internal static SKTypeface? GetObject(IntPtr handle) =>
+        GetOrAddObject(handle, (h, o) => new SKTypeface(h, o));
 
-    internal Typeface(IntPtr handle, bool owns) : base(handle, owns) { }
+    internal SKTypeface(IntPtr handle, bool owns) : base(handle, owns) { }
 
     public string FamilyName => (string)SKString.GetObject(SkiaApi.sk_typeface_get_family_name(Handle))!;
 
@@ -23,5 +22,6 @@ public sealed class Typeface : SKObject, ISKReferenceCounted
     public bool IsFixedPitch => SkiaApi.sk_typeface_is_fixed_pitch(Handle);
 
     public int UnitsPerEm => SkiaApi.sk_typeface_get_units_per_em(Handle);
+
+    public IFont MakeFont(float size) => new SKFont(this, size);
 }
-#endif

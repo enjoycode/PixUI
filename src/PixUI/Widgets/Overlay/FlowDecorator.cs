@@ -26,7 +26,7 @@ public abstract class FlowDecorator<T> : Widget where T : Widget
         //do nothing
     }
 
-    public sealed override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public sealed override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         var widgetToRoot = new List<Widget>();
         Widget temp = Target;
@@ -60,5 +60,5 @@ public abstract class FlowDecorator<T> : Widget where T : Widget
         }
     }
 
-    protected abstract void PaintCore(Canvas canvas);
+    protected abstract void PaintCore(ICanvas canvas);
 }

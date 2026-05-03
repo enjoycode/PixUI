@@ -1,6 +1,3 @@
 namespace PixUI;
 
-public interface IPath
-{
-    
-}
+public interface IPath : IDisposable { }

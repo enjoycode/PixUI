@@ -9,5 +9,5 @@ public interface IPaintEmptyClip
     /// 目前主要用于解决ChartView不可见时，RunDrawingLoop时不停止的问题
     /// </summary>
     /// <param name="canvas">裁剪区域为空的画布</param>
-    void ClearOrStopPaint(Canvas canvas);
+    void ClearOrStopPaint(ICanvas canvas);
 }

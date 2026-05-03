@@ -113,13 +113,13 @@ partial class Widget
 
     internal readonly struct PaintChildrenVisitor : IChildrenVisitor
     {
-        public PaintChildrenVisitor(Canvas canvas, IDirtyArea? dirtyArea)
+        public PaintChildrenVisitor(ICanvas canvas, IDirtyArea? dirtyArea)
         {
             _canvas = canvas;
             _dirtyArea = dirtyArea;
         }
 
-        private readonly Canvas _canvas;
+        private readonly ICanvas _canvas;
         private readonly IDirtyArea? _dirtyArea;
 
         public bool Visit(Widget child)

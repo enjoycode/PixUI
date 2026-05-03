@@ -147,7 +147,7 @@ public abstract class ListViewBase<T> : MultiChildWidget<Widget>, IScrollable
         //不需要再通知上级了
     }
 
-    protected internal override void BeforePaint(Canvas canvas, bool onlyTransform = false,
+    protected internal override void BeforePaint(ICanvas canvas, bool onlyTransform = false,
         IDirtyArea? dirtyArea = null)
     {
         canvas.Translate(X, Y);
@@ -165,13 +165,13 @@ public abstract class ListViewBase<T> : MultiChildWidget<Widget>, IScrollable
             canvas.Translate(-Controller.ScrollController.OffsetX, 0);
     }
 
-    protected internal override void AfterPaint(Canvas canvas)
+    protected internal override void AfterPaint(ICanvas canvas)
     {
         canvas.Restore();
         canvas.Translate(-X, -Y);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (Controller.ScrollController.Direction == ScrollDirection.Vertical)
         {

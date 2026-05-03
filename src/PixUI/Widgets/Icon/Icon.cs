@@ -55,7 +55,7 @@ public sealed class Icon : Widget
             Math.Max(0, Math.Min(availableHeight, size)));
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         var size = _size?.Value ?? Theme.DefaultFontSize;
         var color = _color?.Value ?? new Color(0xff5f6368);

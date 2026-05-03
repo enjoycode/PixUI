@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public enum SKPaintHinting
@@ -9,17 +8,17 @@ public enum SKPaintHinting
     Full = 3,
 }
 
-public sealed class Paint : SKObject, ISKSkipObjectRegistration
+public sealed class SKPaint : SKObject, ISKSkipObjectRegistration, IPaint
 {
 
     #region ====Shared====
 
-    private static Paint? _shared; //Do not create instance, web has not init CanvasKit
+    private static SKPaint? _shared; //Do not create instance, web has not init CanvasKit
 
-    public static Paint Shared(in Color? color = null, PaintStyle style = PaintStyle.Fill,
+    public static SKPaint Shared(in Color? color = null, PaintStyle style = PaintStyle.Fill,
         float strokeWidth = 1)
     {
-        if (_shared == null) _shared = new Paint();
+        if (_shared == null) _shared = new SKPaint();
         else _shared.Reset();
         _shared.Style = style;
         if (color != null)
@@ -33,9 +32,9 @@ public sealed class Paint : SKObject, ISKSkipObjectRegistration
     // private SKFont font;
     // private bool lcdRenderText;
 
-    private Paint(IntPtr handle, bool owns) : base(handle, owns) { }
+    private SKPaint(IntPtr handle, bool owns) : base(handle, owns) { }
 
-    public Paint() : this(SkiaApi.sk_compatpaint_new(), true)
+    public SKPaint() : this(SkiaApi.sk_compatpaint_new(), true)
     {
         if (Handle == IntPtr.Zero)
             throw new InvalidOperationException("Unable to create a new Paint instance.");
@@ -43,8 +42,8 @@ public sealed class Paint : SKObject, ISKSkipObjectRegistration
 
     protected override void DisposeNative() => SkiaApi.sk_compatpaint_delete(Handle);
 
-    internal static Paint? GetObject(IntPtr handle) =>
-        handle == IntPtr.Zero ? null : new Paint(handle, true);
+    internal static SKPaint? GetObject(IntPtr handle) =>
+        handle == IntPtr.Zero ? null : new SKPaint(handle, true);
 
     #region ====Properties====
 
@@ -100,33 +99,33 @@ public sealed class Paint : SKObject, ISKSkipObjectRegistration
         set => SkiaApi.sk_paint_set_stroke_join(Handle, value);
     }
 
-    public Shader? Shader
+    public SKShader? Shader
     {
-        get => Shader.GetObject(SkiaApi.sk_paint_get_shader(Handle));
+        get => SKShader.GetObject(SkiaApi.sk_paint_get_shader(Handle));
         set => SkiaApi.sk_paint_set_shader(Handle, value?.Handle ?? IntPtr.Zero);
     }
 
-    public MaskFilter? MaskFilter
+    public SKMaskFilter? MaskFilter
     {
-        get => MaskFilter.GetObject(SkiaApi.sk_paint_get_maskfilter(Handle));
+        get => SKMaskFilter.GetObject(SkiaApi.sk_paint_get_maskfilter(Handle));
         set => SkiaApi.sk_paint_set_maskfilter(Handle, value?.Handle ?? IntPtr.Zero);
     }
 
-    public ColorFilter? ColorFilter
+    public SKColorFilter? ColorFilter
     {
-        get => ColorFilter.GetObject(SkiaApi.sk_paint_get_colorfilter(Handle));
+        get => SKColorFilter.GetObject(SkiaApi.sk_paint_get_colorfilter(Handle));
         set => SkiaApi.sk_paint_set_colorfilter(Handle, value?.Handle ?? IntPtr.Zero);
     }
 
-    public ImageFilter? ImageFilter
+    public SKImageFilter? ImageFilter
     {
-        get => ImageFilter.GetObject(SkiaApi.sk_paint_get_imagefilter(Handle));
+        get => SKImageFilter.GetObject(SkiaApi.sk_paint_get_imagefilter(Handle));
         set => SkiaApi.sk_paint_set_imagefilter(Handle, value?.Handle ?? IntPtr.Zero);
     }
 
-    public PathEffect? PathEffect
+    public SKPathEffect? PathEffect
     {
-        get => PathEffect.GetObject(SkiaApi.sk_paint_get_path_effect(Handle));
+        get => SKPathEffect.GetObject(SkiaApi.sk_paint_get_path_effect(Handle));
         set => SkiaApi.sk_paint_set_path_effect(Handle, value?.Handle ?? IntPtr.Zero);
     }
 
@@ -153,4 +152,3 @@ public sealed class Paint : SKObject, ISKSkipObjectRegistration
     //     GetFont ().Edging = edging;
     // }
 }
-#endif

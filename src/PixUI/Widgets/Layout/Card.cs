@@ -78,7 +78,7 @@ public sealed class Card : SingleChildWidget
             H - margin.Top - margin.Bottom);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         var color = _color?.Value ?? Colors.White;
         var shadowColor = _shadowColor?.Value ?? Colors.Black;

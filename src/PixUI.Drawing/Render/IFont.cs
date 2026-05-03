@@ -1,6 +1,6 @@
 namespace PixUI;
 
-public interface IFont
+public interface IFont : IDisposable
 {
-    
+    ushort GetGlyphId(int codepoint);
 }
