@@ -70,6 +70,14 @@ public struct TextBox
 public static class TextStyle
 {
     public static ITextStyle Create() => Render.Provider.MakeTextStyle();
+
+    public static ITextStyle Create(Color color, float height)
+    {
+        var ts = Render.Provider.MakeTextStyle();
+        ts.Color = color;
+        ts.Height = height;
+        return ts;
+    }
 }
 
 public static class ParagraphStyle

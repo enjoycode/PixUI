@@ -60,7 +60,7 @@ internal sealed class IconBarArea : EditorArea
         TextEditor.Controller.Widget.RequestInvalidate(true, null);
     }
 
-    internal override void Paint(Canvas canvas, int[] viewLines)
+    internal override void Paint(ICanvas canvas, int[] viewLines)
     {
         if (Bounds.Width <= 0 || Bounds.Height <= 0)
             return;

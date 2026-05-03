@@ -46,6 +46,9 @@ public interface IRender
 
     IMaskFilter? MaskFilterCreateBlur(BlurStyle blurStyle, float sigma);
 
+    IImageFilter? ImageFilterCreateDropShadow(float dx, float dy, float sigmaX, float sigmaY, 
+        Color color, IImageFilter? input);
+
     IPath MakePath();
 
     IPath PathFromSvgData(string svgPath);

@@ -26,7 +26,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
 
     public readonly State<bool> Focused = false;
 
-    private Paragraph? _hintParagraph;
+    private IParagraph? _hintParagraph;
     private string? _hintText;
     private State<bool>? _readonly;
 
@@ -318,7 +318,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         SetSize(maxSize.Width, Math.Min(maxSize.Height, FontHeight));
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         const float offsetY = 2;
         if (string.IsNullOrEmpty(Text.Value) || Text.Value.Length == 0)
@@ -345,7 +345,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         }
     }
 
-    private void DrawSelection(Canvas canvas)
+    private void DrawSelection(ICanvas canvas)
     {
         if (_selectionStart == _selectionEnd) return;
 

@@ -11,7 +11,7 @@ public abstract class TextBase : Widget
     private State<Color>? _textColor;
     private int _maxLines = 1;
 
-    protected Paragraph? CachedParagraph { get; private set; }
+    protected IParagraph? CachedParagraph { get; private set; }
 
     public State<string> Text
     {
@@ -99,7 +99,7 @@ public abstract class TextBase : Widget
         CachedParagraph = BuildParagraphInternal(text, width, color);
     }
 
-    protected Paragraph BuildParagraphInternal(string text, float width, in Color color)
+    protected IParagraph BuildParagraphInternal(string text, float width, in Color color)
     {
         var fontSize = _fontSize?.Value ?? Theme.DefaultFontSize;
         FontStyle? fontStyle = _fontWeight == null
@@ -138,7 +138,7 @@ public abstract class TextBase : Widget
         );
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (string.IsNullOrEmpty(Text.Value) || Text.Value.Length == 0) return;
 

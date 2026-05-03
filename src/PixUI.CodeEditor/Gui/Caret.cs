@@ -164,7 +164,7 @@ public sealed class Caret
             _textEditor.ScrollToCaret();
     }
 
-    internal void Paint(Canvas canvas)
+    internal void Paint(ICanvas canvas)
     {
         var textViewBounds = _textEditor.TextView.Bounds;
 

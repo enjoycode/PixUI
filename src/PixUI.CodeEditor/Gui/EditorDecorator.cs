@@ -27,7 +27,7 @@ internal sealed class EditorDecorator : FlowDecorator<CodeEditorWidget>
         //Log.Debug($"Type: {nodeAtCaret.Value.Type} IsNamed: {nodeAtCaret.Value.IsNamed()}");
     }
 
-    protected override void PaintCore(Canvas canvas)
+    protected override void PaintCore(ICanvas canvas)
     {
         var textEditor = Target.Controller.TextEditor;
         //clip to visible area
@@ -42,7 +42,7 @@ internal sealed class EditorDecorator : FlowDecorator<CodeEditorWidget>
         PaintHighlightedBookmark(canvas, textEditor);
     }
 
-    private static void PaintSelection(Canvas canvas, TextEditor textEditor)
+    private static void PaintSelection(ICanvas canvas, TextEditor textEditor)
     {
         var textView = textEditor.TextView;
         var paint = PixUI.Paint.Shared(textEditor.Theme.SelectionColor);
@@ -82,7 +82,7 @@ internal sealed class EditorDecorator : FlowDecorator<CodeEditorWidget>
         }
     }
 
-    private static void PaintHighlightedBookmark(Canvas canvas, TextEditor textEditor)
+    private static void PaintHighlightedBookmark(ICanvas canvas, TextEditor textEditor)
     {
         var textView = textEditor.TextView;
         var bookmarks = textEditor.Document.BookmarkManager.Marks;

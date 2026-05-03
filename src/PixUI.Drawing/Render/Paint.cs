@@ -11,6 +11,7 @@ public interface IPaint : IDisposable
     IPathEffect? PathEffect { get; set; }
     IShader? Shader { get; set; }
     IMaskFilter? MaskFilter { get; set; }
+    IImageFilter? ImageFilter { get; set; }
     void Reset();
 }
 
@@ -20,4 +21,11 @@ public static class Paint
         => Render.Provider.PaintShared(color, style, strokeWidth);
 
     public static IPaint Create() => Render.Provider.MakePaint();
+
+    public static IPaint Create(Color color)
+    {
+        var paint = Render.Provider.MakePaint();
+        paint.Color = color;
+        return paint;
+    }
 }

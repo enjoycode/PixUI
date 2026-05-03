@@ -1,6 +1,6 @@
 namespace PixUI;
 
-public sealed class SKImageFilter : SKObject, ISKReferenceCounted
+public sealed class SKImageFilter : SKObject, ISKReferenceCounted, IImageFilter
 {
     private SKImageFilter(IntPtr handle, bool owns) : base(handle, owns) { }
 

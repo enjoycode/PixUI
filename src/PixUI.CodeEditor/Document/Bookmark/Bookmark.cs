@@ -125,7 +125,7 @@ public class Bookmark
         return false;
     }
 
-    public virtual void Draw(Canvas canvas, Rect bounds)
+    public virtual void Draw(ICanvas canvas, Rect bounds)
     {
         var paint = Paint.Shared(Colors.Red);
         paint.AntiAlias = true;

@@ -10,9 +10,9 @@ internal sealed class TextView : EditorArea //TODO: rename to TextArea
     {
         //TODO: 从Theme取Font设置 and Web use FontCollection.DefaultFontFamily
         var typeface = OperatingSystem.IsBrowser()
-            ? FontCollection.Instance.FindTypeface(FontCollection.DefaultFamilyName, false, false)
-            : FontCollection.Instance.DefaultFallback('X', null, false, false);
-        var defaultFont = new Font(typeface, Theme.FontSize);
+            ? FontCollection.FindTypeface(FontCollection.DefaultFamilyName, false, false)
+            : FontCollection.DefaultFallback('X', null, false, false);
+        var defaultFont = typeface!.MakeFont(Theme.FontSize);
 
         FontHeight = textEditor.Theme.FontSize + textEditor.Theme.LineSpace * 2;
         SpaceWidth = defaultFont.MeasureString(" ").Width;
@@ -172,7 +172,7 @@ internal sealed class TextView : EditorArea //TODO: rename to TextArea
         }
     }
 
-    internal override void Paint(Canvas canvas, int[] viewLines)
+    internal override void Paint(ICanvas canvas, int[] viewLines)
     {
         if (Bounds.Width <= 0 || Bounds.Height <= 0) return;
 

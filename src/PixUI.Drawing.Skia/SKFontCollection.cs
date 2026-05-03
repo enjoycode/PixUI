@@ -58,17 +58,17 @@ public sealed class SKFontCollection : IFontCollection
             FontChanged?.Invoke();
     }
 
-    public unsafe SKTypeface FindTypeface(string familyName, bool bold, bool italic)
+    public unsafe ITypeface? FindTypeface(string familyName, bool bold, bool italic)
     {
         fixed (char* namePtr = familyName)
         {
             var typefaceHandler = SkiaApi.sk_font_collection_find_typeface(_fontCollectionHandle,
                 new IntPtr(namePtr), familyName.Length * 2, bold, italic);
-            return SKTypeface.GetObject(typefaceHandler)!; //Typeface.PreventPublicDisposal()
+            return SKTypeface.GetObject(typefaceHandler); //Typeface.PreventPublicDisposal()
         }
     }
 
-    public unsafe SKTypeface? DefaultFallback(int unicode, string? familyName, bool bold, bool italic)
+    public unsafe ITypeface? DefaultFallback(int unicode, string? familyName, bool bold, bool italic)
     {
         var defaultFontMgr = SkiaApi.sk_font_collection_get_fallback_manager(Handle);
         var fontStyle = SKFontStyle.Make(bold, italic);

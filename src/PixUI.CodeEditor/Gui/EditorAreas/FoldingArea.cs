@@ -9,12 +9,12 @@ internal sealed class FoldingArea : EditorArea
 
     // private int _selectedFoldLine = -1;
 
-    private static Paint GetNormalPaint()
+    private static IPaint GetNormalPaint()
     {
         return PixUI.Paint.Shared(new Color(200, 200, 200, 255), PaintStyle.Stroke, 1f);
     }
 
-    private static Paint GetSelectedPaint()
+    private static IPaint GetSelectedPaint()
     {
         return PixUI.Paint.Shared(new Color(200, 200, 200, 255), PaintStyle.Stroke, 1.5f);
     }
@@ -65,7 +65,7 @@ internal sealed class FoldingArea : EditorArea
         Document.FoldingManager.RaiseFoldingsChanged(new FoldingChangeEventArgs(FoldingChangeType.FoldedStatus, null));
     }
 
-    internal override void Paint(Canvas canvas, int[] viewLines)
+    internal override void Paint(ICanvas canvas, int[] viewLines)
     {
         if (Bounds.Width <= 0 || Bounds.Height <= 0) return;
 
@@ -105,7 +105,7 @@ internal sealed class FoldingArea : EditorArea
         }
     }
 
-    private void PaintFoldMarker(Canvas canvas, int lineNumber, Rect rect, FoldingInfo[] foldings)
+    private void PaintFoldMarker(ICanvas canvas, int lineNumber, Rect rect, FoldingInfo[] foldings)
     {
         var foldingsWithStart = new List<FoldingInfo>();
         var foldingsBetween = new List<FoldingInfo>();
@@ -208,7 +208,7 @@ internal sealed class FoldingArea : EditorArea
         }
     }
 
-    private static void PaintMarker(Canvas canvas, Rect rect, bool isOpened, bool isSelected)
+    private static void PaintMarker(ICanvas canvas, Rect rect, bool isOpened, bool isSelected)
     {
         canvas.DrawRect(Rect.FromLTWH(rect.Left, rect.Top, rect.Width, rect.Height),
             isSelected ? GetSelectedPaint() : GetNormalPaint());

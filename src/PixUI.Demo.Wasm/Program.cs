@@ -11,12 +11,11 @@ Console.WriteLine("Hello World!");
 // await using var fontDataStream = await httpClient.GetStreamAsync(fontUrl);
 // using var fontData = SKData.Create(fontDataStream);
 // FontCollection.Instance.RegisterTypeface(fontData!, FontCollection.DefaultFamilyName, false);
-if (!FontCollection.Instance.HasAny)
+if (!FontCollection.HasAny)
 {
     using var fontDataStream =
-        typeof(Program).Assembly.GetManifestResourceStream("PixUI.Demo.Wasm.Fonts.NotoMono-Regular.woff2");
-    using var fontData = SKData.Create(fontDataStream!);
-    FontCollection.Instance.RegisterTypeface(fontData!, FontCollection.DefaultFamilyName, false); 
+        typeof(Program).Assembly.GetManifestResourceStream("PixUI.Demo.Wasm.Fonts.NotoMono-Regular.woff2")!;
+    FontCollection.RegisterTypeface(fontDataStream, FontCollection.DefaultFamilyName, false);
 }
 
 //开始执行
@@ -78,10 +77,10 @@ internal sealed class DemoChart : View
 
 internal sealed class DemoWidget : Widget
 {
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         Log.Info($"Width={W}, Height={H}");
-        
+
         // const float s = 30f;
         // var paint = PixUI.Paint.Shared(Colors.Red);
         // paint.Style = PaintStyle.Stroke;

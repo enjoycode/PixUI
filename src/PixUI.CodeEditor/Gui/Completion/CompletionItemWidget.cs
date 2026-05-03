@@ -14,14 +14,14 @@ internal sealed class CompletionItemWidget : Widget
     private readonly ICompletionItem _item;
     private readonly State<bool> _isSelected;
     private readonly IconPainter _iconPainter;
-    private Paragraph? _paragraph; //TODO: use TextPainter
+    private IParagraph? _paragraph; //TODO: use TextPainter
 
     public override void Layout(float availableWidth, float availableHeight)
     {
         SetSize(availableWidth, availableHeight);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         const float fontSize = 13f;
         const float x = 2f;

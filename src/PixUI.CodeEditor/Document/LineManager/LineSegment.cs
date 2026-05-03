@@ -99,7 +99,7 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
 
     private List<CodeToken>? _lineTokens;
     private int _tokenColumnIndex; //仅用于Tokenize时缓存
-    private Paragraph? _cachedParagraph;
+    private IParagraph? _cachedParagraph;
 
     internal IList<CachedFoldInfo>? CachedFolds { get; private set; }
 
@@ -363,13 +363,14 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
 
     #region ====Line Paragraph====
 
-    internal Paragraph GetLineParagraph(TextEditor editor)
+    internal IParagraph GetLineParagraph(TextEditor editor)
     {
         if (_cachedParagraph != null) return _cachedParagraph!;
 
-        // ReSharper disable once UsingStatementResourceInitialization
-        using var ps = new ParagraphStyle() { MaxLines = 1, Height = 1 };
-        using var pb = new ParagraphBuilder(ps);
+        using var ps = ParagraphStyle.Create();
+        ps.MaxLines = 1;
+        ps.Height = 1;
+        using var pb = ParagraphBuilder.Create(ps);
 
         if (_lineTokens == null || Length == 0)
         {
@@ -391,7 +392,7 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
         return _cachedParagraph!;
     }
 
-    private void BuildParagraphByTokens(ParagraphBuilder pb, TextEditor editor, int startIndex, int endIndex)
+    private void BuildParagraphByTokens(IParagraphBuilder pb, TextEditor editor, int startIndex, int endIndex)
     {
         for (var i = 0; i < _lineTokens!.Count; i++)
         {
@@ -416,7 +417,7 @@ public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
         }
     }
 
-    private void BuildParagraphByFoldings(ParagraphBuilder pb, TextEditor editor)
+    private void BuildParagraphByFoldings(IParagraphBuilder pb, TextEditor editor)
     {
         // there can't be a folding with starts in an above line and ends here,
         // because the line is a new one, there must be a return before this line.

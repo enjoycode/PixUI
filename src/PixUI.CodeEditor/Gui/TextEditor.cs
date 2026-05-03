@@ -206,7 +206,7 @@ public sealed class TextEditor
         //TODO: adjust scroll bars
     }
 
-    internal void Paint(Canvas canvas, Size size, IDirtyArea? dirtyArea)
+    internal void Paint(ICanvas canvas, Size size, IDirtyArea? dirtyArea)
     {
         //TODO: check dirtyArea
 

@@ -116,10 +116,10 @@ public sealed class SKPaint : SKObject, ISKSkipObjectRegistration, IPaint
         set => SkiaApi.sk_paint_set_colorfilter(Handle, value?.Handle ?? IntPtr.Zero);
     }
 
-    public SKImageFilter? ImageFilter
+    public IImageFilter? ImageFilter
     {
         get => SKImageFilter.GetObject(SkiaApi.sk_paint_get_imagefilter(Handle));
-        set => SkiaApi.sk_paint_set_imagefilter(Handle, value?.Handle ?? IntPtr.Zero);
+        set => SkiaApi.sk_paint_set_imagefilter(Handle, (value as SKImageFilter)?.Handle ?? IntPtr.Zero);
     }
 
     public IPathEffect? PathEffect

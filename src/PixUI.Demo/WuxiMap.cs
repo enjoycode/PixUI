@@ -178,8 +178,8 @@ public sealed class WuxiMap : Widget
         }
     }
 
-    private static void PaintLayer(MapLayer<SkiaDrawingContext> layer, Canvas canvas, Paint strokePaint,
-        Paint fillPaint)
+    private static void PaintLayer(MapLayer<SkiaDrawingContext> layer, ICanvas canvas,
+        IPaint strokePaint, IPaint fillPaint)
     {
         foreach (var landDefinition in layer.Lands.Values)
         {
@@ -187,7 +187,7 @@ public sealed class WuxiMap : Widget
             {
                 if (landData.Shape is HeatPathShape heatPathShape)
                 {
-                    using var path = new Path();
+                    using var path = Path.Create();
                     var temp = heatPathShape.FirstCommand;
                     while (temp != null)
                     {

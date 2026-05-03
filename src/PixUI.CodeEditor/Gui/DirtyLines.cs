@@ -32,7 +32,7 @@ public sealed class DirtyLines : IDirtyArea
 
     public IDirtyArea? ToChild(Widget child) => throw new NotSupportedException();
 
-    public void ApplyClip(Canvas canvas)
+    public void ApplyClip(ICanvas canvas)
     {
         // do nothing now
     }

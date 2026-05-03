@@ -10,19 +10,19 @@ internal sealed class GutterArea : EditorArea
         _numberWidth = _numberCache[7].LongestLine;
     }
 
-    private readonly Paragraph[] _numberCache;
+    private readonly IParagraph[] _numberCache;
     private readonly float _numberWidth;
 
-    private Paragraph[] GenerateNumberCache()
+    private IParagraph[] GenerateNumberCache()
     {
-        var cache = new Paragraph[10];
-        using var ts = new TextStyle();
+        var cache = new IParagraph[10];
+        using var ts = TextStyle.Create();
         ts.Color = Theme.LineNumberColor;
         for (var i = 0; i < 10; i++)
         {
-            using var ps = new ParagraphStyle();
+            using var ps = ParagraphStyle.Create();
             ps.MaxLines = 1;
-            using var pb = new ParagraphBuilder(ps);
+            using var pb = ParagraphBuilder.Create(ps);
             pb.PushStyle(ts);
             pb.AddText(i.ToString());
             var ph = pb.Build();
@@ -35,7 +35,7 @@ internal sealed class GutterArea : EditorArea
 
     internal override Size Size => new Size(_numberWidth * 5, -1);
 
-    internal override void Paint(Canvas canvas, int[] viewLines)
+    internal override void Paint(ICanvas canvas, int[] viewLines)
     {
         if (Bounds.Width <= 0 || Bounds.Height <= 0) return;
 
@@ -53,7 +53,7 @@ internal sealed class GutterArea : EditorArea
         }
     }
 
-    private void DrawLineNumber(Canvas canvas, int lineNumber, float yPos)
+    private void DrawLineNumber(ICanvas canvas, int lineNumber, float yPos)
     {
         var xPos = Bounds.Left + 2;
 

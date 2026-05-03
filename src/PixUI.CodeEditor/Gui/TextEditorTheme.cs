@@ -27,43 +27,37 @@ public sealed class TextEditorTheme
 
     public Color LineBgColor = new(0xFF313335);
 
-    public Paint BracketHighlightPaint = new() { Color = new Color(255, 255, 0, 100) };
+    public IPaint BracketHighlightPaint = Paint.Create(new Color(255, 255, 0, 100));
 
     public Color LineNumberColor = new(0xFF606366);
 
-    public TextStyle TextStyle = new() { Color = new Color(0xFFDCDCDC), Height = 1 };
+    public ITextStyle TextStyle = PixUI.TextStyle.Create(0xFFDCDCDC, 1f);
 
-    public TextStyle FoldedTextStyle = new()
-    {
-        Color = new Color(0xFFA9B7C7),
-        Height = 1,
-        //LetterSpacing = 1.5,
-        //Background = new Paint() {Color=new Color(0xFF3A3A3A)}
-    };
+    public ITextStyle FoldedTextStyle = PixUI.TextStyle.Create(0xFFA9B7C7, 1f);
 
     #region ====Token TextStyle====
 
-    private TextStyle _tokenErrorStyle = new() { Color = Colors.Red, Height = 1 };
+    private ITextStyle _tokenErrorStyle = PixUI.TextStyle.Create(Colors.Red, 1);
 
-    private TextStyle _tokenTypeStyle = new() { Color = 0xFF67DBF1, Height = 1 };
+    private ITextStyle _tokenTypeStyle = PixUI.TextStyle.Create(0xFF67DBF1, 1);
 
-    private TextStyle _tokenNumberStyle = new() { Color = 0xFF6996BD, Height = 1 };
+    private ITextStyle _tokenNumberStyle = PixUI.TextStyle.Create(0xFF6996BD, 1);
 
-    private TextStyle _tokenStringStyle = new() { Color = 0xFF98C379, Height = 1 };
+    private ITextStyle _tokenStringStyle = PixUI.TextStyle.Create(0xFF98C379, 1);
 
-    private TextStyle _tokenKeywordStyle = new() { Color = 0xFFCC7927, Height = 1 };
+    private ITextStyle _tokenKeywordStyle = PixUI.TextStyle.Create(0xFFCC7927, 1);
 
-    private TextStyle _tokenCommentStyle = new() { Color = 0xFF5F984F, Height = 1 };
+    private ITextStyle _tokenCommentStyle = PixUI.TextStyle.Create(0xFF5F984F, 1);
 
-    private TextStyle _tokenVariableStyle = new() { Color = 0xFFDCDCDC, Height = 1 };
+    private ITextStyle _tokenVariableStyle = PixUI.TextStyle.Create(0xFFDCDCDC, 1);
 
-    private TextStyle _tokenFunctionStyle = new() { Color = 0xFFFFC763, Height = 1 };
+    private ITextStyle _tokenFunctionStyle = PixUI.TextStyle.Create(0xFFFFC763, 1);
 
     /// <summary>
     /// 根据TokenType获取缓存的TextStyle
     /// </summary>
     /// <returns>Don't dispose result</returns>
-    public TextStyle GetTokenStyle(TokenType tokenType) =>
+    public ITextStyle GetTokenStyle(TokenType tokenType) =>
         tokenType switch
         {
             TokenType.Error => _tokenErrorStyle,
