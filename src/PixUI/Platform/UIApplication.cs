@@ -67,9 +67,6 @@ public abstract class UIApplication
             hasRelayout = window.WidgetsInvalidQueue.RenderFrame(ctx);
             if (OperatingSystem.IsBrowser())
                 widgetsCanvas.Flush(); //widgetsCanvas.Surface!.Flush();
-#if __WEB__
-            window.FlushOffscreenSurface();
-#endif
         }
 
         //重新布局OverlayCanvas
@@ -79,24 +76,12 @@ public abstract class UIApplication
             window.OverlayInvalidQueue.RelayoutAll();
         }
 
-#if !__WEB__
         widgetsCanvas.Surface!.Draw(overlayCanvas, 0, 0, null);
         if (window.ScaleFactor != 1)
             overlayCanvas.Scale(window.ScaleFactor, window.ScaleFactor);
         window.Overlay.Paint(overlayCanvas); //always repaint
         if (window.ScaleFactor != 1)
             overlayCanvas.ResetMatrix();
-#else
-            window.DrawOffscreenSurface();
-            if (window.ScaleFactor != 1)
-            {
-                overlayCanvas.Save();
-                overlayCanvas.Scale(window.ScaleFactor, window.ScaleFactor);
-            }
-            window.Overlay.Paint(overlayCanvas); //always repaint
-            if (window.ScaleFactor != 1)
-                overlayCanvas.Restore();
-#endif
 
         window.HasPostInvalidateEvent = false;
         // 通知重新进行HitTest, must after reset HasPostInvalidateEvent

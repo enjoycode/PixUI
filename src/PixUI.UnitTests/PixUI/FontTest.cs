@@ -6,7 +6,7 @@ namespace PixUI.UnitTests;
 public class FontTest
 {
     private const string fontFamilyName = "PingFang SC";
-    
+
     private static Typeface GetTypeface(string familyName, bool bold, bool italic) =>
         FontCollection.Instance.FindTypeface(familyName, bold, italic);
 
@@ -46,10 +46,11 @@ public class FontTest
     [Test]
     public void ParagraphTest()
     {
-        using var ts = new TextStyle { Color = Colors.Red, FontSize = 20};
+        using var ts = TextStyle.Create(Colors.Red, 20);
         //ts.SetFontFamilies(new[] { FontCollection.DefaultFamilyName });
-        using var ps = new ParagraphStyle { MaxLines = 1};
-        using var pb = new ParagraphBuilder(ps);
+        using var ps = ParagraphStyle.Create();
+        ps.MaxLines = 1;
+        using var pb = ParagraphBuilder.Create(ps);
         pb.PushStyle(ts);
         pb.AddText("ABC");
         pb.Pop();

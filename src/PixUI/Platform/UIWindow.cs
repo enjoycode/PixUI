@@ -105,21 +105,10 @@ public abstract class UIWindow
     /// </summary>
     protected internal abstract ICanvas GetOffscreenCanvas();
 
-#if __WEB__
-        protected internal abstract void FlushOffscreenSurface();
-        
-        protected internal abstract void DrawOffscreenSurface();
-#endif
-
-
     /// <summary>
     /// 窗体首次呈现
     /// </summary>
-    protected
-#if __WEB__
-    internal
-#endif
-        void OnFirstShow()
+    protected void OnFirstShow()
     {
         RootWidget.Layout(Width, Height);
         Overlay.Layout(Width, Height);
@@ -128,12 +117,7 @@ public abstract class UIWindow
         RootWidget.Paint(widgetsCanvas);
 
         var overlayCanvas = GetOnscreenCanvas();
-#if __WEB__
-        FlushOffscreenSurface();
-        DrawOffscreenSurface();
-#else
         widgetsCanvas.Surface?.Draw(overlayCanvas, 0, 0, null);
-#endif
 
         //TODO: maybe paint Overlay
 
