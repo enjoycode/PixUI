@@ -16,7 +16,7 @@ public sealed class PdfView : Widget
         SetSize(maxSize.Width, maxSize.Height);
     }
 
-    protected override void BeforePaint(Canvas canvas, bool onlyTransform = false, IDirtyArea? dirtyArea = null)
+    protected override void BeforePaint(ICanvas canvas, bool onlyTransform = false, IDirtyArea? dirtyArea = null)
     {
         canvas.Translate(X, Y);
         if (!onlyTransform)
@@ -26,13 +26,13 @@ public sealed class PdfView : Widget
         }
     }
 
-    protected override void AfterPaint(Canvas canvas)
+    protected override void AfterPaint(ICanvas canvas)
     {
         canvas.Restore();
         canvas.Translate(-X, -Y);
     }
 
-    public override void Paint(Canvas canvas, IDirtyArea? area = null)
+    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
     {
         //TODO: 待完成，目前仅测试
         if (!_controller.TryGetRenderedPage(0, out var page))

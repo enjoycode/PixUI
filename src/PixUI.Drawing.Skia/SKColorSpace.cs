@@ -127,9 +127,8 @@ public unsafe class SKColorSpace : SKObject, ISKNonVirtualReferenceCounted
     // public ColorSpace ToSrgbGamma() =>
     //     GetObject(SkiaApi.sk_colorspace_make_srgb_gamma(Handle));
 
-    internal static SKColorSpace GetObject(IntPtr handle, bool owns = true,
-        bool unrefExisting = true) =>
-        GetOrAddObject(handle, owns, unrefExisting, (h, o) => new SKColorSpace(h, o));
+    internal static SKColorSpace GetObject(IntPtr handle, bool owns = true, bool unrefExisting = true) =>
+        GetOrAddObject(handle, owns, unrefExisting, (h, o) => new SKColorSpace(h, o))!;
 
     private sealed class SKColorSpaceStatic : SKColorSpace
     {

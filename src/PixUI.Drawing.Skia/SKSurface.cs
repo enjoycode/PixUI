@@ -9,7 +9,7 @@ public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegi
         handle == IntPtr.Zero ? null : new SKSurface(handle, true);
 
     public SKCanvas Canvas =>
-        OwnedBy(SKCanvas.GetObject(this, SkiaApi.sk_surface_get_canvas(Handle), false, unrefExisting: false), this);
+        OwnedBy(SKCanvas.GetObject(this, SkiaApi.sk_surface_get_canvas(Handle), false, unrefExisting: false)!, this);
 
     #region ====Static Create====
 

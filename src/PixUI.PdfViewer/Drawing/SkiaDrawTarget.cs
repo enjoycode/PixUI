@@ -6,12 +6,12 @@ namespace PixUI.PdfViewer.Drawing;
 
 internal class SkiaDrawTarget : IDrawTarget, IDisposable
 {
-    private readonly Canvas _target;
+    private readonly ICanvas _target;
     private readonly GraphicsStateStack<SkiaGraphicsState> _state;
-    private readonly Path _compositePath = new();
-    private Path? _path = null;
+    private readonly IPath _compositePath = Path.Create();
+    private IPath? _path;
 
-    public SkiaDrawTarget(Canvas target, GraphicsStateStack<SkiaGraphicsState> state)
+    public SkiaDrawTarget(ICanvas target, GraphicsStateStack<SkiaGraphicsState> state)
     {
         _target = target;
         _state = state;
@@ -24,7 +24,7 @@ internal class SkiaDrawTarget : IDrawTarget, IDisposable
         if (_path == null || _path.IsEmpty()) return;
         //var matrix = currentMatrix.Transform();
         _compositePath.AddPath(_path); //, ref matrix);
-        _path = new Path();
+        _path = Path.Create();
     }
 
     public void MoveTo(Vector2 startPoint) => GetOrCreatePath()
@@ -32,7 +32,7 @@ internal class SkiaDrawTarget : IDrawTarget, IDisposable
 
     //The Adobe Pdf interpreter ignores drawing operations before the first MoveTo operation.
     //If path == null then we have not yet gotten a moveto command and we just ignore all the drawing operations
-    private Path GetOrCreatePath() => _path ??= new Path();
+    private IPath GetOrCreatePath() => _path ??= Path.Create();
 
     public void LineTo(Vector2 endPoint) => _path?.LineTo(
         endPoint.X, endPoint.Y);
@@ -71,7 +71,7 @@ internal class SkiaDrawTarget : IDrawTarget, IDisposable
     }
 
     private void SetCurrentFillRule(bool evenOddFillRule) =>
-        _compositePath.FillType = evenOddFillRule ? SKPathFillType.EvenOdd : SKPathFillType.Winding;
+        _compositePath.FillType = evenOddFillRule ? PathFillType.EvenOdd : PathFillType.Winding;
 
 
     public void ClipToPath(bool evenOddRule)

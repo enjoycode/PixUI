@@ -2,9 +2,13 @@ namespace PixUI;
 
 public interface IPath : IDisposable
 {
+    PathFillType FillType { get; set; }
+
     Point[] Points { get; }
 
     Rect Bounds { get; }
+
+    bool IsEmpty();
 
     bool GetTightBounds(out Rect result);
 
@@ -20,11 +24,15 @@ public interface IPath : IDisposable
 
     void CubicTo(float x0, float y0, float x1, float y1, float x2, float y2);
 
+    void QuadTo(float x0, float y0, float x1, float y1);
+
     void AddRect(Rect rect, bool isCCW = false);
 
     void AddOval(Rect rect, PathDirection direction = PathDirection.Clockwise);
 
     void AddRRect(RRect rect, bool isCCW = false);
+
+    void AddPath(IPath other, PathAddMode mode = PathAddMode.Append);
 
     void Close();
 }

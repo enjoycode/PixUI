@@ -5,9 +5,9 @@ using Melville.Pdf.Model.Renderers.Bitmaps;
 
 namespace PixUI.PdfViewer.Drawing;
 
-internal partial class SkiaRenderTarget : RenderTargetBase<Canvas, SkiaGraphicsState>
+internal partial class SkiaRenderTarget : RenderTargetBase<ICanvas, SkiaGraphicsState>
 {
-    public SkiaRenderTarget(Canvas target) : base(target)
+    public SkiaRenderTarget(ICanvas target) : base(target)
     {
         State.ContextPushed += (_, __) => Target.Save();
         State.BeforeContextPopped += (_, __) => Target.Restore();
@@ -38,7 +38,7 @@ internal partial class SkiaRenderTarget : RenderTargetBase<Canvas, SkiaGraphicsS
     //         ? new SKSamplingOptions(SKFilterMode.Linear)
     //         : new SKSamplingOptions(SKFilterMode.Nearest);
 
-    private readonly Paint _fillPaint = new();
+    private readonly IPaint _fillPaint = Paint.Create();
 
     public override void Dispose()
     {

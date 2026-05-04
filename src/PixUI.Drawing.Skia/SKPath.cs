@@ -22,7 +22,7 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
 
     public SKPath Clone() => new SKPath(SkiaApi.sk_path_clone(this.Handle), true);
 
-    public SKPathFillType FillType
+    public PathFillType FillType
     {
         get => SkiaApi.sk_path_get_filltype(Handle);
         set => SkiaApi.sk_path_set_filltype(Handle, value);
@@ -336,8 +336,7 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
         SkiaApi.sk_path_transform_to_dest(Handle, &matrix, destination.Handle);
     }
 
-    public void AddPath(SKPath other, float dx, float dy,
-        SKPathAddMode mode = SKPathAddMode.Append)
+    public void AddPath(SKPath other, float dx, float dy, PathAddMode mode = PathAddMode.Append)
     {
         if (other == null)
             throw new ArgumentNullException(nameof(other));
@@ -345,8 +344,7 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
         SkiaApi.sk_path_add_path_offset(Handle, other.Handle, dx, dy, mode);
     }
 
-    public void AddPath(SKPath other, ref Matrix3 matrix,
-        SKPathAddMode mode = SKPathAddMode.Append)
+    public void AddPath(SKPath other, ref Matrix3 matrix, PathAddMode mode = PathAddMode.Append)
     {
         if (other == null)
             throw new ArgumentNullException(nameof(other));
@@ -357,17 +355,16 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
         }
     }
 
-    public void AddPath(SKPath other, SKPathAddMode mode = SKPathAddMode.Append)
+    public void AddPath(IPath other, PathAddMode mode = PathAddMode.Append)
     {
         if (other == null)
             throw new ArgumentNullException(nameof(other));
 
-        SkiaApi.sk_path_add_path(Handle, other.Handle, mode);
+        SkiaApi.sk_path_add_path(Handle, ((SKPath)other).Handle, mode);
     }
 
     public void AddPath(SKPath other, bool connect) =>
-        AddPath(other, connect ? SKPathAddMode.Extend : SKPathAddMode.Append);
-
+        AddPath(other, connect ? PathAddMode.Extend : PathAddMode.Append);
 
     public void AddPathReverse(SKPath other)
     {

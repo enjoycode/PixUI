@@ -2834,19 +2834,19 @@ public unsafe partial class SkiaApi
 	// void sk_path_add_path(sk_path_t* cpath, sk_path_t* other, sk_path_add_mode_t add_mode)
 		
 	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
-	internal static extern void sk_path_add_path (sk_path_t cpath, sk_path_t other, SKPathAddMode add_mode);
+	internal static extern void sk_path_add_path (sk_path_t cpath, sk_path_t other, PathAddMode add_mode);
 		
 
 	// void sk_path_add_path_matrix(sk_path_t* cpath, sk_path_t* other, sk_matrix_t* matrix, sk_path_add_mode_t add_mode)
 		
 	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
-	internal static extern void sk_path_add_path_matrix (sk_path_t cpath, sk_path_t other, Matrix3* matrix, SKPathAddMode add_mode);
+	internal static extern void sk_path_add_path_matrix (sk_path_t cpath, sk_path_t other, Matrix3* matrix, PathAddMode add_mode);
 		
 
 	// void sk_path_add_path_offset(sk_path_t* cpath, sk_path_t* other, float dx, float dy, sk_path_add_mode_t add_mode)
 		
 	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
-	internal static extern void sk_path_add_path_offset (sk_path_t cpath, sk_path_t other, Single dx, Single dy, SKPathAddMode add_mode);
+	internal static extern void sk_path_add_path_offset (sk_path_t cpath, sk_path_t other, Single dx, Single dy, PathAddMode add_mode);
 		
 
 	// void sk_path_add_path_reverse(sk_path_t* cpath, sk_path_t* other)
@@ -2991,7 +2991,7 @@ public unsafe partial class SkiaApi
 	// sk_path_filltype_t sk_path_get_filltype(sk_path_t*)
 		
 	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
-	internal static extern SKPathFillType sk_path_get_filltype (sk_path_t param0);
+	internal static extern PathFillType sk_path_get_filltype (sk_path_t param0);
 		
 
 	// bool sk_path_get_last_point(const sk_path_t* cpath, sk_point_t* point)
@@ -3193,7 +3193,7 @@ public unsafe partial class SkiaApi
 	// void sk_path_set_filltype(sk_path_t*, sk_path_filltype_t)
 		
 	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
-	internal static extern void sk_path_set_filltype (sk_path_t param0, SKPathFillType param1);
+	internal static extern void sk_path_set_filltype (sk_path_t param0, PathFillType param1);
 		
 
 	// void sk_path_to_svg_string(const sk_path_t* cpath, sk_string_t* str)

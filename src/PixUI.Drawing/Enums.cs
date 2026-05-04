@@ -274,3 +274,17 @@ public enum PathDirection
     Clockwise = 0,
     CounterClockwise = 1,
 }
+
+public enum PathAddMode
+{
+    Append = 0,
+    Extend = 1,
+}
+
+public enum PathFillType
+{
+    Winding = 0,
+    EvenOdd = 1,
+    InverseWinding = 2,
+    InverseEvenOdd = 3,
+}

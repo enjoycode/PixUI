@@ -11,7 +11,7 @@ public sealed class PdfViewController
     private DocumentRenderer? _document;
     private PdfView? _view;
     private string? _openError;
-    private Image?[]? _pagesCache;
+    private IImage?[]? _pagesCache;
 
     public int TotalPages => _document?.TotalPages ?? 0;
 
@@ -29,7 +29,7 @@ public sealed class PdfViewController
             _openError = null;
             _pagesCache = null;
             _document = await new PdfReader().ReadFromAsync(stream);
-            _pagesCache = new Image[_document.TotalPages];
+            _pagesCache = new IImage[_document.TotalPages];
         }
         catch (Exception e)
         {
@@ -39,7 +39,7 @@ public sealed class PdfViewController
         _view?.Repaint();
     }
 
-    internal bool TryGetRenderedPage(int pageIndex, [MaybeNullWhen(returnValue: false)] out Image pageImage)
+    internal bool TryGetRenderedPage(int pageIndex, [MaybeNullWhen(returnValue: false)] out IImage pageImage)
     {
         pageImage = null;
         if (_document == null || _pagesCache == null)

@@ -355,16 +355,6 @@ public enum SKMaskFormat
     Sdf = 5,
 }
 
-// sk_path_add_mode_t
-public enum SKPathAddMode
-{
-    // APPEND_SK_PATH_ADD_MODE = 0
-    Append = 0,
-
-    // EXTEND_SK_PATH_ADD_MODE = 1
-    Extend = 1,
-}
-
 // sk_path_arc_size_t
 public enum SKPathArcSize
 {
@@ -383,22 +373,6 @@ public enum SKTrimPathEffectMode
 
     // INVERTED_SK_PATH_EFFECT_TRIM_MODE = 1
     Inverted = 1,
-}
-
-// sk_path_filltype_t
-public enum SKPathFillType
-{
-    // WINDING_SK_PATH_FILLTYPE = 0
-    Winding = 0,
-
-    // EVENODD_SK_PATH_FILLTYPE = 1
-    EvenOdd = 1,
-
-    // INVERSE_WINDING_SK_PATH_FILLTYPE = 2
-    InverseWinding = 2,
-
-    // INVERSE_EVENODD_SK_PATH_FILLTYPE = 3
-    InverseEvenOdd = 3,
 }
 
 // sk_path_segment_mask_t
@@ -585,7 +559,7 @@ public enum SKSurfacePropsFlags
     // USE_DEVICE_INDEPENDENT_FONTS_SK_SURFACE_PROPS_FLAGS = 1 << 0
     UseDeviceIndependentFonts = 1,
 }
-    
+
 // sk_text_encoding_t
 public enum SKTextEncoding
 {
