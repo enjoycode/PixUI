@@ -129,8 +129,8 @@ public abstract class UIWindow
 
         var overlayCanvas = GetOnscreenCanvas();
 #if __WEB__
-            FlushOffscreenSurface();
-            DrawOffscreenSurface();
+        FlushOffscreenSurface();
+        DrawOffscreenSurface();
 #else
         widgetsCanvas.Surface?.Draw(overlayCanvas, 0, 0, null);
 #endif

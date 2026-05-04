@@ -43,14 +43,14 @@ public static class RenderWithSkia
     /// <param name="width">Optional parameter for the width of the desired image.</param>
     /// <param name="height">Optional parameter for the height of the desired image.</param>
     /// <returns>A SKSurface object with the selected page rendered upon it.</returns>
-    public static async ValueTask<SKSurface> ToSurfaceAsync(DocumentRenderer doc, int oneBasedPageNumber,
+    public static async ValueTask<ISurface> ToSurfaceAsync(DocumentRenderer doc, int oneBasedPageNumber,
         int width = -1, int height = -1)
     {
-        SKSurface surface = null!;
+        ISurface surface = null!;
         await doc.RenderPageToAsync(oneBasedPageNumber, (rect, pageRotationMatrix) =>
         {
             (width, height) = doc.ScalePageToRequestedSize(rect, new Vector2(width, height));
-            surface = SKSurface.Create(new ImageInfo() { Width = width, Height = height });
+            surface = Surface.Create(new ImageInfo() { Width = width, Height = height });
 
             var target = new SkiaRenderTarget(surface.Canvas);
             doc.InitializeRenderTarget(target, rect, width, height, pageRotationMatrix);

@@ -50,7 +50,7 @@ public sealed class PdfViewController
             var windowRatio = UIWindow.Current.ScaleFactor;
             Task.Run(async () =>
             {
-                SKSurface surface = null!;
+                ISurface surface = null!;
                 // var recorder = new PictureRecorder();
                 await _document.RenderPageToAsync(pageIndex + 1, (rect, pageRotationMatrix) =>
                 {
@@ -59,7 +59,7 @@ public sealed class PdfViewController
                     var widthPx = (int)(rect.Width * windowRatio);
                     var heightPx = (int)(rect.Height * windowRatio);
                     var (width, height) = _document.ScalePageToRequestedSize(rect, new Vector2(widthPx, heightPx));
-                    surface = SKSurface.Create(new ImageInfo() { Width = widthPx, Height = heightPx });
+                    surface = Surface.Create(new ImageInfo() { Width = widthPx, Height = heightPx });
                     var canvas = surface.Canvas;
                     // canvas.Scale(windowRatio, windowRatio);
                     var target = new SkiaRenderTarget(canvas);

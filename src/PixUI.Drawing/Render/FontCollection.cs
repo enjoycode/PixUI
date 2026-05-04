@@ -35,23 +35,23 @@ public static class FontCollection
 
     public static event Action? FontChanged
     {
-        add => Render.Provider.FontCollection.FontChanged += value;
-        remove => Render.Provider.FontCollection.FontChanged -= value;
+        add => Render.Backend.FontCollection.FontChanged += value;
+        remove => Render.Backend.FontCollection.FontChanged -= value;
     }
 
-    public static bool HasAny => Render.Provider.FontCollection.HasAny;
+    public static bool HasAny => Render.Backend.FontCollection.HasAny;
 
-    public static bool HasLoading(string familyName) => Render.Provider.FontCollection.HasLoading(familyName);
+    public static bool HasLoading(string familyName) => Render.Backend.FontCollection.HasLoading(familyName);
 
     public static ITypeface? TryMatchFamilyFromAsset(string familyName) =>
-        Render.Provider.FontCollection.TryMatchFamilyFromAsset(familyName);
+        Render.Backend.FontCollection.TryMatchFamilyFromAsset(familyName);
 
     public static void RegisterTypeface(Stream stream, string fontFAmily, bool isAsset) =>
-        Render.Provider.FontCollection.RegisterTypeface(stream, fontFAmily, isAsset);
+        Render.Backend.FontCollection.RegisterTypeface(stream, fontFAmily, isAsset);
 
     public static ITypeface? FindTypeface(string familyName, bool bold, bool italic) =>
-        Render.Provider.FontCollection.FindTypeface(familyName, bold, italic);
+        Render.Backend.FontCollection.FindTypeface(familyName, bold, italic);
 
     public static ITypeface? DefaultFallback(int unicode, string? familyName, bool bold, bool italic) =>
-        Render.Provider.FontCollection.DefaultFallback(unicode, familyName, bold, italic);
+        Render.Backend.FontCollection.DefaultFallback(unicode, familyName, bold, italic);
 }

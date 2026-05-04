@@ -6,8 +6,8 @@ public static class ImageFilter
 {
     public static IImageFilter? CreateDropShadow(float dx, float dy, float sigmaX, float sigmaY,
         Color color, IImageFilter? input)
-        => Render.Provider.ImageFilterCreateDropShadow(dx, dy, sigmaX, sigmaY, color, input);
+        => Render.Backend.MakeImageFilterDropShadow(dx, dy, sigmaX, sigmaY, color, input);
 
     public static IImageFilter? CreateBlur(float sigmaX, float sigmaY, TileMode tileMode, IImageFilter? input)
-        => Render.Provider.ImageFilterCreateBlur(sigmaX, sigmaY, tileMode, input);
+        => Render.Backend.MakeImageFilterBlur(sigmaX, sigmaY, tileMode, input);
 }

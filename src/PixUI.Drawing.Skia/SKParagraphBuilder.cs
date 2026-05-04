@@ -6,7 +6,7 @@ public sealed class SKParagraphBuilder : SKObject, IParagraphBuilder
 
     public SKParagraphBuilder(SKParagraphStyle style)
         : this(SkiaApi.sk_paragraph_builder_new(
-            style.Handle, ((SKFontCollection)Render.Provider.FontCollection).Handle), true) { }
+            style.Handle, ((SKFontCollection)Render.Backend.FontCollection).Handle), true) { }
 
     protected override void DisposeNative() => SkiaApi.sk_paragraph_builder_delete(Handle);
 

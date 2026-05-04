@@ -18,11 +18,11 @@ public interface IRender
 
     #region ====Image====
 
-    IImage? ImageFromEncodedData(byte[] data);
+    IImage? MakeImageFromEncodedData(byte[] data);
 
-    IImage? ImageFromEncodedData(Stream data);
+    IImage? MakeImageFromEncodedData(Stream data);
 
-    IImage ImageFromPicture(IPicture picture, SizeI size);
+    IImage MakeImageFromPicture(IPicture picture, SizeI size);
 
     IPictureRecorder MakePictureRecorder();
 
@@ -30,9 +30,9 @@ public interface IRender
 
     #region ====Shader====
 
-    IShader? ShaderCreateRadialGradient(Point center, float radius, Color[] colors, float[]? colorPos, TileMode mode);
+    IShader? MakeShaderRadialGradient(Point center, float radius, Color[] colors, float[]? colorPos, TileMode mode);
 
-    IShader? ShaderCreateLinearGradient(Point start, Point end, Color[] colors, float[]? colorPos, TileMode mode);
+    IShader? MakeShaderLinearGradient(Point start, Point end, Color[] colors, float[]? colorPos, TileMode mode);
 
     #endregion
 
@@ -44,26 +44,28 @@ public interface IRender
 
     #endregion
 
-    IMaskFilter? MaskFilterCreateBlur(BlurStyle blurStyle, float sigma);
+    IMaskFilter? MakeMaskFilterBlur(BlurStyle blurStyle, float sigma);
 
-    IImageFilter? ImageFilterCreateDropShadow(float dx, float dy, float sigmaX, float sigmaY,
+    IImageFilter? MakeImageFilterDropShadow(float dx, float dy, float sigmaX, float sigmaY,
         Color color, IImageFilter? input);
 
-    IImageFilter? ImageFilterCreateBlur(float sigmaX, float sigmaY, TileMode tileMode, IImageFilter? input);
+    IImageFilter? MakeImageFilterBlur(float sigmaX, float sigmaY, TileMode tileMode, IImageFilter? input);
 
     IPath MakePath();
 
-    IPath PathFromSvgData(string svgPath);
+    IPath MakePathFromSvgData(string svgPath);
 
-    IPathEffect? PathEffectCreateDash(float[] intervals, float phase);
+    IPathEffect? MakePathEffectDash(float[] intervals, float phase);
+
+    ISurface MakeSurface(ImageInfo imageInfo);
 }
 
 public static class Render
 {
-    public static IRender Provider { get; private set; } = null!;
+    public static IRender Backend { get; private set; } = null!;
 
-    public static void Init(IRender provider)
+    public static void Init(IRender backend)
     {
-        Provider = provider;
+        Backend = backend;
     }
 }

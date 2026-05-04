@@ -13,5 +13,5 @@ public static class MaskFilter
         sigma > 0.5f ? (sigma - 0.5f) / BlurSigmaScale : 0.0f;
 
     public static IMaskFilter? CreateBlur(BlurStyle blurStyle, float sigma)
-        => Render.Provider.MaskFilterCreateBlur(blurStyle, sigma);
+        => Render.Backend.MakeMaskFilterBlur(blurStyle, sigma);
 }

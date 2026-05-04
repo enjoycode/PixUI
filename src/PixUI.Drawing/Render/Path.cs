@@ -39,7 +39,7 @@ public interface IPath : IDisposable
 
 public static class Path
 {
-    public static IPath Create() => Render.Provider.MakePath();
+    public static IPath Create() => Render.Backend.MakePath();
 
-    public static IPath ParseSvgPathData(string svgPath) => Render.Provider.PathFromSvgData(svgPath);
+    public static IPath ParseSvgPathData(string svgPath) => Render.Backend.MakePathFromSvgData(svgPath);
 }

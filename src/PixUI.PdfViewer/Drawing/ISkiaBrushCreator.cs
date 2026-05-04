@@ -51,11 +51,11 @@ internal abstract class IntermediateBrushHolder<T> : ISkiaBrushCreator where T :
     public abstract IPaint CreateBrush(SkiaGraphicsState topState);
 }
 
-internal class SurfacePatternHolder : IntermediateBrushHolder<SKSurface>
+internal class SurfacePatternHolder : IntermediateBrushHolder<ISurface>
 {
     private readonly Matrix3x2 _patternTransform;
 
-    public SurfacePatternHolder(SKSurface value, Matrix3x2 patternTransform) : base(value)
+    public SurfacePatternHolder(ISurface value, Matrix3x2 patternTransform) : base(value)
     {
         this._patternTransform = patternTransform;
     }

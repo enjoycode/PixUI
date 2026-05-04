@@ -69,11 +69,11 @@ public struct TextBox
 
 public static class TextStyle
 {
-    public static ITextStyle Create() => Render.Provider.MakeTextStyle();
+    public static ITextStyle Create() => Render.Backend.MakeTextStyle();
 
     public static ITextStyle Create(Color color, float height)
     {
-        var ts = Render.Provider.MakeTextStyle();
+        var ts = Render.Backend.MakeTextStyle();
         ts.Color = color;
         ts.Height = height;
         return ts;
@@ -82,11 +82,11 @@ public static class TextStyle
 
 public static class ParagraphStyle
 {
-    public static IParagraphStyle Create() => Render.Provider.MakeParagraphStyle();
+    public static IParagraphStyle Create() => Render.Backend.MakeParagraphStyle();
 }
 
 public static class ParagraphBuilder
 {
     public static IParagraphBuilder Create(IParagraphStyle paragraphStyle) =>
-        Render.Provider.MakeParagraphBuilder(paragraphStyle);
+        Render.Backend.MakeParagraphBuilder(paragraphStyle);
 }

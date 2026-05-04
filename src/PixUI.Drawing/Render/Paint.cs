@@ -20,20 +20,20 @@ public interface IPaint : IDisposable
 public static class Paint
 {
     public static IPaint Shared(in Color? color = null, PaintStyle style = PaintStyle.Fill, float strokeWidth = 1)
-        => Render.Provider.PaintShared(color, style, strokeWidth);
+        => Render.Backend.PaintShared(color, style, strokeWidth);
 
-    public static IPaint Create() => Render.Provider.MakePaint();
+    public static IPaint Create() => Render.Backend.MakePaint();
 
     public static IPaint Create(Color color)
     {
-        var paint = Render.Provider.MakePaint();
+        var paint = Render.Backend.MakePaint();
         paint.Color = color;
         return paint;
     }
 
     public static IPaint Create(Color color, PaintStyle style)
     {
-        var paint = Render.Provider.MakePaint();
+        var paint = Render.Backend.MakePaint();
         paint.Color = color;
         paint.Style = style;
         return paint;

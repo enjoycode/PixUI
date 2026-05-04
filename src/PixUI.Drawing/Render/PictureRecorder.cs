@@ -9,5 +9,5 @@ public interface IPictureRecorder : IDisposable
 
 public static class PictureRecorder
 {
-    public static IPictureRecorder Create() => Render.Provider.MakePictureRecorder();
+    public static IPictureRecorder Create() => Render.Backend.MakePictureRecorder();
 }

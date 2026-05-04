@@ -1,14 +1,13 @@
-#if !__WEB__
 namespace PixUI;
 
-public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegistration
+public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegistration, ISurface
 {
     private SKSurface(IntPtr h, bool owns) : base(h, owns) { }
 
     internal static SKSurface? GetObject(IntPtr handle) =>
         handle == IntPtr.Zero ? null : new SKSurface(handle, true);
 
-    public SKCanvas Canvas =>
+    public ICanvas Canvas =>
         OwnedBy(SKCanvas.GetObject(this, SkiaApi.sk_surface_get_canvas(Handle), false, unrefExisting: false)!, this);
 
     #region ====Static Create====
@@ -23,7 +22,7 @@ public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegi
     public static SKSurface Create(ImageInfo info, int rowBytes = 0, SKSurfaceProperties? props = null)
     {
         var cinfo = SKImageInfoNative.FromManaged(ref info);
-        return GetObject(SkiaApi.sk_surface_new_raster(&cinfo, (IntPtr)rowBytes, props?.Handle ?? IntPtr.Zero));
+        return GetObject(SkiaApi.sk_surface_new_raster(&cinfo, (IntPtr)rowBytes, props?.Handle ?? IntPtr.Zero))!;
     }
 
     public static SKSurface Create(ImageInfo info, IntPtr pixels, int rowBytes)
@@ -63,13 +62,12 @@ public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegi
 
     #endregion
 
-    public SKImage Snapshot() =>
+    public IImage Snapshot() =>
         SKImage.GetObject(SkiaApi.sk_surface_new_image_snapshot(Handle))!;
 
-    public SKImage Snapshot(RectI bounds) =>
+    public IImage Snapshot(RectI bounds) =>
         SKImage.GetObject(SkiaApi.sk_surface_new_image_snapshot_with_crop(Handle, &bounds))!;
 
-    public void Draw(SKCanvas canvas, float x, float y, SKPaint? paint)
-        => SkiaApi.sk_surface_draw(Handle, canvas.Handle, x, y, paint?.Handle ?? IntPtr.Zero);
+    public void Draw(ICanvas canvas, float x, float y, IPaint? paint)
+        => SkiaApi.sk_surface_draw(Handle, ((SKCanvas)canvas).Handle, x, y, (paint as SKPaint)?.Handle ?? IntPtr.Zero);
 }
-#endif

@@ -10,8 +10,8 @@ public abstract class MetalWindowContext : NativeWindowContext
     private IMTLCommandQueue? Queue;
     protected CAMetalLayer? MetalLayer;
     private ICAMetalDrawable? DrawableHandler;
-    private Canvas? _onscreenCanvas;
-    protected Canvas? OffscreenCanvas;
+    private ICanvas? _onscreenCanvas;
+    protected ICanvas? OffscreenCanvas;
 
     //TODO: Metal sdk >= 230, MTLBinaryArchive
 
@@ -47,7 +47,7 @@ public abstract class MetalWindowContext : NativeWindowContext
     /// </summary>
     protected abstract void OnDestroyContext();
 
-    public override unsafe Canvas GetOnScreenCanvas()
+    public override unsafe ICanvas GetOnScreenCanvas()
     {
         var currentDrawable = MetalLayer!.NextDrawable();
         var fbInfo = new GRMtlTextureInfoNative();
@@ -63,7 +63,7 @@ public abstract class MetalWindowContext : NativeWindowContext
         return _onscreenCanvas;
     }
 
-    public override Canvas GetOffScreenCanvas()
+    public override ICanvas GetOffScreenCanvas()
     {
         if (OffscreenCanvas != null) return OffscreenCanvas;
 

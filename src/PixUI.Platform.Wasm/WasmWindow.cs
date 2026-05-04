@@ -50,9 +50,9 @@ internal sealed class WasmWindow : UIWindow
         if (_onScreenSurface == null) throw new Exception("Can't create on screen surface");
     }
 
-    protected override Canvas GetOnscreenCanvas() => _onScreenSurface!.Canvas;
+    protected override ICanvas GetOnscreenCanvas() => _onScreenSurface!.Canvas;
 
-    protected override Canvas GetOffscreenCanvas() => _offScreenSurface!.Canvas;
+    protected override ICanvas GetOffscreenCanvas() => _offScreenSurface!.Canvas;
 
     protected override void Present() => _grContext?.Flush();
 

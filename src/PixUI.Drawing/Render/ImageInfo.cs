@@ -12,14 +12,6 @@ public readonly struct ImageInfo : IEquatable<ImageInfo>
     static ImageInfo()
     {
         PlatformColorType = ColorType.Bgra8888;
-
-        //fixed (int* a = &PlatformColorAlphaShift)
-        //fixed (int* r = &PlatformColorRedShift)
-        //fixed (int* g = &PlatformColorGreenShift)
-        //fixed (int* b = &PlatformColorBlueShift)
-        //{
-        //    SkiaApi.sk_color_get_bit_shift(a, r, g, b);
-        //}
     }
 
     public ImageInfo() { }
@@ -50,9 +42,9 @@ public readonly struct ImageInfo : IEquatable<ImageInfo>
     //
     // public readonly bool IsOpaque => AlphaType == AlphaType.Opaque;
 
-    // public readonly SKSizeI Size => new SKSizeI (Width, Height);
+    // public readonly SizeI Size => new SizeI (Width, Height);
     //
-    // public readonly SKRectI Rect => SKRectI.Create (Width, Height);
+    // public readonly RectI Rect => RectI.Create (Width, Height);
 
     public bool Equals(ImageInfo obj) =>
         ColorSpace == obj.ColorSpace &&
