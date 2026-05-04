@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public unsafe class GRRecordingContext : SKObject, ISKReferenceCounted
@@ -15,4 +14,3 @@ public unsafe class GRRecordingContext : SKObject, ISKReferenceCounted
         bool unrefExisting = true) =>
         GetOrAddObject(handle, owns, unrefExisting, (h, o) => new GRRecordingContext(h, o));
 }
-#endif

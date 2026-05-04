@@ -1,7 +1,6 @@
-#if !__WEB__
 namespace PixUI;
 
-public unsafe abstract class SKAbstractManagedStream : SKStreamAsset
+public abstract unsafe class SKAbstractManagedStream : SKStreamAsset
 {
     private static readonly SKManagedStreamDelegates delegates;
 
@@ -188,4 +187,3 @@ public unsafe abstract class SKAbstractManagedStream : SKStreamAsset
         gch.Free();
     }
 }
-#endif

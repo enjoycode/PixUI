@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public class SKSurfaceProperties : SKObject
@@ -41,4 +40,3 @@ public class SKSurfaceProperties : SKObject
     internal static SKSurfaceProperties GetObject (IntPtr handle, bool owns = true) =>
         GetOrAddObject (handle, owns, (h, o) => new SKSurfaceProperties (h, o));
 }
-#endif

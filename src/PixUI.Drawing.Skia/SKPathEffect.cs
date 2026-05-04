@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public unsafe class SKPathEffect : SKObject, ISKReferenceCounted, IPathEffect
@@ -81,4 +80,3 @@ public unsafe class SKPathEffect : SKObject, ISKReferenceCounted, IPathEffect
 
     #endregion
 }
-#endif

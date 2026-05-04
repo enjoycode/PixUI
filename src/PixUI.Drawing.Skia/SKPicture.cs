@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public sealed unsafe class SKPicture : SKObject, ISKReferenceCounted, IPicture
@@ -109,4 +108,3 @@ public sealed unsafe class SKPicture : SKObject, ISKReferenceCounted, IPicture
     internal static SKPicture? GetObject(IntPtr handle, bool owns = true, bool unrefExisting = true) =>
         GetOrAddObject(handle, owns, unrefExisting, (h, o) => new SKPicture(h, o));
 }
-#endif

@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public sealed class GRGlInterface : SKObject, ISKReferenceCounted, ISKSkipObjectRegistration
@@ -10,4 +9,3 @@ public sealed class GRGlInterface : SKObject, ISKReferenceCounted, ISKSkipObject
 
     public static GRGlInterface? Create() => GetObject(SkiaApi.gr_glinterface_create_native_interface());
 }
-#endif

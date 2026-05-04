@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public unsafe class GRBackendRenderTarget : SKObject, ISKSkipObjectRegistration
@@ -55,4 +54,3 @@ public unsafe class GRBackendRenderTarget : SKObject, ISKSkipObjectRegistration
     //     }
     // }
 }
-#endif

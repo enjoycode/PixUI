@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public readonly struct SKFontStyle //TODO:合并至FontStyle
@@ -33,4 +32,3 @@ public readonly struct SKFontStyle //TODO:合并至FontStyle
 
     public FontSlant Slant => (FontSlant)((_fValue >> 24) & 0xFF);
 }
-#endif

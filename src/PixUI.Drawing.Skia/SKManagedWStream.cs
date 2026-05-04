@@ -1,4 +1,3 @@
-#if !__WEB__
 using System.Runtime.InteropServices;
 
 namespace PixUI;
@@ -59,4 +58,3 @@ public class SKManagedWStream : SKAbstractManagedWStream
         return (IntPtr)stream.Position;
     }
 }
-#endif

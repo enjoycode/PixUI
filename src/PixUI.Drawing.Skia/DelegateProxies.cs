@@ -1,4 +1,3 @@
-#if !__WEB__
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -345,4 +344,3 @@ internal sealed class MonoPInvokeCallbackAttribute : Attribute
 
     public Type Type { get; private set; }
 }
-#endif

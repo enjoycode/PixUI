@@ -1,4 +1,3 @@
-#if !__WEB__
 using System.Runtime.InteropServices;
 
 namespace PixUI;
@@ -158,4 +157,3 @@ internal unsafe delegate bool SKManagedWStreamWriteProxyDelegate(IntPtr s, void*
 // typedef void (*)(void* addr, void* context)* sk_surface_raster_release_proc
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 internal unsafe delegate void SKSurfaceRasterReleaseProxyDelegate(void* addr, void* context);
-#endif

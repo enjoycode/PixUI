@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public unsafe class GRContextOptions
@@ -26,4 +25,3 @@ public unsafe class GRContextOptions
             fRuntimeProgramCacheSize = RuntimeProgramCacheSize,
         };
 }
-#endif

@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public enum PathConvexity
@@ -597,4 +596,3 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
         protected override void DisposeNative() => SkiaApi.sk_opbuilder_destroy(Handle);
     }
 }
-#endif

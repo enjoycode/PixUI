@@ -1,4 +1,3 @@
-#if !__WEB__
 #if THROW_OBJECT_EXCEPTIONS
 using System.Collections.Concurrent;
 #endif
@@ -234,4 +233,3 @@ internal static class HandleDictionary
         }
     }
 }
-#endif

@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public class SKManagedStream : SKAbstractManagedStream
@@ -269,4 +268,3 @@ public class SKManagedStream : SKAbstractManagedStream
                 "This stream was duplicated or forked and cannot be read anymore.");
     }
 }
-#endif

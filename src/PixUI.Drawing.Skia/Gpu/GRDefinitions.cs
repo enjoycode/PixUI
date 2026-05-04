@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 [Flags]
@@ -26,4 +25,3 @@ public enum GRBackendState : UInt32
     None = 0,
     All = 0xffffffff,
 }
-#endif

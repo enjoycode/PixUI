@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 internal sealed unsafe class SKString : SKObject, ISKSkipObjectRegistration
@@ -55,4 +54,3 @@ internal sealed unsafe class SKString : SKObject, ISKSkipObjectRegistration
         return skString.ToString();
     }
 }
-#endif

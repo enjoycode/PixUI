@@ -1,4 +1,3 @@
-#if !__WEB__
 using System.Runtime.InteropServices;
 
 namespace PixUI;
@@ -195,4 +194,3 @@ partial class SkiaApi
 
     #endregion
 }
-#endif

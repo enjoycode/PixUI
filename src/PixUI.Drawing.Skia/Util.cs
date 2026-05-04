@@ -1,4 +1,3 @@
-#if !__WEB__
 using System.Buffers;
 using System.Text;
 
@@ -90,7 +89,7 @@ internal static unsafe class Utils
     }
 }
 
-public unsafe static class StringUtilities
+public static unsafe class StringUtilities
 {
     internal const string NullTerminator = "\0";
 
@@ -202,4 +201,3 @@ public unsafe static class StringUtilities
         }
     }
 }
-#endif

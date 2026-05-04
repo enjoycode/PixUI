@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public unsafe partial struct SKColorSpacePrimaries
@@ -442,4 +441,3 @@ public unsafe class SKColorSpaceIccProfile : SKObject
         return icc;
     }
 }
-#endif

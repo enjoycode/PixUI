@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public enum GRBackend
@@ -87,4 +86,3 @@ public static class SkiaExtensions
             _ => throw new ArgumentOutOfRangeException(nameof(colorType)),
         };
 }
-#endif

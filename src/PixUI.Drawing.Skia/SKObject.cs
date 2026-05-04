@@ -1,4 +1,3 @@
-#if !__WEB__
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 
@@ -382,4 +381,3 @@ internal interface ISKNonVirtualReferenceCounted : ISKReferenceCounted
 }
 
 internal interface ISKSkipObjectRegistration { }
-#endif

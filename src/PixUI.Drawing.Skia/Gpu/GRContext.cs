@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public unsafe class GRContext : GRRecordingContext
@@ -143,4 +142,3 @@ public unsafe class GRContext : GRRecordingContext
     internal static /*new*/ GRContext? GetObject(IntPtr handle, bool owns = true) =>
         GetOrAddObject(handle, owns, (h, o) => new GRContext(h, o));
 }
-#endif

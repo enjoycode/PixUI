@@ -1,5 +1,3 @@
-#if !__WEB__
-
 namespace PixUI;
 
 public sealed class SKMaskFilter : SKObject, ISKReferenceCounted, IMaskFilter
@@ -14,4 +12,3 @@ public sealed class SKMaskFilter : SKObject, ISKReferenceCounted, IMaskFilter
     public static SKMaskFilter? CreateBlur(BlurStyle blurStyle, float sigma)
         => GetObject(SkiaApi.sk_maskfilter_new_blur(blurStyle, sigma));
 }
-#endif

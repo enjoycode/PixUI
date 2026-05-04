@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI
 {
     public partial class SkiaApi
@@ -10,4 +9,3 @@ namespace PixUI
 #endif
     }
 }
-#endif

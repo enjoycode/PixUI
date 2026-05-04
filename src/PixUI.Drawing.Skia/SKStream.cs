@@ -1,7 +1,6 @@
-#if !__WEB__
 namespace PixUI;
 
-public unsafe abstract class SKStream : SKObject
+public abstract unsafe class SKStream : SKObject
 {
     internal SKStream(IntPtr handle, bool owns)
         : base(handle, owns) { }
@@ -568,4 +567,3 @@ public unsafe class SKDynamicMemoryWStream : SKWStream
     protected override void DisposeNative() =>
         SkiaApi.sk_dynamicmemorywstream_destroy(Handle);
 }
-#endif

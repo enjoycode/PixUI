@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public sealed unsafe class SKPictureRecorder : SKObject, ISKSkipObjectRegistration, IPictureRecorder
@@ -21,5 +20,3 @@ public sealed unsafe class SKPictureRecorder : SKObject, ISKSkipObjectRegistrati
     public SKCanvas RecordingCanvas =>
         OwnedBy(SKCanvas.GetObject(SkiaApi.sk_picture_get_recording_canvas(Handle), false)!, this);
 }
-
-#endif

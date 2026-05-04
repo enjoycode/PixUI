@@ -1,4 +1,3 @@
-#if !__WEB__
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
@@ -1895,5 +1894,3 @@ public unsafe partial struct SKWebpEncoderOptions : IEquatable<SKWebpEncoderOpti
         return hash.ToHashCode();
     }
 }
-
-#endif

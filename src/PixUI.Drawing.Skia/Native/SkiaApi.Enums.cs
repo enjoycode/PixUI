@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 // gr_backend_t
@@ -598,4 +597,3 @@ public enum SKWebpEncoderCompression
     // LOSSLESS_SK_WEBPENCODER_COMPTRESSION = 1
     Lossless = 1,
 }
-#endif

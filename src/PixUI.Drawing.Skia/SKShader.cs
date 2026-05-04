@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public sealed unsafe class SKShader : SKObject, ISKReferenceCounted, IShader
@@ -59,4 +58,3 @@ public sealed unsafe class SKShader : SKObject, ISKReferenceCounted, IShader
         return src.ToShader(tmx, tmy, localMatrix);
     }
 }
-#endif

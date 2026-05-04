@@ -1,7 +1,6 @@
-#if !__WEB__
 namespace PixUI;
 
-public unsafe abstract class SKAbstractManagedWStream : SKWStream
+public abstract unsafe class SKAbstractManagedWStream : SKWStream
 {
     private static readonly SKManagedWStreamDelegates delegates;
 
@@ -83,4 +82,3 @@ public unsafe abstract class SKAbstractManagedWStream : SKWStream
         gch.Free();
     }
 }
-#endif

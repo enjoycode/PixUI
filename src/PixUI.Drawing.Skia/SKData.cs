@@ -1,4 +1,3 @@
-#if !__WEB__
 namespace PixUI;
 
 public unsafe class SKData : SKObject, ISKNonVirtualReferenceCounted
@@ -293,4 +292,3 @@ public unsafe class SKData : SKObject, ISKNonVirtualReferenceCounted
         }
     }
 }
-#endif
