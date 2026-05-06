@@ -2,7 +2,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct TSInput

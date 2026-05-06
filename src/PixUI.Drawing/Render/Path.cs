@@ -20,6 +20,8 @@ public interface IPath : IDisposable
 
     bool TryGetLastPoint(out Point point);
 
+    bool Contains(float x, float y);
+
     void MoveTo(float x, float y);
 
     void LineTo(float x, float y);
@@ -41,6 +43,8 @@ public interface IPath : IDisposable
     void AddPath(IPath other, PathAddMode mode = PathAddMode.Append);
 
     bool Op(IPath other, PathOp op);
+
+    void Transform(Matrix3 matrix);
 
     void Close();
 }

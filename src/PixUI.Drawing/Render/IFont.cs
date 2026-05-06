@@ -73,6 +73,10 @@ public struct FontMetrics : IEquatable<FontMetrics>
 
 public interface IFont : IDisposable
 {
+    string Name { get; }
+
+    ITypeface? Typeface { get; set; }
+
     /// <summary>
     /// 以像素为单位的行距
     /// </summary>
@@ -80,7 +84,7 @@ public interface IFont : IDisposable
     /// 行距是两个连续文本行的基线之间的垂直距离。 因此，行距包括行之间的空格以及字符本身的高度。
     /// </remarks>
     int Height { get; }
-    
+
     /// <summary>
     /// Size in points
     /// </summary>

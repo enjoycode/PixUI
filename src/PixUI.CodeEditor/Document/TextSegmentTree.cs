@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 /// <summary>
 /// <para>

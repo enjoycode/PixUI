@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using PixUI;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 internal sealed class IconBarArea : EditorArea
 {

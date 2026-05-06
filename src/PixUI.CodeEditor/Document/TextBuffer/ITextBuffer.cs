@@ -1,6 +1,6 @@
 using System;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 /// <summary>
 /// Interface to describe a sequence of characters that can be edited. 	

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public interface IFoldingProvider
 {

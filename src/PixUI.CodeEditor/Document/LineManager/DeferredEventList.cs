@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 /// <summary>
 /// A list of events that are fired after the line manager has finished working.

@@ -105,4 +105,6 @@ public sealed class SkiaRender : IRender
         uint width, uint height)
         => new Direct3DSwapChain(SkiaApi.gr_d3d_new_swapchain(windowHandle,
             ((Direct3DBackendContext)direct3DBackendContext).Handle, width, height));
+
+    public IDocument MakeDocumentPdf(Stream stream, float dpi) => SKDocument.CreatePdf(stream, dpi);
 }

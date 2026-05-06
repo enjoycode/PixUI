@@ -1,7 +1,7 @@
 #if !__WEB__
-using static CodeEditor.TreeSitterApi;
+using static PixUI.CodeEditor.TreeSitterApi;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public sealed class TSQuery : IDisposable
 {

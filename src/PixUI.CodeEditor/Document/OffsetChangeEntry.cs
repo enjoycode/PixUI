@@ -1,6 +1,6 @@
 using System;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 /// <summary>
 /// This represents the offset of a document change (either insertion or removal, not both at once).

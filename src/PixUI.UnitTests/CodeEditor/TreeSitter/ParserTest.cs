@@ -1,6 +1,6 @@
 using System;
 using NUnit.Framework;
-using CodeEditor;
+using PixUI.CodeEditor;
 
 namespace PixUI.UnitTests.TreeSitter;
 

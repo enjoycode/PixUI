@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using PixUI;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 internal sealed class TextView : EditorArea //TODO: rename to TextArea
 {

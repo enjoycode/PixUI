@@ -1,7 +1,7 @@
 #if !__WEB__
 using System.Runtime.InteropServices;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public enum TsInputEncoding
 {

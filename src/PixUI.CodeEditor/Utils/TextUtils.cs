@@ -1,4 +1,4 @@
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 internal static class TextUtils
 {

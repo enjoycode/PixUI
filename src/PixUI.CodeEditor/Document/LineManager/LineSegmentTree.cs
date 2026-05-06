@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 /// <summary>
 /// Data structure for efficient management of the line segments (most operations are O(lg n)).

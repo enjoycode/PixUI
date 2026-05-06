@@ -2,9 +2,9 @@
 
 using System.Runtime.InteropServices;
 using System.Text;
-using static CodeEditor.TreeSitterApi;
+using static PixUI.CodeEditor.TreeSitterApi;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 [StructLayout(LayoutKind.Sequential)]
 public unsafe struct TSNode : IEquatable<TSNode>

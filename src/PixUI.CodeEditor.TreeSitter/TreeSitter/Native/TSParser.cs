@@ -1,9 +1,9 @@
 #if !__WEB__
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
-using static CodeEditor.TreeSitterApi;
+using static PixUI.CodeEditor.TreeSitterApi;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public sealed class TSParser : IDisposable
 {

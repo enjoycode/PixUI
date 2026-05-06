@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 internal interface IRedBlackTreeNode<TSelf> where TSelf : class, IRedBlackTreeNode<TSelf>
 {

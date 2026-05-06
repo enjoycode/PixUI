@@ -13,7 +13,7 @@ public sealed unsafe class SKFont : SKObject, IFont
 
     protected override void DisposeNative() => SkiaApi.sk_font_delete(Handle);
 
-    public string Name => Typeface!.FamilyName;
+    public string Name => ((SKTypeface)Typeface!).FamilyName;
 
     public bool ForceAutoHinting
     {
@@ -63,10 +63,10 @@ public sealed unsafe class SKFont : SKObject, IFont
         set => SkiaApi.sk_font_set_hinting(Handle, value);
     }
 
-    public SKTypeface? Typeface
+    public ITypeface? Typeface
     {
         get => SKTypeface.GetObject(SkiaApi.sk_font_get_typeface(Handle));
-        set => SkiaApi.sk_font_set_typeface(Handle, value?.Handle ?? IntPtr.Zero);
+        set => SkiaApi.sk_font_set_typeface(Handle, (value as SKTypeface)?.Handle ?? IntPtr.Zero);
     }
 
     /// <summary>

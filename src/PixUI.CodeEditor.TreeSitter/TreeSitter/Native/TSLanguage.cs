@@ -1,8 +1,8 @@
 #if !__WEB__
 using System.Runtime.InteropServices;
-using static CodeEditor.TreeSitterApi;
+using static PixUI.CodeEditor.TreeSitterApi;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public sealed class TSLanguage
 {

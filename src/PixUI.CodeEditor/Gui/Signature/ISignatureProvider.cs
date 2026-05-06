@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public interface ISignatureParameter
 {

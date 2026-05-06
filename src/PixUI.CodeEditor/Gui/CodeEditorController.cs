@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using PixUI;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public sealed class CodeEditorController : WidgetController<CodeEditorWidget>, IDisposable
 {

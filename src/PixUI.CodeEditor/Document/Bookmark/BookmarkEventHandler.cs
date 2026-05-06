@@ -1,4 +1,4 @@
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public delegate void BookmarkEventHandler(BookmarkEventArgs e);
 

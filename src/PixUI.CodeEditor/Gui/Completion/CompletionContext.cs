@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PixUI;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 internal sealed class CompletionContext
 {

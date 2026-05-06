@@ -1,4 +1,4 @@
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 /// <summary>
 /// <p> This class represents an immutable character sequence with 

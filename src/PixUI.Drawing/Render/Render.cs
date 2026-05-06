@@ -69,7 +69,7 @@ public interface IRender
         int width, int height, int sampleCount,
         IColorSpace? colorSpace, ISurfaceProperties? surfaceProperties);
 
-    ISurface? MakeSurfaceForDirect3DWindow(IGRContext context, IDirect3DSwapChain swapChain, int bufferIndex, 
+    ISurface? MakeSurfaceForDirect3DWindow(IGRContext context, IDirect3DSwapChain swapChain, int bufferIndex,
         int width, int height,
         IColorSpace? colorSpace, ISurfaceProperties? surfaceProperties);
 
@@ -87,6 +87,12 @@ public interface IRender
 
     IDirect3DSwapChain MakeDirect3DSwapChain(IntPtr windowHandle, IDirect3DBackendContext direct3DBackendContext,
         uint width, uint height);
+
+    #endregion
+
+    #region ====Document====
+
+    IDocument MakeDocumentPdf(Stream stream, float dpi);
 
     #endregion
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using PixUI;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public sealed class LineSegment : IRedBlackTreeNode<LineSegment>, ISegment
 {

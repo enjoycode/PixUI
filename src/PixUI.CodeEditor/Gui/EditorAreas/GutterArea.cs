@@ -1,6 +1,6 @@
 using PixUI;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 internal sealed class GutterArea : EditorArea
 {

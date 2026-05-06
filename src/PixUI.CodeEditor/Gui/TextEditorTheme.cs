@@ -1,6 +1,6 @@
 using PixUI;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public sealed class TextEditorTheme
 {

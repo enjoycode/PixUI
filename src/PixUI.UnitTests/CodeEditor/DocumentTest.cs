@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using CodeEditor;
+using PixUI.CodeEditor;
 
 namespace PixUI.UnitTests.CodeEditor;
 
@@ -39,7 +39,7 @@ class Person
     [Test]
     public void TokenizeTest()
     {
-        var doc = new Document("Test.cs", new ImmutableTextBuffer(), new TreeSitterSyntaxParser());
+        var doc = new PixUI.CodeEditor.Document("Test.cs", new ImmutableTextBuffer(), new TreeSitterSyntaxParser());
         doc.Open(SrcCode);
         // doc.SyntaxParser.Tokenize(2, 3);
         var line = doc.GetLineSegment(5);

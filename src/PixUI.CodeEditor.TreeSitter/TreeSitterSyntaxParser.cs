@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using PixUI;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public sealed class TreeSitterSyntaxParser : ISyntaxParser
 {

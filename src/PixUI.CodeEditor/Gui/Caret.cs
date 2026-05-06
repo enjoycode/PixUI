@@ -1,7 +1,7 @@
 using System;
 using PixUI;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public enum CaretMode
 {

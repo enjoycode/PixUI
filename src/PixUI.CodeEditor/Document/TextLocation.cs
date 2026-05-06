@@ -1,6 +1,6 @@
 using System;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 /// <summary>
 /// A line/column position.

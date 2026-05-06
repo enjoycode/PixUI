@@ -1,6 +1,6 @@
 using System;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public sealed class LineManager
 {

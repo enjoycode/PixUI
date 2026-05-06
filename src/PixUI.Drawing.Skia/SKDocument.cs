@@ -1,6 +1,6 @@
 namespace PixUI.Drawing.Skia;
 
-public sealed unsafe class SKDocument : SKObject, ISKReferenceCounted, ISKSkipObjectRegistration
+public sealed unsafe class SKDocument : SKObject, ISKReferenceCounted, ISKSkipObjectRegistration, IDocument
 {
     public const float DefaultRasterDpi = 72.0f;
 
@@ -13,28 +13,23 @@ public sealed unsafe class SKDocument : SKObject, ISKReferenceCounted, ISKSkipOb
     public void Abort() =>
         SkiaApi.sk_document_abort(Handle);
 
-    public SKCanvas BeginPage(float width, float height) =>
+    public ICanvas BeginPage(float width, float height) =>
         OwnedBy(SKCanvas.GetObject(SkiaApi.sk_document_begin_page(Handle, width, height, null), false), this);
 
     public SKCanvas BeginPage(float width, float height, Rect content) =>
         OwnedBy(SKCanvas.GetObject(SkiaApi.sk_document_begin_page(Handle, width, height, &content), false), this);
 
-    public void EndPage() =>
-        SkiaApi.sk_document_end_page(Handle);
+    public void EndPage() => SkiaApi.sk_document_end_page(Handle);
 
-    public void Close() =>
-        SkiaApi.sk_document_close(Handle);
+    public void Close() => SkiaApi.sk_document_close(Handle);
 
     // CreateXps
 
-    public static SKDocument CreateXps(string path) =>
-        CreateXps(path, DefaultRasterDpi);
+    public static SKDocument CreateXps(string path) => CreateXps(path, DefaultRasterDpi);
 
-    public static SKDocument CreateXps(Stream stream) =>
-        CreateXps(stream, DefaultRasterDpi);
+    public static SKDocument CreateXps(Stream stream) => CreateXps(stream, DefaultRasterDpi);
 
-    public static SKDocument CreateXps(SKWStream stream) =>
-        CreateXps(stream, DefaultRasterDpi);
+    public static SKDocument CreateXps(SKWStream stream) => CreateXps(stream, DefaultRasterDpi);
 
     public static SKDocument CreateXps(string path, float dpi)
     {

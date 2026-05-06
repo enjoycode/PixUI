@@ -1,6 +1,6 @@
 using PixUI;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 /// <summary>
 /// 专用于在Overlay绘制光标、高亮及选择区等

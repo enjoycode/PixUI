@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public sealed class FoldingManager
 {

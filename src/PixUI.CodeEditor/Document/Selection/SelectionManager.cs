@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public sealed class SelectionManager
 {

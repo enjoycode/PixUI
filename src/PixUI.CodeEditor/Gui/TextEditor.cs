@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using PixUI;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 /// <summary>
 /// 代码编辑器的总管，管理各个可视区域、光标、选择等

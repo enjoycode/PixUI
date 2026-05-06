@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 /// <summary>
 /// A collection that does not allow its elements to be garbage-collected (unless there are other

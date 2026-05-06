@@ -1,4 +1,4 @@
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public interface ICodeLanguage : ITokensProvider, IFoldingProvider
 {

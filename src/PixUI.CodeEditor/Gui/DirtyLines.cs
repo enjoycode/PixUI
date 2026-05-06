@@ -1,7 +1,7 @@
 using System;
 using PixUI;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 /// <summary>
 /// 需要重新绘制的行范围[StartLine, EndLine)

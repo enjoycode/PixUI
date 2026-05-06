@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct TSPoint

@@ -1,4 +1,4 @@
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 internal sealed class UndoableReplace : IUndoableOperation
 {

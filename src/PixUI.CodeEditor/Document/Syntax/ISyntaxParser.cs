@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 public interface ISyntaxParser : IDisposable
 {

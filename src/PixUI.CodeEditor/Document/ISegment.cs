@@ -1,4 +1,4 @@
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 /// <summary>
 /// This interface is used to describe a span inside a text sequence

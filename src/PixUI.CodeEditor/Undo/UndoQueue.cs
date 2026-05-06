@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CodeEditor;
+namespace PixUI.CodeEditor;
 
 internal sealed class UndoQueue : IUndoableOperation
 {

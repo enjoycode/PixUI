@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CodeEditor;
+using PixUI.CodeEditor;
 
 namespace PixUI.Demo.Mac;
 
@@ -65,9 +65,9 @@ public sealed class Person
 
 internal sealed class MockCompletionProvider : ICompletionProvider
 {
-    public IEnumerable<char> TriggerCharacters => new[] { '.' };
+    public IEnumerable<char> TriggerCharacters => ['.'];
 
-    public Task<IList<ICompletionItem>?> ProvideCompletionItems(Document document,
+    public Task<IList<ICompletionItem>?> ProvideCompletionItems(global::PixUI.CodeEditor.Document document,
         int offset, string? completionWord)
     {
         var list = new List<ICompletionItem>
