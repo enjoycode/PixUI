@@ -7,11 +7,11 @@ public class FontTest
 {
     private const string fontFamilyName = "PingFang SC";
 
-    private static Typeface GetTypeface(string familyName, bool bold, bool italic) =>
-        FontCollection.Instance.FindTypeface(familyName, bold, italic);
+    private static ITypeface GetTypeface(string familyName, bool bold, bool italic) =>
+        FontCollection.FindTypeface(familyName, bold, italic)!;
 
-    private static Font GetFont(string familyName, bool bold, bool italic, int sizeInPoints) =>
-        new(GetTypeface(familyName, bold, italic), sizeInPoints);
+    private static IFont GetFont(string familyName, bool bold, bool italic, int sizeInPoints) =>
+        GetTypeface(familyName, bold, italic).MakeFont(sizeInPoints);
 
     [Test]
     public void FindTypefaceTest()

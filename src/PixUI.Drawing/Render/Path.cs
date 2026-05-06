@@ -12,6 +12,8 @@ public interface IPath : IDisposable
 
     bool IsEmpty();
 
+    bool IsClosed();
+
     Rect GetRect();
 
     bool GetTightBounds(out Rect result);
