@@ -160,19 +160,13 @@ public unsafe struct GRMtlTextureInfoNative : IEquatable<GRMtlTextureInfoNative>
     // public const void* fTexture
     public void* fTexture;
 
-    public readonly bool Equals(GRMtlTextureInfoNative obj) =>
-        fTexture == obj.fTexture;
+    public readonly bool Equals(GRMtlTextureInfoNative obj) => fTexture == obj.fTexture;
 
-    public readonly override bool Equals(object? obj) =>
-        obj is GRMtlTextureInfoNative f && Equals(f);
+    public readonly override bool Equals(object? obj) => obj is GRMtlTextureInfoNative f && Equals(f);
 
-    public static bool operator ==(GRMtlTextureInfoNative left,
-        GRMtlTextureInfoNative right) =>
-        left.Equals(right);
+    public static bool operator ==(GRMtlTextureInfoNative left, GRMtlTextureInfoNative right) => left.Equals(right);
 
-    public static bool operator !=(GRMtlTextureInfoNative left,
-        GRMtlTextureInfoNative right) =>
-        !left.Equals(right);
+    public static bool operator !=(GRMtlTextureInfoNative left, GRMtlTextureInfoNative right) => !left.Equals(right);
 
     public readonly override int GetHashCode()
     {

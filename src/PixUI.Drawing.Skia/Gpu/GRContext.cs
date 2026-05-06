@@ -1,6 +1,6 @@
 namespace PixUI.Drawing.Skia;
 
-public unsafe class GRContext : GRRecordingContext
+public unsafe class GRContext : GRRecordingContext, IGRContext
 {
     private GRContext(IntPtr h, bool owns) : base(h, owns) { }
 
@@ -50,16 +50,13 @@ public unsafe class GRContext : GRRecordingContext
 
     // CreateMetal
 
-    public static GRContext CreateMetal(IntPtr device, IntPtr queue,
-        GRContextOptions? options = null)
+    public static GRContext CreateMetal(IntPtr device, IntPtr queue, GRContextOptions? options = null)
     {
         if (options == null)
             return GetObject(SkiaApi.gr_direct_context_make_metal((void*)device, (void*)queue))!;
 
         var opts = GRContextOptionsToNative(ref options);
-        return GetObject(
-            SkiaApi.gr_direct_context_make_metal_with_options((void*)device, (void*)queue,
-                &opts))!;
+        return GetObject(SkiaApi.gr_direct_context_make_metal_with_options((void*)device, (void*)queue, &opts))!;
     }
 
     private static GRContextOptionsNative GRContextOptionsToNative(ref GRContextOptions options) => new()

@@ -11,13 +11,7 @@ public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegi
         OwnedBy(SKCanvas.GetObject(this, SkiaApi.sk_surface_get_canvas(Handle), false, unrefExisting: false)!, this);
 
     #region ====Static Create====
-
-    public static SKSurface? CreateGLOnScreen(GRContext grContext, int width, int height)
-    {
-        var surfacePtr = SkiaApi.gr_direct_context_make_gl_onscreen_surface(grContext.Handle, width, height);
-        return GetObject(surfacePtr);
-    }
-
+    
     // RASTER DIRECT surface
     public static SKSurface Create(ImageInfo info, int rowBytes = 0, SKSurfaceProperties? props = null)
     {
@@ -36,7 +30,7 @@ public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegi
     // ----GPU BACKEND RENDER TARGET surface----
 
     public static SKSurface? Create(GRRecordingContext context, GRBackendRenderTarget renderTarget,
-        GRSurfaceOrigin origin, ColorType colorType,
+        SurfaceOrigin origin, ColorType colorType,
         SKColorSpace? colorspace, SKSurfaceProperties? props)
     {
         if (context == null)
@@ -47,17 +41,23 @@ public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegi
         return GetObject(SkiaApi.sk_surface_new_backend_render_target(context.Handle, renderTarget.Handle,
             origin, colorType.ToNative(), colorspace?.Handle ?? IntPtr.Zero, props?.Handle ?? IntPtr.Zero));
     }
+    
+    public static SKSurface? CreateGLOnScreen(GRContext grContext, int width, int height)
+    {
+        var surfacePtr = SkiaApi.gr_direct_context_make_gl_onscreen_surface(grContext.Handle, width, height);
+        return GetObject(surfacePtr);
+    }
 
     // ----GPU NEW surface----
     public static SKSurface? Create(GRRecordingContext context, bool budgeted, ImageInfo info) =>
-        Create(context, budgeted, info, 0, GRSurfaceOrigin.TopLeft, null, false);
+        Create(context, budgeted, info, 0, SurfaceOrigin.TopLeft, null, false);
 
     public static SKSurface? Create(GRRecordingContext context, bool budgeted, ImageInfo info,
-        int sampleCount, GRSurfaceOrigin origin, SKSurfaceProperties? props, bool shouldCreateWithMips)
+        int sampleCount, SurfaceOrigin origin, ISurfaceProperties? props, bool shouldCreateWithMips)
     {
         var cinfo = SKImageInfoNative.FromManaged(ref info);
         return GetObject(SkiaApi.sk_surface_new_render_target(context.Handle, budgeted, &cinfo, sampleCount, origin,
-            props?.Handle ?? IntPtr.Zero, shouldCreateWithMips));
+            (props as SKSurfaceProperties)?.Handle ?? IntPtr.Zero, shouldCreateWithMips));
     }
 
     #endregion

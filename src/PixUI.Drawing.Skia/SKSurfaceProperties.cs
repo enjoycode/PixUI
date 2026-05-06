@@ -1,6 +1,6 @@
 namespace PixUI.Drawing.Skia;
 
-public class SKSurfaceProperties : SKObject
+public sealed class SKSurfaceProperties : SKObject, ISurfaceProperties
 {
     internal SKSurfaceProperties (IntPtr h, bool owns)
         : base (h, owns)

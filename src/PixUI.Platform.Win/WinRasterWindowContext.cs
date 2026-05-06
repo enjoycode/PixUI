@@ -12,10 +12,10 @@ internal sealed class WinRasterWindowContext : NativeWindowContext
 
     private IntPtr _onscreenSurfaceMem;
     private IntPtr _offscreenSufaceMem;
-    private SKSurface? _onscreenSurface;
-    private SKSurface? _offscreenSurface;
-    private Canvas? _onscreenCanvas;
-    private Canvas? _offscreenCanvas;
+    private ISurface? _onscreenSurface;
+    private ISurface? _offscreenSurface;
+    private ICanvas? _onscreenCanvas;
+    private ICanvas? _offscreenCanvas;
 
     public override bool IsGpuContext => false;
 
@@ -45,7 +45,7 @@ internal sealed class WinRasterWindowContext : NativeWindowContext
         _offscreenCanvas.Scale(NativeWindow.ScaleFactor, NativeWindow.ScaleFactor);
     }
 
-    private unsafe SKSurface CreateSurface(IntPtr memPtr, int w, int h)
+    private unsafe ISurface CreateSurface(IntPtr memPtr, int w, int h)
     {
         var bmpHeaderInfo = (BITMAPINFOHEADER*)memPtr.ToPointer();
         bmpHeaderInfo->biSize = (uint)sizeof(BITMAPINFOHEADER);
@@ -58,12 +58,12 @@ internal sealed class WinRasterWindowContext : NativeWindowContext
 
         var skImgInfo = new ImageInfo
             { Width = w, Height = h, ColorType = ColorType.Bgra8888, AlphaType = AlphaType.Premul };
-        return SKSurface.Create(skImgInfo, new IntPtr(pixels), sizeof(uint) * w);
+        return Surface.Create(skImgInfo, new IntPtr(pixels), sizeof(uint) * w);
     }
 
-    public override Canvas GetOffScreenCanvas() => _offscreenCanvas!;
+    public override ICanvas GetOffScreenCanvas() => _offscreenCanvas!;
 
-    public override Canvas GetOnScreenCanvas() => _onscreenCanvas!;
+    public override ICanvas GetOnScreenCanvas() => _onscreenCanvas!;
 
     public override void Resize(int width, int height)
     {

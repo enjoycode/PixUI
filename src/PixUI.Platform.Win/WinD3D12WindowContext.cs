@@ -8,15 +8,15 @@ internal class WinD3D12WindowContext : NativeWindowContext
         InitContext();
     }
 
-    private IntPtr _d3dBackendContext;
-    private IntPtr _swapchain;
-    private SKSurface? _onscreenSurface1;
-    private SKSurface? _onscreenSurface2;
-    private SKSurface? _offscreenSurface;
-    private Canvas? _onscreenCanvas1;
-    private Canvas? _onscreenCanvas2;
-    private Canvas? _offscreenCanvas;
-    private int _backbufferIndex = 0;
+    private IDirect3DBackendContext _direct3DBackendContext;
+    private IDirect3DSwapChain _swapChain;
+    private ISurface? _onscreenSurface1;
+    private ISurface? _onscreenSurface2;
+    private ISurface? _offscreenSurface;
+    private ICanvas? _onscreenCanvas1;
+    private ICanvas? _onscreenCanvas2;
+    private ICanvas? _offscreenCanvas;
+    private int _backBufferIndex = 0;
 
     private void InitContext()
     {
@@ -27,11 +27,10 @@ internal class WinD3D12WindowContext : NativeWindowContext
         Width = clientRect.right - clientRect.left;
         Height = clientRect.bottom - clientRect.top;
 
-        _d3dBackendContext = SkiaApi.gr_d3d_new_backend_context();
-        GrContext = GRContext.CreateDirect3D(_d3dBackendContext);
+        GrContext = Render.Backend.MakeGRContextDirect3D(out _direct3DBackendContext);
 
-        // make the swapchain
-        _swapchain = SkiaApi.gr_d3d_new_swapchain(win.HWND, _d3dBackendContext, (uint)Width, (uint)Height);
+        // make the swap chain
+        _swapChain = Render.Backend.MakeDirect3DSwapChain(win.HWND, _direct3DBackendContext, (uint)Width, (uint)Height);
         // create surfaces
         _onscreenSurface1 = CreateOnscreenSurface(0);
         _onscreenSurface2 = CreateOnscreenSurface(1);
@@ -40,31 +39,24 @@ internal class WinD3D12WindowContext : NativeWindowContext
         CreateOffscreenSurface();
     }
 
-    private SKSurface CreateOnscreenSurface(int index)
-    {
-        var backBuffer = SkiaApi.gr_d3d_swapchain_get_buffer(_swapchain, index);
-        var backendRt = GRBackendRenderTarget.CreateDirect3D(Width, Height, backBuffer);
-        var surface = SKSurface.Create(GrContext!, backendRt, GRSurfaceOrigin.TopLeft,
-            ColorType.Rgba8888, DisplayParams.ColorSpace, DisplayParams.SurfaceProps);
-        backendRt.Dispose();
-        return surface!;
-    }
+    private ISurface CreateOnscreenSurface(int index) => Render.Backend.MakeSurfaceForDirect3DWindow(GrContext!,
+        _swapChain, index, Width, Height, DisplayParams.ColorSpace, DisplayParams.SurfaceProps)!;
 
     private void CreateOffscreenSurface()
     {
         var imageInfo = new ImageInfo { Width = Width, Height = Height, ColorType = ColorType.Rgba8888 };
-        _offscreenSurface = SKSurface.Create(GrContext!, true, imageInfo);
+        _offscreenSurface = Surface.Create(GrContext!, true, imageInfo);
         _offscreenCanvas = _offscreenSurface!.Canvas;
         //直接缩放一次OffscreenCanvas，后续就不用处理了
         _offscreenCanvas.Scale(NativeWindow.ScaleFactor, NativeWindow.ScaleFactor);
     }
 
-    public override Canvas GetOffScreenCanvas() => _offscreenCanvas!;
+    public override ICanvas GetOffScreenCanvas() => _offscreenCanvas!;
 
-    public override Canvas GetOnScreenCanvas()
+    public override ICanvas GetOnScreenCanvas()
     {
-        _backbufferIndex = SkiaApi.gr_d3d_swapchain_get_current_buffer_index(_swapchain);
-        return _backbufferIndex == 0 ? _onscreenCanvas1! : _onscreenCanvas2!;
+        _backBufferIndex = _swapChain.CurrentBufferIndex;
+        return _backBufferIndex == 0 ? _onscreenCanvas1! : _onscreenCanvas2!;
     }
 
     public override void Resize(int width, int height)
@@ -72,21 +64,21 @@ internal class WinD3D12WindowContext : NativeWindowContext
         // Clean up any outstanding resources in command lists
         GrContext!.Flush(true, true);
 
-        // release the previous surface and backbuffer resources
+        // release the previous surface and back buffer resources
         _onscreenCanvas1?.Dispose();
         _onscreenCanvas2?.Dispose();
         _offscreenCanvas?.Dispose();
         _offscreenSurface?.Dispose();
         _onscreenSurface1?.Dispose();
         _onscreenSurface2?.Dispose();
-        SkiaApi.gr_d3d_swapchain_release_buffers(_swapchain, 2);
+        _swapChain.ReleaseBuffers(2);
 
         GrContext.PurgeResources(); //TODO:?
 
         Width = width;
         Height = height;
-        // resize swapchain buffers and recreate surfaces
-        SkiaApi.gr_d3d_swapchain_resize_buffers(_swapchain, (uint)width, (uint)height);
+        // resize swap chain buffers and recreate surfaces
+        _swapChain.ResizeBuffers((uint)width, (uint)height);
         _onscreenSurface1 = CreateOnscreenSurface(0);
         _onscreenSurface2 = CreateOnscreenSurface(1);
         _onscreenCanvas1 = _onscreenSurface1!.Canvas;
@@ -96,8 +88,8 @@ internal class WinD3D12WindowContext : NativeWindowContext
 
     public override void SwapBuffers()
     {
-        //Console.WriteLine($"SwapBuffer to: {_backbufferIndex}");
-        var surface = _backbufferIndex == 1 ? _onscreenSurface2 : _onscreenSurface1;
-        SkiaApi.gr_d3d_swapbuffer(_d3dBackendContext, GrContext!.Handle, surface!.Handle, _swapchain);
+        //Console.WriteLine($"SwapBuffer to: {_backBufferIndex}");
+        var surface = _backBufferIndex == 1 ? _onscreenSurface2 : _onscreenSurface1;
+        _swapChain.SwapBuffer(GrContext!, _direct3DBackendContext, surface!);
     }
 }

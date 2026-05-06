@@ -1,10 +1,28 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace PixUI;
 
 public interface IGRContext : IDisposable
 {
     void AbandonContext(bool releaseResources = false);
     void Flush(bool submit, bool synchronous = false);
+    void PurgeResources();
+}
 
+public interface IDirect3DBackendContext : IDisposable { }
+
+public interface IDirect3DSwapChain : IDisposable
+{
+    int CurrentBufferIndex { get; }
+    void ReleaseBuffers(int count);
+    void ResizeBuffers(uint width, uint height);
+    void SwapBuffer(IGRContext context, IDirect3DBackendContext backend, ISurface surface);
+}
+
+public enum SurfaceOrigin
+{
+    TopLeft = 0,
+    BottomLeft = 1,
 }
 
 public sealed class GRContextOptions //TODO: change to struct

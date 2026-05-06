@@ -8,9 +8,9 @@ internal sealed class WasmWindow : UIWindow
         CreateSurface(width, height, ratio);
     }
 
-    private GRContext? _grContext;
-    private SKSurface? _onScreenSurface;
-    private SKSurface? _offScreenSurface;
+    private IGRContext? _grContext;
+    private ISurface? _onScreenSurface;
+    private ISurface? _offScreenSurface;
     private int _width;
     private int _height;
     private float _ratio;
@@ -22,11 +22,8 @@ internal sealed class WasmWindow : UIWindow
     private void CreateContext(int glHandle)
     {
         //创建Surface TODO:根据类型创建，目前仅支持WebGL
-        var glInterface = GRGlInterface.Create();
-        if (glInterface == null) throw new Exception("无法创建WebGL Interface");
-
-        _grContext = GRContext.CreateGl(glInterface);
-        if (_grContext == null) throw new Exception("无法创建WebGL GRContext");
+        _grContext = Render.Backend.MakeGRContextWebGL(glHandle);
+        if (_grContext == null) throw new Exception("Can't create WebGL GRContext");
     }
 
     private void CreateSurface(int width, int height, float ratio)
@@ -37,16 +34,17 @@ internal sealed class WasmWindow : UIWindow
 
         var pixWidth = (int)(width * ratio);
         var pixHeight = (int)(height * ratio);
-        _offScreenSurface = SKSurface.Create(_grContext!, true, new ImageInfo
+        _offScreenSurface = Surface.Create(_grContext!, true, new ImageInfo
             {
-                Width = pixWidth, Height = pixHeight, AlphaType = AlphaType.Premul, ColorType = ColorType.Rgba8888,
-                ColorSpace = ColorSpace.SRGB
+                Width = pixWidth, Height = pixHeight,
+                AlphaType = AlphaType.Premul, ColorType = ColorType.Rgba8888,
+                ColorSpace = Render.Backend.ColorSpaceSRGB
             },
-            0, GRSurfaceOrigin.BottomLeft, null, false);
+            0, SurfaceOrigin.BottomLeft);
         if (_offScreenSurface == null) throw new Exception("Can't create off screen surface");
         _offScreenSurface!.Canvas.Scale(ratio, ratio);
 
-        _onScreenSurface = SKSurface.CreateGLOnScreen(_grContext!, pixWidth, pixHeight);
+        _onScreenSurface = Surface.CreateForWebGL(_grContext!, pixWidth, pixHeight);
         if (_onScreenSurface == null) throw new Exception("Can't create on screen surface");
     }
 
@@ -54,27 +52,27 @@ internal sealed class WasmWindow : UIWindow
 
     protected override ICanvas GetOffscreenCanvas() => _offScreenSurface!.Canvas;
 
-    protected override void Present() => _grContext?.Flush();
+    protected override void Present() => _grContext?.Flush(true);
 
     internal void FirstShow()
     {
         RootWidget.Layout(Width, Height);
         Overlay.Layout(Width, Height);
-        
+
         var widgetsCanvas = GetOffscreenCanvas();
         RootWidget.Paint(widgetsCanvas);
-        
+
         var overlayCanvas = GetOnscreenCanvas();
         widgetsCanvas?.Flush(); // _offScreenSurface?.Flush();
         _offScreenSurface?.Draw(overlayCanvas, 0, 0, null);
-        
+
         // test draw onscreen bounds
         // var paint = Paint.Shared (Colors.Blue, PaintStyle.Stroke, 18f);
         // overlayCanvas.Scale(_ratio, _ratio);
         // overlayCanvas.DrawRect(0, 0, Width, Height, paint);
         // overlayCanvas.ResetMatrix();
         // //overlayCanvas.Flush();
-        
+
         Present();
     }
 

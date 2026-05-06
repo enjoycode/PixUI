@@ -11,9 +11,9 @@ public sealed class BlazorWindow : UIWindow
         CreateSurface(width, height, ratio);
     }
 
-    private GRContext? _grContext;
-    private SKSurface? _onScreenSurface;
-    private SKSurface? _offScreenSurface;
+    private IGRContext? _grContext;
+    private ISurface? _onScreenSurface;
+    private ISurface? _offScreenSurface;
     private int _width;
     private int _height;
     private float _ratio;
@@ -25,11 +25,8 @@ public sealed class BlazorWindow : UIWindow
     private void CreateContext(int glHandle)
     {
         //创建Surface TODO:根据类型创建，目前仅支持WebGL
-        var glInterface = GRGlInterface.Create();
-        if (glInterface == null) throw new Exception("无法创建WebGL Interface");
-
-        _grContext = GRContext.CreateGl(glInterface);
-        if (_grContext == null) throw new Exception("无法创建WebGL GRContext");
+        _grContext = Render.Backend.MakeGRContextWebGL(glHandle);
+        if (_grContext == null) throw new Exception("Can't create WebGL GRContext");
     }
 
     private void CreateSurface(int width, int height, float ratio)
@@ -40,21 +37,22 @@ public sealed class BlazorWindow : UIWindow
 
         var pixWidth = (int)(width * ratio);
         var pixHeigh = (int)(height * ratio);
-        _offScreenSurface = SKSurface.Create(_grContext!, true, new ImageInfo
+        _offScreenSurface = Surface.Create(_grContext!, true, new ImageInfo
             {
-                Width = pixWidth, Height = pixHeigh, AlphaType = AlphaType.Premul, ColorType = ColorType.Rgba8888,
-                ColorSpace = ColorSpace.SRGB
+                Width = pixWidth, Height = pixHeigh,
+                AlphaType = AlphaType.Premul, ColorType = ColorType.Rgba8888,
+                ColorSpace = Render.Backend.ColorSpaceSRGB
             },
-            0, GRSurfaceOrigin.BottomLeft, null, false);
+            0, SurfaceOrigin.BottomLeft);
         _offScreenSurface!.Canvas.Scale(ratio, ratio);
-        _onScreenSurface = SKSurface.CreateGLOnScreen(_grContext!, pixWidth, pixHeigh);
+        _onScreenSurface = Surface.CreateForWebGL(_grContext!, pixWidth, pixHeigh);
     }
 
     protected override ICanvas GetOnscreenCanvas() => _onScreenSurface!.Canvas;
 
     protected override ICanvas GetOffscreenCanvas() => _offScreenSurface!.Canvas;
 
-    protected override void Present() => _grContext?.Flush();
+    protected override void Present() => _grContext?.Flush(true);
 
     internal void FirstShow()
     {

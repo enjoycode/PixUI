@@ -1,6 +1,6 @@
 namespace PixUI.Drawing.Skia;
 
-public unsafe class SKColorSpace : SKObject, ISKNonVirtualReferenceCounted
+public class SKColorSpace : SKObject, ISKNonVirtualReferenceCounted, IColorSpace
 {
     public static readonly SKColorSpace SRGB;
     // private static readonly ColorSpace srgbLinear;

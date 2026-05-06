@@ -2,11 +2,9 @@ namespace PixUI;
 
 public interface IRender
 {
-    #region ====Font====
+    IColorSpace ColorSpaceSRGB { get; }
 
     IFontCollection FontCollection { get; }
-
-    #endregion
 
     #region ====Paint====
 
@@ -57,7 +55,40 @@ public interface IRender
 
     IPathEffect? MakePathEffectDash(float[] intervals, float phase);
 
+    #region ====Surface Factory====
+
     ISurface MakeSurface(ImageInfo imageInfo);
+    ISurface MakeSurface(ImageInfo imageInfo, IntPtr pixels, int rowBytes);
+
+    ISurface? MakeSurface(IGRContext context, bool budgeted, ImageInfo info,
+        int sampleCount, SurfaceOrigin origin, ISurfaceProperties? props, bool shouldCreateWithMips);
+
+    ISurface? MakeSurfaceForWebGL(IGRContext context, int width, int height);
+
+    ISurface? MakeSurfaceForMetalWindow(IGRContext context, IntPtr textureHandle,
+        int width, int height, int sampleCount,
+        IColorSpace? colorSpace, ISurfaceProperties? surfaceProperties);
+
+    ISurface? MakeSurfaceForDirect3DWindow(IGRContext context, IDirect3DSwapChain swapChain, int bufferIndex, 
+        int width, int height,
+        IColorSpace? colorSpace, ISurfaceProperties? surfaceProperties);
+
+    #endregion
+
+    #region ====GRContext Factory====
+
+    IGRContext? MakeGRContextWebGL(int webglHandle);
+    IGRContext? MakeGRContextMetal(IntPtr device, IntPtr queue);
+    IGRContext? MakeGRContextDirect3D(out IDirect3DBackendContext direct3DBackendContext);
+
+    #endregion
+
+    #region ====Direct3D SwapChain====
+
+    IDirect3DSwapChain MakeDirect3DSwapChain(IntPtr windowHandle, IDirect3DBackendContext direct3DBackendContext,
+        uint width, uint height);
+
+    #endregion
 }
 
 public static class Render

@@ -5,11 +5,11 @@ namespace PixUI.Platform.Mac;
 
 public abstract class MetalWindowContext : NativeWindowContext
 {
-    private bool Valid;
+    private bool _valid;
     protected IMTLDevice? Device;
-    private IMTLCommandQueue? Queue;
+    private IMTLCommandQueue? _queue;
     protected CAMetalLayer? MetalLayer;
-    private ICAMetalDrawable? DrawableHandler;
+    private ICAMetalDrawable? _drawableHandler;
     private ICanvas? _onscreenCanvas;
     protected ICanvas? OffscreenCanvas;
 
@@ -25,7 +25,7 @@ public abstract class MetalWindowContext : NativeWindowContext
     protected void InitializeContext()
     {
         Device = MTLDevice.SystemDefault;
-        Queue = Device!.CreateCommandQueue();
+        _queue = Device!.CreateCommandQueue();
         if (DisplayParams.MSAASampleCount > 1)
         {
             //TODO:
@@ -33,9 +33,9 @@ public abstract class MetalWindowContext : NativeWindowContext
 
         SampleCount = DisplayParams.MSAASampleCount;
         StencilBits = 8;
-        Valid = OnInitializeContext();
+        _valid = OnInitializeContext();
 
-        GrContext = GRContext.CreateMetal(Device.Handle, Queue!.Handle);
+        GrContext = Render.Backend.MakeGRContextMetal(Device.Handle, _queue!.Handle);
     }
 
     protected abstract bool OnInitializeContext();
@@ -47,18 +47,14 @@ public abstract class MetalWindowContext : NativeWindowContext
     /// </summary>
     protected abstract void OnDestroyContext();
 
-    public override unsafe ICanvas GetOnScreenCanvas()
+    public override ICanvas GetOnScreenCanvas()
     {
         var currentDrawable = MetalLayer!.NextDrawable();
-        var fbInfo = new GRMtlTextureInfoNative();
-        fbInfo.fTexture = (void*)currentDrawable!.Texture.Handle;
+        var surface = Render.Backend.MakeSurfaceForMetalWindow(GrContext!, currentDrawable!.Texture.Handle,
+            Width, Height, SampleCount,
+            DisplayParams.ColorSpace, DisplayParams.SurfaceProps);
 
-        var backendRt = GRBackendRenderTarget.CreateMetal(Width, Height, SampleCount, fbInfo);
-        var surface = SKSurface.Create(GrContext!, backendRt, GRSurfaceOrigin.TopLeft,
-            ColorType.Bgra8888, DisplayParams.ColorSpace, DisplayParams.SurfaceProps);
-        backendRt.Dispose();
-
-        DrawableHandler = currentDrawable;
+        _drawableHandler = currentDrawable;
         _onscreenCanvas = surface!.Canvas;
         return _onscreenCanvas;
     }
@@ -68,7 +64,7 @@ public abstract class MetalWindowContext : NativeWindowContext
         if (OffscreenCanvas != null) return OffscreenCanvas;
 
         var imageInfo = new ImageInfo { Width = Width, Height = Height, ColorType = ColorType.Bgra8888 };
-        var surface = SKSurface.Create(GrContext!, true, imageInfo);
+        var surface = Surface.Create(GrContext!, true, imageInfo);
         OffscreenCanvas = surface!.Canvas;
         //直接缩放一次OffscreenCanvas，后续就不用处理了
         OffscreenCanvas.Scale(NativeWindow.ScaleFactor, NativeWindow.ScaleFactor);
@@ -78,12 +74,12 @@ public abstract class MetalWindowContext : NativeWindowContext
     public override void SwapBuffers()
     {
         //flush and submit
-        GrContext!.Flush();
+        GrContext!.Flush(true);
 
-        var commandBuffer = Queue!.CommandBufferWithUnretainedReferences(); //Queue!.CommandBuffer();
+        var commandBuffer = _queue!.CommandBufferWithUnretainedReferences(); //Queue!.CommandBuffer();
         commandBuffer!.AddCompletedHandler(buf => buf.Dispose());
         commandBuffer.Label = "Present";
-        commandBuffer.PresentDrawable(DrawableHandler!);
+        commandBuffer.PresentDrawable(_drawableHandler!);
         commandBuffer.Commit();
         // DrawableHandler!.Present();
 
@@ -91,8 +87,8 @@ public abstract class MetalWindowContext : NativeWindowContext
         _onscreenCanvas?.Dispose();
         _onscreenCanvas?.Surface?.Dispose();
         _onscreenCanvas = null;
-        DrawableHandler!.Dispose();
-        DrawableHandler = null;
+        _drawableHandler!.Dispose();
+        _drawableHandler = null;
     }
 
     protected override void Dispose(bool disposing)
@@ -109,7 +105,7 @@ public abstract class MetalWindowContext : NativeWindowContext
             OnDestroyContext();
 
             MetalLayer?.Dispose();
-            Queue?.Dispose();
+            _queue?.Dispose();
             Device?.Dispose();
         }
     }
