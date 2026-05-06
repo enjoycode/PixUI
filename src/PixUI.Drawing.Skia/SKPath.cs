@@ -279,11 +279,8 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
 
     public void AddRRect(RRect rect, bool isCCW = false)
     {
-        throw new NotImplementedException();
-        // if (rect == null)
-        //     throw new ArgumentNullException(nameof(rect));
-        // SkiaApi.sk_path_add_rrect(Handle, rect.Handle,
-        //     isCCW ? SKPathDirection.CounterClockwise : SKPathDirection.Clockwise);
+        SkiaApi.sk_path_add_rrect(Handle, new IntPtr(&rect),
+            isCCW ? PathDirection.CounterClockwise : PathDirection.Clockwise);
     }
 
     // public void AddRRect(RRect rect, SKPathDirection direction, uint startIndex)

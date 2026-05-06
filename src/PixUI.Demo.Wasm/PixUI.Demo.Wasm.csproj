@@ -42,6 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PixUI.Drawing.Skia\PixUI.Drawing.Skia.csproj" />
     <ProjectReference Include="..\PixUI.LiveCharts\PixUI.LiveCharts.csproj" />
     <ProjectReference Include="..\PixUI.Platform.Wasm\PixUI.Platform.Wasm.csproj" />
     <ProjectReference Include="..\PixUI.Platform.Wxmp\PixUI.Platform.Wxmp.csproj" />

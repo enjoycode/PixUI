@@ -13,6 +13,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\PixUI.Demo\PixUI.Demo.csproj" />
+		<ProjectReference Include="..\PixUI.Drawing.Skia\PixUI.Drawing.Skia.csproj" />
 		<ProjectReference Include="..\PixUI.Platform.Win\PixUI.Platform.Win.csproj" />
 	</ItemGroup>
 

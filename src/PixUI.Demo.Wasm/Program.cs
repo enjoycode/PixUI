@@ -1,9 +1,12 @@
 using LiveCharts;
 using LiveChartsCore;
 using PixUI;
+using PixUI.Drawing.Skia;
 using PixUI.Platform.Wasm;
 
 Console.WriteLine("Hello World!");
+
+Render.Init(new SkiaRender());
 
 //初始化默认字体
 // using var httpClient = new HttpClient();

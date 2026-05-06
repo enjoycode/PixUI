@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.JSInterop;
 using PixUI.Demo;
+using PixUI.Drawing.Skia;
 
 namespace PixUI.Platform.Blazor;
 
@@ -8,6 +9,7 @@ public static class Program
 {
     public static async Task Main(string[] args)
     {
+        Render.Init(new SkiaRender());
         var builder = WebAssemblyHostBuilder.CreateDefault(args);
         builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
