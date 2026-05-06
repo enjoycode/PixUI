@@ -1,4 +1,4 @@
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 public enum PathConvexity
 {
@@ -395,12 +395,12 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
     public RawIterator CreateRawIterator() =>
         new RawIterator(this);
 
-    public bool Op(SKPath other, PathOp op)
+    public bool Op(IPath other, PathOp op)
     {
         if (other == null)
             throw new ArgumentNullException(nameof(other));
 
-        return SkiaApi.sk_pathop_op(Handle, other.Handle, op, Handle);
+        return SkiaApi.sk_pathop_op(Handle, ((SKPath)other).Handle, op, Handle);
     }
 
     public bool Simplify(SKPath result)

@@ -1,4 +1,4 @@
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 public sealed class GRGlInterface : SKObject, ISKReferenceCounted, ISKSkipObjectRegistration
 {

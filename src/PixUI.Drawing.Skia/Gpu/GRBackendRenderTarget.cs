@@ -1,4 +1,4 @@
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 public unsafe class GRBackendRenderTarget : SKObject, ISKSkipObjectRegistration
 {

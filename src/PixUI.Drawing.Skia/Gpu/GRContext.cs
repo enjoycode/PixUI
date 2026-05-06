@@ -1,9 +1,9 @@
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 public unsafe class GRContext : GRRecordingContext
 {
     private GRContext(IntPtr h, bool owns) : base(h, owns) { }
-    
+
     protected override void DisposeNative()
     {
         AbandonContext();
@@ -23,7 +23,7 @@ public unsafe class GRContext : GRRecordingContext
 
         if (options == null)
             return GetObject(SkiaApi.gr_direct_context_make_gl(ctx));
-        var opts = options.ToNative();
+        var opts = GRContextOptionsToNative(ref options);
         return GetObject(SkiaApi.gr_direct_context_make_gl_with_options(ctx, &opts));
     }
 
@@ -56,11 +56,21 @@ public unsafe class GRContext : GRRecordingContext
         if (options == null)
             return GetObject(SkiaApi.gr_direct_context_make_metal((void*)device, (void*)queue))!;
 
-        var opts = options.ToNative();
+        var opts = GRContextOptionsToNative(ref options);
         return GetObject(
             SkiaApi.gr_direct_context_make_metal_with_options((void*)device, (void*)queue,
                 &opts))!;
     }
+
+    private static GRContextOptionsNative GRContextOptionsToNative(ref GRContextOptions options) => new()
+    {
+        fAllowPathMaskCaching = options.AllowPathMaskCaching ? (byte)1 : (byte)0,
+        fAvoidStencilBuffers = options.AvoidStencilBuffers ? (byte)1 : (byte)0,
+        fBufferMapThreshold = options.BufferMapThreshold,
+        fDoManualMipmapping = options.DoManualMipmapping ? (byte)1 : (byte)0,
+        fGlyphCacheTextureMaximumBytes = (IntPtr)options.GlyphCacheTextureMaximumBytes,
+        fRuntimeProgramCacheSize = options.RuntimeProgramCacheSize,
+    };
 
     public static GRContext CreateDirect3D(IntPtr backendContext)
     {

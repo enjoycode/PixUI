@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 // typedef void (*)()* gr_gl_func_ptr
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

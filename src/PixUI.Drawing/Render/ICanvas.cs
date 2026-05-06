@@ -2,6 +2,8 @@ namespace PixUI;
 
 public interface ICanvas : IDisposable
 {
+    ISurface? Surface { get; } //TODO: remove it
+
     #region ====Draw Methods====
 
     void DrawLine(float x0, float y0, float x1, float y1, IPaint paint);

@@ -1,11 +1,10 @@
-namespace PixUI
+namespace PixUI.Drawing.Skia;
+
+public partial class SkiaApi
 {
-    public partial class SkiaApi
-    {
 #if __IOS__ || __TVOS__ || __WATCHOS__
 		private const string SKIA = "@rpath/libskia.framework/libskia";
 #else
-        private const string SKIA = "skia";
+    private const string SKIA = "skia";
 #endif
-    }
 }

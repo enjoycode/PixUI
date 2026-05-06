@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 #if THROW_OBJECT_EXCEPTIONS
 	using GCHandle = GCHandleProxy;
 #endif

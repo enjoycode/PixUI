@@ -1,4 +1,4 @@
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 public sealed unsafe class SKFont : SKObject, IFont
 {

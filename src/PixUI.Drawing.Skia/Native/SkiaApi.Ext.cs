@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 partial class SkiaApi
 {

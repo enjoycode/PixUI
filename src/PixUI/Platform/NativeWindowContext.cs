@@ -1,11 +1,10 @@
-#if !__WEB__
 using System;
 
 namespace PixUI.Platform;
 
 public abstract class NativeWindowContext : IDisposable
 {
-    protected GRContext? GrContext;
+    protected IGRContext? GrContext;
 
     /// <summary>
     /// Canvas physics pixel width 实际像素宽度
@@ -22,7 +21,7 @@ public abstract class NativeWindowContext : IDisposable
     protected int StencilBits = 0;
     protected readonly NativeWindow NativeWindow;
 
-    protected NativeWindowContext(NativeWindow nativeWindow,  DisplayParams displayParams)
+    protected NativeWindowContext(NativeWindow nativeWindow, DisplayParams displayParams)
     {
         NativeWindow = nativeWindow;
         DisplayParams = displayParams;
@@ -66,4 +65,3 @@ public abstract class NativeWindowContext : IDisposable
         GC.SuppressFinalize(this);
     }
 }
-#endif

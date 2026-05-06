@@ -1,11 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 // gr_context_options_t
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe partial struct GRContextOptionsNative : IEquatable<GRContextOptionsNative>
+internal struct GRContextOptionsNative : IEquatable<GRContextOptionsNative>
 {
     // public bool fAvoidStencilBuffers
     public Byte fAvoidStencilBuffers;
@@ -33,7 +33,7 @@ internal unsafe partial struct GRContextOptionsNative : IEquatable<GRContextOpti
         fDoManualMipmapping == obj.fDoManualMipmapping &&
         fBufferMapThreshold == obj.fBufferMapThreshold;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is GRContextOptionsNative f && Equals(f);
 
     public static bool operator ==(GRContextOptionsNative left,
@@ -59,12 +59,12 @@ internal unsafe partial struct GRContextOptionsNative : IEquatable<GRContextOpti
 
 // gr_gl_framebufferinfo_t
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct GRGlFramebufferInfo : IEquatable<GRGlFramebufferInfo>
+public struct GRGlFramebufferInfo : IEquatable<GRGlFramebufferInfo>
 {
     // public unsigned int fFBOID
     private UInt32 fFBOID;
 
-    public UInt32 FramebufferObjectId
+    public uint FramebufferObjectId
     {
         readonly get => fFBOID;
         set => fFBOID = value;
@@ -73,7 +73,7 @@ public unsafe partial struct GRGlFramebufferInfo : IEquatable<GRGlFramebufferInf
     // public unsigned int fFormat
     private UInt32 fFormat;
 
-    public UInt32 Format
+    public uint Format
     {
         readonly get => fFormat;
         set => fFormat = value;
@@ -82,7 +82,7 @@ public unsafe partial struct GRGlFramebufferInfo : IEquatable<GRGlFramebufferInf
     public readonly bool Equals(GRGlFramebufferInfo obj) =>
         fFBOID == obj.fFBOID && fFormat == obj.fFormat;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is GRGlFramebufferInfo f && Equals(f);
 
     public static bool operator ==(GRGlFramebufferInfo left, GRGlFramebufferInfo right) =>
@@ -102,12 +102,12 @@ public unsafe partial struct GRGlFramebufferInfo : IEquatable<GRGlFramebufferInf
 
 // gr_gl_textureinfo_t
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct GRGlTextureInfo : IEquatable<GRGlTextureInfo>
+public struct GRGlTextureInfo : IEquatable<GRGlTextureInfo>
 {
     // public unsigned int fTarget
     private UInt32 fTarget;
 
-    public UInt32 Target
+    public uint Target
     {
         readonly get => fTarget;
         set => fTarget = value;
@@ -116,7 +116,7 @@ public unsafe partial struct GRGlTextureInfo : IEquatable<GRGlTextureInfo>
     // public unsigned int fID
     private UInt32 fID;
 
-    public UInt32 Id
+    public uint Id
     {
         readonly get => fID;
         set => fID = value;
@@ -125,7 +125,7 @@ public unsafe partial struct GRGlTextureInfo : IEquatable<GRGlTextureInfo>
     // public unsigned int fFormat
     private UInt32 fFormat;
 
-    public UInt32 Format
+    public uint Format
     {
         readonly get => fFormat;
         set => fFormat = value;
@@ -134,7 +134,7 @@ public unsafe partial struct GRGlTextureInfo : IEquatable<GRGlTextureInfo>
     public readonly bool Equals(GRGlTextureInfo obj) =>
         fTarget == obj.fTarget && fID == obj.fID && fFormat == obj.fFormat;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is GRGlTextureInfo f && Equals(f);
 
     public static bool operator ==(GRGlTextureInfo left, GRGlTextureInfo right) =>
@@ -155,7 +155,7 @@ public unsafe partial struct GRGlTextureInfo : IEquatable<GRGlTextureInfo>
 
 // gr_mtl_textureinfo_t
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct GRMtlTextureInfoNative : IEquatable<GRMtlTextureInfoNative>
+public unsafe struct GRMtlTextureInfoNative : IEquatable<GRMtlTextureInfoNative>
 {
     // public const void* fTexture
     public void* fTexture;
@@ -163,7 +163,7 @@ public unsafe partial struct GRMtlTextureInfoNative : IEquatable<GRMtlTextureInf
     public readonly bool Equals(GRMtlTextureInfoNative obj) =>
         fTexture == obj.fTexture;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is GRMtlTextureInfoNative f && Equals(f);
 
     public static bool operator ==(GRMtlTextureInfoNative left,
@@ -184,12 +184,12 @@ public unsafe partial struct GRMtlTextureInfoNative : IEquatable<GRMtlTextureInf
 
 // gr_vk_alloc_t
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct GRVkAlloc : IEquatable<GRVkAlloc>
+public struct GRVkAlloc : IEquatable<GRVkAlloc>
 {
     // public uint64_t fMemory
     private UInt64 fMemory;
 
-    public UInt64 Memory
+    public ulong Memory
     {
         readonly get => fMemory;
         set => fMemory = value;
@@ -198,7 +198,7 @@ public unsafe partial struct GRVkAlloc : IEquatable<GRVkAlloc>
     // public uint64_t fOffset
     private UInt64 fOffset;
 
-    public UInt64 Offset
+    public ulong Offset
     {
         readonly get => fOffset;
         set => fOffset = value;
@@ -207,7 +207,7 @@ public unsafe partial struct GRVkAlloc : IEquatable<GRVkAlloc>
     // public uint64_t fSize
     private UInt64 fSize;
 
-    public UInt64 Size
+    public ulong Size
     {
         readonly get => fSize;
         set => fSize = value;
@@ -216,7 +216,7 @@ public unsafe partial struct GRVkAlloc : IEquatable<GRVkAlloc>
     // public uint32_t fFlags
     private UInt32 fFlags;
 
-    public UInt32 Flags
+    public uint Flags
     {
         readonly get => fFlags;
         set => fFlags = value;
@@ -239,7 +239,7 @@ public unsafe partial struct GRVkAlloc : IEquatable<GRVkAlloc>
         fFlags == obj.fFlags && fBackendMemory == obj.fBackendMemory &&
         fUsesSystemHeap == obj.fUsesSystemHeap;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is GRVkAlloc f && Equals(f);
 
     public static bool operator ==(GRVkAlloc left, GRVkAlloc right) =>
@@ -263,7 +263,7 @@ public unsafe partial struct GRVkAlloc : IEquatable<GRVkAlloc>
 
 // gr_vk_backendcontext_t
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe partial struct
+internal unsafe struct
     GRVkBackendContextNative : IEquatable<GRVkBackendContextNative>
 {
     // public vk_instance_t* fInstance
@@ -334,7 +334,7 @@ internal unsafe partial struct
         fOwnsInstanceAndDevice == obj.fOwnsInstanceAndDevice &&
         fProtectedContext == obj.fProtectedContext;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is GRVkBackendContextNative f && Equals(f);
 
     public static bool operator ==(GRVkBackendContextNative left,
@@ -372,12 +372,12 @@ internal unsafe partial struct
 
 // gr_vk_imageinfo_t
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct GRVkImageInfo : IEquatable<GRVkImageInfo>
+public struct GRVkImageInfo : IEquatable<GRVkImageInfo>
 {
     // public uint64_t fImage
     private UInt64 fImage;
 
-    public UInt64 Image
+    public ulong Image
     {
         readonly get => fImage;
         set => fImage = value;
@@ -395,7 +395,7 @@ public unsafe partial struct GRVkImageInfo : IEquatable<GRVkImageInfo>
     // public uint32_t fImageTiling
     private UInt32 fImageTiling;
 
-    public UInt32 ImageTiling
+    public uint ImageTiling
     {
         readonly get => fImageTiling;
         set => fImageTiling = value;
@@ -404,7 +404,7 @@ public unsafe partial struct GRVkImageInfo : IEquatable<GRVkImageInfo>
     // public uint32_t fImageLayout
     private UInt32 fImageLayout;
 
-    public UInt32 ImageLayout
+    public uint ImageLayout
     {
         readonly get => fImageLayout;
         set => fImageLayout = value;
@@ -413,7 +413,7 @@ public unsafe partial struct GRVkImageInfo : IEquatable<GRVkImageInfo>
     // public uint32_t fFormat
     private UInt32 fFormat;
 
-    public UInt32 Format
+    public uint Format
     {
         readonly get => fFormat;
         set => fFormat = value;
@@ -422,7 +422,7 @@ public unsafe partial struct GRVkImageInfo : IEquatable<GRVkImageInfo>
     // public uint32_t fImageUsageFlags
     private UInt32 fImageUsageFlags;
 
-    public UInt32 ImageUsageFlags
+    public uint ImageUsageFlags
     {
         readonly get => fImageUsageFlags;
         set => fImageUsageFlags = value;
@@ -431,7 +431,7 @@ public unsafe partial struct GRVkImageInfo : IEquatable<GRVkImageInfo>
     // public uint32_t fSampleCount
     private UInt32 fSampleCount;
 
-    public UInt32 SampleCount
+    public uint SampleCount
     {
         readonly get => fSampleCount;
         set => fSampleCount = value;
@@ -440,7 +440,7 @@ public unsafe partial struct GRVkImageInfo : IEquatable<GRVkImageInfo>
     // public uint32_t fLevelCount
     private UInt32 fLevelCount;
 
-    public UInt32 LevelCount
+    public uint LevelCount
     {
         readonly get => fLevelCount;
         set => fLevelCount = value;
@@ -449,7 +449,7 @@ public unsafe partial struct GRVkImageInfo : IEquatable<GRVkImageInfo>
     // public uint32_t fCurrentQueueFamily
     private UInt32 fCurrentQueueFamily;
 
-    public UInt32 CurrentQueueFamily
+    public uint CurrentQueueFamily
     {
         readonly get => fCurrentQueueFamily;
         set => fCurrentQueueFamily = value;
@@ -476,7 +476,7 @@ public unsafe partial struct GRVkImageInfo : IEquatable<GRVkImageInfo>
     // public uint32_t fSharingMode
     private UInt32 fSharingMode;
 
-    public UInt32 SharingMode
+    public uint SharingMode
     {
         readonly get => fSharingMode;
         set => fSharingMode = value;
@@ -490,7 +490,7 @@ public unsafe partial struct GRVkImageInfo : IEquatable<GRVkImageInfo>
         fProtected == obj.fProtected && fYcbcrConversionInfo == obj.fYcbcrConversionInfo &&
         fSharingMode == obj.fSharingMode;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is GRVkImageInfo f && Equals(f);
 
     public static bool operator ==(GRVkImageInfo left, GRVkImageInfo right) =>
@@ -520,12 +520,12 @@ public unsafe partial struct GRVkImageInfo : IEquatable<GRVkImageInfo>
 
 // gr_vk_ycbcrconversioninfo_t
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct GrVkYcbcrConversionInfo : IEquatable<GrVkYcbcrConversionInfo>
+public struct GrVkYcbcrConversionInfo : IEquatable<GrVkYcbcrConversionInfo>
 {
     // public uint32_t fFormat
     private UInt32 fFormat;
 
-    public UInt32 Format
+    public uint Format
     {
         readonly get => fFormat;
         set => fFormat = value;
@@ -534,7 +534,7 @@ public unsafe partial struct GrVkYcbcrConversionInfo : IEquatable<GrVkYcbcrConve
     // public uint64_t fExternalFormat
     private UInt64 fExternalFormat;
 
-    public UInt64 ExternalFormat
+    public ulong ExternalFormat
     {
         readonly get => fExternalFormat;
         set => fExternalFormat = value;
@@ -543,7 +543,7 @@ public unsafe partial struct GrVkYcbcrConversionInfo : IEquatable<GrVkYcbcrConve
     // public uint32_t fYcbcrModel
     private UInt32 fYcbcrModel;
 
-    public UInt32 YcbcrModel
+    public uint YcbcrModel
     {
         readonly get => fYcbcrModel;
         set => fYcbcrModel = value;
@@ -552,7 +552,7 @@ public unsafe partial struct GrVkYcbcrConversionInfo : IEquatable<GrVkYcbcrConve
     // public uint32_t fYcbcrRange
     private UInt32 fYcbcrRange;
 
-    public UInt32 YcbcrRange
+    public uint YcbcrRange
     {
         readonly get => fYcbcrRange;
         set => fYcbcrRange = value;
@@ -561,7 +561,7 @@ public unsafe partial struct GrVkYcbcrConversionInfo : IEquatable<GrVkYcbcrConve
     // public uint32_t fXChromaOffset
     private UInt32 fXChromaOffset;
 
-    public UInt32 XChromaOffset
+    public uint XChromaOffset
     {
         readonly get => fXChromaOffset;
         set => fXChromaOffset = value;
@@ -570,7 +570,7 @@ public unsafe partial struct GrVkYcbcrConversionInfo : IEquatable<GrVkYcbcrConve
     // public uint32_t fYChromaOffset
     private UInt32 fYChromaOffset;
 
-    public UInt32 YChromaOffset
+    public uint YChromaOffset
     {
         readonly get => fYChromaOffset;
         set => fYChromaOffset = value;
@@ -579,7 +579,7 @@ public unsafe partial struct GrVkYcbcrConversionInfo : IEquatable<GrVkYcbcrConve
     // public uint32_t fChromaFilter
     private UInt32 fChromaFilter;
 
-    public UInt32 ChromaFilter
+    public uint ChromaFilter
     {
         readonly get => fChromaFilter;
         set => fChromaFilter = value;
@@ -588,7 +588,7 @@ public unsafe partial struct GrVkYcbcrConversionInfo : IEquatable<GrVkYcbcrConve
     // public uint32_t fForceExplicitReconstruction
     private UInt32 fForceExplicitReconstruction;
 
-    public UInt32 ForceExplicitReconstruction
+    public uint ForceExplicitReconstruction
     {
         readonly get => fForceExplicitReconstruction;
         set => fForceExplicitReconstruction = value;
@@ -597,7 +597,7 @@ public unsafe partial struct GrVkYcbcrConversionInfo : IEquatable<GrVkYcbcrConve
     // public uint32_t fFormatFeatures
     private UInt32 fFormatFeatures;
 
-    public UInt32 FormatFeatures
+    public uint FormatFeatures
     {
         readonly get => fFormatFeatures;
         set => fFormatFeatures = value;
@@ -611,7 +611,7 @@ public unsafe partial struct GrVkYcbcrConversionInfo : IEquatable<GrVkYcbcrConve
         fForceExplicitReconstruction == obj.fForceExplicitReconstruction &&
         fFormatFeatures == obj.fFormatFeatures;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is GrVkYcbcrConversionInfo f && Equals(f);
 
     public static bool operator ==(GrVkYcbcrConversionInfo left,
@@ -640,12 +640,12 @@ public unsafe partial struct GrVkYcbcrConversionInfo : IEquatable<GrVkYcbcrConve
 
 // sk_codec_frameinfo_t
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct SKCodecFrameInfo : IEquatable<SKCodecFrameInfo>
+public struct SKCodecFrameInfo : IEquatable<SKCodecFrameInfo>
 {
     // public int fRequiredFrame
     private Int32 fRequiredFrame;
 
-    public Int32 RequiredFrame
+    public int RequiredFrame
     {
         readonly get => fRequiredFrame;
         set => fRequiredFrame = value;
@@ -654,7 +654,7 @@ public unsafe partial struct SKCodecFrameInfo : IEquatable<SKCodecFrameInfo>
     // public int fDuration
     private Int32 fDuration;
 
-    public Int32 Duration
+    public int Duration
     {
         readonly get => fDuration;
         set => fDuration = value;
@@ -692,7 +692,7 @@ public unsafe partial struct SKCodecFrameInfo : IEquatable<SKCodecFrameInfo>
         fFullyReceived == obj.fFullyReceived && fAlphaType == obj.fAlphaType &&
         fDisposalMethod == obj.fDisposalMethod;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is SKCodecFrameInfo f && Equals(f);
 
     public static bool operator ==(SKCodecFrameInfo left, SKCodecFrameInfo right) =>
@@ -715,13 +715,13 @@ public unsafe partial struct SKCodecFrameInfo : IEquatable<SKCodecFrameInfo>
 
 // sk_codec_options_t
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe partial struct SKCodecOptionsInternal : IEquatable<SKCodecOptionsInternal>
+internal unsafe struct SKCodecOptionsInternal : IEquatable<SKCodecOptionsInternal>
 {
     // public sk_codec_zero_initialized_t fZeroInitialized
     public SKZeroInitialized fZeroInitialized;
 
     // public sk_irect_t* fSubset
-    public PixUI.RectI* fSubset;
+    public RectI* fSubset;
 
     // public int fFrameIndex
     public Int32 fFrameIndex;
@@ -733,7 +733,7 @@ internal unsafe partial struct SKCodecOptionsInternal : IEquatable<SKCodecOption
         fZeroInitialized == obj.fZeroInitialized && fSubset == obj.fSubset &&
         fFrameIndex == obj.fFrameIndex && fPriorFrame == obj.fPriorFrame;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is SKCodecOptionsInternal f && Equals(f);
 
     public static bool operator ==(SKCodecOptionsInternal left,
@@ -757,28 +757,29 @@ internal unsafe partial struct SKCodecOptionsInternal : IEquatable<SKCodecOption
 
 // sk_color4f_t
 [StructLayout(LayoutKind.Sequential)]
-public readonly unsafe partial struct SKColorF : IEquatable<SKColorF>
+public readonly struct SKColorF : IEquatable<SKColorF>
 {
     // public float fR
     private readonly Single fR;
-    public readonly Single Red => fR;
+    public readonly float Red => fR;
 
     // public float fG
     private readonly Single fG;
-    public readonly Single Green => fG;
+    public readonly float Green => fG;
 
     // public float fB
     private readonly Single fB;
-    public readonly Single Blue => fB;
+    public readonly float Blue => fB;
 
     // public float fA
     private readonly Single fA;
-    public readonly Single Alpha => fA;
+    public readonly float Alpha => fA;
 
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public readonly bool Equals(SKColorF obj) =>
         fR == obj.fR && fG == obj.fG && fB == obj.fB && fA == obj.fA;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is SKColorF f && Equals(f);
 
     public static bool operator ==(SKColorF left, SKColorF right) =>
@@ -800,12 +801,13 @@ public readonly unsafe partial struct SKColorF : IEquatable<SKColorF>
 
 // sk_colorspace_primaries_t
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct SKColorSpacePrimaries : IEquatable<PixUI.SKColorSpacePrimaries>
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+public partial struct SKColorSpacePrimaries : IEquatable<SKColorSpacePrimaries>
 {
     // public float fRX
     private Single fRX;
 
-    public Single RX
+    public float RX
     {
         readonly get => fRX;
         set => fRX = value;
@@ -814,7 +816,7 @@ public unsafe partial struct SKColorSpacePrimaries : IEquatable<PixUI.SKColorSpa
     // public float fRY
     private Single fRY;
 
-    public Single RY
+    public float RY
     {
         readonly get => fRY;
         set => fRY = value;
@@ -823,7 +825,7 @@ public unsafe partial struct SKColorSpacePrimaries : IEquatable<PixUI.SKColorSpa
     // public float fGX
     private Single fGX;
 
-    public Single GX
+    public float GX
     {
         readonly get => fGX;
         set => fGX = value;
@@ -832,7 +834,7 @@ public unsafe partial struct SKColorSpacePrimaries : IEquatable<PixUI.SKColorSpa
     // public float fGY
     private Single fGY;
 
-    public Single GY
+    public float GY
     {
         readonly get => fGY;
         set => fGY = value;
@@ -841,7 +843,7 @@ public unsafe partial struct SKColorSpacePrimaries : IEquatable<PixUI.SKColorSpa
     // public float fBX
     private Single fBX;
 
-    public Single BX
+    public float BX
     {
         readonly get => fBX;
         set => fBX = value;
@@ -850,7 +852,7 @@ public unsafe partial struct SKColorSpacePrimaries : IEquatable<PixUI.SKColorSpa
     // public float fBY
     private Single fBY;
 
-    public Single BY
+    public float BY
     {
         readonly get => fBY;
         set => fBY = value;
@@ -859,7 +861,7 @@ public unsafe partial struct SKColorSpacePrimaries : IEquatable<PixUI.SKColorSpa
     // public float fWX
     private Single fWX;
 
-    public Single WX
+    public float WX
     {
         readonly get => fWX;
         set => fWX = value;
@@ -868,25 +870,23 @@ public unsafe partial struct SKColorSpacePrimaries : IEquatable<PixUI.SKColorSpa
     // public float fWY
     private Single fWY;
 
-    public Single WY
+    public float WY
     {
         readonly get => fWY;
         set => fWY = value;
     }
 
-    public readonly bool Equals(PixUI.SKColorSpacePrimaries obj) =>
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
+    public readonly bool Equals(SKColorSpacePrimaries obj) =>
         fRX == obj.fRX && fRY == obj.fRY && fGX == obj.fGX && fGY == obj.fGY &&
         fBX == obj.fBX && fBY == obj.fBY && fWX == obj.fWX && fWY == obj.fWY;
 
-    public readonly override bool Equals(object obj) =>
-        obj is PixUI.SKColorSpacePrimaries f && Equals(f);
+    public readonly override bool Equals(object? obj) => obj is SKColorSpacePrimaries f && Equals(f);
 
-    public static bool operator ==(PixUI.SKColorSpacePrimaries left,
-        PixUI.SKColorSpacePrimaries right) =>
+    public static bool operator ==(SKColorSpacePrimaries left, SKColorSpacePrimaries right) =>
         left.Equals(right);
 
-    public static bool operator !=(PixUI.SKColorSpacePrimaries left,
-        PixUI.SKColorSpacePrimaries right) =>
+    public static bool operator !=(SKColorSpacePrimaries left, SKColorSpacePrimaries right) =>
         !left.Equals(right);
 
     public readonly override int GetHashCode()
@@ -906,13 +906,12 @@ public unsafe partial struct SKColorSpacePrimaries : IEquatable<PixUI.SKColorSpa
 
 // sk_colorspace_transfer_fn_t
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct
-    SKColorSpaceTransferFn : IEquatable<PixUI.SKColorSpaceTransferFn>
+public partial struct SKColorSpaceTransferFn : IEquatable<SKColorSpaceTransferFn>
 {
     // public float fG
     private Single fG;
 
-    public Single G
+    public float G
     {
         readonly get => fG;
         set => fG = value;
@@ -921,7 +920,7 @@ public unsafe partial struct
     // public float fA
     private Single fA;
 
-    public Single A
+    public float A
     {
         readonly get => fA;
         set => fA = value;
@@ -930,7 +929,7 @@ public unsafe partial struct
     // public float fB
     private Single fB;
 
-    public Single B
+    public float B
     {
         readonly get => fB;
         set => fB = value;
@@ -939,7 +938,7 @@ public unsafe partial struct
     // public float fC
     private Single fC;
 
-    public Single C
+    public float C
     {
         readonly get => fC;
         set => fC = value;
@@ -948,7 +947,7 @@ public unsafe partial struct
     // public float fD
     private Single fD;
 
-    public Single D
+    public float D
     {
         readonly get => fD;
         set => fD = value;
@@ -957,7 +956,7 @@ public unsafe partial struct
     // public float fE
     private Single fE;
 
-    public Single E
+    public float E
     {
         readonly get => fE;
         set => fE = value;
@@ -966,25 +965,24 @@ public unsafe partial struct
     // public float fF
     private Single fF;
 
-    public Single F
+    public float F
     {
         readonly get => fF;
         set => fF = value;
     }
 
-    public readonly bool Equals(PixUI.SKColorSpaceTransferFn obj) =>
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
+    public readonly bool Equals(SKColorSpaceTransferFn obj) =>
         fG == obj.fG && fA == obj.fA && fB == obj.fB && fC == obj.fC && fD == obj.fD &&
         fE == obj.fE && fF == obj.fF;
 
-    public readonly override bool Equals(object obj) =>
-        obj is PixUI.SKColorSpaceTransferFn f && Equals(f);
+    public readonly override bool Equals(object? obj) =>
+        obj is SKColorSpaceTransferFn f && Equals(f);
 
-    public static bool operator ==(PixUI.SKColorSpaceTransferFn left,
-        PixUI.SKColorSpaceTransferFn right) =>
+    public static bool operator ==(SKColorSpaceTransferFn left, SKColorSpaceTransferFn right) =>
         left.Equals(right);
 
-    public static bool operator !=(PixUI.SKColorSpaceTransferFn left,
-        PixUI.SKColorSpaceTransferFn right) =>
+    public static bool operator !=(SKColorSpaceTransferFn left, SKColorSpaceTransferFn right) =>
         !left.Equals(right);
 
     public readonly override int GetHashCode()
@@ -1003,7 +1001,7 @@ public unsafe partial struct
 
 // sk_colorspace_xyz_t
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct SKColorSpaceXyz : IEquatable<PixUI.SKColorSpaceXyz>
+public partial struct SKColorSpaceXyz : IEquatable<SKColorSpaceXyz>
 {
     // public float fM00
     private Single fM00;
@@ -1033,21 +1031,16 @@ public unsafe partial struct SKColorSpaceXyz : IEquatable<PixUI.SKColorSpaceXyz>
     private Single fM22;
 
     [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
-    public readonly bool Equals(PixUI.SKColorSpaceXyz obj) =>
+    public readonly bool Equals(SKColorSpaceXyz obj) =>
         fM00 == obj.fM00 && fM01 == obj.fM01 && fM02 == obj.fM02 && fM10 == obj.fM10 &&
         fM11 == obj.fM11 && fM12 == obj.fM12 && fM20 == obj.fM20 && fM21 == obj.fM21 &&
         fM22 == obj.fM22;
 
-    public readonly override bool Equals(object? obj) =>
-        obj is PixUI.SKColorSpaceXyz f && Equals(f);
+    public readonly override bool Equals(object? obj) => obj is SKColorSpaceXyz f && Equals(f);
 
-    public static bool operator ==(PixUI.SKColorSpaceXyz left,
-        PixUI.SKColorSpaceXyz right) =>
-        left.Equals(right);
+    public static bool operator ==(SKColorSpaceXyz left, SKColorSpaceXyz right) => left.Equals(right);
 
-    public static bool operator !=(PixUI.SKColorSpaceXyz left,
-        PixUI.SKColorSpaceXyz right) =>
-        !left.Equals(right);
+    public static bool operator !=(SKColorSpaceXyz left, SKColorSpaceXyz right) => !left.Equals(right);
 
     public readonly override int GetHashCode()
     {
@@ -1067,7 +1060,7 @@ public unsafe partial struct SKColorSpaceXyz : IEquatable<PixUI.SKColorSpaceXyz>
 
 // sk_document_pdf_metadata_t
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe partial struct
+internal unsafe struct
     SKDocumentPdfMetadataInternal : IEquatable<SKDocumentPdfMetadataInternal>
 {
     // public sk_string_t* fTitle
@@ -1103,6 +1096,7 @@ internal unsafe partial struct
     // public int fEncodingQuality
     public Int32 fEncodingQuality;
 
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public readonly bool Equals(SKDocumentPdfMetadataInternal obj) =>
         fTitle == obj.fTitle && fAuthor == obj.fAuthor && fSubject == obj.fSubject &&
         fKeywords == obj.fKeywords && fCreator == obj.fCreator &&
@@ -1110,7 +1104,7 @@ internal unsafe partial struct
         fModified == obj.fModified && fRasterDPI == obj.fRasterDPI && fPDFA == obj.fPDFA &&
         fEncodingQuality == obj.fEncodingQuality;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is SKDocumentPdfMetadataInternal f && Equals(f);
 
     public static bool operator ==(SKDocumentPdfMetadataInternal left,
@@ -1165,6 +1159,7 @@ public struct FontMetrics : IEquatable<FontMetrics>
     public bool HasStrikeoutThickness => (Flags & 4) == 4;
     public bool HasStrikeoutPosition => (Flags & 8) == 8;
 
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public readonly bool Equals(FontMetrics obj) =>
         Flags == obj.Flags && Top == obj.Top && Ascent == obj.Ascent &&
         Descent == obj.Descent && Bottom == obj.Bottom && Leading == obj.Leading &&
@@ -1175,7 +1170,7 @@ public struct FontMetrics : IEquatable<FontMetrics>
         StrikeoutThickness == obj.StrikeoutThickness &&
         StrikeoutPosition == obj.StrikeoutPosition;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is FontMetrics f && Equals(f);
 
     public static bool operator ==(FontMetrics left, FontMetrics right) =>
@@ -1209,7 +1204,7 @@ public struct FontMetrics : IEquatable<FontMetrics>
 
 // sk_highcontrastconfig_t
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct SKHighContrastConfig : IEquatable<SKHighContrastConfig>
+public struct SKHighContrastConfig : IEquatable<SKHighContrastConfig>
 {
     // public bool fGrayscale
     private Byte fGrayscale;
@@ -1232,17 +1227,18 @@ public unsafe partial struct SKHighContrastConfig : IEquatable<SKHighContrastCon
     // public float fContrast
     private Single fContrast;
 
-    public Single Contrast
+    public float Contrast
     {
         readonly get => fContrast;
         set => fContrast = value;
     }
 
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public readonly bool Equals(SKHighContrastConfig obj) =>
         fGrayscale == obj.fGrayscale && fInvertStyle == obj.fInvertStyle &&
         fContrast == obj.fContrast;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is SKHighContrastConfig f && Equals(f);
 
     public static bool operator ==(SKHighContrastConfig left, SKHighContrastConfig right) =>
@@ -1263,7 +1259,7 @@ public unsafe partial struct SKHighContrastConfig : IEquatable<SKHighContrastCon
 
 // sk_imageinfo_t
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe partial struct SKImageInfoNative : IEquatable<SKImageInfoNative>
+internal partial struct SKImageInfoNative : IEquatable<SKImageInfoNative>
 {
     // public sk_colorspace_t* colorspace
     public IntPtr colorspace;
@@ -1304,12 +1300,12 @@ internal unsafe partial struct SKImageInfoNative : IEquatable<SKImageInfoNative>
 
 // sk_jpegencoder_options_t
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct SKJpegEncoderOptions : IEquatable<SKJpegEncoderOptions>
+public struct SKJpegEncoderOptions : IEquatable<SKJpegEncoderOptions>
 {
     // public int fQuality
     private Int32 fQuality;
 
-    public Int32 Quality
+    public int Quality
     {
         readonly get => fQuality;
         set => fQuality = value;
@@ -1337,7 +1333,7 @@ public unsafe partial struct SKJpegEncoderOptions : IEquatable<SKJpegEncoderOpti
         fQuality == obj.fQuality && fDownsample == obj.fDownsample &&
         fAlphaOption == obj.fAlphaOption;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is SKJpegEncoderOptions f && Equals(f);
 
     public static bool operator ==(SKJpegEncoderOptions left, SKJpegEncoderOptions right) =>
@@ -1358,7 +1354,7 @@ public unsafe partial struct SKJpegEncoderOptions : IEquatable<SKJpegEncoderOpti
 
 // sk_lattice_t
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe partial struct SKLatticeInternal : IEquatable<SKLatticeInternal>
+internal unsafe struct SKLatticeInternal : IEquatable<SKLatticeInternal>
 {
     // public const int* fXDivs
     public Int32* fXDivs;
@@ -1376,7 +1372,7 @@ internal unsafe partial struct SKLatticeInternal : IEquatable<SKLatticeInternal>
     public Int32 fYCount;
 
     // public const sk_irect_t* fBounds
-    public PixUI.RectI* fBounds;
+    public RectI* fBounds;
 
     // public const sk_color_t* fColors
     public UInt32* fColors;
@@ -1386,7 +1382,7 @@ internal unsafe partial struct SKLatticeInternal : IEquatable<SKLatticeInternal>
         fXCount == obj.fXCount && fYCount == obj.fYCount && fBounds == obj.fBounds &&
         fColors == obj.fColors;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is SKLatticeInternal f && Equals(f);
 
     public static bool operator ==(SKLatticeInternal left, SKLatticeInternal right) =>
@@ -1411,7 +1407,7 @@ internal unsafe partial struct SKLatticeInternal : IEquatable<SKLatticeInternal>
 
 // sk_manageddrawable_procs_t
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe partial struct
+internal struct
     SKManagedDrawableDelegates : IEquatable<SKManagedDrawableDelegates>
 {
     // public sk_manageddrawable_draw_proc fDraw
@@ -1430,7 +1426,7 @@ internal unsafe partial struct
         fDraw == obj.fDraw && fGetBounds == obj.fGetBounds &&
         fNewPictureSnapshot == obj.fNewPictureSnapshot && fDestroy == obj.fDestroy;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is SKManagedDrawableDelegates f && Equals(f);
 
     public static bool operator ==(SKManagedDrawableDelegates left,
@@ -1454,7 +1450,7 @@ internal unsafe partial struct
 
 // sk_managedstream_procs_t
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe partial struct
+internal struct
     SKManagedStreamDelegates : IEquatable<SKManagedStreamDelegates>
 {
     // public sk_managedstream_read_proc fRead
@@ -1503,7 +1499,7 @@ internal unsafe partial struct
         fMove == obj.fMove && fGetLength == obj.fGetLength &&
         fDuplicate == obj.fDuplicate && fFork == obj.fFork && fDestroy == obj.fDestroy;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is SKManagedStreamDelegates f && Equals(f);
 
     public static bool operator ==(SKManagedStreamDelegates left,
@@ -1536,7 +1532,7 @@ internal unsafe partial struct
 
 // sk_managedtracememorydump_procs_t
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe partial struct
+internal struct
     SKManagedTraceMemoryDumpDelegates : IEquatable<SKManagedTraceMemoryDumpDelegates>
 {
     // public sk_managedtraceMemoryDump_dumpNumericValue_proc fDumpNumericValue
@@ -1549,7 +1545,7 @@ internal unsafe partial struct
         fDumpNumericValue == obj.fDumpNumericValue &&
         fDumpStringValue == obj.fDumpStringValue;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is SKManagedTraceMemoryDumpDelegates f && Equals(f);
 
     public static bool operator ==(SKManagedTraceMemoryDumpDelegates left,
@@ -1571,7 +1567,7 @@ internal unsafe partial struct
 
 // sk_managedwstream_procs_t
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe partial struct
+internal struct
     SKManagedWStreamDelegates : IEquatable<SKManagedWStreamDelegates>
 {
     // public sk_managedwstream_write_proc fWrite
@@ -1590,7 +1586,7 @@ internal unsafe partial struct
         fWrite == obj.fWrite && fFlush == obj.fFlush &&
         fBytesWritten == obj.fBytesWritten && fDestroy == obj.fDestroy;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is SKManagedWStreamDelegates f && Equals(f);
 
     public static bool operator ==(SKManagedWStreamDelegates left,
@@ -1614,13 +1610,13 @@ internal unsafe partial struct
 
 // sk_mask_t
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct SKMask : IEquatable<SKMask>
+public unsafe struct SKMask : IEquatable<SKMask>
 {
     // public uint8_t* fImage
     private Byte* fImage;
 
     // public sk_irect_t fBounds
-    private PixUI.RectI fBounds;
+    private RectI fBounds;
 
     // public uint32_t fRowBytes
     private UInt32 fRowBytes;
@@ -1632,7 +1628,7 @@ public unsafe partial struct SKMask : IEquatable<SKMask>
         fImage == obj.fImage && fBounds == obj.fBounds && fRowBytes == obj.fRowBytes &&
         fFormat == obj.fFormat;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is SKMask f && Equals(f);
 
     public static bool operator ==(SKMask left, SKMask right) =>
@@ -1654,7 +1650,7 @@ public unsafe partial struct SKMask : IEquatable<SKMask>
 
 // sk_pngencoder_options_t
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct SKPngEncoderOptions : IEquatable<SKPngEncoderOptions>
+public unsafe struct SKPngEncoderOptions : IEquatable<SKPngEncoderOptions>
 {
     // public sk_pngencoder_filterflags_t fFilterFlags
     private SKPngEncoderFilterFlags fFilterFlags;
@@ -1669,7 +1665,7 @@ public unsafe partial struct SKPngEncoderOptions : IEquatable<SKPngEncoderOption
         fFilterFlags == obj.fFilterFlags && fZLibLevel == obj.fZLibLevel &&
         fComments == obj.fComments;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is SKPngEncoderOptions f && Equals(f);
 
     public static bool operator ==(SKPngEncoderOptions left, SKPngEncoderOptions right) =>
@@ -1690,12 +1686,13 @@ public unsafe partial struct SKPngEncoderOptions : IEquatable<SKPngEncoderOption
 
 // sk_rsxform_t
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct SKRotationScaleMatrix : IEquatable<SKRotationScaleMatrix>
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+public struct SKRotationScaleMatrix : IEquatable<SKRotationScaleMatrix>
 {
     // public float fSCos
     private Single fSCos;
 
-    public Single SCos
+    public float SCos
     {
         readonly get => fSCos;
         set => fSCos = value;
@@ -1704,7 +1701,7 @@ public unsafe partial struct SKRotationScaleMatrix : IEquatable<SKRotationScaleM
     // public float fSSin
     private Single fSSin;
 
-    public Single SSin
+    public float SSin
     {
         readonly get => fSSin;
         set => fSSin = value;
@@ -1713,7 +1710,7 @@ public unsafe partial struct SKRotationScaleMatrix : IEquatable<SKRotationScaleM
     // public float fTX
     private Single fTX;
 
-    public Single TX
+    public float TX
     {
         readonly get => fTX;
         set => fTX = value;
@@ -1722,16 +1719,17 @@ public unsafe partial struct SKRotationScaleMatrix : IEquatable<SKRotationScaleM
     // public float fTY
     private Single fTY;
 
-    public Single TY
+    public float TY
     {
         readonly get => fTY;
         set => fTY = value;
     }
 
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public readonly bool Equals(SKRotationScaleMatrix obj) =>
         fSCos == obj.fSCos && fSSin == obj.fSSin && fTX == obj.fTX && fTY == obj.fTY;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is SKRotationScaleMatrix f && Equals(f);
 
     public static bool operator ==(SKRotationScaleMatrix left,
@@ -1755,7 +1753,7 @@ public unsafe partial struct SKRotationScaleMatrix : IEquatable<SKRotationScaleM
 
 // sk_textblob_builder_runbuffer_t
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe partial struct SKRunBufferInternal : IEquatable<SKRunBufferInternal>
+internal unsafe struct SKRunBufferInternal : IEquatable<SKRunBufferInternal>
 {
     // public void* glyphs
     public void* glyphs;
@@ -1773,7 +1771,7 @@ internal unsafe partial struct SKRunBufferInternal : IEquatable<SKRunBufferInter
         glyphs == obj.glyphs && pos == obj.pos && utf8text == obj.utf8text &&
         clusters == obj.clusters;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is SKRunBufferInternal f && Equals(f);
 
     public static bool operator ==(SKRunBufferInternal left, SKRunBufferInternal right) =>
@@ -1795,7 +1793,7 @@ internal unsafe partial struct SKRunBufferInternal : IEquatable<SKRunBufferInter
 
 // sk_time_datetime_t
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe partial struct SKTimeDateTimeInternal : IEquatable<SKTimeDateTimeInternal>
+internal struct SKTimeDateTimeInternal : IEquatable<SKTimeDateTimeInternal>
 {
     // public int16_t fTimeZoneMinutes
     public Int16 fTimeZoneMinutes;
@@ -1826,7 +1824,7 @@ internal unsafe partial struct SKTimeDateTimeInternal : IEquatable<SKTimeDateTim
         fMonth == obj.fMonth && fDayOfWeek == obj.fDayOfWeek && fDay == obj.fDay &&
         fHour == obj.fHour && fMinute == obj.fMinute && fSecond == obj.fSecond;
 
-    public readonly override bool Equals(object obj) =>
+    public readonly override bool Equals(object? obj) =>
         obj is SKTimeDateTimeInternal f && Equals(f);
 
     public static bool operator ==(SKTimeDateTimeInternal left,
@@ -1854,7 +1852,7 @@ internal unsafe partial struct SKTimeDateTimeInternal : IEquatable<SKTimeDateTim
 
 // sk_webpencoder_options_t
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct SKWebpEncoderOptions : IEquatable<SKWebpEncoderOptions>
+public struct SKWebpEncoderOptions : IEquatable<SKWebpEncoderOptions>
 {
     // public sk_webpencoder_compression_t fCompression
     private SKWebpEncoderCompression fCompression;
@@ -1868,12 +1866,13 @@ public unsafe partial struct SKWebpEncoderOptions : IEquatable<SKWebpEncoderOpti
     // public float fQuality
     private Single fQuality;
 
-    public Single Quality
+    public float Quality
     {
         readonly get => fQuality;
         set => fQuality = value;
     }
 
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public readonly bool Equals(SKWebpEncoderOptions obj) =>
         fCompression == obj.fCompression && fQuality == obj.fQuality;
 

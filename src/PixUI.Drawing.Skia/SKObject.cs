@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 public abstract class SKObject : SKNativeObject
 {

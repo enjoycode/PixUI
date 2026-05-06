@@ -8,7 +8,11 @@ public interface IPath : IDisposable
 
     Rect Bounds { get; }
 
+    bool IsRect { get; }
+
     bool IsEmpty();
+
+    Rect GetRect();
 
     bool GetTightBounds(out Rect result);
 
@@ -33,6 +37,8 @@ public interface IPath : IDisposable
     void AddRRect(RRect rect, bool isCCW = false);
 
     void AddPath(IPath other, PathAddMode mode = PathAddMode.Append);
+
+    bool Op(IPath other, PathOp op);
 
     void Close();
 }

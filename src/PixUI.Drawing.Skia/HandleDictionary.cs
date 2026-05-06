@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 #endif
 
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 internal static class HandleDictionary
 {

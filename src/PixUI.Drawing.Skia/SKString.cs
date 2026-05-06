@@ -1,4 +1,4 @@
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 internal sealed unsafe class SKString : SKObject, ISKSkipObjectRegistration
 {

@@ -1,4 +1,4 @@
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 [Flags]
 public enum GRGlBackendState : UInt32

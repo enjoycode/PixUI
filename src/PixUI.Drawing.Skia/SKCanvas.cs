@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 public sealed unsafe class SKCanvas : SKObject, ICanvas
 {
@@ -9,7 +9,7 @@ public sealed unsafe class SKCanvas : SKObject, ICanvas
     // private const double RadiansCircle = 2.0 * Math.PI;
     private const double DegreesCircle = 360.0;
 
-    public readonly SKSurface? Surface;
+    public ISurface? Surface { get; }
 
     private SKCanvas(SKSurface surface, IntPtr handle, bool owns) : base(handle, owns)
     {

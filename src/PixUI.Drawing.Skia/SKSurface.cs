@@ -1,4 +1,4 @@
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegistration, ISurface
 {

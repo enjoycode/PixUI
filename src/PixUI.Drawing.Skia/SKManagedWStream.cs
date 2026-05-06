@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 public class SKManagedWStream : SKAbstractManagedWStream
 {

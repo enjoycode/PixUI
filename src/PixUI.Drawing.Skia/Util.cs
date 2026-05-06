@@ -1,7 +1,7 @@
 using System.Buffers;
 using System.Text;
 
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 internal static unsafe class Utils
 {

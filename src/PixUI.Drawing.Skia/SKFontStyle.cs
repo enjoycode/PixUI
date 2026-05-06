@@ -1,4 +1,4 @@
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 public readonly struct SKFontStyle //TODO:合并至FontStyle
 {

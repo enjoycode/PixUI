@@ -9,9 +9,9 @@ public class PathTest
     {
         var bigger = Rect.FromLTWH(10, 10, 200, 200);
         var smaller = Rect.FromLTWH(20, 20, 50, 50);
-        var pathBigger = new Path();
+        var pathBigger = Path.Create();
         pathBigger.AddRect(bigger);
-        var pathSmaller = new Path();
+        var pathSmaller = Path.Create();
         pathSmaller.AddRect(smaller);
 
         var res = pathBigger.Op(pathSmaller, PathOp.Intersect);

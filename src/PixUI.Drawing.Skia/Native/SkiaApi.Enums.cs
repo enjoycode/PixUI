@@ -1,4 +1,4 @@
-namespace PixUI;
+namespace PixUI.Drawing.Skia;
 
 // gr_backend_t
 internal enum GRBackendNative
