@@ -87,7 +87,7 @@ public sealed class MonthView : Widget, IMouseRegion
         Cursor.Current = _hitDay != 0 ? Cursors.Hand : Cursors.Arrow;
 
         if (_hitDay != oldHitDay)
-            Invalidate(InvalidAction.Repaint);
+            Repaint();
     }
 
     private void OnHoverChanged(bool isHover)
@@ -96,7 +96,7 @@ public sealed class MonthView : Widget, IMouseRegion
         {
             _hitDay = 0;
             Cursor.Current = Cursors.Arrow;
-            Invalidate(InvalidAction.Repaint);
+            Repaint();
         }
     }
 

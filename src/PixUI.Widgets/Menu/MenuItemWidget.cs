@@ -66,7 +66,7 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
         if (MenuItem.Type == MenuItemType.Divider) return;
 
         _isHover = hover;
-        Invalidate(InvalidAction.Repaint);
+        Repaint();
 
         _controller.OnMenuItemHoverChanged(this, hover);
     }

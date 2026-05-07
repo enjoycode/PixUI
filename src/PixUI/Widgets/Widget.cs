@@ -154,7 +154,7 @@ public abstract partial class Widget : IDisposable
     private State<float>? _height;
 
     /// <summary>
-    /// 指定的宽度
+    /// 期望的布局宽度
     /// </summary>
     public State<float>? Width
     {
@@ -163,7 +163,7 @@ public abstract partial class Widget : IDisposable
     }
 
     /// <summary>
-    /// 指定的高度
+    /// 期户的布局高度
     /// </summary>
     public State<float>? Height
     {
@@ -176,12 +176,18 @@ public abstract partial class Widget : IDisposable
     /// </summary>
     protected bool AutoSize => _width == null || _height == null;
 
+    /// <summary>
+    /// 用于布局计算完后设置相对于上级的位置
+    /// </summary>
     protected internal void SetPosition(float x, float y)
     {
         X = x;
         Y = y;
     }
 
+    /// <summary>
+    /// 用于布局计算完后设置尺寸
+    /// </summary>
     protected void SetSize(float w, float h)
     {
         W = w;

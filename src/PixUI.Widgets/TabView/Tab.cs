@@ -27,7 +27,7 @@ public sealed class Tab : SingleChildWidget, IMouseRegion
     {
         _isHover = hover;
         if (!IsSelected.Value) //已选中的不需要重绘
-            Invalidate(InvalidAction.Repaint);
+            Repaint();
     }
 
     public override bool IsOpaque

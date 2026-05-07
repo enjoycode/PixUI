@@ -48,7 +48,7 @@ public sealed class MoveChildCommand : DesignCommand
         if (slot.ContainerType != ContainerType.MultiChild) return false;
 
         var res = slot.TryMoveChild(parentContainer.Target!, child!, _action);
-        parentContainer.Invalidate(InvalidAction.Relayout);
+        parentContainer.Relayout();
         controller.RaiseOutlineChanged();
         return res;
     }

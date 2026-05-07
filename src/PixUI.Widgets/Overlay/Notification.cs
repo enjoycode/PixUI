@@ -37,7 +37,7 @@ internal sealed class NotificationEntry : SingleChildWidget
     {
         var offsetX = Overlay!.Window.Width - W * _controller.Value;
         SetPosition((float)offsetX, Y);
-        Invalidate(InvalidAction.Repaint);
+        Repaint();
     }
 
     private void OnAnimationStateChanged(AnimationStatus status)
@@ -85,7 +85,7 @@ public sealed class Notification : Popup
         }
 
         _children.RemoveAt(index);
-        Invalidate(InvalidAction.Repaint);
+        Repaint();
     }
 
     #region ====Overrides====

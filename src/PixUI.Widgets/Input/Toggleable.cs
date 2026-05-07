@@ -57,10 +57,7 @@ public abstract class Toggleable : Widget, IMouseRegion
         }
     }
 
-    private void OnPositionValueChanged()
-    {
-        Invalidate(InvalidAction.Repaint);
-    }
+    private void OnPositionValueChanged() => Repaint();
 
     private void OnValueChanged(State state)
     {
