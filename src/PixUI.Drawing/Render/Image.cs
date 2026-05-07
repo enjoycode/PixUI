@@ -7,6 +7,8 @@ public interface IImage : IDisposable
     int Width { get; }
 
     int Height { get; }
+
+    IShader? ToShader(TileMode tileX, TileMode tileY);
 }
 
 public interface IPicture : IDisposable

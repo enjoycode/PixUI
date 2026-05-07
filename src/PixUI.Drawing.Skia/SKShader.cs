@@ -48,13 +48,13 @@ public sealed unsafe class SKShader : SKObject, ISKReferenceCounted, IShader
     {
         if (src == null)
             throw new ArgumentNullException(nameof(src));
-        return src.ToShader(tmx, tmy);
+        return src.ToShader(tmx, tmy) as SKShader;
     }
 
     public static SKShader? CreateImage(SKImage src, TileMode tmx, TileMode tmy, Matrix3 localMatrix)
     {
         if (src == null)
             throw new ArgumentNullException(nameof(src));
-        return src.ToShader(tmx, tmy, localMatrix);
+        return src.ToShader(tmx, tmy, localMatrix) as SKShader;
     }
 }
