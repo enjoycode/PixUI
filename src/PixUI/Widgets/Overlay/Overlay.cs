@@ -59,7 +59,7 @@ public sealed class Overlay : Widget, IRootWidget
         //do nothing, children will layout on Show()
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         foreach (var entry in _children)
         {
@@ -69,7 +69,7 @@ public sealed class Overlay : Widget, IRootWidget
             var needTranslate = entry.X != 0 || entry.Y != 0;
             if (needTranslate)
                 canvas.Translate(entry.X, entry.Y);
-            entry.Paint(canvas, area);
+            entry.OnPaint(canvas, area);
             if (needTranslate)
                 canvas.Translate(-entry.X, -entry.Y);
         }

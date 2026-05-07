@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 public sealed class ImageBox : Widget
@@ -39,17 +37,13 @@ public sealed class ImageBox : Widget
 
     public override void Layout(float availableWidth, float availableHeight)
     {
-        var availableSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-        if (Width != null)
-            availableSize.Width = Math.Min(availableWidth, Width.Value);
-        if (Height != null)
-            availableSize.Height = Math.Min(availableHeight, Height.Value);
+        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
 
         //TODO:根据加载状态及加载的图像大小来计算
-        SetSize(availableSize.Width, availableSize.Height);
+        SetSize(maxSize.Width, maxSize.Height);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (_imgSrc.Value.Loading)
         {

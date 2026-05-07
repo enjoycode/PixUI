@@ -206,7 +206,7 @@ public sealed class GeoMap : Widget, IMouseRegion, IGeoMapView<SkiaDrawingContex
         }
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         EnsureDrawingContext(canvas);
         _motionCanvas.CanvasCore.DrawFrame(_drawCtx!);

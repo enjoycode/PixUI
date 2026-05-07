@@ -146,7 +146,7 @@ internal sealed class RepaintChild : IDirtyArea
     {
         var child = Child;
         child.BeforePaint(canvas, true);
-        child.Paint(canvas, ToChild(child));
+        child.OnPaint(canvas, ToChild(child));
         return child;
     }
 

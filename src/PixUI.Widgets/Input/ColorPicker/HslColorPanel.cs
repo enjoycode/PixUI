@@ -62,7 +62,7 @@ public sealed class HslColorPanel : Widget, IMouseRegion
 
     #endregion
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         // Draw background
         var noSlColor = Color.FromHsl(_hue.Value);

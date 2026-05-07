@@ -35,7 +35,7 @@ public sealed class SelectableItem : SingleChildWidget, IMouseRegion
         SetSize(fixedWidth, fixedHeight);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         //TODO: 根据样式属性绘制选择状态及Hover状态
         if (_selectedState.Value)
@@ -43,6 +43,6 @@ public sealed class SelectableItem : SingleChildWidget, IMouseRegion
         else if (_hoverState.Value)
             canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(Theme.AccentColor));
 
-        base.Paint(canvas, area);
+        base.OnPaint(canvas, area);
     }
 }

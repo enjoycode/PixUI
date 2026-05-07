@@ -146,7 +146,7 @@ public sealed class TabBar<T> : Widget, ITabBar
         }
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (BgColor != null)
             canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(BgColor.Value));
@@ -160,7 +160,7 @@ public sealed class TabBar<T> : Widget, ITabBar
         foreach (var tab in _tabs) //TODO: check visible
         {
             canvas.Translate(tab.X, tab.Y);
-            tab.Paint(canvas, area?.ToChild(tab));
+            tab.OnPaint(canvas, area?.ToChild(tab));
             canvas.Translate(-tab.X, -tab.Y);
         }
 

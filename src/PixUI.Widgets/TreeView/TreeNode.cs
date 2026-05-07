@@ -319,7 +319,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         Parent!.OnChildSizeChanged(this, newWidth - oldWidth, newHeight - oldHeight, affects);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (area is RepaintChild repaintChild)
         {
@@ -333,7 +333,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
             canvas.ClipRect(Rect.FromLTWH(0, 0, Controller.TreeView!.W, H), ClipOp.Intersect, false);
         }
 
-        _row.Paint(canvas, area);
+        _row.OnPaint(canvas, area);
 
         if (IsExpanding || IsCollapsing)
         {
@@ -359,7 +359,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     {
         //TODO:判断是否可见
         canvas.Translate(child.X, child.Y);
-        child.Paint(canvas, area?.ToChild(child));
+        child.OnPaint(canvas, area?.ToChild(child));
         canvas.Translate(-child.X, -child.Y);
 
         PaintDebugger.PaintWidgetBorder(child, canvas);

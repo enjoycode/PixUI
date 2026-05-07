@@ -32,7 +32,7 @@ public sealed class PdfView : Widget
         canvas.Translate(-X, -Y);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         //TODO: 待完成，目前仅测试
         if (!_controller.TryGetRenderedPage(0, out var page))

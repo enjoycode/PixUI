@@ -419,7 +419,7 @@ internal sealed class InvalidQueue
                 temp.BeforePaint(canvas, true);
                 if (ReferenceEquals(temp, opaque))
                 {
-                    opaque.Paint(canvas, ReferenceEquals(opaque, widget)
+                    opaque.OnPaint(canvas, ReferenceEquals(opaque, widget)
                         ? dirtyArea
                         : new RepaintChild(opaque, widget, dirtyArea));
                     break;

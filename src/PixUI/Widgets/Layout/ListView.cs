@@ -171,7 +171,7 @@ public abstract class ListViewBase<T> : MultiChildWidget<Widget>, IScrollable
         canvas.Translate(-X, -Y);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (Controller.ScrollController.Direction == ScrollDirection.Vertical)
         {
@@ -182,7 +182,7 @@ public abstract class ListViewBase<T> : MultiChildWidget<Widget>, IScrollable
                 if (child.Y >= scrollOffsetY + H) break; //大于下边界
 
                 child.BeforePaint(canvas);
-                child.Paint(canvas);
+                child.OnPaint(canvas);
                 child.AfterPaint(canvas);
             }
         }
@@ -195,7 +195,7 @@ public abstract class ListViewBase<T> : MultiChildWidget<Widget>, IScrollable
                 if (child.X >= scrollOffsetX + W) break; //大于右边界
 
                 child.BeforePaint(canvas);
-                child.Paint(canvas);
+                child.OnPaint(canvas);
                 child.AfterPaint(canvas);
             }
         }

@@ -141,7 +141,7 @@ public sealed class Collapse : Widget
         SetSize(maxSize.Width, IsExpanded ? TitleHeight + _body?.H ?? 0 : TitleHeight);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         var needClip = IsExpanding || IsCollapsing;
         if (needClip)
@@ -150,7 +150,7 @@ public sealed class Collapse : Widget
             canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
         }
 
-        base.Paint(canvas, area);
+        base.OnPaint(canvas, area);
 
         if (needClip)
             canvas.Restore();

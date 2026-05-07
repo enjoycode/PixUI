@@ -118,12 +118,12 @@ internal sealed class PopupMenuStack : Popup
         //do nothing,每个弹出的子菜单在加入前已经手动布局过
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         foreach (var child in _children)
         {
             canvas.Translate(child.X, child.Y);
-            child.Paint(canvas, area);
+            child.OnPaint(canvas, area);
             canvas.Translate(-child.X, -child.Y);
         }
     }

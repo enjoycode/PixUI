@@ -84,7 +84,7 @@ public sealed class CodeEditorWidget : Widget, IMouseRegion, IFocusable, IScroll
         Controller.TextEditor.Layout(maxSize.Width, maxSize.Height);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         var clipRect = Rect.FromLTWH(0, 0, W, H);
         canvas.Save();

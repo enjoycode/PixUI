@@ -96,7 +96,7 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
         SetSize(availableWidth, availableHeight);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (_controller.DataView == null || _controller.DataView.Count == 0)
         {

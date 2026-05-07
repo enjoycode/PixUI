@@ -34,7 +34,7 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
         var cellWidget = GetOrMakeCellWidget(rowIndex, controller, cellRect);
         canvas.Translate(cellRect.Left, cellRect.Top);
         // cellWidget.BeforePaint(canvas);
-        cellWidget.Paint(canvas, null);
+        cellWidget.OnPaint(canvas, null);
         // cellWidget.AfterPaint(canvas);
         canvas.Translate(-cellRect.Left, -cellRect.Top);
     }

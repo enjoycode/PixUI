@@ -4,7 +4,7 @@ internal sealed class DraggingDecorator : Widget
 {
     protected internal override bool HitTest(float x, float y, HitTestResult result) => false;
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (DragDropManager.DragEvent == null) return;
 

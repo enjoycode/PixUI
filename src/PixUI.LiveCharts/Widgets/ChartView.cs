@@ -357,7 +357,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
         }
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         canvas.Save();
         canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);

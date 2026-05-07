@@ -138,7 +138,7 @@ public abstract class TextBase : Widget
         );
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (string.IsNullOrEmpty(Text.Value) || Text.Value.Length == 0) return;
 

@@ -66,7 +66,7 @@ public sealed class Tab : SingleChildWidget, IMouseRegion
         }
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         //根据状态画背景色
         if (IsSelected.Value)
@@ -83,7 +83,7 @@ public sealed class Tab : SingleChildWidget, IMouseRegion
         if (Child == null) return;
 
         canvas.Translate(Child!.X, Child.Y);
-        Child.Paint(canvas, area?.ToChild(Child));
+        Child.OnPaint(canvas, area?.ToChild(Child));
         canvas.Translate(-Child.X, -Child.Y);
 
         //TODO:暂在这里画指示器，待TabBar实现后移除

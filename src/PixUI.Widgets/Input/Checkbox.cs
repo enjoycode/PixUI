@@ -49,7 +49,7 @@ public sealed class Checkbox : Toggleable
         SetSize(Math.Min(maxSize.Width, K_CHECKBOX_SIZE), Math.Min(maxSize.Height, K_CHECKBOX_SIZE));
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         var origin = new Offset(W / 2f - K_EDGE_SIZE / 2f, H / 2f - K_EDGE_SIZE / 2f);
         var checkColor = Colors.White; //TODO:

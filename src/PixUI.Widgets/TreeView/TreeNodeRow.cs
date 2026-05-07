@@ -128,7 +128,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
             var x = padding;
             var y = (H - _icon.H) / 2f;
             canvas.Translate(x, y);
-            _icon.Paint(canvas);
+            _icon.OnPaint(canvas);
             canvas.Translate(-x, -y);
             iconWidth = _icon.W + padding;
         }
@@ -138,7 +138,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
             var x = padding + iconWidth;
             var y = (H - _label.H) / 2f;
             canvas.Translate(x, y);
-            _label.Paint(canvas);
+            _label.OnPaint(canvas);
             canvas.Translate(-x, -y);
         }
 
@@ -280,7 +280,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         }
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (_isHover)
         {
@@ -309,7 +309,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         if (child == null) return;
 
         canvas.Translate(child.X, child.Y);
-        child.Paint(canvas);
+        child.OnPaint(canvas);
         canvas.Translate(-child.X, -child.Y);
 
         PaintDebugger.PaintWidgetBorder(child, canvas);

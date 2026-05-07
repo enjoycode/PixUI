@@ -100,7 +100,7 @@ public abstract class SliderBase : Widget, IMouseRegion
         DragThumb.Draw(canvas, cx, cy, Colors.Red);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         DrawBackground(canvas);
         DrawThumb(canvas);

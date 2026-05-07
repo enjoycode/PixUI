@@ -28,7 +28,7 @@ public sealed class SplitterBar : Widget, IMouseRegion
         _onResize(new(e.DeltaX, e.DeltaY));
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         //TODO:暂简单实现
         var paint = PixUI.Paint.Shared(Color);
@@ -235,7 +235,7 @@ public sealed class Splitter : Widget
         }
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (IsPanel1Collapsed && IsPanel2Collapsed) return;
 

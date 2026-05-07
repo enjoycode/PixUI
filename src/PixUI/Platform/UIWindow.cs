@@ -114,7 +114,7 @@ public abstract class UIWindow
         Overlay.Layout(Width, Height);
 
         var widgetsCanvas = GetOffscreenCanvas();
-        RootWidget.Paint(widgetsCanvas);
+        RootWidget.OnPaint(widgetsCanvas);
 
         var overlayCanvas = GetOnscreenCanvas();
         widgetsCanvas.Surface?.Draw(overlayCanvas, 0, 0, null);

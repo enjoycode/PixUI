@@ -95,7 +95,7 @@ public sealed class Visible : SingleChildWidget
         SetSize(Child.W + padding.Left + padding.Right, Child.H + padding.Top + padding.Bottom);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (_visibility.Value != PixUI.Visibility.Visible || W == 0 || H == 0 || canvas.IsClipEmpty)
             return;

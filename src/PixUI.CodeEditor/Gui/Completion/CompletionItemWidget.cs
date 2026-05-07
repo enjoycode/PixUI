@@ -21,7 +21,7 @@ internal sealed class CompletionItemWidget : Widget
         SetSize(availableWidth, availableHeight);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         const float fontSize = 13f;
         const float x = 2f;

@@ -125,7 +125,7 @@ public class Transform : SingleChildWidget
         canvas.Restore();
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (Child == null) return;
 

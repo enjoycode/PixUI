@@ -211,21 +211,21 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         }
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         PaintShape(canvas);
 
         if (_iconWidget != null)
         {
             canvas.Translate(_iconWidget.X, _iconWidget.Y);
-            _iconWidget.Paint(canvas, area);
+            _iconWidget.OnPaint(canvas, area);
             canvas.Translate(-_iconWidget.X, -_iconWidget.Y);
         }
 
         if (_textWidget != null)
         {
             canvas.Translate(_textWidget.X, _textWidget.Y);
-            _textWidget.Paint(canvas, area);
+            _textWidget.OnPaint(canvas, area);
             canvas.Translate(-_textWidget.X, -_textWidget.Y);
         }
 

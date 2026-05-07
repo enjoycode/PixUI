@@ -173,7 +173,7 @@ internal sealed class IconList : Widget, IScrollable
         canvas.Translate(0, -ScrollOffsetY);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         foreach (var child in _items)
         {
@@ -181,7 +181,7 @@ internal sealed class IconList : Widget, IScrollable
             if (child.Y >= ScrollOffsetY + H) break; //大于下边界
 
             child.BeforePaint(canvas);
-            child.Paint(canvas);
+            child.OnPaint(canvas);
             child.AfterPaint(canvas);
         }
     }
@@ -224,7 +224,7 @@ internal sealed class IconItem : Widget, IMouseRegion
         SetSize(50, 50);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (_isHover)
         {

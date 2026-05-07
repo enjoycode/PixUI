@@ -354,7 +354,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
         base.OnUnmounted();
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         //TODO:缩放坐标系
 

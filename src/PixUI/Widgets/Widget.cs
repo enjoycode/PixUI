@@ -501,7 +501,7 @@ public abstract partial class Widget : IDisposable
         canvas.Translate(-X, -Y);
     }
 
-    public virtual void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public virtual void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (W == 0 || H == 0 || canvas.IsClipEmpty)
             return;
@@ -529,7 +529,7 @@ public abstract partial class Widget : IDisposable
             return; //脏区域与子组件没有相交部分，不用绘制
 
         child.BeforePaint(canvas);
-        child.Paint(canvas, area?.ToChild(child));
+        child.OnPaint(canvas, area?.ToChild(child));
         child.AfterPaint(canvas);
     }
 

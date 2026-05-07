@@ -169,7 +169,7 @@ public sealed class TreeView<T> : Widget, IScrollable
 
     protected internal override void AfterPaint(ICanvas canvas) => canvas.Restore();
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         // draw background color if has
         if (_fillColor != null)
@@ -198,7 +198,7 @@ public sealed class TreeView<T> : Widget, IScrollable
             if (vb <= dirtyRect.Top) continue;
 
             canvas.Translate(node.X, node.Y);
-            node.Paint(canvas /*area?.ToChild(vx, vy)*/);
+            node.OnPaint(canvas /*area?.ToChild(vx, vy)*/);
             canvas.Translate(-node.X, -node.Y);
         }
     }

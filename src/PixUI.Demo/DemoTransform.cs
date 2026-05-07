@@ -73,7 +73,7 @@ internal sealed class HitTestWidget : Widget, IMouseRegion
         SetSize(width, height);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(Colors.Red));
     }

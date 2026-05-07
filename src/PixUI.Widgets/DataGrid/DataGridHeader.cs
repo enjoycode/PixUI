@@ -26,7 +26,7 @@ internal sealed class DataGridHeader<T> : Widget
         SetSize(availableWidth, _controller.TotalHeaderHeight);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         var size = new Size(_controller.DataGrid.W, _controller.DataGrid.H);
         PaintHeader(canvas, size, _controller.TotalColumnsWidth, _controller.CachedVisibleColumns);

@@ -168,7 +168,7 @@ public sealed class MonthView : Widget, IMouseRegion
         _cellSize = new Size(maxSize.Width / 7, (maxSize.Height - _headerHeight) / 6);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         PaintWeeks(canvas);
 

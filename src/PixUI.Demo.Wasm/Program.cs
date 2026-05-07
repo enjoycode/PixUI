@@ -80,7 +80,7 @@ internal sealed class DemoChart : View
 
 internal sealed class DemoWidget : Widget
 {
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         Log.Info($"Width={W}, Height={H}");
 

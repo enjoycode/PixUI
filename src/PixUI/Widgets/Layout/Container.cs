@@ -26,7 +26,7 @@ public sealed class Container : SingleChildWidget
         set => FillColor = value;
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (_fillColor != null)
             canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(_fillColor.Value));

@@ -129,7 +129,7 @@ public sealed class ScrollBarDecorator<T> : FlowDecorator<T> where T : Widget, I
             _hBar.Layout(_target.W - (allVisible ? _vBar!.Size : 0), _target.H);
             _hBar.SetPosition(0, _target.H - _hBar.Size);
             _hBar.BeforePaint(canvas, true);
-            _hBar.Paint(canvas);
+            _hBar.OnPaint(canvas);
             _hBar.AfterPaint(canvas);
         }
 
@@ -140,7 +140,7 @@ public sealed class ScrollBarDecorator<T> : FlowDecorator<T> where T : Widget, I
             _vBar.Layout(_target.W, _target.H - (allVisible ? _hBar!.Size : 0));
             _vBar.SetPosition(_target.W - _vBar.Size, 0);
             _vBar.BeforePaint(canvas, true);
-            _vBar.Paint(canvas);
+            _vBar.OnPaint(canvas);
             _vBar.AfterPaint(canvas);
         }
     }
@@ -232,7 +232,7 @@ public sealed class ScrollBar : Widget, IMouseRegion
             SetSize(Size, availableHeight);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         // draw background
         Color bgColor = 0x555F6368;

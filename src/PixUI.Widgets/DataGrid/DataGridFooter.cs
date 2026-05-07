@@ -19,7 +19,7 @@ internal sealed class DataGridFooter<T> : Widget
         SetSize(availableWidth, _controller.Theme.RowHeight /*TODO:暂设为行高*/);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         //TODO:判断定义列范围重叠或超出范围或简单捕获异常
 

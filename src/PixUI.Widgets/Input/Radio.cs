@@ -25,7 +25,7 @@ public sealed class Radio : Toggleable
         SetSize(Math.Min(maxSize.Width, _kRadioSize), Math.Min(maxSize.Height, _kRadioSize));
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         var center = new Offset(W / 2, H / 2);
 

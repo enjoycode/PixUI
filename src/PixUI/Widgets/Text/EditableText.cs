@@ -318,7 +318,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         SetSize(maxSize.Width, Math.Min(maxSize.Height, FontHeight));
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         const float offsetY = 2;
         if (string.IsNullOrEmpty(Text.Value) || Text.Value.Length == 0)

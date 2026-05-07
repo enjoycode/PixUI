@@ -34,7 +34,7 @@ public sealed class Switch : Toggleable
         SetSize(Math.Min(max.Width, KSwitchWidth), Math.Min(max.Height, KSwitchHeight));
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         canvas.Save();
         canvas.Translate(0, (KSwitchHeight - KTrackHeight) / 2f);

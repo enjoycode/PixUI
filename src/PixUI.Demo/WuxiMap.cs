@@ -147,7 +147,7 @@ public sealed class WuxiMap : Widget
 
     protected override void AfterPaint(ICanvas canvas) => canvas.Restore();
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         const float s = 4;
         using var fillPaint = PixUI.Paint.Create();

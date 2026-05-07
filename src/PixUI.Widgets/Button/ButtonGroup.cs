@@ -27,7 +27,7 @@ public sealed class ButtonGroup : MultiChildWidget<Button>
         SetSize(xPos, _buttonHeight.Value);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (W == 0 || H == 0 || canvas.IsClipEmpty)
             return;

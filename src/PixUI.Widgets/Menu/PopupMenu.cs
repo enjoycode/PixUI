@@ -85,7 +85,7 @@ internal sealed class PopupMenu : Widget
         SetSize(maxChildWidth, offsetY);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         //画背景及阴影
         var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, W, H), 4f, 4f);

@@ -770,12 +770,12 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
         TryNotifyParentIfSizeChanged(oldWidth, oldHeight, affects);
     }
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         DrawBackground(canvas);
 
         if (Child != null)
-            base.Paint(canvas, area);
+            base.OnPaint(canvas, area);
         else
             DrawPlaceholder(canvas);
     }

@@ -12,7 +12,7 @@ public abstract class View : SingleChildWidget
 
     public override bool IsOpaque => _fillColor != null && _fillColor.Value.IsOpaque;
 
-    public override void Paint(ICanvas canvas, IDirtyArea? area = null)
+    public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (_fillColor != null)
             canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(_fillColor.Value));
