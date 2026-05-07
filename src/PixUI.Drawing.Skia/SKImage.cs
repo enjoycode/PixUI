@@ -64,9 +64,7 @@ public sealed class SKImage : SKObject, ISKReferenceCounted, IImage
 
     #region ====ToShader====
 
-    public IShader? ToShader() => ToShader(TileMode.Clamp, TileMode.Clamp);
-
-    public unsafe IShader? ToShader(TileMode tileX, TileMode tileY) =>
+    public unsafe IShader? ToShader(TileMode tileX = TileMode.Clamp, TileMode tileY = TileMode.Clamp) =>
         SKShader.GetObject(SkiaApi.sk_image_make_shader(Handle, tileX, tileY, null));
 
     public unsafe IShader? ToShader(TileMode tileX, TileMode tileY, Matrix3 localMatrix) =>
