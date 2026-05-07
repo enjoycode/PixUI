@@ -9,6 +9,7 @@ public interface IImage : IDisposable
     int Height { get; }
 
     IShader? ToShader(TileMode tileX = TileMode.Clamp, TileMode tileY = TileMode.Clamp);
+    IShader? ToShader(TileMode tileX, TileMode tileY, Matrix3 localMatrix);
 }
 
 public interface IPicture : IDisposable
