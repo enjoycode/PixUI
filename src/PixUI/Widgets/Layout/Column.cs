@@ -217,7 +217,7 @@ public sealed class Column : MultiChildWidget<Widget>
                     }
                 }
 
-                SetLayoutSize(W, Math.Min(height, H + dx));
+                SetLayoutSize(W, Math.Min(height, H + dy));
             }
         }
 

@@ -28,7 +28,7 @@ public sealed class DemoAnimation : View
             Children =
             {
                 new Button("Play") { OnTap = _ => Play() },
-                new Text(_title) { FontSize = _fontSize, TextColor = _color },
+                // new Text(_title) { FontSize = _fontSize, TextColor = _color },
                 new Container
                 {
                     FillColor = Colors.Gray,
@@ -46,7 +46,8 @@ public sealed class DemoAnimation : View
                             }
                         }
                     }
-                }
+                },
+                new Text(_title) { FontSize = _fontSize, TextColor = _color },
             }
         };
     }
