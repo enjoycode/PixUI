@@ -97,10 +97,9 @@ public sealed class ColorPicker : InputBase<EditableText>
         private const float SIZE = 16;
         private const float RADIUS = 3;
 
-        public override void Layout(float availableWidth, float availableHeight)
+        protected override void OnLayout(Size maxSize)
         {
-            CacheAndGetMaxSize(availableWidth, availableHeight);
-            SetSize(SIZE, SIZE);
+            SetLayoutSize(SIZE, SIZE);
         }
 
         public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

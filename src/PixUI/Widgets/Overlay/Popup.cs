@@ -45,7 +45,7 @@ public abstract class Popup : Widget, IEventHook
 
     public void UpdatePosition(float x, float y)
     {
-        SetPosition(x, y);
+        SetLayoutLocation(x, y);
         Repaint();
     }
 
@@ -111,9 +111,9 @@ public abstract class Popup : Widget, IEventHook
         }
 
         if (relativeTo != null)
-            target.SetPosition(winX, winY);
+            target.SetLayoutLocation(winX, winY);
         else if (IsDialog)
-            target.SetPosition((winWidth - W) / 2f, (winHeight - H) / 2f);
+            target.SetLayoutLocation((winWidth - W) / 2f, (winHeight - H) / 2f);
 
         Owner.Window.EventHookManager.Add(this);
         Owner.Window.FocusManagerStack.Push(FocusManager);
@@ -211,7 +211,7 @@ internal sealed class PopupProxy : Widget
         _popup.Parent = this;
 
         //直接布局方便计算显示位置，后续不用再计算
-        popup.Layout(popup.Owner.Window.Width, popup.Owner.Window.Height);
+        popup.PerformLayout(new(popup.Owner.Window.Width, popup.Owner.Window.Height));
     }
 
     private readonly Popup _popup;
@@ -229,10 +229,10 @@ internal sealed class PopupProxy : Widget
         return true;
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
         //popup已经布局过,只需要设置自身大小等于popup的大小
-        SetSize(_popup.W, _popup.H);
+        SetLayoutSize(_popup.W, _popup.H);
     }
 
     protected override void OnUnmounted()

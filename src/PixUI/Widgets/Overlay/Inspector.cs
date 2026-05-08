@@ -46,7 +46,7 @@ public sealed class Inspector : Widget
         return false; //Can't hit now
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
         //do nothing
     }

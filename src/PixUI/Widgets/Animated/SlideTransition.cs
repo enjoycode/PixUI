@@ -24,9 +24,9 @@ public sealed class SlideTransition : Transform
         _position.ValueChanged += OnPositionChanged;
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        base.Layout(availableWidth, availableHeight);
+        base.OnLayout(maxSize);
         //根据子组件大小计算并初始化偏移量
         CalcOffset();
         InitTransformAndOrigin(Matrix4.CreateTranslation(_offsetX, _offsetY, 0));

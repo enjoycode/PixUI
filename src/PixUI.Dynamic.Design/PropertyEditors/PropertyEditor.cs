@@ -290,25 +290,23 @@ public sealed class PropertyEditor : Widget
         if (_bindButton != null) visitor.Visit(_bindButton);
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
-        _targetEditor.Layout(maxSize.Width - ButtonSize.Value * 2, maxSize.Height);
-        _targetEditor.SetPosition(0, 0);
-        SetSize(maxSize.Width, _targetEditor.H);
+        _targetEditor.PerformLayout(new(maxSize.Width - ButtonSize.Value * 2, maxSize.Height));
+        _targetEditor.SetLayoutLocation(0, 0);
+        SetLayoutSize(maxSize.Width, _targetEditor.H);
 
         // 按钮固定位置
         if (_deleteButton != null)
         {
-            _deleteButton.Layout(ButtonSize.Value, ButtonSize.Value);
-            _deleteButton.SetPosition(maxSize.Width - ButtonSize.Value, (H - _deleteButton.H) / 2f);
+            _deleteButton.PerformLayout(new(ButtonSize.Value, ButtonSize.Value));
+            _deleteButton.SetLayoutLocation(maxSize.Width - ButtonSize.Value, (H - _deleteButton.H) / 2f);
         }
 
         if (_bindButton != null)
         {
-            _bindButton.Layout(ButtonSize.Value, ButtonSize.Value);
-            _bindButton.SetPosition(maxSize.Width - ButtonSize.Value * 2, (H - _bindButton.H) / 2f);
+            _bindButton.PerformLayout(new(ButtonSize.Value, ButtonSize.Value));
+            _bindButton.SetLayoutLocation(maxSize.Width - ButtonSize.Value * 2, (H - _bindButton.H) / 2f);
         }
     }
 

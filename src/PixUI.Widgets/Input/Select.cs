@@ -192,14 +192,12 @@ internal sealed class SelectText : TextBase, IMouseRegion, IFocusable
 
     protected override bool ForceHeight => true;
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
         BuildParagraph(Text.Value, maxSize.Width);
 
         var fontHeight = (FontSize?.Value ?? Theme.DefaultFontSize) + 4;
-        SetSize(maxSize.Width, Math.Min(maxSize.Height, fontHeight));
+        SetLayoutSize(maxSize.Width, Math.Min(maxSize.Height, fontHeight));
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

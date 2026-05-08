@@ -113,7 +113,7 @@ internal sealed class PopupMenuStack : Popup
         return false;
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
         //do nothing,每个弹出的子菜单在加入前已经手动布局过
     }

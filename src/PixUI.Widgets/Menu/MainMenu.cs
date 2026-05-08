@@ -45,10 +45,9 @@ public sealed class MainMenu : Widget
     /// <summary>
     /// 布局充满可用空间
     /// </summary>
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-        SetSize(maxSize.Width, maxSize.Height);
+        SetLayoutSize(maxSize.Width, maxSize.Height);
 
         if (HasLayout) return; //只布局一次，除非强制重布
         HasLayout = true;
@@ -56,8 +55,8 @@ public sealed class MainMenu : Widget
         var offsetX = 0f;
         foreach (var child in _children)
         {
-            child.Layout(float.PositiveInfinity, maxSize.Height);
-            child.SetPosition(offsetX, 0);
+            child.PerformLayout(float.PositiveInfinity, maxSize.Height);
+            child.SetLayoutLocation(offsetX, 0);
             offsetX += child.W;
         }
     }

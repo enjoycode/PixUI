@@ -41,11 +41,9 @@ public sealed class Column : MultiChildWidget<Widget>
         }
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var availableSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
-        var remainHeight = availableSize.Height;
+        var remainHeight = maxSize.Height;
         float maxWidthOfChild = 0;
 
         //先计算非Expanded的子级
@@ -64,11 +62,11 @@ public sealed class Column : MultiChildWidget<Widget>
 
             if (remainHeight <= 0)
             {
-                child.Layout(0, 0);
+                child.PerformLayout(Size.Empty);
             }
             else
             {
-                child.Layout(availableSize.Width, remainHeight);
+                child.PerformLayout(new(maxSize.Width, remainHeight));
                 maxWidthOfChild = Math.Max(maxWidthOfChild, child.W);
                 remainHeight -= child.H;
             }
@@ -83,11 +81,11 @@ public sealed class Column : MultiChildWidget<Widget>
                 {
                     if (remainHeight <= 0)
                     {
-                        child.Layout(0, 0);
+                        child.PerformLayout(Size.Empty);
                     }
                     else
                     {
-                        child.Layout(availableSize.Width, remainHeight * (expanded.Flex / _totalFlex));
+                        child.PerformLayout(new(maxSize.Width, remainHeight * (expanded.Flex / _totalFlex)));
                         maxWidthOfChild = Math.Max(maxWidthOfChild, child.W);
                     }
                 }
@@ -99,7 +97,7 @@ public sealed class Column : MultiChildWidget<Widget>
         for (var i = 0; i < _children.Count; i++)
         {
             if (i != 0) totalHeight += _spacing;
-            if (totalHeight >= availableSize.Height) break;
+            if (totalHeight >= maxSize.Height) break;
 
             var child = _children[i];
             var childX = _alignment switch
@@ -108,13 +106,13 @@ public sealed class Column : MultiChildWidget<Widget>
                 HorizontalAlignment.Center => (maxWidthOfChild - child.W) / 2,
                 _ => 0
             };
-            child.SetPosition(childX, totalHeight);
+            child.SetLayoutLocation(childX, totalHeight);
 
             totalHeight += child.H;
         }
 
         //最宽的子级 and 所有子级的高度
-        SetSize(maxWidthOfChild, Math.Min(availableSize.Height, totalHeight));
+        SetLayoutSize(maxWidthOfChild, Math.Min(maxSize.Height, totalHeight));
     }
 
     protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
@@ -125,11 +123,11 @@ public sealed class Column : MultiChildWidget<Widget>
         var oldHeight = H;
 
         var width = Width == null
-            ? CachedAvailableWidth
-            : Math.Min(Width.Value, CachedAvailableWidth);
+            ? AvailableSize.Width
+            : Math.Min(Width.Value, AvailableSize.Width);
         var height = Height == null
-            ? CachedAvailableHeight
-            : Math.Min(Height.Value, CachedAvailableHeight);
+            ? AvailableSize.Height
+            : Math.Min(Height.Value, AvailableSize.Height);
 
         //TODO:可优化变窄或变宽但不是原来最宽的
 
@@ -142,7 +140,7 @@ public sealed class Column : MultiChildWidget<Widget>
                 newWidth = Math.Min(Math.Max(item.W, newWidth), width);
             }
 
-            SetSize(newWidth, oldHeight);
+            SetLayoutSize(newWidth, oldHeight);
 
             //重设X坐标
             foreach (var item in _children)
@@ -153,7 +151,7 @@ public sealed class Column : MultiChildWidget<Widget>
                     HorizontalAlignment.Center => (W - item.W) / 2,
                     _ => 0
                 };
-                item.SetPosition(childX, item.Y);
+                item.SetLayoutLocation(childX, item.Y);
             }
         }
 
@@ -169,7 +167,7 @@ public sealed class Column : MultiChildWidget<Widget>
                         remainHeight = Math.Max(0, remainHeight - _spacing);
                     if (remainHeight < _children[i].H) //eg: 子组件改变后高度超出原总高
                     {
-                        _children[i].Layout(width, remainHeight);
+                        _children[i].PerformLayout(new(width, remainHeight));
                         remainHeight -= _children[i].H;
                         break;
                     }
@@ -184,16 +182,15 @@ public sealed class Column : MultiChildWidget<Widget>
 
                     var c = _children[i];
                     if (totalHeight >= H)
-                        c.Layout(0, 0);
+                        c.PerformLayout(Size.Empty);
                     if (c is Expanded expanded)
                     {
-                        if (remainHeight <= 0)
-                            c.Layout(0, 0);
-                        else
-                            c.Layout(width, remainHeight * (expanded.Flex / _totalFlex));
+                        c.PerformLayout(remainHeight <= 0
+                            ? Size.Empty
+                            : new(width, remainHeight * (expanded.Flex / _totalFlex)));
                     }
 
-                    c.SetPosition(c.X, totalHeight);
+                    c.SetLayoutLocation(c.X, totalHeight);
                     totalHeight += c.H;
                 }
 
@@ -209,18 +206,18 @@ public sealed class Column : MultiChildWidget<Widget>
                     var c = _children[i];
                     if (remainHeight >= c.H)
                     {
-                        c.SetPosition(c.X, totalHeight);
+                        c.SetLayoutLocation(c.X, totalHeight);
                         totalHeight += c.H;
                     }
                     else
                     {
-                        c.Layout(width, Math.Max(0, remainHeight));
-                        c.SetPosition(c.X, totalHeight);
+                        c.PerformLayout(new(width, Math.Max(0, remainHeight)));
+                        c.SetLayoutLocation(c.X, totalHeight);
                         totalHeight += c.H;
                     }
                 }
 
-                SetSize(W, Math.Min(height, H + dx));
+                SetLayoutSize(W, Math.Min(height, H + dx));
             }
         }
 

@@ -92,7 +92,7 @@ public sealed class Collapse : Widget
         if (_body != null && !(_animationFlag == 0 && !IsExpanded)) visitor.Visit(_body);
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
         //先处理是否由动画引起的高度改变
         if (IsExpanding || IsCollapsing)
@@ -103,42 +103,39 @@ public sealed class Collapse : Widget
             if (IsCollapsing && _animationValue == 0) //已收缩需要恢复本身的宽度
             {
                 _animationFlag = 0;
-                SetSize(W, TitleHeight);
+                SetLayoutSize(W, TitleHeight);
             }
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             else if (IsExpanding && _animationValue == 1)
             {
                 _animationFlag = 0;
-                SetSize(W, TitleHeight + bodyHeight); //宽度之前已预设
+                SetLayoutSize(W, TitleHeight + bodyHeight); //宽度之前已预设
             }
             else
             {
-                SetSize(W, TitleHeight + expandedHeight); //宽度之前已预设
+                SetLayoutSize(W, TitleHeight + expandedHeight); //宽度之前已预设
             }
 
             return;
         }
-
-
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
+        
         const float padding = 5f;
-        _expandIcon.Layout(TitleHeight, TitleHeight);
-        _expandIcon.SetPosition(maxSize.Width - padding - _expandIcon.W, (TitleHeight - _expandIcon.H) / 2f);
+        _expandIcon.PerformLayout(TitleHeight, TitleHeight);
+        _expandIcon.SetLayoutLocation(maxSize.Width - padding - _expandIcon.W, (TitleHeight - _expandIcon.H) / 2f);
 
         if (_title != null)
         {
-            _title.Layout(maxSize.Width - _expandIcon.W - padding, TitleHeight);
-            _title.SetPosition(padding, (TitleHeight - _title.H) / 2f);
+            _title.PerformLayout(maxSize.Width - _expandIcon.W - padding, TitleHeight);
+            _title.SetLayoutLocation(padding, (TitleHeight - _title.H) / 2f);
         }
 
         if (_body != null)
         {
-            _body.Layout(maxSize.Width, maxSize.Height /*maybe infinity*/);
-            _body.SetPosition(0, TitleHeight);
+            _body.PerformLayout(maxSize.Width, maxSize.Height /*maybe infinity*/);
+            _body.SetLayoutLocation(0, TitleHeight);
         }
 
-        SetSize(maxSize.Width, IsExpanded ? TitleHeight + _body?.H ?? 0 : TitleHeight);
+        SetLayoutSize(maxSize.Width, IsExpanded ? TitleHeight + _body?.H ?? 0 : TitleHeight);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

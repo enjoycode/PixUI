@@ -110,8 +110,8 @@ public abstract class UIWindow
     /// </summary>
     protected void OnFirstShow()
     {
-        RootWidget.Layout(Width, Height);
-        Overlay.Layout(Width, Height);
+        RootWidget.PerformLayout(new(Width, Height));
+        Overlay.PerformLayout(new(Width, Height));
 
         var widgetsCanvas = GetOffscreenCanvas();
         RootWidget.OnPaint(widgetsCanvas);

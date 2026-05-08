@@ -81,12 +81,10 @@ public sealed class Form : MultiChildWidget<FormItem>
 
     #region ====Widget Overrides====
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var max = CacheAndGetMaxSize(availableWidth, availableHeight);
-
         //单列可用宽度
-        var columnWidth = (max.Width - (_columns - 1) * _horizontalSpacing
+        var columnWidth = (maxSize.Width - (_columns - 1) * _horizontalSpacing
                                      - _padding.Left - _padding.Right) / _columns;
 
         var y = _padding.Top;
@@ -94,13 +92,13 @@ public sealed class Form : MultiChildWidget<FormItem>
         var rowHeight = 0f; //同一行中的最高的那个子组件
         for (var i = 0; i < _children.Count; i++)
         {
-            var leftHeight = max.Height - y;
+            var leftHeight = maxSize.Height - y;
             if (leftHeight <= 0) break;
 
             var child = _children[i];
             var span = Math.Min(child.ColumnSpan, _columns - colIndex);
-            child.Layout(columnWidth * span + (span - 1) * _horizontalSpacing, leftHeight);
-            child.SetPosition(_padding.Left + colIndex * _horizontalSpacing + colIndex * columnWidth, y);
+            child.PerformLayout(new(columnWidth * span + (span - 1) * _horizontalSpacing, leftHeight));
+            child.SetLayoutLocation(_padding.Left + colIndex * _horizontalSpacing + colIndex * columnWidth, y);
             rowHeight = Math.Max(rowHeight, child.H);
 
             colIndex += span;
@@ -118,7 +116,7 @@ public sealed class Form : MultiChildWidget<FormItem>
             }
         }
 
-        SetSize(max.Width, Math.Min(y + _padding.Bottom, max.Height));
+        SetLayoutSize(maxSize.Width, Math.Min(y + _padding.Bottom, maxSize.Height));
     }
 
     #endregion

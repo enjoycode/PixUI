@@ -52,23 +52,21 @@ public sealed class Card : SingleChildWidget
     //TODO:方形框无Margin且不透明背景
     //protected internal override bool IsOpaque => _color != null && _color.Value.Alpha == 0;
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
         if (Child == null)
         {
-            SetSize(maxSize.Width, maxSize.Height);
+            SetLayoutSize(maxSize);
             return;
         }
 
         var margin = _margin?.Value ?? EdgeInsets.All(DefaultMargin);
         var padding = Padding?.Value ?? EdgeInsets.All(0);
 
-        Child.Layout(maxSize.Width - margin.Horizontal - padding.Horizontal,
-            maxSize.Height - margin.Vertical - padding.Vertical);
-        Child.SetPosition(margin.Left + padding.Left, margin.Top + padding.Top);
-        SetSize(Child.W + margin.Horizontal + padding.Horizontal,
-            Child.H + margin.Vertical + padding.Vertical);
+        Child.PerformLayout(new(maxSize.Width - margin.Horizontal - padding.Horizontal,
+            maxSize.Height - margin.Vertical - padding.Vertical));
+        Child.SetLayoutLocation(margin.Left + padding.Left, margin.Top + padding.Top);
+        SetLayoutSize(Child.W + margin.Horizontal + padding.Horizontal, Child.H + margin.Vertical + padding.Vertical);
     }
 
     private Rect GetChildRect()

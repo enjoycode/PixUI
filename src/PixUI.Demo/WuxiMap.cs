@@ -69,14 +69,12 @@ public sealed class WuxiMap : Widget
     private readonly double _boundsRight = double.NaN;
     private readonly double _boundsBottom = double.NaN;
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
         // var oldWidth = W;
         // var oldHeight = H;
 
-        SetSize(maxSize.Width, maxSize.Height);
+        SetLayoutSize(maxSize.Width, maxSize.Height);
 
         _projector = Maps.BuildProjector(MapProjection.Mercator, [W, H]);
 

@@ -142,8 +142,8 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         for (var i = 0; i < Children!.Count; i++)
         {
             var node = Children[i];
-            node.Layout(float.PositiveInfinity, float.PositiveInfinity);
-            node.SetPosition(0, yPos);
+            node.PerformLayout(float.PositiveInfinity, float.PositiveInfinity);
+            node.SetLayoutLocation(0, yPos);
             yPos += node.H;
             maxWidth = Math.Max(maxWidth, node.W);
         }
@@ -176,7 +176,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         else
         {
             var maxChildWidth = TryBuildAndLayoutChildren(); //先尝试布局子节点
-            SetSize(Math.Max(W, maxChildWidth), H); //仅预设宽度
+            SetLayoutSize(Math.Max(W, maxChildWidth), H); //仅预设宽度
 
             SetChildrenVisible(true, false);
             IsExpanded = true;
@@ -245,7 +245,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         return true;
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
         //先处理是否由动画引起的高度改变
         if (IsExpanding || IsCollapsing)
@@ -256,17 +256,17 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
             if (IsCollapsing && _animationValue == 0) //已收缩需要恢复本身的宽度
             {
                 _animationFlag = 0;
-                SetSize(_row.W, Controller.NodeHeight);
+                SetLayoutSize(_row.W, Controller.NodeHeight);
             }
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             else if (IsExpanding && _animationValue == 1)
             {
                 _animationFlag = 0;
-                SetSize(W, Controller.NodeHeight + totalChildrenHeight); //宽度之前已预设
+                SetLayoutSize(W, Controller.NodeHeight + totalChildrenHeight); //宽度之前已预设
             }
             else
             {
-                SetSize(W, Controller.NodeHeight + expandedHeight); //宽度之前已预设
+                SetLayoutSize(W, Controller.NodeHeight + expandedHeight); //宽度之前已预设
             }
 
             return;
@@ -278,11 +278,11 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         if (!IsLeaf)
             TryBuildExpandIcon();
 
-        _row.Layout(float.PositiveInfinity, Controller.NodeHeight);
+        _row.PerformLayout(float.PositiveInfinity, Controller.NodeHeight);
 
         if (IsLeaf || !IsExpanded)
         {
-            SetSize(_row.W, Controller.NodeHeight);
+            SetLayoutSize(_row.W, Controller.NodeHeight);
             HasLayout = true;
             return;
         }
@@ -291,7 +291,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         if (!IsLeaf && IsExpanded)
         {
             var maxChildWidth = TryBuildAndLayoutChildren();
-            SetSize(Math.Max(_row.W, maxChildWidth), Controller.NodeHeight + Children!.Sum(t => t.H));
+            SetLayoutSize(Math.Max(_row.W, maxChildWidth), Controller.NodeHeight + Children!.Sum(t => t.H));
             HasLayout = true;
         }
     }
@@ -313,7 +313,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
             ? Math.Max(TreeView<T>.CalcMaxChildWidth(Children), _row.W)
             : _row.W;
         var newHeight = oldHeight + dy;
-        SetSize(newWidth, newHeight);
+        SetLayoutSize(newWidth, newHeight);
 
         //继续通知上级节点尺寸变更
         Parent!.OnChildSizeChanged(this, newWidth - oldWidth, newHeight - oldHeight, affects);

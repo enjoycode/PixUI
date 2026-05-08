@@ -78,12 +78,12 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>, I
         // 处理非文本区域
         foreach (var area in TextEditor.LeftAreas)
         {
-            if (area.Bounds.ContainsPoint(e.X, e.Y))
+            if (area.Bounds.Contains(e.X, e.Y))
                 area.HandlePointerDown(e.X, e.Y, e.Buttons);
         }
 
         // 处理文本编辑区域
-        if (TextEditor.TextView.Bounds.ContainsPoint(e.X, e.Y))
+        if (TextEditor.TextView.Bounds.Contains(e.X, e.Y))
         {
             _gotMouseDown = true;
             TextEditor.SelectionManager.SelectFrom.Where = WhereFrom.TextArea;

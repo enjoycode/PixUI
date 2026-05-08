@@ -157,27 +157,26 @@ public sealed class Splitter : Widget
         visitor.Visit(_bar);
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
         var oldW = Math.Max(W, 0);
         var oldH = Math.Max(H, 0);
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-        SetSize(maxSize.Width, maxSize.Height);
+        SetLayoutSize(maxSize.Width, maxSize.Height);
 
         if (IsPanel1Collapsed && IsPanel2Collapsed)
             return;
 
         if (IsPanel1Collapsed)
         {
-            Panel2!.Layout(W, H);
-            Panel2.SetPosition(0, 0);
+            Panel2!.PerformLayout(new(W, H));
+            Panel2.SetLayoutLocation(0, 0);
             return;
         }
 
         if (IsPanel2Collapsed)
         {
-            Panel1!.Layout(W, H);
-            Panel1.SetPosition(0, 0);
+            Panel1!.PerformLayout(new(W, H));
+            Panel1.SetLayoutLocation(0, 0);
             return;
         }
 
@@ -196,16 +195,16 @@ public sealed class Splitter : Widget
                     _barDistance += (W - oldW) / 2;
             }
 
-            if (Panel1!.CachedAvailableWidth != distance || Panel1.CachedAvailableHeight != H)
-                Panel1.Layout(distance, H);
+            if (Panel1!.AvailableSize.Width != distance || Panel1.AvailableSize.Height != H)
+                Panel1.PerformLayout(new(distance, H));
             if (_bar.W != SplitterSize || _bar.H != H)
-                _bar.Layout(SplitterSize, H);
-            if (Panel2!.CachedAvailableWidth != W - distance - SplitterSize || Panel2.CachedAvailableHeight != H)
-                Panel2.Layout(W - distance - SplitterSize, H);
+                _bar.PerformLayout(new(SplitterSize, H));
+            if (Panel2!.AvailableSize.Width != W - distance - SplitterSize || Panel2.AvailableSize.Height != H)
+                Panel2.PerformLayout(new(W - distance - SplitterSize, H));
 
-            Panel1.SetPosition(0, 0);
-            _bar.SetPosition(distance, 0);
-            Panel2.SetPosition(distance + SplitterSize, 0);
+            Panel1.SetLayoutLocation(0, 0);
+            _bar.SetLayoutLocation(distance, 0);
+            Panel2.SetLayoutLocation(distance + SplitterSize, 0);
         }
         else
         {
@@ -222,16 +221,16 @@ public sealed class Splitter : Widget
                     _barDistance += (H - oldH) / 2;
             }
 
-            if (Panel1!.CachedAvailableWidth != W || Panel1.CachedAvailableHeight != distance)
-                Panel1.Layout(W, distance);
+            if (Panel1!.AvailableSize.Width != W || Panel1.AvailableSize.Height != distance)
+                Panel1.PerformLayout(new(W, distance));
             if (_bar.W != W || _bar.H != SplitterSize)
-                _bar.Layout(W, SplitterSize);
-            if (Panel2!.CachedAvailableWidth != W || Panel2.CachedAvailableHeight != H - distance - SplitterSize)
-                Panel2.Layout(W, H - distance - SplitterSize);
+                _bar.PerformLayout(new(W, SplitterSize));
+            if (Panel2!.AvailableSize.Width != W || Panel2.AvailableSize.Height != H - distance - SplitterSize)
+                Panel2.PerformLayout(new(W, H - distance - SplitterSize));
 
-            Panel1.SetPosition(0, 0);
-            _bar.SetPosition(0, distance);
-            Panel2.SetPosition(0, distance + SplitterSize);
+            Panel1.SetLayoutLocation(0, 0);
+            _bar.SetLayoutLocation(0, distance);
+            Panel2.SetLayoutLocation(0, distance + SplitterSize);
         }
     }
 

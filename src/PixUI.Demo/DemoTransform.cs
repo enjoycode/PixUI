@@ -66,11 +66,11 @@ internal sealed class HitTestWidget : Widget, IMouseRegion
         return true;
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var width = Math.Min(availableWidth, Width?.Value ?? float.MaxValue);
-        var height = Math.Min(availableHeight, Height?.Value ?? float.MaxValue);
-        SetSize(width, height);
+        var width = Math.Min(AvailableSize.Width, Width?.Value ?? float.MaxValue);
+        var height = Math.Min(AvailableSize.Height, Height?.Value ?? float.MaxValue);
+        SetLayoutSize(width, height);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

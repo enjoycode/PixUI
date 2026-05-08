@@ -76,16 +76,14 @@ public sealed class EventEditor : Widget
         visitor.Visit(_deleteButton);
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
+        _editButton.PerformLayout(new(maxSize.Width - _buttonSize.Value * 2, maxSize.Height));
+        _editButton.SetLayoutLocation(0, 0);
+        SetLayoutSize(maxSize.Width, _editButton.H);
 
-        _editButton.Layout(maxSize.Width - _buttonSize.Value * 2, maxSize.Height);
-        _editButton.SetPosition(0, 0);
-        SetSize(maxSize.Width, _editButton.H);
-
-        _deleteButton.Layout(_buttonSize.Value, _buttonSize.Value);
-        _deleteButton.SetPosition(maxSize.Width - _buttonSize.Value, (H - _deleteButton.H) / 2f);
+        _deleteButton.PerformLayout(new(_buttonSize.Value, _buttonSize.Value));
+        _deleteButton.SetLayoutLocation(maxSize.Width - _buttonSize.Value, (H - _deleteButton.H) / 2f);
     }
 
     #endregion

@@ -112,36 +112,35 @@ public sealed class TabBar<T> : Widget, ITabBar
         return true;
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var max = CacheAndGetMaxSize(availableWidth, availableHeight);
         if (_tabs.Count == 0)
         {
-            SetSize(max.Width, max.Height);
+            SetLayoutSize(maxSize);
             return;
         }
 
         if (Scrollable)
         {
-            SetSize(max.Width, max.Height); //TODO:考虑累加宽度
+            SetLayoutSize(maxSize); //TODO:考虑累加宽度
 
             var offsetX = 0f;
             for (var i = 0; i < _tabs.Count; i++)
             {
-                _tabs[i].Layout(float.PositiveInfinity, max.Height);
-                _tabs[i].SetPosition(offsetX, 0);
+                _tabs[i].PerformLayout(float.PositiveInfinity, maxSize.Height);
+                _tabs[i].SetLayoutLocation(offsetX, 0);
                 offsetX += _tabs[i].W;
             }
         }
         else
         {
-            SetSize(max.Width, max.Height);
+            SetLayoutSize(maxSize.Width, maxSize.Height);
 
-            var tabWidth = max.Width / _tabs.Count;
+            var tabWidth = maxSize.Width / _tabs.Count;
             for (var i = 0; i < _tabs.Count; i++)
             {
-                _tabs[i].Layout(tabWidth, max.Height);
-                _tabs[i].SetPosition(tabWidth * i, 0);
+                _tabs[i].PerformLayout(tabWidth, maxSize.Height);
+                _tabs[i].SetLayoutLocation(tabWidth * i, 0);
             }
         }
     }

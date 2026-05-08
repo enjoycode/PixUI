@@ -26,11 +26,11 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
 
     public float LeftToDataGrid => CachedLeft;
 
-    protected internal override void PaintCell(ICanvas canvas, DataGridController<T> controller, 
+    protected internal override void PaintCell(ICanvas canvas, DataGridController<T> controller,
         int rowIndex, Rect cellRect)
     {
         PaintCellBackground(canvas, controller, rowIndex, cellRect);
-        
+
         var cellWidget = GetOrMakeCellWidget(rowIndex, controller, cellRect);
         canvas.Translate(cellRect.Left, cellRect.Top);
         // cellWidget.BeforePaint(canvas);
@@ -56,7 +56,7 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
         var hostedWidget = new HostedCellWidget(controller.DataGrid.Body, this, cellWidget,
             rowIndex * controller.Theme.RowHeight);
         hostedWidget.Parent = controller.DataGrid.Body;
-        hostedWidget.Layout(cellRect.Width, cellRect.Height);
+        hostedWidget.PerformLayout(new(cellRect.Width, cellRect.Height));
         //不需要设置hostedWidget的位置(动态计算)
         var cellCachedWidget = new CellCache<Widget>(rowIndex, hostedWidget);
         _cellWidgets.Insert(index, cellCachedWidget);
@@ -80,7 +80,7 @@ public class DataGridHostColumn<T> : DataGridColumn<T>, IDataGridHostColumn
         //尽量重用缓存的Widget，所以不用ClearAllCache
         foreach (var cellWidget in _cellWidgets)
         {
-            cellWidget.CachedItem?.Layout(width, height);
+            cellWidget.CachedItem?.PerformLayout(new(width, height));
         }
     }
 

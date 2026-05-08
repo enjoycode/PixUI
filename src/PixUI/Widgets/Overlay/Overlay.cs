@@ -27,7 +27,7 @@ public sealed class Overlay : Widget, IRootWidget
         if (_children.Contains(entry)) return;
 
         _children.Add(entry);
-        entry.Layout(Window.Width, Window.Height);
+        entry.PerformLayout(new(Window.Width, Window.Height));
 
         Repaint();
     }
@@ -54,7 +54,7 @@ public sealed class Overlay : Widget, IRootWidget
         return result.IsHitAnyMouseRegion;
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
         //do nothing, children will layout on Show()
     }

@@ -22,17 +22,17 @@ public sealed class SelectableItem : SingleChildWidget, IMouseRegion
 
     public MouseRegion MouseRegion { get; private set; }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var fixedWidth = Width?.Value ?? availableWidth;
+        var fixedWidth = Width?.Value ?? AvailableSize.Width;
         var fixedHeight = Height?.Value ?? 20;
         if (Child != null)
         {
-            Child.Layout(fixedWidth, fixedHeight);
-            Child.SetPosition(0, (fixedHeight - Child.H) / 2f); //暂上下居中
+            Child.PerformLayout(new(fixedWidth, fixedHeight));
+            Child.SetLayoutLocation(0, (fixedHeight - Child.H) / 2f); //暂上下居中
         }
 
-        SetSize(fixedWidth, fixedHeight);
+        SetLayoutSize(fixedWidth, fixedHeight);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

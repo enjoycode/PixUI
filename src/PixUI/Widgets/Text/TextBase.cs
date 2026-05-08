@@ -108,22 +108,15 @@ public abstract class TextBase : Widget
         return TextPainter.BuildParagraph(text, width, fontSize, color, fontStyle, _maxLines, ForceHeight);
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var availableSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-        //如果指定了宽高，限制允许的Size
-        if (Width != null)
-            availableSize.Width = Math.Min(Width.Value, availableSize.Width);
-        if (Height != null)
-            availableSize.Height = Math.Min(Height.Value, availableSize.Height);
-
         if (string.IsNullOrEmpty(Text.Value) || Text.Value.Length == 0)
         {
-            SetSize(Width == null ? 0 : availableSize.Width, Height == null ? 0 : availableSize.Height);
+            SetLayoutSize(Width == null ? 0 : maxSize.Width, Height == null ? 0 : maxSize.Height);
             return;
         }
 
-        BuildParagraph(Text.Value, availableSize.Width);
+        BuildParagraph(Text.Value, maxSize.Width);
 
         //TODO:wait skia fix bug
         //https://groups.google.com/g/skia-discuss/c/WXUVWrcgiko?pli=1
@@ -132,9 +125,9 @@ public abstract class TextBase : Widget
         //W = Math.Min(width, _cachedParagraph.LongestLine);
         var textWidth = CachedParagraph!.MaxIntrinsicWidth;
         var textHeight = CachedParagraph.Height;
-        SetSize(
-            Width == null ? Math.Min(availableSize.Width, textWidth) : availableSize.Width,
-            Height == null ? Math.Min(availableSize.Height, textHeight) : availableSize.Height
+        SetLayoutSize(
+            Width == null ? Math.Min(maxSize.Width, textWidth) : maxSize.Width,
+            Height == null ? Math.Min(maxSize.Height, textHeight) : maxSize.Height
         );
     }
 
@@ -145,8 +138,8 @@ public abstract class TextBase : Widget
         if (CachedParagraph == null) //可能颜色改变后导致的缓存丢失，可以简单重建
         {
             var width = Width == null
-                ? CachedAvailableWidth
-                : Math.Min(Math.Max(0, Width.Value), CachedAvailableWidth);
+                ? AvailableSize.Width
+                : Math.Min(Math.Max(0, Width.Value), AvailableSize.Width);
             BuildParagraph(Text.Value, width);
         }
 

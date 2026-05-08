@@ -28,10 +28,9 @@ public sealed class Switch : Toggleable
     private const float KThumbRadius = KTrackHeight / 2 - 2;
     private static readonly Color KThumbBorderColor = new Color(0x0A000000);
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var max = CacheAndGetMaxSize(availableWidth, availableHeight);
-        SetSize(Math.Min(max.Width, KSwitchWidth), Math.Min(max.Height, KSwitchHeight));
+        SetLayoutSize(Math.Min(maxSize.Width, KSwitchWidth), Math.Min(maxSize.Height, KSwitchHeight));
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

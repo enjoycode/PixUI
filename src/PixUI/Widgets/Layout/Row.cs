@@ -37,10 +37,9 @@ public sealed class Row : MultiChildWidget<Widget>
         }
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var availableSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-        var remainWidth = availableSize.Width;
+        var remainWidth = maxSize.Width;
         float maxHeightOfChild = 0;
 
         //先计算非Expanded的子级
@@ -61,11 +60,11 @@ public sealed class Row : MultiChildWidget<Widget>
 
             if (remainWidth <= 0)
             {
-                child.Layout(0, 0);
+                child.PerformLayout(Size.Empty);
             }
             else
             {
-                child.Layout(remainWidth, availableSize.Height);
+                child.PerformLayout(new(remainWidth, maxSize.Height));
                 maxHeightOfChild = Math.Max(maxHeightOfChild, child.H);
                 remainWidth -= child.W;
             }
@@ -80,11 +79,11 @@ public sealed class Row : MultiChildWidget<Widget>
                 {
                     if (remainWidth <= 0)
                     {
-                        child.Layout(0, 0);
+                        child.PerformLayout(Size.Empty);
                     }
                     else
                     {
-                        child.Layout(remainWidth * (expanded.Flex / totalFlex), availableSize.Height);
+                        child.PerformLayout(new(remainWidth * (expanded.Flex / totalFlex), maxSize.Height));
                         maxHeightOfChild = Math.Max(maxHeightOfChild, child.H);
                     }
                 }
@@ -96,7 +95,7 @@ public sealed class Row : MultiChildWidget<Widget>
         for (var i = 0; i < _children.Count; i++)
         {
             if (i != 0) totalWidth += _spacing;
-            if (totalWidth >= availableSize.Width) break;
+            if (totalWidth >= maxSize.Width) break;
 
             var child = _children[i];
             var childY = _alignment switch
@@ -105,13 +104,13 @@ public sealed class Row : MultiChildWidget<Widget>
                 VerticalAlignment.Middle => (maxHeightOfChild - child.H) / 2,
                 _ => 0
             };
-            child.SetPosition(totalWidth, childY);
+            child.SetLayoutLocation(totalWidth, childY);
 
             totalWidth += child.W;
         }
 
         // 最高的子级 and 所有子级的宽度
-        SetSize(Math.Min(availableSize.Width, totalWidth), maxHeightOfChild);
+        SetLayoutSize(Math.Min(maxSize.Width, totalWidth), maxHeightOfChild);
     }
 
     protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
@@ -119,7 +118,7 @@ public sealed class Row : MultiChildWidget<Widget>
         //TODO:暂全部重新布局并设脏区域为全部重绘，可优化
         var oldWidth = W;
         var oldHeight = H;
-        Layout(CachedAvailableWidth, CachedAvailableHeight);
+        PerformLayout(AvailableSize);
         affects.Widget = this;
         affects.OldX = 0;
         affects.OldY = 0;

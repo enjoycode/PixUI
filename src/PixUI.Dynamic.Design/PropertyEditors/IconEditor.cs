@@ -131,10 +131,9 @@ internal sealed class IconList : Widget, IScrollable
         }
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-        SetSize(maxSize.Width, maxSize.Height);
+        SetLayoutSize(maxSize.Width, maxSize.Height);
 
         _filtered = string.IsNullOrEmpty(_keyword.Value)
             ? _allIcons
@@ -149,8 +148,8 @@ internal sealed class IconList : Widget, IScrollable
             var item = new IconItem( /*tuple.Item1, */tuple.Item2);
             item.OnTap = _ => OnSelect(tuple.Item2);
             item.Parent = this;
-            item.Layout(float.MaxValue, float.MaxValue);
-            item.SetPosition(ox, oy);
+            item.PerformLayout(new(float.MaxValue, float.MaxValue));
+            item.SetLayoutLocation(ox, oy);
             ox += item.W;
             if (ox >= W)
             {
@@ -219,9 +218,9 @@ internal sealed class IconItem : Widget, IMouseRegion
         Repaint();
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        SetSize(50, 50);
+        SetLayoutSize(50, 50);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

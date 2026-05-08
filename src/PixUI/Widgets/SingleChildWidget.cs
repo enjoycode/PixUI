@@ -46,28 +46,27 @@ public abstract class SingleChildWidget : Widget
     /// 无子组件如果IsLayoutTight==true则设为空,否则充满可用空间;
     /// 有子组件如果IsLayoutTight==true则设为子组件大小,否则充满可用空间
     /// </summary>
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var max = CacheAndGetMaxSize(availableWidth, availableHeight);
-
         var padding = _padding?.Value ?? EdgeInsets.All(0);
 
         if (Child == null)
         {
             if (IsLayoutTight)
-                SetSize(0, 0);
+                SetLayoutSize(0, 0);
             else
-                SetSize(max.Width, max.Height);
+                SetLayoutSize(maxSize.Width, maxSize.Height);
             return;
         }
 
-        Child.Layout(max.Width - padding.Left - padding.Right, max.Height - padding.Top - padding.Bottom);
-        Child.SetPosition(padding.Left, padding.Top);
+        Child.PerformLayout(new(maxSize.Width - padding.Left - padding.Right,
+            maxSize.Height - padding.Top - padding.Bottom));
+        Child.SetLayoutLocation(padding.Left, padding.Top);
 
         if (IsLayoutTight)
-            SetSize(Child.W + padding.Left + padding.Right, Child.H + padding.Top + padding.Bottom);
+            SetLayoutSize(Child.W + padding.Left + padding.Right, Child.H + padding.Top + padding.Bottom);
         else
-            SetSize(max.Width, max.Height);
+            SetLayoutSize(maxSize.Width, maxSize.Height);
     }
 
     protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
@@ -78,7 +77,7 @@ public abstract class SingleChildWidget : Widget
 
         var oldWidth = W;
         var oldHeight = H;
-        SetSize(oldWidth + dx, oldHeight + dy); //直接更新自己的大小
+        SetLayoutSize(oldWidth + dx, oldHeight + dy); //直接更新自己的大小
 
         TryNotifyParentIfSizeChanged(oldWidth, oldHeight, affects);
     }

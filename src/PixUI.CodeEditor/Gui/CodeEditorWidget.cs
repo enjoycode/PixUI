@@ -75,10 +75,9 @@ public sealed class CodeEditorWidget : Widget, IMouseRegion, IFocusable, IScroll
 
     public override bool IsOpaque => true;
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-        SetSize(maxSize.Width, maxSize.Height);
+        SetLayoutSize(maxSize);
 
         //布局各个EditorArea
         Controller.TextEditor.Layout(maxSize.Width, maxSize.Height);

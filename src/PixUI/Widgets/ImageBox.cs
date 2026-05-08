@@ -35,12 +35,10 @@ public sealed class ImageBox : Widget
 
     private void OnImageLoaded() => RelayoutOnStateChanged(_imgSrc);
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
         //TODO:根据加载状态及加载的图像大小来计算
-        SetSize(maxSize.Width, maxSize.Height);
+        SetLayoutSize(maxSize.Width, maxSize.Height);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
@@ -59,7 +57,6 @@ public sealed class ImageBox : Widget
         }
 
         //TODO:暂简单绘制，应根据大小及fit
-        canvas.DrawImage(img, Rect.FromLTWH(0, 0, img.Width, img.Height),
-            Rect.FromLTWH(0, 0, W, H));
+        canvas.DrawImage(img, Rect.FromLTWH(0, 0, img.Width, img.Height), Rect.FromLTWH(0, 0, W, H));
     }
 }

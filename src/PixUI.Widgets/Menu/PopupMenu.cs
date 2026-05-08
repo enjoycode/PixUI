@@ -49,7 +49,7 @@ internal sealed class PopupMenu : Widget
         }
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
         if (HasLayout) return;
         HasLayout = true;
@@ -59,8 +59,8 @@ internal sealed class PopupMenu : Widget
         var offsetY = 0f;
         foreach (var child in _children)
         {
-            child.Layout(float.PositiveInfinity, _controller.PopupItemHeight);
-            child.SetPosition(0, offsetY);
+            child.PerformLayout(float.PositiveInfinity, _controller.PopupItemHeight);
+            child.SetLayoutLocation(0, offsetY);
             if (child.W >= maxChildWidth)
             {
                 maxChildWidth = child.W;
@@ -82,7 +82,7 @@ internal sealed class PopupMenu : Widget
             child.ResetWidth(maxChildWidth);
         }
 
-        SetSize(maxChildWidth, offsetY);
+        SetLayoutSize(maxChildWidth, offsetY);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

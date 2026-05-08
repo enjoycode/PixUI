@@ -2,14 +2,13 @@ namespace PixUI;
 
 public sealed class Stack : MultiChildWidget<Positioned>
 {
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-        SetSize(maxSize.Width, maxSize.Height);
+        SetLayoutSize(maxSize.Width, maxSize.Height);
 
         foreach (var child in _children)
         {
-            child.Layout(maxSize.Width, maxSize.Height); //TODO: use float.MaxValue?
+            child.PerformLayout(new(maxSize.Width, maxSize.Height)); //TODO: use float.MaxValue?
         }
     }
 

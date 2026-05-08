@@ -25,10 +25,9 @@ public sealed class LedBulb : Widget
         set => Bind(ref _on!, value, RepaintOnStateChanged);
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-        SetSize(maxSize.Width, maxSize.Height);
+        SetLayoutSize(maxSize.Width, maxSize.Height);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

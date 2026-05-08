@@ -15,15 +15,14 @@ public sealed class Root : SingleChildWidget, IRootWidget
         Child = child;
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        SetPosition(0, 0);
-        SetSize(Window.Width, Window.Height);
-        Child!.Layout(W, H);
+        SetLayoutLocation(0, 0);
+        SetLayoutSize(Window.Width, Window.Height);
+        Child!.PerformLayout(new(Window.Width, Window.Height));
     }
 
-    protected internal override void OnChildSizeChanged(Widget child, float dx, float dy,
-        AffectsByRelayout affects)
+    protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
     {
         //do nothing
     }

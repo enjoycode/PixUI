@@ -225,15 +225,15 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         return true;
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
         var indentation = TreeNode.Depth * Controller.NodeIndent;
 
         // ExpandIcon
         if (_expander != null)
         {
-            _expander?.Layout(Controller.NodeHeight, Controller.NodeHeight);
-            _expander?.SetPosition(indentation, (Controller.NodeHeight - _expander.H) / 2);
+            _expander?.PerformLayout(Controller.NodeHeight, Controller.NodeHeight);
+            _expander?.SetLayoutLocation(indentation, (Controller.NodeHeight - _expander.H) / 2);
         }
 
         indentation += Controller.NodeIndent; //always keep expand icon size
@@ -241,16 +241,16 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         // Icon or Checkbox
         if (Controller.ShowCheckbox)
         {
-            _checkbox!.Layout(Controller.NodeHeight, Controller.NodeHeight);
-            _checkbox.SetPosition(indentation, (Controller.NodeHeight - _checkbox.H) / 2);
+            _checkbox!.PerformLayout(Controller.NodeHeight, Controller.NodeHeight);
+            _checkbox.SetLayoutLocation(indentation, (Controller.NodeHeight - _checkbox.H) / 2);
             indentation += _checkbox.W;
         }
         else
         {
             if (_icon != null)
             {
-                _icon.Layout(Controller.NodeHeight, Controller.NodeHeight);
-                _icon.SetPosition(indentation, (Controller.NodeHeight - _icon.H) / 2);
+                _icon.PerformLayout(Controller.NodeHeight, Controller.NodeHeight);
+                _icon.SetLayoutLocation(indentation, (Controller.NodeHeight - _icon.H) / 2);
             }
 
             indentation += Controller.NodeIndent; //always keep icon size
@@ -259,12 +259,12 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         // Label
         if (_label != null)
         {
-            _label.Layout(float.PositiveInfinity, Controller.NodeHeight);
-            _label.SetPosition(indentation, (Controller.NodeHeight - _label.H) / 2);
+            _label.PerformLayout(float.PositiveInfinity, Controller.NodeHeight);
+            _label.SetLayoutLocation(indentation, (Controller.NodeHeight - _label.H) / 2);
             indentation += _label.W;
         }
 
-        SetSize(indentation, Controller.NodeHeight);
+        SetLayoutSize(indentation, Controller.NodeHeight);
     }
 
     protected internal override void BeforePaint(ICanvas canvas, bool onlyTransform = false,

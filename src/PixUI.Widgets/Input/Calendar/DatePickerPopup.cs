@@ -19,10 +19,10 @@ public sealed class DatePickerPopup : Popup
 
     public override void VisitChildren<TVisitor>(ref TVisitor visitor) => visitor.Visit(_child);
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        SetSize(250, 220);
-        _child.Layout(W, H);
+        SetLayoutSize(250, 220);
+        _child.PerformLayout(LayoutSize);
     }
 
     // public override EventPreviewResult PreviewEvent(EventType type, object? e)

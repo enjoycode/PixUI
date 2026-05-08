@@ -21,9 +21,9 @@ internal sealed class DataGridHeader<T> : Widget
         return true;
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        SetSize(availableWidth, _controller.TotalHeaderHeight);
+        SetLayoutSize(AvailableSize.Width, _controller.TotalHeaderHeight);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
@@ -32,7 +32,8 @@ internal sealed class DataGridHeader<T> : Widget
         PaintHeader(canvas, size, _controller.TotalColumnsWidth, _controller.CachedVisibleColumns);
     }
 
-    private void PaintHeader(ICanvas canvas, Size size, float totalColumnsWidth, IList<DataGridColumn<T>> visibleColumns)
+    private void PaintHeader(ICanvas canvas, Size size, float totalColumnsWidth,
+        IList<DataGridColumn<T>> visibleColumns)
     {
         var paintedGroupColumns = new List<DataGridGroupColumn<T>>();
 

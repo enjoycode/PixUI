@@ -318,14 +318,12 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
         OnUnloading();
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
         var oldWidth = W;
         var oldHeight = H;
 
-        SetSize(maxSize.Width, maxSize.Height);
+        SetLayoutSize(maxSize.Width, maxSize.Height);
 
         if (core != null && !core._isFirstDraw && (oldWidth != W || oldHeight != H))
             core.Update();

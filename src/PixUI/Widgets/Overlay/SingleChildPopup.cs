@@ -13,9 +13,9 @@ public sealed class SingleChildPopup : Popup
 
     public override void VisitChildren<TVisitor>(ref TVisitor visitor) => visitor.Visit(_child);
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        _child.Layout(availableWidth, availableHeight);
-        SetSize(_child.W, _child.H);
+        _child.PerformLayout(AvailableSize);
+        SetLayoutSize(_child.W, _child.H);
     }
 }

@@ -137,7 +137,7 @@ public sealed class HitTestResult
         if (LastHitWidget == null || IsInvalidated) return false;
 
         //先判断是否在限制区域内
-        if (_restrictedBounds.HasValue && !_restrictedBounds.Value.ContainsPoint(winX, winY))
+        if (_restrictedBounds.HasValue && !_restrictedBounds.Value.Contains(winX, winY))
             return false;
 
         //再判断是否还在旧区域内

@@ -72,17 +72,15 @@ public sealed class TabView<T> : Widget
         visitor.Visit(_tabBody);
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
         //TODO:支持上、下、左、右布局
-        var max = CacheAndGetMaxSize(availableWidth, availableHeight);
+        _tabBar.PerformLayout(maxSize.Width, _tabBarIndent);
+        _tabBar.SetLayoutLocation(0, 0);
+        _tabBody.PerformLayout(maxSize.Width, maxSize.Height - _tabBar.H);
+        _tabBody.SetLayoutLocation(0, _tabBar.H);
 
-        _tabBar.Layout(max.Width, _tabBarIndent);
-        _tabBar.SetPosition(0, 0);
-        _tabBody.Layout(max.Width, max.Height - _tabBar.H);
-        _tabBody.SetPosition(0, _tabBar.H);
-
-        SetSize(max.Width, max.Height);
+        SetLayoutSize(maxSize.Width, maxSize.Height);
     }
 
     #endregion

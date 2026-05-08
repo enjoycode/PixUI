@@ -121,9 +121,8 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
         if (_suffix != null) visitor.Visit(_suffix);
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
         var width = maxSize.Width;
         var height = maxSize.Height;
         var padding = _padding?.Value ?? EdgeInsets.All(4);
@@ -133,34 +132,34 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
         var lh = height - padding.Vertical;
         if (lw <= 0 || lh <= 0)
         {
-            SetSize(width, height);
+            SetLayoutSize(width, height);
             return;
         }
 
         // 布局计算子组件
         if (_prefix != null)
         {
-            _prefix.Layout(lw, lh);
+            _prefix.PerformLayout(new(lw, lh));
             lw -= _prefix.W;
         }
 
         if (_suffix != null)
         {
-            _suffix.Layout(lw, lh);
+            _suffix.PerformLayout(new(lw, lh));
             lw -= _suffix.W;
         }
 
-        _editor.Layout(lw, lh);
+        _editor.PerformLayout(new(lw, lh));
 
         // 设置子组件位置(暂以editor为中心上下居中对齐, TODO:考虑基线对齐)
         var maxChildHeight = _editor.H;
-        _prefix?.SetPosition(padding.Left, (maxChildHeight - _prefix.H) / 2 + padding.Top);
-        _suffix?.SetPosition(width - padding.Right - _suffix.W, (maxChildHeight - _suffix.H) / 2 + padding.Top);
-        _editor.SetPosition(padding.Left + (_prefix?.W ?? 0), padding.Top + 1 /*offset*/);
+        _prefix?.SetLayoutLocation(padding.Left, (maxChildHeight - _prefix.H) / 2 + padding.Top);
+        _suffix?.SetLayoutLocation(width - padding.Right - _suffix.W, (maxChildHeight - _suffix.H) / 2 + padding.Top);
+        _editor.SetLayoutLocation(padding.Left + (_prefix?.W ?? 0), padding.Top + 1 /*offset*/);
 
         // 设置自身宽高
         height = Math.Min(height, maxChildHeight + padding.Vertical);
-        SetSize(width, height);
+        SetLayoutSize(width, height);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

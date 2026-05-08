@@ -14,9 +14,9 @@ internal sealed class DataGridFooter<T> : Widget
 
     public DataGridFooterCell[] Cells { get; set; } = null!;
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        SetSize(availableWidth, _controller.Theme.RowHeight /*TODO:暂设为行高*/);
+        SetLayoutSize(AvailableSize.Width, _controller.Theme.RowHeight /*TODO:暂设为行高*/);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

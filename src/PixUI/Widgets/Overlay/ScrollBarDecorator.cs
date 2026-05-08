@@ -126,8 +126,8 @@ public sealed class ScrollBarDecorator<T> : FlowDecorator<T> where T : Widget, I
         {
             _hBar!.Update(_target.ScrollOffsetX, maxOffset.Dx);
 
-            _hBar.Layout(_target.W - (allVisible ? _vBar!.Size : 0), _target.H);
-            _hBar.SetPosition(0, _target.H - _hBar.Size);
+            _hBar.PerformLayout(new(_target.W - (allVisible ? _vBar!.Size : 0), _target.H));
+            _hBar.SetLayoutLocation(0, _target.H - _hBar.Size);
             _hBar.BeforePaint(canvas, true);
             _hBar.OnPaint(canvas);
             _hBar.AfterPaint(canvas);
@@ -137,8 +137,8 @@ public sealed class ScrollBarDecorator<T> : FlowDecorator<T> where T : Widget, I
         {
             _vBar!.Update(_target.ScrollOffsetY, maxOffset.Dy);
 
-            _vBar.Layout(_target.W, _target.H - (allVisible ? _hBar!.Size : 0));
-            _vBar.SetPosition(_target.W - _vBar.Size, 0);
+            _vBar.PerformLayout(new(_target.W, _target.H - (allVisible ? _hBar!.Size : 0)));
+            _vBar.SetLayoutLocation(_target.W - _vBar.Size, 0);
             _vBar.BeforePaint(canvas, true);
             _vBar.OnPaint(canvas);
             _vBar.AfterPaint(canvas);
@@ -181,7 +181,7 @@ public sealed class ScrollBar : Widget, IMouseRegion
     private void OnPointerDown(PointerEvent e)
     {
         _hitThumb = false;
-        if (_thumbRect.ContainsPoint(e.X, e.Y))
+        if (_thumbRect.Contains(e.X, e.Y))
         {
             _hitThumb = true;
             return;
@@ -224,12 +224,12 @@ public sealed class ScrollBar : Widget, IMouseRegion
         }
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
         if (_axis == Axis.Horizontal)
-            SetSize(availableWidth, Size);
+            SetLayoutSize(AvailableSize.Width, Size);
         else
-            SetSize(Size, availableHeight);
+            SetLayoutSize(Size, AvailableSize.Height);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

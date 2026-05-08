@@ -104,18 +104,15 @@ public sealed class FormItem : Widget
 
     public override void VisitChildren<TVisitor>(ref TVisitor visitor) => visitor.Visit(Child);
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        CachedAvailableWidth = availableWidth;
-        CachedAvailableHeight = availableHeight;
-
         EnsureBuildLabelParagraph();
 
         var labelWidth = ((Form)Parent!).LabelWidth + 5;
-        Child.Layout(availableWidth - labelWidth, availableHeight);
-        Child.SetPosition(labelWidth, 0);
+        Child.PerformLayout(new(AvailableSize.Width - labelWidth, AvailableSize.Height));
+        Child.SetLayoutLocation(labelWidth, 0);
 
-        SetSize(availableWidth, Math.Max(_cachedLabelParagraph!.Height, Child.H));
+        SetLayoutSize(AvailableSize.Width, Math.Max(_cachedLabelParagraph!.Height, Child.H));
     }
 
     private void EnsureBuildLabelParagraph()

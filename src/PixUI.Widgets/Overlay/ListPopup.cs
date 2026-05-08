@@ -175,7 +175,7 @@ public class ListPopup<T> : Popup
 
     public override void VisitChildren<TVisitor>(ref TVisitor visitor) => visitor.Visit(_child);
     
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
         if (DataSource == null) return;
 
@@ -185,8 +185,8 @@ public class ListPopup<T> : Popup
             ? Card.DefaultMargin * 2
             : _child.Margin.Value.Top + _child.Margin.Value.Bottom;
 
-        _child.Layout(_child.Width!.Value, maxHeight + cardMarginTotalHeight);
-        SetSize(_child.W, _child.H);
+        _child.PerformLayout(_child.Width!.Value, maxHeight + cardMarginTotalHeight);
+        SetLayoutSize(_child.W, _child.H);
     }
 
     #endregion

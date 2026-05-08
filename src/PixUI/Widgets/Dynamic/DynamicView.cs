@@ -35,8 +35,7 @@ public class DynamicView : SingleChildWidget
     /// 动画替换
     /// </summary>
     protected void AnimateTo(Widget from, Widget to, int duration, bool reverse,
-        TransitionBuilder enteringBuilder,
-        TransitionBuilder? existingBuilder)
+        TransitionBuilder enteringBuilder, TransitionBuilder? existingBuilder)
     {
         _animationFrom = from;
         _animationTo = to;
@@ -52,7 +51,7 @@ public class DynamicView : SingleChildWidget
         _transitionStack = new TransitionStack(exsiting, entering);
         Child = _transitionStack;
 
-        Layout(CachedAvailableWidth, CachedAvailableHeight); //开始前强制重新布局
+        PerformLayout(AvailableSize); //开始前强制重新布局
         if (reverse)
             _animationController!.Reverse();
         else

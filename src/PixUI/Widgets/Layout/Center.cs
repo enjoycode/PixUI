@@ -12,22 +12,20 @@ public sealed class Center : SingleChildWidget
     /// <summary>
     /// 布局充满可用空间
     /// </summary>
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
         if (Child != null)
         {
-            Child.Layout(maxSize.Width, maxSize.Height);
-            Child.SetPosition((maxSize.Width - Child.W) / 2, (maxSize.Height - Child.H) / 2);
+            Child.PerformLayout(maxSize);
+            Child.SetLayoutLocation((maxSize.Width - Child.W) / 2, (maxSize.Height - Child.H) / 2);
         }
 
-        SetSize(maxSize.Width, maxSize.Height);
+        SetLayoutSize(maxSize);
     }
 
     protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
     {
         Debug.Assert(ReferenceEquals(child, Child));
-        Child!.SetPosition((W - Child.W) / 2, (H - Child.H) / 2);
+        Child!.SetLayoutLocation((W - Child.W) / 2, (H - Child.H) / 2);
     }
 }

@@ -68,14 +68,12 @@ public sealed class Positioned : Widget
         if (_child != null) visitor.Visit(_child);
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        CachedAvailableWidth = availableWidth;
-        CachedAvailableHeight = availableHeight;
-
+        maxSize = AvailableSize;
         if (_child == null)
         {
-            SetSize(0, 0);
+            SetLayoutSize(0, 0);
             return;
         }
 
@@ -89,7 +87,7 @@ public sealed class Positioned : Widget
         if (_left != null && _right != null)
         {
             x = _left.Value;
-            w = availableWidth - x - _right.Value;
+            w = maxSize.Width - x - _right.Value;
         }
         else
         {
@@ -98,7 +96,7 @@ public sealed class Positioned : Widget
             else if (_right != null)
             {
                 if (w.HasValue)
-                    x = availableWidth - w.Value - _right.Value;
+                    x = maxSize.Width - w.Value - _right.Value;
                 else
                     calcXAfterLayoutChild = true;
             }
@@ -107,7 +105,7 @@ public sealed class Positioned : Widget
         if (_top != null && _bottom != null)
         {
             y = _top.Value;
-            h = availableHeight - y - _bottom.Value;
+            h = maxSize.Height - y - _bottom.Value;
         }
         else
         {
@@ -116,7 +114,7 @@ public sealed class Positioned : Widget
             else if (_bottom != null)
             {
                 if (h.HasValue)
-                    y = availableHeight - h.Value - _bottom.Value;
+                    y = maxSize.Height - h.Value - _bottom.Value;
                 else
                     calcYAfterLayoutChild = true;
             }
@@ -124,24 +122,24 @@ public sealed class Positioned : Widget
 
         if (w is <= 0 || h is <= 0) //eg: availableWidth - left - right <= 0
         {
-            SetSize(0, 0);
+            SetLayoutSize(0, 0);
             return;
         }
 
         //注意优先顺序 (_child.Width, _child.Height) > (w,h) > (availableWidth, availableHeight)
-        _child.Layout(_child.Width?.Value ?? (w ?? availableWidth),
-            _child.Height?.Value ?? (h ?? availableHeight));
-        _child.SetPosition(0, 0);
+        _child.PerformLayout(new(_child.Width?.Value ?? (w ?? maxSize.Width),
+            _child.Height?.Value ?? (h ?? maxSize.Height)));
+        _child.SetLayoutLocation(0, 0);
 
         w ??= _child.W;
         h ??= _child.H;
 
         if (calcXAfterLayoutChild)
-            x = availableWidth - w.Value - _right!.Value;
+            x = maxSize.Width - w.Value - _right!.Value;
         if (calcYAfterLayoutChild)
-            y = availableHeight - h.Value - _bottom!.Value;
+            y = maxSize.Height - h.Value - _bottom!.Value;
 
-        SetPosition(x, y);
-        SetSize(w.Value, h.Value);
+        SetLayoutLocation(x, y);
+        SetLayoutSize(w.Value, h.Value);
     }
 }

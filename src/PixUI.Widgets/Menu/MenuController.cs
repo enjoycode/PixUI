@@ -40,11 +40,11 @@ internal sealed class MenuController
             //     Rect.FromLTWH(relativeToWinPt.X, relativeToWinPt.Y, item.W, item.H);
             //TODO:计算弹出位置
             if (item.Parent is PopupMenu)
-                popupMenu.SetPosition(relativeToWinPt.X + item.W, relativeToWinPt.Y);
+                popupMenu.SetLayoutLocation(relativeToWinPt.X + item.W, relativeToWinPt.Y);
             else
-                popupMenu.SetPosition(relativeToWinPt.X, relativeToWinPt.Y + item.H);
+                popupMenu.SetLayoutLocation(relativeToWinPt.X, relativeToWinPt.Y + item.H);
             var win = item.Root!.Window;
-            popupMenu.Layout(win.Width, win.Height);
+            popupMenu.PerformLayout(win.Width, win.Height);
 
             _popupMenuStack.Add(popupMenu);
         }
@@ -62,8 +62,8 @@ internal sealed class MenuController
 
         _popupMenuStack ??= new PopupMenuStack(win.Overlay, CloseAll);
         var popupMenu = new PopupMenu(null, menuItems, 1/*根级为1*/, this);
-        popupMenu.Layout(win.Width, win.Height);
-        popupMenu.SetPosition(winX, winY); //TODO: 计算合适的弹出位置
+        popupMenu.PerformLayout(win.Width, win.Height);
+        popupMenu.SetLayoutLocation(winX, winY); //TODO: 计算合适的弹出位置
         _popupMenuStack.Add(popupMenu);
     }
 

@@ -108,18 +108,17 @@ public sealed class TreeView<T> : Widget, IScrollable
         }
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-        SetSize(maxSize.Width, maxSize.Height);
+        SetLayoutSize(maxSize.Width, maxSize.Height);
 
         var totalWidth = 0f;
         var totalHeight = 0f;
 
         foreach (var node in _controller.Nodes)
         {
-            node.Layout(float.PositiveInfinity, float.PositiveInfinity);
-            node.SetPosition(0, totalHeight);
+            node.PerformLayout(float.PositiveInfinity, float.PositiveInfinity);
+            node.SetLayoutLocation(0, totalHeight);
             totalWidth = Math.Max(totalWidth, node.W);
             totalHeight += node.H;
         }
@@ -237,7 +236,7 @@ public sealed class TreeView<T> : Widget, IScrollable
             else
             {
                 var node = nodes[i];
-                node.SetPosition(node.X, node.Y + dy);
+                node.SetLayoutLocation(node.X, node.Y + dy);
             }
         }
     }

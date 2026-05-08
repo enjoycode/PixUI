@@ -39,16 +39,15 @@ public sealed class Calendar : Widget
         visitor.Visit(_monthView);
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-        SetSize(maxSize.Width, maxSize.Height);
+        SetLayoutSize(maxSize);
 
-        _naviBar.Layout(maxSize.Width, maxSize.Height);
-        _naviBar.SetPosition(0, 0);
+        _naviBar.PerformLayout(maxSize);
+        _naviBar.SetLayoutLocation(0, 0);
 
-        _monthView.Layout(maxSize.Width, H - _naviBar.H);
-        _monthView.SetPosition(0, _naviBar.H);
+        _monthView.PerformLayout(new(maxSize.Width, H - _naviBar.H));
+        _monthView.SetLayoutLocation(0, _naviBar.H);
     }
 
     #region ====Navigation====
@@ -124,7 +123,7 @@ internal sealed class CalendarNaviBar : Widget
         };
 
         button.Parent = this;
-        button.Layout(float.MaxValue, float.MaxValue);
+        button.PerformLayout(new(float.MaxValue, float.MaxValue));
 
         return button;
     }
@@ -138,26 +137,25 @@ internal sealed class CalendarNaviBar : Widget
         visitor.Visit(_title);
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-        SetSize(maxSize.Width, Math.Min(maxSize.Height, _btPrevYear.H));
+        SetLayoutSize(maxSize.Width, Math.Min(maxSize.Height, _btPrevYear.H));
 
         var offsetX = 5f;
         const float offsetY = 5f;
         const float space = 5f;
-        _btPrevYear.SetPosition(offsetX, offsetY);
+        _btPrevYear.SetLayoutLocation(offsetX, offsetY);
         offsetX += _btPrevYear.W;
-        _btPrevMonth.SetPosition(offsetX, offsetY);
+        _btPrevMonth.SetLayoutLocation(offsetX, offsetY);
         offsetX += _btPrevMonth.W;
 
         var centerWidth = W - _btPrevYear.W * 4 - space * 2;
-        _title.Layout(centerWidth, maxSize.Height);
-        _title.SetPosition(offsetX + (centerWidth - _title.W) / 2, offsetY + 4 /*基线偏移*/);
+        _title.PerformLayout(new(centerWidth, maxSize.Height));
+        _title.SetLayoutLocation(offsetX + (centerWidth - _title.W) / 2, offsetY + 4 /*基线偏移*/);
         offsetX += centerWidth;
 
-        _btNextMonth.SetPosition(offsetX, offsetY);
+        _btNextMonth.SetLayoutLocation(offsetX, offsetY);
         offsetX += _btNextMonth.W;
-        _btNextYear.SetPosition(offsetX, offsetY);
+        _btNextYear.SetLayoutLocation(offsetX, offsetY);
     }
 }

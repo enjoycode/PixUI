@@ -22,10 +22,10 @@ public sealed class ColorPickerPopup : Popup
 
     public override void VisitChildren<TVisitor>(ref TVisitor visitor) => visitor.Visit(_child);
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        SetSize(250, 220);
-        _child.Layout(W, H);
+        SetLayoutSize(250, 220);
+        _child.PerformLayout(LayoutSize);
     }
 
     public override EventPreviewResult PreviewEvent(EventType type, object? e)
@@ -36,7 +36,7 @@ public sealed class ColorPickerPopup : Popup
             var pointerEvent = (PointerEvent)e!;
             var localPos = LocalToWindow(0, 0);
             var winBounds = Rect.FromLTWH(localPos.X, localPos.Y, W, H);
-            if (!winBounds.ContainsPoint(pointerEvent.X, pointerEvent.Y)) //TODO:排除下拉按钮
+            if (!winBounds.Contains(pointerEvent.X, pointerEvent.Y)) //TODO:排除下拉按钮
             {
                 _hideAction();
                 // return EventPreviewResult.Processed;

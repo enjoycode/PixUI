@@ -77,22 +77,21 @@ public sealed class Visible : SingleChildWidget
             visitor.Visit(Child);
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var max = CacheAndGetMaxSize(availableWidth, availableHeight);
-
         if (Child == null || _visibility.Value == PixUI.Visibility.Collapsed)
         {
-            SetSize(0, 0);
+            SetLayoutSize(0, 0);
             return;
         }
 
         //暂不考虑Padding
         var padding = EdgeInsets.All(0);
-        Child.Layout(max.Width - padding.Left - padding.Right, max.Height - padding.Top - padding.Bottom);
-        Child.SetPosition(padding.Left, padding.Top);
+        Child.PerformLayout(new(maxSize.Width - padding.Left - padding.Right,
+            maxSize.Height - padding.Top - padding.Bottom));
+        Child.SetLayoutLocation(padding.Left, padding.Top);
 
-        SetSize(Child.W + padding.Left + padding.Right, Child.H + padding.Top + padding.Bottom);
+        SetLayoutSize(Child.W + padding.Left + padding.Right, Child.H + padding.Top + padding.Bottom);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

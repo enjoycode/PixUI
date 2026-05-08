@@ -10,10 +10,9 @@ public sealed class PdfView : Widget
 
     private readonly PdfViewController _controller;
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-        SetSize(maxSize.Width, maxSize.Height);
+        SetLayoutSize(maxSize.Width, maxSize.Height);
     }
 
     protected override void BeforePaint(ICanvas canvas, bool onlyTransform = false, IDirtyArea? dirtyArea = null)

@@ -347,7 +347,7 @@ internal sealed class InvalidQueue
         affects.OldH = widget.H;
 
         //再重新布局并尝试通知上级
-        widget.Layout(widget.CachedAvailableWidth, widget.CachedAvailableHeight);
+        widget.PerformLayout(widget.AvailableSize);
         widget.TryNotifyParentIfSizeChanged(affects.OldW, affects.OldH, affects);
     }
 

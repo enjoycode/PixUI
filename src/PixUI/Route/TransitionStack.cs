@@ -23,16 +23,15 @@ internal sealed class TransitionStack : Widget
         visitor.Visit(_to);
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        CachedAvailableWidth = availableWidth;
-        CachedAvailableHeight = availableHeight;
-        SetSize(availableWidth, availableHeight);
+        maxSize = AvailableSize;
+        SetLayoutSize(maxSize);
 
-        _from.Layout(W, H);
-        _from.SetPosition(0, 0);
-        _to.Layout(W, H);
-        _to.SetPosition(0, 0);
+        _from.PerformLayout(maxSize);
+        _from.SetLayoutLocation(0, 0);
+        _to.PerformLayout(maxSize);
+        _to.SetLayoutLocation(0, 0);
     }
 
     protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)

@@ -21,7 +21,7 @@ public abstract class FlowDecorator<T> : Widget where T : Widget
         return false; // Default can't hit
     }
 
-    public sealed override void Layout(float availableWidth, float availableHeight)
+    protected sealed override void OnLayout(Size maxSize)
     {
         //do nothing
     }

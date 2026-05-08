@@ -26,20 +26,17 @@ internal sealed class HostedCellWidget : Widget
     private readonly IDataGridHostColumn _column;
 
     //注意X加上滚动偏移量用于抵消
-    protected internal override float X => _column.LeftToDataGrid + _dataGridBody.ScrollOffsetX;
-
-    protected internal override float Y => _offsetYToBody;
+    protected internal override Point LayoutLocation =>
+        new(_column.LeftToDataGrid + _dataGridBody.ScrollOffsetX, _offsetYToBody);
 
     public override void VisitChildren<TVisitor>(ref TVisitor visitor) => visitor.Visit(_hostedWidget);
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
-        SetSize(maxSize.Width, maxSize.Height);
-        _hostedWidget.Layout(maxSize.Width, maxSize.Height);
+        SetLayoutSize(maxSize);
+        _hostedWidget.PerformLayout(maxSize);
         //TODO:根据对齐方式设置位置，暂简单居中
-        _hostedWidget.SetPosition((maxSize.Width - _hostedWidget.W) / 2, 0);
+        _hostedWidget.SetLayoutLocation((maxSize.Width - _hostedWidget.W) / 2, 0);
     }
 
     protected internal override void BeforePaint(ICanvas canvas, bool onlyTransform = false,

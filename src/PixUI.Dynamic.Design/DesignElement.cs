@@ -157,15 +157,12 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
 
     Widget IDesignElement.CreatePlaceHolder(string slotName, Size? size, DynamicWidgetMeta? meta, Widget? child)
     {
-        var placeHolder = meta == null
-            ? new DesignElement(Controller, slotName)
-            : new DesignElement(Controller, meta, slotName);
+        State<float>? width = size?.Width;
+        State<float>? height = size?.Height;
 
-        if (size != null)
-        {
-            placeHolder.Width = size.Value.Width;
-            placeHolder.Height = size.Value.Height;
-        }
+        var placeHolder = meta == null
+            ? new DesignElement(Controller, slotName) { Width = width, Height = height }
+            : new DesignElement(Controller, meta, slotName) { Width = width, Height = height };
 
         if (child != null)
             placeHolder.Child = child;
@@ -273,7 +270,7 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
                 _hoverAnchor = null;
                 foreach (var pos in Enum.GetValues<AnchorPosition>())
                 {
-                    if (GetAnchorRect(pos).ContainsPoint(e.X, e.Y))
+                    if (GetAnchorRect(pos).Contains(e.X, e.Y))
                     {
                         _hoverAnchor = pos;
                         if (pos == AnchorPosition.MiddleLeft || pos == AnchorPosition.MiddleRight)
@@ -356,10 +353,7 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
         }
         else
         {
-            //需要清除占位大小
-            Width = null;
-            Height = null;
-
+            Width = Height = null; //需要清除占位大小
             ChangeMeta(meta, !meta.IsReversedWrapElement);
             meta.OnAddToCanvas?.Invoke(this);
             Controller.OnSelectionChanged(); //强制刷新属性面板
@@ -743,18 +737,16 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
         return true;
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var size = CacheAndGetMaxSize(availableWidth, availableHeight);
-
         if (Child == null)
         {
-            SetSize(size.Width, size.Height); //仅设置占位宽高
+            SetLayoutSize(maxSize.Width, maxSize.Height); //仅设置占位宽高
             return;
         }
 
-        Child.Layout(CachedAvailableWidth, CachedAvailableHeight); //始终为允许的宽高
-        SetSize(Child.W, Child.H);
+        Child.PerformLayout(AvailableSize); //始终为允许的宽高
+        SetLayoutSize(Child.W, Child.H);
     }
 
     protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
@@ -765,7 +757,7 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
 
         var oldWidth = W;
         var oldHeight = H;
-        SetSize(child.W, child.H); //直接更新自己的大小
+        SetLayoutSize(child.W, child.H); //直接更新自己的大小
 
         TryNotifyParentIfSizeChanged(oldWidth, oldHeight, affects);
     }

@@ -18,11 +18,9 @@ public sealed class Radio : Toggleable
     private const float _kOuterRadius = 8f;
     private const float _kInnerRadius = 4.5f;
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
-        SetSize(Math.Min(maxSize.Width, _kRadioSize), Math.Min(maxSize.Height, _kRadioSize));
+        SetLayoutSize(Math.Min(maxSize.Width, _kRadioSize), Math.Min(maxSize.Height, _kRadioSize));
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

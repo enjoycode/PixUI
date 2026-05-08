@@ -56,8 +56,8 @@ internal sealed class WasmWindow : UIWindow
 
     internal void FirstShow()
     {
-        RootWidget.Layout(Width, Height);
-        Overlay.Layout(Width, Height);
+        RootWidget.PerformLayout(new(Width, Height));
+        Overlay.PerformLayout(new(Width, Height));
 
         var widgetsCanvas = GetOffscreenCanvas();
         RootWidget.OnPaint(widgetsCanvas);

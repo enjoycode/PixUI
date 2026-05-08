@@ -16,9 +16,9 @@ internal sealed class CompletionItemWidget : Widget
     private readonly IconPainter _iconPainter;
     private IParagraph? _paragraph; //TODO: use TextPainter
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        SetSize(availableWidth, availableHeight);
+        SetLayoutSize(AvailableSize);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

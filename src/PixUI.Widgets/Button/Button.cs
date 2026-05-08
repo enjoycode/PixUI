@@ -172,24 +172,23 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     /// <summary>
     /// 没有指定宽高充满可用空间, 仅指定高则使用Icon+Text的宽度
     /// </summary>
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
         var width = maxSize.Width;
         var height = maxSize.Height;
 
         TryBuildContent();
-        _iconWidget?.Layout(width, height);
-        _textWidget?.Layout(width - (_iconWidget?.W ?? 0), height);
+        _iconWidget?.PerformLayout(new(width, height));
+        _textWidget?.PerformLayout(new(width - (_iconWidget?.W ?? 0), height));
         var contentWidth = (_iconWidget?.W ?? 0) + (_textWidget?.W ?? 0);
-        SetSize(Width == null ? Math.Max(DefaultHeight, contentWidth + 16 /*padding*/) : width, height);
+        SetLayoutSize(Width == null ? Math.Max(DefaultHeight, contentWidth + 16 /*padding*/) : width, height);
 
         //TODO: 根据icon位置计算
         // var contentHeight = Math.Max(_iconWidget?.H ?? 0, _textWidget?.H ?? 0);
         var contentOffsetX = (W - contentWidth) / 2;
         // var contentOffsetY = (H - contentHeight) / 2;
-        _iconWidget?.SetPosition(contentOffsetX, (H - _iconWidget!.H) / 2);
-        _textWidget?.SetPosition(contentOffsetX + (_iconWidget?.W ?? 0), (H - _textWidget!.H) / 2);
+        _iconWidget?.SetLayoutLocation(contentOffsetX, (H - _iconWidget!.H) / 2);
+        _textWidget?.SetLayoutLocation(contentOffsetX + (_iconWidget?.W ?? 0), (H - _textWidget!.H) / 2);
     }
 
     private void TryBuildContent()

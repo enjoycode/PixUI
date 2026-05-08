@@ -105,8 +105,8 @@ partial class Widget
         public bool Visit(Widget child)
         {
             HasChildren = true;
-            child.Layout(_maxSize.Width, _maxSize.Height);
-            _parent.SetSize(Math.Max(_parent.W, child.W), Math.Max(_parent.H, child.H));
+            child.PerformLayout(_maxSize);
+            _parent.SetLayoutSize(Math.Max(_parent.W, child.W), Math.Max(_parent.H, child.H));
             return false;
         }
     }

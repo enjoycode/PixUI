@@ -135,11 +135,9 @@ public sealed class DataGrid<T> : Widget, IDroppable
         if (Footer != null) visitor.Visit(Footer);
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
-        SetSize(maxSize.Width, maxSize.Height);
+        SetLayoutSize(maxSize);
 
         var bodyHeight = maxSize.Height;
 
@@ -151,20 +149,20 @@ public sealed class DataGrid<T> : Widget, IDroppable
                 Header.Parent = this;
             }
 
-            Header.Layout(maxSize.Width, maxSize.Height);
-            Header.SetPosition(0, 0);
+            Header.PerformLayout(maxSize);
+            Header.SetLayoutLocation(0, 0);
             bodyHeight -= Header.H;
         }
 
         if (ShowFooter)
         {
-            Footer!.Layout(maxSize.Width, bodyHeight);
-            Footer.SetPosition(0, H - Footer.H);
+            Footer!.PerformLayout(new(maxSize.Width, bodyHeight));
+            Footer.SetLayoutLocation(0, H - Footer.H);
             bodyHeight -= Footer.H;
         }
 
-        Body.Layout(maxSize.Width, bodyHeight);
-        Body.SetPosition(0, Header?.H ?? 0);
+        Body.PerformLayout(new(maxSize.Width, bodyHeight));
+        Body.SetLayoutLocation(0, Header?.H ?? 0);
 
         _controller.CalcColumnsWidth(maxSize);
     }

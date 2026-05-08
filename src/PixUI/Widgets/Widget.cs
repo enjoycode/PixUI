@@ -5,37 +5,7 @@ namespace PixUI;
 
 public abstract partial class Widget : IDisposable
 {
-    /// <summary>
-    /// 是否不透明的
-    /// </summary>
-    public virtual bool IsOpaque => false;
-
-    /// <summary>
-    /// 调试标签
-    /// </summary>
-    public string? DebugLabel { get; set; }
-
-    //TODO: IsOverflow判断是否超出可视范围
-
-    /// <summary>
-    /// 绑定当前Widget实例至WidgetRef
-    /// </summary>
-    [Obsolete("Use Widget.RefBy()")]
-    public IWidgetRef Ref
-    {
-        set => value.SetWidget(this);
-    }
-
-    /// <summary>
-    /// 设置当前Widget的引用
-    /// </summary>
-    public T RefBy<T>(ref T by) where T : Widget
-    {
-        by = (T)this;
-        return by;
-    }
-
-    #region ----Flags----
+    #region ====Fields & Properties====
 
     private int _flag;
     private const int MountedMask = 1;
@@ -44,13 +14,16 @@ public abstract partial class Widget : IDisposable
     private const int InvisibleMask = 1 << 4; //不可见状态
     private const int SuspendingMountMask = 1 << 20;
 
-    private void SetFlagValue(bool value, int mask)
-    {
-        if (value)
-            _flag |= mask;
-        else
-            _flag &= ~(mask);
-    }
+    private Widget? _parent;
+
+    private State<float>? _width;
+    private State<float>? _height;
+
+    private Point _layoutLocation = Point.Empty;
+    private Size _layoutSize = Size.Empty;
+    private Size _availableSize = Size.Empty;
+
+    #region ----Flag----
 
     /// <summary>
     /// 用于移动组件上下级关系时，临时禁止激发OnMount/OnUnmount
@@ -101,10 +74,6 @@ public abstract partial class Widget : IDisposable
         }
     }
 
-    protected virtual void OnMounted() { }
-
-    protected virtual void OnUnmounted() { }
-
     /// <summary>
     /// 是否可见状态，不可见状态的组件不会重新绘制
     /// </summary>
@@ -114,91 +83,9 @@ public abstract partial class Widget : IDisposable
         set => SetFlagValue(!value, InvisibleMask);
     }
 
-    public void SetVisibleWithChildren(bool visible)
-    {
-        IsVisible = visible;
-        var visitor = new SetVisibleChildrenVisitor(visible);
-        VisitChildren(ref visitor);
-    }
-
-    #endregion
-
-    #region ----Layout Bounds----
-
-    /// <summary>
-    /// 布局计算后相对于上级的位置，允许覆写以支持动态计算
-    /// </summary>
-    protected internal virtual float X { get; private set; }
-
-    /// <summary>
-    /// 布局计算后相对于上级的位置，允许覆写以支持动态计算
-    /// </summary>
-    protected internal virtual float Y { get; private set; }
-
-    /// <summary>
-    /// 布局计算后的可视宽度
-    /// </summary>
-    protected internal float W { get; private set; }
-
-    /// <summary>
-    /// 布局计算后的可视高度
-    /// </summary>
-    protected internal float H { get; private set; }
-
-    public Rect LayoutBounds => Rect.FromLTWH(X, Y, W, H);
-
-    protected internal float CachedAvailableWidth = float.NaN; //TODO:考虑移到有子级的内
-    protected internal float CachedAvailableHeight = float.NaN;
-
-    private State<float>? _width;
-    private State<float>? _height;
-
-    /// <summary>
-    /// 期望的布局宽度
-    /// </summary>
-    public State<float>? Width
-    {
-        get => _width;
-        set => Bind(ref _width, value, RelayoutOnStateChanged);
-    }
-
-    /// <summary>
-    /// 期户的布局高度
-    /// </summary>
-    public State<float>? Height
-    {
-        get => _height;
-        set => Bind(ref _height, value, RelayoutOnStateChanged);
-    }
-
-    /// <summary>
-    /// 是否布局计算出来的大小，即非同时指定宽高
-    /// </summary>
-    protected bool AutoSize => _width == null || _height == null;
-
-    /// <summary>
-    /// 用于布局计算完后设置相对于上级的位置
-    /// </summary>
-    protected internal void SetPosition(float x, float y)
-    {
-        X = x;
-        Y = y;
-    }
-
-    /// <summary>
-    /// 用于布局计算完后设置尺寸
-    /// </summary>
-    protected void SetSize(float w, float h)
-    {
-        W = w;
-        H = h;
-    }
-
     #endregion
 
     #region ----Tree----
-
-    private Widget? _parent;
 
     public Widget? Parent
     {
@@ -252,6 +139,140 @@ public abstract partial class Widget : IDisposable
             if (routeView == null) return null;
             return ((RouteView)routeView).Navigator;
         }
+    }
+
+    #endregion
+
+    #region ----Layout----
+
+    /// <summary>
+    /// 上级允许的可用尺寸
+    /// </summary>
+    protected internal Size AvailableSize => _availableSize;
+
+    /// <summary>
+    /// 期望的布局宽度
+    /// </summary>
+    public State<float>? Width
+    {
+        get => _width;
+        set => Bind(ref _width, value, RelayoutOnStateChanged);
+    }
+
+    /// <summary>
+    /// 期望的布局高度
+    /// </summary>
+    public State<float>? Height
+    {
+        get => _height;
+        set => Bind(ref _height, value, RelayoutOnStateChanged);
+    }
+
+    /// <summary>
+    /// 是否布局计算出来的大小，即非同时指定宽高
+    /// </summary>
+    protected bool AutoSize => _width == null || _height == null;
+
+    /// <summary>
+    /// 布局计算后相对于上级的位置，允许覆写以支持动态计算
+    /// </summary>
+    protected internal virtual Point LayoutLocation => _layoutLocation;
+
+    /// <summary>
+    /// 布局计算后的尺寸
+    /// </summary>
+    protected internal virtual Size LayoutSize => _layoutSize;
+
+    protected internal float X => _layoutLocation.X;
+    protected internal float Y => _layoutLocation.Y;
+    protected internal float W => _layoutSize.Width;
+    protected internal float H => _layoutSize.Height;
+
+    public Rect LayoutBounds => Rect.FromLS(LayoutLocation, LayoutSize);
+
+    #endregion
+
+    /// <summary>
+    /// 调试标签
+    /// </summary>
+    public string? DebugLabel { get; set; }
+
+    //TODO: IsOverflow判断是否超出可视范围
+
+    /// <summary>
+    /// 是否不透明的
+    /// </summary>
+    public virtual bool IsOpaque => false;
+
+    #endregion
+
+    #region ====Ref====
+
+    /// <summary>
+    /// 绑定当前Widget实例至WidgetRef
+    /// </summary>
+    [Obsolete("Use Widget.RefBy()")]
+    public IWidgetRef Ref
+    {
+        set => value.SetWidget(this);
+    }
+
+    /// <summary>
+    /// 设置当前Widget的引用
+    /// </summary>
+    public T RefBy<T>(ref T by) where T : Widget
+    {
+        by = (T)this;
+        return by;
+    }
+
+    #endregion
+
+    #region ====Flag Methods====
+
+    private void SetFlagValue(bool value, int mask)
+    {
+        if (value)
+            _flag |= mask;
+        else
+            _flag &= ~(mask);
+    }
+
+    public void SetVisibleWithChildren(bool visible)
+    {
+        IsVisible = visible;
+        var visitor = new SetVisibleChildrenVisitor(visible);
+        VisitChildren(ref visitor);
+    }
+
+    #endregion
+
+    #region ====Tree Methods====
+
+    protected virtual void OnMounted() { }
+
+    protected virtual void OnUnmounted() { }
+
+    private void Mount()
+    {
+        if (SuspendingMount) return;
+        if (IsMounted) return;
+
+        IsMounted = true;
+        var visitor = new MountChildrenVisitor();
+        VisitChildren(ref visitor);
+        OnMounted();
+    }
+
+    private void Unmount()
+    {
+        if (SuspendingMount) return;
+        if (!IsMounted) return;
+
+        IsMounted = false;
+        var visitor = new UnmountChildrenVisitor();
+        VisitChildren(ref visitor);
+        OnUnmounted();
     }
 
     /// <summary>
@@ -344,59 +365,69 @@ public abstract partial class Widget : IDisposable
 
     #endregion
 
-    #region ====Mount & Layout====
+    #region ====Layout Methods====
 
-    private void Mount()
+    /// <summary>
+    /// 用于布局计算完后设置相对于上级的位置
+    /// </summary>
+    protected internal void SetLayoutLocation(float x, float y) => _layoutLocation = new Point(x, y);
+
+    /// <summary>
+    /// 用于布局计算完后设置尺寸
+    /// </summary>
+    protected void SetLayoutSize(float w, float h) => _layoutSize = new Size(w, h);
+
+    /// <summary>
+    /// 用于布局计算完后设置尺寸
+    /// </summary>
+    protected void SetLayoutSize(Size size) => _layoutSize = size;
+
+    /// <summary>
+    /// 仅用于Root widget
+    /// </summary>
+    internal void ResetAvailableSize(Size availableSize)
     {
-        if (SuspendingMount) return;
-        if (IsMounted) return;
-
-        IsMounted = true;
-        var visitor = new MountChildrenVisitor();
-        VisitChildren(ref visitor);
-        OnMounted();
+        Debug.Assert(this is Root);
+        _availableSize = availableSize;
     }
 
-    private void Unmount()
-    {
-        if (SuspendingMount) return;
-        if (!IsMounted) return;
+    /// <summary>
+    /// 执行布局计算
+    /// </summary>
+    public void PerformLayout(float availableWidth, float availableHeight) =>
+        PerformLayout(new(availableWidth, availableHeight));
 
-        IsMounted = false;
-        var visitor = new UnmountChildrenVisitor();
-        VisitChildren(ref visitor);
-        OnUnmounted();
+    /// <summary>
+    /// 执行布局计算
+    /// </summary>
+    /// <param name="availableSize">上级布局计算后留给当前组件的允许的最大尺寸</param>
+    public void PerformLayout(Size availableSize)
+    {
+        //缓存可用大小，并根据是否指定宽度高度取指定值与可用值的小值
+        _availableSize = new Size(Math.Max(0, availableSize.Width), Math.Max(0, availableSize.Height));
+        var maxW = Width == null
+            ? _availableSize.Width
+            : Math.Min(Math.Max(0, Width.Value), _availableSize.Width);
+
+        var maxH = Height == null
+            ? _availableSize.Height
+            : Math.Min(Math.Max(0, Height.Value), _availableSize.Height);
+
+        OnLayout(new Size(maxW, maxH));
     }
 
-    public virtual void Layout(float availableWidth, float availableHeight)
+    /// <summary>
+    /// 布局计算
+    /// </summary>
+    /// <param name="maxSize">允许的尺寸与期望的小值</param>
+    protected virtual void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
-        SetSize(0, 0);
+        SetLayoutSize(0, 0);
         var visitor = new LayoutChildrenVisitor(this, maxSize);
         VisitChildren(ref visitor);
 
         if (!visitor.HasChildren)
-            SetSize(maxSize.Width, maxSize.Height);
-    }
-
-    /// <summary>
-    /// 缓存可用大小，并根据是否指定宽度高度取指定值与可用值的小值
-    /// </summary>
-    protected Size CacheAndGetMaxSize(float availableWidth, float availableHeight)
-    {
-        CachedAvailableWidth = Math.Max(0, availableWidth);
-        CachedAvailableHeight = Math.Max(0, availableHeight);
-
-        var maxW = Width == null
-            ? CachedAvailableWidth
-            : Math.Min(Math.Max(0, Width.Value), CachedAvailableWidth);
-
-        var maxH = Height == null
-            ? CachedAvailableHeight
-            : Math.Min(Math.Max(0, Height.Value), CachedAvailableHeight);
-
-        return new Size(maxW, maxH);
+            SetLayoutSize(maxSize.Width, maxSize.Height);
     }
 
     /// <summary>
@@ -410,7 +441,7 @@ public abstract partial class Widget : IDisposable
         var oldHeight = H;
 
         //TODO:考虑避免重复layout，在这里传入参数表明由子级触发，无需再layout子级?
-        Layout(CachedAvailableWidth, CachedAvailableHeight);
+        PerformLayout(_availableSize);
         TryNotifyParentIfSizeChanged(oldWidth, oldHeight, affects);
     }
 

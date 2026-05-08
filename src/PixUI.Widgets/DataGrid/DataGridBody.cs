@@ -91,9 +91,9 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
         return true;
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        SetSize(availableWidth, availableHeight);
+        SetLayoutSize(AvailableSize);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

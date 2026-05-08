@@ -106,17 +106,15 @@ public abstract class ListViewBase<T> : MultiChildWidget<Widget>, IScrollable
         Relayout();
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var availableSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
         if (Controller.ScrollController.Direction == ScrollDirection.Vertical)
         {
             float y = 0;
             foreach (var child in _children)
             {
-                child.Layout(availableSize.Width, float.PositiveInfinity);
-                child.SetPosition(0, y);
+                child.PerformLayout(new(maxSize.Width, float.PositiveInfinity));
+                child.SetLayoutLocation(0, y);
                 y += child.H;
             }
         }
@@ -125,20 +123,19 @@ public abstract class ListViewBase<T> : MultiChildWidget<Widget>, IScrollable
             float x = 0;
             foreach (var child in _children)
             {
-                child.Layout(float.PositiveInfinity, availableSize.Height);
-                child.SetPosition(x, 0);
+                child.PerformLayout(new(float.PositiveInfinity, maxSize.Height));
+                child.SetLayoutLocation(x, 0);
                 x += child.W;
             }
         }
 
-
-        SetSize(availableSize.Width, availableSize.Height);
+        SetLayoutSize(maxSize.Width, maxSize.Height);
     }
 
     protected internal override void OnChildSizeChanged(Widget child, float dx, float dy, AffectsByRelayout affects)
     {
         //TODO:暂全部重新布局并设脏区域为全部重绘，可优化
-        Layout(CachedAvailableWidth, CachedAvailableHeight);
+        PerformLayout(AvailableSize);
         affects.Widget = this;
         affects.OldX = 0;
         affects.OldY = 0;

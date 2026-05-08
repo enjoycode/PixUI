@@ -76,12 +76,12 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
     /// </summary>
     internal void ResetWidth(float newWidth)
     {
-        SetSize(newWidth, H);
+        SetLayoutSize(newWidth, H);
         //右对齐快键指示orExpandIcon
         if (_expander != null)
         {
             var newX = W - _controller.ItemPadding.Right - _expander.W;
-            _expander.SetPosition(newX, _expander.Y);
+            _expander.SetLayoutLocation(newX, _expander.Y);
         }
     }
 
@@ -101,38 +101,38 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
         return true;
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
         var offsetX = _controller.ItemPadding.Left;
 
         if (MenuItem.Type == MenuItemType.Divider)
         {
-            SetSize(offsetX + 2, 6);
+            SetLayoutSize(offsetX + 2, 6);
             return;
         }
 
         if (_icon != null)
         {
-            _icon.Layout(availableWidth, availableHeight);
-            _icon.SetPosition(offsetX, (availableHeight - _icon.H) / 2);
+            _icon.PerformLayout(AvailableSize);
+            _icon.SetLayoutLocation(offsetX, (AvailableSize.Height - _icon.H) / 2);
             offsetX += _icon.W + 5;
         }
 
         if (_label != null)
         {
-            _label.Layout(availableWidth, availableHeight);
-            _label.SetPosition(offsetX, (availableHeight - _label.H) / 2);
+            _label.PerformLayout(AvailableSize);
+            _label.SetLayoutLocation(offsetX, (AvailableSize.Height - _label.H) / 2);
             offsetX += _label.W + 5;
         }
 
         if (_expander != null)
         {
-            _expander.Layout(availableWidth, availableHeight);
-            _expander.SetPosition(offsetX, (availableHeight - _expander.H) / 2);
+            _expander.PerformLayout(AvailableSize);
+            _expander.SetLayoutLocation(offsetX, (AvailableSize.Height - _expander.H) / 2);
             offsetX += _expander.W;
         }
 
-        SetSize(offsetX + _controller.ItemPadding.Right, availableHeight);
+        SetLayoutSize(offsetX + _controller.ItemPadding.Right, AvailableSize.Height);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

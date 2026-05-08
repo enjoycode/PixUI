@@ -42,11 +42,9 @@ public sealed class Checkbox : Toggleable
     private const float K_EDGE_SIZE = 18;
     private const float K_STROKE_WIDTH = 2.0f;
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
-        SetSize(Math.Min(maxSize.Width, K_CHECKBOX_SIZE), Math.Min(maxSize.Height, K_CHECKBOX_SIZE));
+        SetLayoutSize(Math.Min(maxSize.Width, K_CHECKBOX_SIZE), Math.Min(maxSize.Height, K_CHECKBOX_SIZE));
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

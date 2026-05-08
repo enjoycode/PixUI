@@ -310,12 +310,10 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
             Root?.Window.StartTextInput();
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
         TryBuildParagraph();
-        SetSize(maxSize.Width, Math.Min(maxSize.Height, FontHeight));
+        SetLayoutSize(maxSize.Width, Math.Min(maxSize.Height, FontHeight));
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

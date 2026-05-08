@@ -25,20 +25,17 @@ public sealed class Expanded : SingleChildWidget
         }
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        CachedAvailableWidth = availableWidth;
-        CachedAvailableHeight = availableHeight;
-
         if (Child != null)
         {
-            Child.Layout(availableWidth, availableHeight);
-            Child.SetPosition(0, 0);
+            Child.PerformLayout(AvailableSize);
+            Child.SetLayoutLocation(0, 0);
         }
 
-        var w = Parent is Column ? Child?.W ?? 0 : availableWidth;
-        var h = Parent is Row ? Child?.H ?? 0 : availableHeight;
-        SetSize(w, h);
+        var w = Parent is Column ? Child?.W ?? 0 : AvailableSize.Width;
+        var h = Parent is Row ? Child?.H ?? 0 : AvailableSize.Height;
+        SetLayoutSize(w, h);
     }
 
     protected internal override void OnChildSizeChanged(Widget child,
@@ -46,9 +43,9 @@ public sealed class Expanded : SingleChildWidget
     {
         var oldWidth = W;
         var oldHeight = H;
-        var w = Parent is Column ? child.W : CachedAvailableWidth;
-        var h = Parent is Row ? child.H : CachedAvailableHeight;
-        SetSize(w, h);
+        var w = Parent is Column ? child.W : AvailableSize.Width;
+        var h = Parent is Row ? child.H : AvailableSize.Height;
+        SetLayoutSize(w, h);
 
         TryNotifyParentIfSizeChanged(oldWidth, oldHeight, affects);
     }

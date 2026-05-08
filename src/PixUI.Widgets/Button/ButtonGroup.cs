@@ -8,23 +8,21 @@ public sealed class ButtonGroup : MultiChildWidget<Button>
 
     #region ====Widget Overrides====
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
         var xPos = 0f;
         _buttonHeight.Value = Math.Min(maxSize.Height, Button.DefaultHeight); //暂强制同高
         for (var i = 0; i < _children.Count; i++)
         {
             _children[i].Height = _buttonHeight;
             _children[i].Shape = ButtonShape.Square;
-            _children[i].Layout(Math.Max(0, maxSize.Width - xPos), _buttonHeight.Value);
-            _children[i].SetPosition(xPos, 0);
+            _children[i].PerformLayout(new(Math.Max(0, maxSize.Width - xPos), _buttonHeight.Value));
+            _children[i].SetLayoutLocation(xPos, 0);
 
             xPos += _children[i].W;
         }
 
-        SetSize(xPos, _buttonHeight.Value);
+        SetLayoutSize(xPos, _buttonHeight.Value);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

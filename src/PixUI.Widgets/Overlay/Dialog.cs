@@ -184,7 +184,7 @@ public abstract class Dialog : Popup
     }
 
     public override void VisitChildren<TVisitor>(ref TVisitor visitor) => visitor.Visit(_child!);
-    
+
     public override bool ContainsPoint(float x, float y) => true;
 
     protected internal override bool HitTest(float x, float y, HitTestResult result)
@@ -195,12 +195,12 @@ public abstract class Dialog : Popup
         return true;
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
         TryBuildChild();
-        _child!.Layout(Width?.Value ?? availableWidth, Height?.Value ?? availableHeight);
+        _child!.PerformLayout(Width?.Value ?? AvailableSize.Width, Height?.Value ?? AvailableSize.Height);
         //不用设置_child位置,显示时设置自身位置，另外不能设置自身大小为无限，因为弹出动画需要
-        SetSize(_child.W, _child.H);
+        SetLayoutSize(_child.W, _child.H);
     }
 
     #endregion

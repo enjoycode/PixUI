@@ -159,11 +159,9 @@ public sealed class MonthView : Widget, IMouseRegion
 
     private bool IsToday(int day) => new DateTime(Year.Value, Month.Value, day) == DateTime.Today;
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
-        SetSize(maxSize.Width, maxSize.Height);
+        SetLayoutSize(maxSize.Width, maxSize.Height);
 
         _cellSize = new Size(maxSize.Width / 7, (maxSize.Height - _headerHeight) / 6);
     }

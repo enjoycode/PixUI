@@ -42,27 +42,25 @@ public sealed class Tab : SingleChildWidget, IMouseRegion
         }
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-
         if (Child == null)
         {
-            SetSize(0, 0);
+            SetLayoutSize(0, 0);
             return;
         }
 
-        Child!.Layout(maxSize.Width, maxSize.Height);
+        Child!.PerformLayout(maxSize);
 
         if (TabBar.Scrollable)
         {
-            SetSize(Child.W, maxSize.Height);
-            Child.SetPosition(0, (maxSize.Height - Child.H) / 2);
+            SetLayoutSize(Child.W, maxSize.Height);
+            Child.SetLayoutLocation(0, (maxSize.Height - Child.H) / 2);
         }
         else
         {
-            SetSize(maxSize.Width, maxSize.Height);
-            Child.SetPosition((maxSize.Width - Child.W) / 2, (maxSize.Height - Child.H) / 2);
+            SetLayoutSize(maxSize);
+            Child.SetLayoutLocation((maxSize.Width - Child.W) / 2, (maxSize.Height - Child.H) / 2);
         }
     }
 

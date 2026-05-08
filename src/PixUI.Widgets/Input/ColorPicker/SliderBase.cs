@@ -78,10 +78,9 @@ public abstract class SliderBase : Widget, IMouseRegion
         return (float)(w * ratio);
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var maxSize = CacheAndGetMaxSize(availableWidth, availableHeight);
-        SetSize(maxSize.Width, SLIDER_HEIGHT + H_PADDING * 2);
+        SetLayoutSize(maxSize.Width, SLIDER_HEIGHT + H_PADDING * 2);
     }
 
     protected virtual void DrawBackground(ICanvas canvas)

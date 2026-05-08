@@ -48,11 +48,11 @@ public sealed class Icon : Widget
         Relayout();
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
-        var size = _size?.Value ?? Theme.DefaultFontSize;
-        SetSize(Math.Max(0, Math.Min(availableWidth, size)),
-            Math.Max(0, Math.Min(availableHeight, size)));
+        var size = _size?.Value ?? Theme.DefaultFontSize; //TODO: measure font size
+        SetLayoutSize(Math.Max(0, Math.Min(maxSize.Width, size)),
+            Math.Max(0, Math.Min(maxSize.Height, size)));
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

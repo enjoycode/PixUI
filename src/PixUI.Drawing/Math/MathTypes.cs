@@ -383,7 +383,7 @@ public partial struct Rect
     public Point Location
     {
         readonly get => new Point(Left, Top);
-        set => this = Create(value, Size);
+        set => this = FromLS(value, Size);
     }
 
     public Point Center => new((Left + Right) / 2, (Top + Bottom) / 2);
@@ -508,9 +508,9 @@ public partial struct Rect
 
     public static implicit operator Rect(RectI r) => new Rect(r.Left, r.Top, r.Right, r.Bottom);
 
-    public readonly bool Contains(Point point) => ContainsPoint(point.X, point.Y);
+    public readonly bool Contains(Point point) => Contains(point.X, point.Y);
 
-    public readonly bool ContainsPoint(float x, float y) =>
+    public readonly bool Contains(float x, float y) =>
         x >= Left && x < Right && y >= Top && y < Bottom;
 
     public readonly bool ContainsRect(Rect rect) =>
@@ -538,7 +538,7 @@ public partial struct Rect
 
     public readonly override string ToString() => $"{{X={Left},Y={Top},W={Width},H={Height}}}";
 
-    public static Rect Create(Point location, Size size) =>
+    public static Rect FromLS(Point location, Size size) =>
         FromLTWH(location.X, location.Y, size.Width, size.Height);
 
     public static Rect FromLTWH(float x, float y, float width, float height) =>

@@ -36,7 +36,7 @@ internal sealed class NotificationEntry : SingleChildWidget
     private void OnAnimationValueChanged()
     {
         var offsetX = Overlay!.Window.Width - W * _controller.Value;
-        SetPosition((float)offsetX, Y);
+        SetLayoutLocation((float)offsetX, Y);
         Repaint();
     }
 
@@ -81,7 +81,7 @@ public sealed class Notification : Popup
         var entryHeight = entry.H;
         for (var i = index + 1; i < _children.Count; i++)
         {
-            _children[i].SetPosition(_children[i].X, _children[i].Y - entryHeight);
+            _children[i].SetLayoutLocation(_children[i].X, _children[i].Y - entryHeight);
         }
 
         _children.RemoveAt(index);
@@ -108,7 +108,7 @@ public sealed class Notification : Popup
         return false;
     }
 
-    public override void Layout(float availableWidth, float availableHeight)
+    protected override void OnLayout(Size maxSize)
     {
         //do nothing,加入前已经手动布局过
     }
@@ -150,13 +150,13 @@ public sealed class Notification : Popup
         var entry = new NotificationEntry(iconWidget, textWidget, bgColor);
         entry.Parent = notification;
         //布局并设置位置
-        entry.Layout(float.PositiveInfinity, float.PositiveInfinity);
+        entry.PerformLayout(float.PositiveInfinity, float.PositiveInfinity);
         var childrenCount = notification._children.Count;
         var yPos = childrenCount == 0
             ? _firstOffset
             : notification._children[childrenCount - 1].Y +
               notification._children[childrenCount - 1].H + _sepSpace;
-        entry.SetPosition(win.Width, yPos);
+        entry.SetLayoutLocation(win.Width, yPos);
         notification._children.Add(entry);
 
         entry.StartShow();
