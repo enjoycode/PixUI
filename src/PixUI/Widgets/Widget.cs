@@ -183,10 +183,10 @@ public abstract partial class Widget : IDisposable
     /// </summary>
     protected internal virtual Size LayoutSize => _layoutSize;
 
-    protected internal float X => _layoutLocation.X;
-    protected internal float Y => _layoutLocation.Y;
-    protected internal float W => _layoutSize.Width;
-    protected internal float H => _layoutSize.Height;
+    protected internal float X => LayoutLocation.X;
+    protected internal float Y => LayoutLocation.Y;
+    protected internal float W => LayoutSize.Width;
+    protected internal float H => LayoutSize.Height;
 
     public Rect LayoutBounds => Rect.FromLS(LayoutLocation, LayoutSize);
 
