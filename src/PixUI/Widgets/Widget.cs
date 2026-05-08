@@ -403,6 +403,9 @@ public abstract partial class Widget : IDisposable
     /// <param name="availableSize">上级布局计算后留给当前组件的允许的最大尺寸</param>
     public void PerformLayout(Size availableSize)
     {
+        //TODO: 1.判断availableSize==AvailableSize且HasLayout==true时忽略，Relayout时设置HasLayout=false;
+        //      2.结束时设置HasLayout=true
+
         //缓存可用大小，并根据是否指定宽度高度取指定值与可用值的小值
         _availableSize = new Size(Math.Max(0, availableSize.Width), Math.Max(0, availableSize.Height));
         var maxW = Width == null
