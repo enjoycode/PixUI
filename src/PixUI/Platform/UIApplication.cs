@@ -77,10 +77,10 @@ public abstract class UIApplication
         }
 
         widgetsCanvas.Surface!.Draw(overlayCanvas, 0, 0, null);
-        if (window.ScaleFactor != 1)
+        if (!FloatUtils.NearlyEqual(window.ScaleFactor, 1))
             overlayCanvas.Scale(window.ScaleFactor, window.ScaleFactor);
         window.Overlay.OnPaint(overlayCanvas); //always repaint
-        if (window.ScaleFactor != 1)
+        if (!FloatUtils.NearlyEqual(window.ScaleFactor, 1))
             overlayCanvas.ResetMatrix();
 
         window.HasPostInvalidateEvent = false;

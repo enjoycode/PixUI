@@ -7,10 +7,10 @@ public static class FloatUtils
 {
     internal const float NearlyZero = 1.0f / (1 << 12);
 
-    internal static bool NearlyEqual(float a, float b) =>
+    public static bool NearlyEqual(float a, float b) =>
         Math.Abs(a - b) <= NearlyZero;
 
-    internal static bool NearlyEqual(float a, float b, float tolerance) =>
+    public static bool NearlyEqual(float a, float b, float tolerance) =>
         Math.Abs(a - b) <= tolerance;
 
     public static float Lerp(float a, float b, double t) //TODO: use float.Lerp()

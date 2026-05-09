@@ -248,11 +248,19 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>, I
 
     private async void _OnDocumentChanged(DocumentEventArgs e)
     {
-        //TODO: 顺序或合并
-        var dirtyLines = await Document.SyntaxParser.ParseAndTokenize();
-        //暂全部刷新
-        if (Widget != null!)
-            Widget.RequestInvalidate(true, null /*dirtyLines*/);
+        if (Document.TextLength == 0)
+        {
+            if (Widget != null!)
+                Widget.RequestInvalidate(true, null);
+        }
+        else
+        {
+            //TODO: 顺序或合并
+            var dirtyLines = await Document.SyntaxParser.ParseAndTokenize();
+            //暂全部刷新
+            if (Widget != null!)
+                Widget.RequestInvalidate(true, null /*dirtyLines*/);
+        }
     }
 
     private void _OnFoldingChanged(FoldingChangeEventArgs e)
