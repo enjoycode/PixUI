@@ -179,7 +179,7 @@ public abstract partial class Widget : IDisposable
     protected internal virtual Point LayoutLocation => _layoutLocation;
 
     /// <summary>
-    /// 布局计算后的尺寸
+    /// 布局计算后的可视尺寸,允许覆写以支持动态计算
     /// </summary>
     protected internal virtual Size LayoutSize => _layoutSize;
 

@@ -172,7 +172,7 @@ public sealed class DataGrid<T> : Widget, IDroppable
         var size = new Size(W, H);
         //clip first
         canvas.Save();
-        canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
+        canvas.ClipRect(Rect.FromLTWH(0, 0, W, H));
 
         //TODO: 暂每次计算可见列
         _controller.LayoutVisibleColumns(size);

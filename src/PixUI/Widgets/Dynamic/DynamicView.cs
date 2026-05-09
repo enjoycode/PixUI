@@ -131,7 +131,7 @@ public class DynamicView : SingleChildWidget
         if (!onlyTransform)
         {
             canvas.Save();
-            canvas.ClipRect(Rect.FromLTWH(0, 0, W, H), ClipOp.Intersect, false);
+            canvas.ClipRect(Rect.FromLTWH(0, 0, W, H));
         }
     }
 

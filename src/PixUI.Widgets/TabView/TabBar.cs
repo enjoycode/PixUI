@@ -74,6 +74,19 @@ public sealed class TabBar<T> : Widget, ITabBar
     #endregion
 
     #region ====Widget Overrides====
+    
+    protected internal override Size LayoutSize
+    {
+        get
+        {
+            //重写因为可能TabView的布局空间不够TabBar指定的高度造成的overflow
+            var tabView = Parent;
+            //TODO: 还需要根据TabBar的方向判断处理
+            return tabView == null
+                ? base.LayoutSize
+                : new(base.LayoutSize.Width, Math.Min(tabView.LayoutSize.Height, base.LayoutSize.Height));
+        }
+    }
 
     private Tab BuildTab(T dataItem)
     {
@@ -134,7 +147,7 @@ public sealed class TabBar<T> : Widget, ITabBar
         }
         else
         {
-            SetLayoutSize(maxSize.Width, maxSize.Height);
+            SetLayoutSize(maxSize);
 
             var tabWidth = maxSize.Width / _tabs.Count;
             for (var i = 0; i < _tabs.Count; i++)
@@ -148,7 +161,7 @@ public sealed class TabBar<T> : Widget, ITabBar
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (BgColor != null)
-            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(BgColor.Value));
+            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), Paint.Shared(BgColor.Value));
 
         if (area is RepaintChild repaintChild)
         {
@@ -158,9 +171,7 @@ public sealed class TabBar<T> : Widget, ITabBar
 
         foreach (var tab in _tabs) //TODO: check visible
         {
-            canvas.Translate(tab.X, tab.Y);
-            tab.OnPaint(canvas, area?.ToChild(tab));
-            canvas.Translate(-tab.X, -tab.Y);
+            PaintChild(tab, canvas, area);
         }
 
         //TODO: paint indicator(因为动画移动需要)

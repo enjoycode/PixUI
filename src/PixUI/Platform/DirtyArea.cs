@@ -128,7 +128,7 @@ internal sealed class RepaintChild : IDirtyArea
         //防止重写了具备多个子组件的Paint方法，但忘了处理RepaintChild的情况
         if (!ReferenceEquals(_path[_current], child))
         {
-            Log.Debug($"[{child.Parent!.GetType().Name}]重写了Paint，但未处理RepaintChild");
+            Log.Debug($"[{child.Parent!.GetType().Name}]重写了OnPaint，但未处理RepaintChild");
             return null;
         }
 

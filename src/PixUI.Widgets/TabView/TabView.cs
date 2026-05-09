@@ -74,13 +74,13 @@ public sealed class TabView<T> : Widget
 
     protected override void OnLayout(Size maxSize)
     {
+        SetLayoutSize(maxSize); //set self size first
+
         //TODO:支持上、下、左、右布局
         _tabBar.PerformLayout(maxSize.Width, _tabBarIndent);
         _tabBar.SetLayoutLocation(0, 0);
         _tabBody.PerformLayout(maxSize.Width, maxSize.Height - _tabBar.H);
         _tabBody.SetLayoutLocation(0, _tabBar.H);
-
-        SetLayoutSize(maxSize.Width, maxSize.Height);
     }
 
     #endregion

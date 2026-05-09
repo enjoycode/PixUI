@@ -35,10 +35,23 @@ public sealed class Tab : SingleChildWidget, IMouseRegion
         get
         {
             if (IsSelected.Value)
-                return TabBar.SelectedColor != null && TabBar.SelectedColor.Value.IsOpaque;
+                return TabBar.SelectedColor is { IsOpaque: true };
             if (_isHover)
-                return TabBar.HoverColor != null && TabBar.HoverColor.Value.IsOpaque;
+                return TabBar.HoverColor is { IsOpaque: true };
             return false;
+        }
+    }
+
+    protected internal override Size LayoutSize
+    {
+        get
+        {
+            //重写因为可能TabView的布局空间不够TabBar指定的高度造成的overflow
+            var tabView = Parent?.Parent;
+            //TODO: 还需要根据TabBar的方向判断处理
+            return tabView == null
+                ? base.LayoutSize
+                : new(base.LayoutSize.Width, Math.Min(tabView.LayoutSize.Height, base.LayoutSize.Height));
         }
     }
 
@@ -70,22 +83,20 @@ public sealed class Tab : SingleChildWidget, IMouseRegion
         if (IsSelected.Value)
         {
             if (TabBar.SelectedColor != null)
-                canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(TabBar.SelectedColor.Value));
+                canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), Paint.Shared(TabBar.SelectedColor.Value));
         }
         else if (_isHover)
         {
             if (TabBar.HoverColor != null)
-                canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(TabBar.HoverColor.Value));
+                canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), Paint.Shared(TabBar.HoverColor.Value));
         }
 
         if (Child == null) return;
 
-        canvas.Translate(Child!.X, Child.Y);
-        Child.OnPaint(canvas, area?.ToChild(Child));
-        canvas.Translate(-Child.X, -Child.Y);
+        PaintChild(Child, canvas, area);
 
         //TODO:暂在这里画指示器，待TabBar实现后移除
         if (IsSelected.Value)
-            canvas.DrawRect(Rect.FromLTWH(0, H - 4, W, 4), PixUI.Paint.Shared(Theme.FocusedColor));
+            canvas.DrawRect(Rect.FromLTWH(0, AvailableSize.Height - 4, W, 4), Paint.Shared(Theme.FocusedColor));
     }
 }

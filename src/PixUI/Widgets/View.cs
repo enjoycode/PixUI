@@ -15,7 +15,7 @@ public abstract class View : SingleChildWidget
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (_fillColor != null)
-            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(_fillColor.Value));
+            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), Paint.Shared(_fillColor.Value));
 
         PaintChildren(canvas, area);
     }
