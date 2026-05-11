@@ -39,7 +39,7 @@ public sealed class Form : MultiChildWidget<FormItem>
         get => _labelWidth;
         set
         {
-            if (_labelWidth == value) return;
+            if (_labelWidth.NearlyEqual(value)) return;
             _labelWidth = value;
             Relayout();
         }
@@ -81,17 +81,28 @@ public sealed class Form : MultiChildWidget<FormItem>
 
     #region ====Widget Overrides====
 
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
+    {
+        foreach (var child in Children)
+        {
+            if (!child.IsVisible) continue;
+            if (visitor.Visit(child)) break;
+        }
+    }
+
     protected override void OnLayout(Size maxSize)
     {
         //单列可用宽度
         var columnWidth = (maxSize.Width - (_columns - 1) * _horizontalSpacing
-                                     - _padding.Left - _padding.Right) / _columns;
+                                         - _padding.Left - _padding.Right) / _columns;
 
         var y = _padding.Top;
         var colIndex = 0;
         var rowHeight = 0f; //同一行中的最高的那个子组件
         for (var i = 0; i < _children.Count; i++)
         {
+            if (!_children[i].IsVisible) continue;
+
             var leftHeight = maxSize.Height - y;
             if (leftHeight <= 0) break;
 

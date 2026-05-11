@@ -70,18 +70,16 @@ public sealed class FormItem : Widget
     internal readonly int ColumnSpan;
     //TODO: tooltip property to show some tips
 
-    private Color? _textColor;
-    private float? _fontSize;
     private IParagraph? _cachedLabelParagraph;
     private readonly Widget _child = null!;
     private string _label;
 
     public Color? TextColor
     {
-        get => _textColor;
+        get;
         set
         {
-            _textColor = value;
+            field = value;
             ClearCache();
             Repaint();
         }
@@ -89,18 +87,30 @@ public sealed class FormItem : Widget
 
     public float? FontSize
     {
-        get => _fontSize;
+        get;
         set
         {
-            _fontSize = value;
+            field = value;
             ClearCache();
             Repaint();
         }
     }
 
+    public State<bool>? Visible
+    {
+        get;
+        init => Bind(ref field, value, OnVisibleChanged, true);
+    } = null;
+
     internal void ClearCache() => _cachedLabelParagraph = null;
 
     #region ====Widget Overrides====
+
+    private void OnVisibleChanged(State state)
+    {
+        SetVisibleWithChildren(((State<bool>)state).Value);
+        Parent?.Relayout();
+    }
 
     public override void VisitChildren<TVisitor>(ref TVisitor visitor) => visitor.Visit(Child);
 

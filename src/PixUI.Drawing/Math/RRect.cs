@@ -43,7 +43,7 @@ public struct RRect
     }
 
     #endregion
-    
+
     #region ====MemoryLayout====
 
     private Rect _rect;
@@ -332,8 +332,7 @@ public struct RRect
 
                 for (var i = 0; i < 4; ++i)
                 {
-                    if (!FloatUtils.NearlyEqual(_radius[i].X, _rect.HarfWidth) ||
-                        !FloatUtils.NearlyEqual(_radius[i].Y, _rect.HarfHeight))
+                    if (!_radius[i].X.NearlyEqual(_rect.HarfWidth) || !_radius[i].Y.NearlyEqual(_rect.HarfHeight))
                         return false;
                 }
 
@@ -483,7 +482,7 @@ public struct RRect
     }
 
     #endregion
-    
+
     // public float Width => SkiaApi.sk_rrect_get_width(Handle);
 
     // public float Height => SkiaApi.sk_rrect_get_height(Handle);
@@ -497,10 +496,10 @@ public struct RRect
         var lr = _radius[LowerRightCorner];
         var ll = _radius[LowerLeftCorner];
 
-        return FloatUtils.NearlyEqual(ul.X, ul.Y, tolerance) &&
-               FloatUtils.NearlyEqual(ur.X, ur.Y, tolerance) &&
-               FloatUtils.NearlyEqual(lr.X, lr.Y, tolerance) &&
-               FloatUtils.NearlyEqual(ll.X, ll.Y, tolerance);
+        return ul.X.NearlyEqual(ul.Y, tolerance) &&
+               ur.X.NearlyEqual(ur.Y, tolerance) &&
+               lr.X.NearlyEqual(lr.Y, tolerance) &&
+               ll.X.NearlyEqual(ll.Y, tolerance);
     }
 
     // public void SetOval(Rect rect)

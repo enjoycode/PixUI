@@ -80,7 +80,7 @@ public abstract partial class Widget : IDisposable
     public bool IsVisible
     {
         get => (_flag & InvisibleMask) != InvisibleMask;
-        set => SetFlagValue(!value, InvisibleMask);
+        private set => SetFlagValue(!value, InvisibleMask);
     }
 
     #endregion
