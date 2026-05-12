@@ -16,20 +16,6 @@ public sealed class CellStyle
     /// </summary>
     public Color? FillColor;
 
-    [Obsolete("Use TextColor")]
-    public Color? Color
-    {
-        get => TextColor;
-        set => TextColor = value;
-    }
-
-    [Obsolete("Use FillColor")]
-    public Color? BackgroundColor
-    {
-        get => FillColor;
-        set => FillColor = value;
-    }
-
     public float FontSize = 15;
     public FontWeight FontWeight = FontWeight.Normal;
     public HorizontalAlignment HorizontalAlignment = HorizontalAlignment.Left;
