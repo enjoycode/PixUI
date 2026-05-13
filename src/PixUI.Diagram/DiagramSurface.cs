@@ -2,7 +2,7 @@
 
 public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
 {
-    public DiagramSurface(IDesignService designService)
+    public DiagramSurface(IDiagramService diagramService)
     {
         Adorners = new DesignAdorners(this);
         ToolboxService = new ToolboxService(this);
@@ -17,8 +17,8 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
         FocusNode = new FocusNode();
         FocusNode.KeyDown += OnKeyDown;
 
-        DesignService = designService;
-        DesignService.InitSurface(this);
+        DiagramService = diagramService;
+        DiagramService.InitSurface(this);
     }
 
     #region ====Fields & Properties====
@@ -39,7 +39,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
 
     #region ====Service about properties====
 
-    public IDesignService DesignService { get; }
+    public IDiagramService DiagramService { get; }
 
     public ToolboxService ToolboxService { get; }
 
@@ -110,7 +110,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
             }
             else //处理已选择的对象的移动
             {
-                DesignService.MoveSelection(new Offset(e.DeltaX, e.DeltaY));
+                DiagramService.MoveSelection(new Offset(e.DeltaX, e.DeltaY));
             }
         }
 
@@ -244,19 +244,19 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
         switch (e.KeyCode)
         {
             case Keys.Delete:
-                DesignService.DeleteSelection();
+                DiagramService.DeleteSelection();
                 break;
             case Keys.Up:
-                DesignService.MoveSelection(new Offset(0, -1));
+                DiagramService.MoveSelection(new Offset(0, -1));
                 break;
             case Keys.Down:
-                DesignService.MoveSelection(new Offset(0, 1));
+                DiagramService.MoveSelection(new Offset(0, 1));
                 break;
             case Keys.Left:
-                DesignService.MoveSelection(new Offset(-1, 0));
+                DiagramService.MoveSelection(new Offset(-1, 0));
                 break;
             case Keys.Right:
-                DesignService.MoveSelection(new Offset(1, 0));
+                DiagramService.MoveSelection(new Offset(1, 0));
                 break;
         }
     }

@@ -5,9 +5,9 @@ public sealed class ToolboxService
     private readonly DiagramSurface _surface;
     private DiagramItem? _currentContainer;
 
-    public IDesignToolbox? Toolbox { get; set; }
+    public IDiagramToolbox? Toolbox { get; set; }
 
-    internal IDesignToolboxItem? SelectedItem => Toolbox?.SelectedItem;
+    internal IDiagramToolboxItem? SelectedItem => Toolbox?.SelectedItem;
 
     public ToolboxService(DiagramSurface surface)
     {

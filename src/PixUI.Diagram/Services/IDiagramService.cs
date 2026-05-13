@@ -3,7 +3,7 @@ namespace PixUI.Diagram;
 /// <summary>
 /// 设计时服务
 /// </summary>
-public interface IDesignService
+public interface IDiagramService
 {
     /// <summary>
     /// 初始化设计服务的画布

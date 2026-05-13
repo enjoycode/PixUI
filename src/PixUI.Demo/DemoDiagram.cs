@@ -6,7 +6,7 @@ public sealed class DemoDiagram : View
 {
     public DemoDiagram()
     {
-        var view = new DiagramView(new DesignService());
+        var view = new DiagramView(new DiagramService());
 
         var shape1 = new DiagramShape();
         shape1.Bounds = Rect.FromLTWH(100, 100, 100, 100);
@@ -27,7 +27,7 @@ public sealed class DemoDiagram : View
     }
 }
 
-internal sealed class DesignService : IDesignService
+internal sealed class DiagramService : IDiagramService
 {
     private DiagramSurface _surface = null!;
 

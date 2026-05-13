@@ -1,6 +1,6 @@
 ﻿namespace PixUI.Diagram;
 
-public interface IDesignToolboxItem
+public interface IDiagramToolboxItem
 {
 
     bool IsConnection { get; }
