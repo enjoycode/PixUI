@@ -71,7 +71,7 @@ public sealed class RepaintArea : IDirtyArea
         return new RepaintArea(childRect);
     }
 
-    public void ApplyClip(ICanvas canvas) => canvas.ClipRect(_rect, ClipOp.Intersect, true);
+    public void ApplyClip(ICanvas canvas) => canvas.ClipRect(_rect, ClipOp.Intersect, false /*must false now*/);
 
     public override string ToString() => $"RepaintArea[{_rect}]";
 }
