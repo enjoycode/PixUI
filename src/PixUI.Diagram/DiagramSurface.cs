@@ -290,7 +290,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
 
     #region ====Shape & Connection Methods====
 
-    internal IList<IShape> GetShapes()
+    public IList<IShape> GetShapes()
     {
         var list = new List<IShape>();
         for (int i = 0; i < _items.Count; i++)
@@ -301,7 +301,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
         return list;
     }
 
-    internal IList<IConnection> GetConnections()
+    public IList<IConnection> GetConnections()
     {
         var list = new List<IConnection>();
         for (var i = 0; i < _items.Count; i++)
