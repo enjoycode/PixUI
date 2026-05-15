@@ -22,6 +22,14 @@ public static class CanvasExtensions
         canvas.DrawRect(rect, paint);
     }
 
+    public static void DrawRoundRectangle(this ICanvas canvas, Color color, Rect rect, float rx, float ry,
+        float thickness = 1f)
+    {
+        var paint = Paint.Shared(color, PaintStyle.Stroke, thickness);
+        paint.AntiAlias = true;
+        canvas.DrawRRect(RRect.FromRectAndRadius(rect, rx, ry), paint);
+    }
+
     public static void FillRoundRectangle(this ICanvas canvas, Color color, Rect rect, float rx, float ry)
     {
         var paint = Paint.Shared(color);
