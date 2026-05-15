@@ -9,7 +9,7 @@ public sealed class RoutingService
 
     public RoutingService(DiagramSurface diagram)
     {
-        //this.Router = new GridRouter(diagram);
+        Router = new GridRouter(diagram);
     }
 
     /// <summary>
@@ -18,7 +18,7 @@ public sealed class RoutingService
     /// <param name="connection">The connection which should be routed.</param>
     /// <remarks>The routing works only for the <see cref="ConnectionType.Spline"/> and <see cref="ConnectionType.Polyline"/> types.</remarks>
     /// <returns>A list of intermediate points defining the route and the start and end connectors.</returns>
-    public ConnectionRoute FindExtendedRoute(IConnection connection)
+    public ConnectionRoute FindExtendedRoute(IConnection? connection)
     {
         var result = new ConnectionRoute();
         if (connection == null) return result;
@@ -40,6 +40,7 @@ public sealed class RoutingService
             //else if (router != null)
             result = new ConnectionRoute(router.GetRoutePoints(connection, false));
         }
+
         return result;
     }
 }

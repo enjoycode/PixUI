@@ -3,7 +3,7 @@
 /// <summary>
 /// Routing based on the A* algorithm.
 /// </summary>
-internal sealed class GridRouter : RoutingBase
+public sealed class GridRouter : RoutingBase
 {
 
     /// <summary>

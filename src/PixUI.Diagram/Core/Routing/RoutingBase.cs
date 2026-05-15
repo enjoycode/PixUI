@@ -1,6 +1,6 @@
 ﻿namespace PixUI.Diagram;
 
-internal abstract class RoutingBase : IRouter
+public abstract class RoutingBase : IRouter
 {
     private readonly DiagramSurface _diagram;
 
@@ -193,11 +193,10 @@ internal abstract class RoutingBase : IRouter
     /// <param name="center">The center of the shape.</param>
     /// <param name="intermediatePoint">The intermediate point.</param>
     /// <returns></returns>
-    private static Point GetNearestGridPoint(Point p, string connectorName, Point center,
-        ref Point intermediatePoint)
+    private static Point GetNearestGridPoint(Point p, string connectorName, Point center, ref Point intermediatePoint)
     {
         float x, y;
-        const float Margin = 10f;
+        const float margin = 10f;
         switch (connectorName)
         {
             case ConnectorPosition.Auto:
@@ -206,20 +205,20 @@ internal abstract class RoutingBase : IRouter
                 break;
             case ConnectorPosition.Left:
                 x = (float)(Math.Floor(p.X / DiagramConstants.RoutingGridSize) * DiagramConstants.RoutingGridSize);
-                if (Math.Abs(x - p.X) <= Margin) x -= DiagramConstants.RoutingGridSize;
+                if (Math.Abs(x - p.X) <= margin) x -= DiagramConstants.RoutingGridSize;
                 y = (float)(Math.Floor(p.Y / DiagramConstants.RoutingGridSize) * DiagramConstants.RoutingGridSize);
                 intermediatePoint = new Point(x, p.Y);
                 break;
             case ConnectorPosition.Top:
                 x = (float)(Math.Floor(p.X / DiagramConstants.RoutingGridSize) * DiagramConstants.RoutingGridSize);
                 y = (float)(Math.Floor(p.Y / DiagramConstants.RoutingGridSize) * DiagramConstants.RoutingGridSize);
-                if (Math.Abs(y - p.Y) <= Margin) y -= DiagramConstants.RoutingGridSize;
+                if (Math.Abs(y - p.Y) <= margin) y -= DiagramConstants.RoutingGridSize;
                 intermediatePoint = new Point(p.X, y);
                 break;
             case ConnectorPosition.Right:
                 x = (float)(Math.Ceiling(p.X / DiagramConstants.RoutingGridSize) *
                             DiagramConstants.RoutingGridSize);
-                if (Math.Abs(x - p.X) <= Margin) x += DiagramConstants.RoutingGridSize;
+                if (Math.Abs(x - p.X) <= margin) x += DiagramConstants.RoutingGridSize;
                 y = (float)(Math.Floor(p.Y / DiagramConstants.RoutingGridSize) * DiagramConstants.RoutingGridSize);
                 intermediatePoint = new Point(x, p.Y);
                 break;
@@ -227,7 +226,7 @@ internal abstract class RoutingBase : IRouter
                 x = (float)(Math.Floor(p.X / DiagramConstants.RoutingGridSize) * DiagramConstants.RoutingGridSize);
                 y = (float)(Math.Ceiling(p.Y / DiagramConstants.RoutingGridSize) *
                             DiagramConstants.RoutingGridSize);
-                if (Math.Abs(y - p.Y) <= Margin) y += DiagramConstants.RoutingGridSize;
+                if (Math.Abs(y - p.Y) <= margin) y += DiagramConstants.RoutingGridSize;
                 intermediatePoint = new Point(p.X, y);
                 break;
 
