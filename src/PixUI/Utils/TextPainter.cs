@@ -3,7 +3,8 @@ namespace PixUI;
 public static class TextPainter
 {
     public static IParagraph BuildParagraph(string text, float width, float fontSize, in Color color,
-        FontStyle? fontStyle = null, int maxLines = 1, bool forceHeight = false)
+        FontStyle? fontStyle = null, int maxLines = 1, bool forceHeight = false,
+        TextAlign textAlign = TextAlign.Left)
     {
         using var ts = TextStyle.Create();
         ts.Color = color;
@@ -14,6 +15,7 @@ public static class TextPainter
         using var ps = ParagraphStyle.Create();
         ps.MaxLines = (uint)maxLines;
         ps.TextStyle = ts;
+        ps.TextAlign = textAlign;
         if (forceHeight)
         {
             ts.Height = 1;
