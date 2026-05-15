@@ -5,7 +5,7 @@ namespace PixUI.Diagram;
 /// <summary>
 /// Router used for the TreeDown, TreeLeft, TreeRight, TreeUp and TipOverTree LayoutTypes.
 /// </summary>
-internal class OrgTreeRouter : IRouter
+public class OrgTreeRouter : IRouter
 {
     // Pool of routers.
     private static readonly Dictionary<TreeLayoutType, TreeRouterBase> Routers;

@@ -3,7 +3,7 @@
 /// <summary>
 /// The different layout algorithms supported.
 /// </summary>
-internal enum TreeLayoutType
+public enum TreeLayoutType
 {
     /// <summary>
     /// The standard mind mapping layout.

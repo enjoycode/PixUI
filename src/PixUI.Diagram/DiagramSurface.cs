@@ -45,7 +45,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
 
     public SelectionService SelectionService { get; }
 
-    public RoutingService? RoutingService { get; }
+    public RoutingService RoutingService { get; }
 
     #endregion
 
