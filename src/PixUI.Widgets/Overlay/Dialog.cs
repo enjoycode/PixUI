@@ -139,6 +139,42 @@ public abstract class Dialog : Popup
     }
 
     /// <summary>
+    /// 显示简单文本输入框的对话框
+    /// </summary>
+    public static Task<DialogResult> ShowTextInputAsync(string title, State<string> value, Size? size = null)
+    {
+        return ShowAsync(title,
+            _ => new Center()
+            {
+                Child = new Row()
+                {
+                    Children =
+                    [
+                        new Icon(MaterialIcons.Help) { Size = 25, Color = Colors.Red },
+                        new TextInput(value),
+                    ]
+                }
+            },
+            dlg => new Container
+            {
+                Height = Button.DefaultHeight + 20 + 20,
+                Padding = EdgeInsets.All(20),
+                Child = new Row(VerticalAlignment.Middle, 20)
+                {
+                    Children =
+                    {
+                        new Expanded(),
+                        new Button(nameof(DialogResult.Cancel))
+                            { Width = 80, OnTap = _ => dlg.Close(DialogResult.Cancel) },
+                        new Button(nameof(DialogResult.OK)) { Width = 80, OnTap = _ => dlg.Close(DialogResult.OK) }
+                    }
+                }
+            },
+            size ?? new(280, 180)
+        );
+    }
+
+    /// <summary>
     /// 显示不等待关闭
     /// </summary>
     public void Show()
