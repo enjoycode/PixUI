@@ -4,15 +4,16 @@ namespace PixUI.CodeEditor;
 
 internal sealed class CompletionItemWidget : Widget
 {
-    public CompletionItemWidget(ICompletionItem item, State<bool> isSelected)
+    public CompletionItemWidget(ICompletionItem item /*, State<bool> isSelected*/)
     {
         _item = item;
-        _isSelected = isSelected;
+        // _isSelected = isSelected;
         _iconPainter = new IconPainter(() => Repaint());
     }
 
     private readonly ICompletionItem _item;
-    private readonly State<bool> _isSelected;
+
+    // private readonly State<bool> _isSelected;
     private readonly IconPainter _iconPainter;
     private IParagraph? _paragraph; //TODO: use TextPainter
 

@@ -114,9 +114,9 @@ public abstract class SelectBase<T> : InputBase<Widget>
 
         var optionBuilder =
             _optionBuilder ??
-            ((data, _, _, isSelected) =>
+            ((data, index, selected) =>
             {
-                var color = RxComputed<Color>.Make(isSelected, v => v ? Colors.White : Colors.Black);
+                var color = selected.ToComputed(i => i == index ? Colors.White : Colors.Black);
                 return new Text(_labelGetter != null ? _labelGetter(data) : data?.ToString() ?? "")
                     { TextColor = color };
             });

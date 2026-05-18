@@ -4,19 +4,7 @@ using System.Linq;
 
 namespace PixUI;
 
-public delegate Widget ListPopupItemBuilder<in T>(T data, int index, State<bool> isHover, State<bool> isSelected);
-
-internal readonly struct ItemState
-{
-    internal readonly State<bool> HoverState;
-    internal readonly State<bool> SelectedState;
-
-    public ItemState(State<bool> hoverState, State<bool> selectedState)
-    {
-        HoverState = hoverState;
-        SelectedState = selectedState;
-    }
-}
+public delegate Widget ListPopupItemBuilder<in T>(T data, int index, State<int> selectState);
 
 /// <summary>
 /// 列表弹窗，可通过键盘或鼠标选择指定项，并且支持条件过滤
@@ -36,6 +24,8 @@ public class ListPopup<T> : Popup
             Child = new ListView<T>(BuildItem, null, _listViewController)
         };
         _child.Parent = this;
+
+        _selectState.AddListener(OnSelectChanged);
     }
 
     private readonly ListViewController<T> _listViewController;
@@ -43,9 +33,9 @@ public class ListPopup<T> : Popup
     private readonly Card _child;
     private readonly int _maxShowItems; //最多可显示多少个
     private readonly float _itemExtent;
-    private ItemState[]? _itemStates;
 
-    private int _selectedIndex = -1;
+    private readonly State<int> _selectState = -1;
+    private bool _selectByTap = true;
     private IList<T>? _fullDataSource;
 
     public IList<T>? DataSource
@@ -62,27 +52,16 @@ public class ListPopup<T> : Popup
 
     private void ChangeDataSource(IList<T>? value)
     {
-        if (value != null)
-        {
-            _itemStates = new ItemState[value.Count];
-            for (var i = 0; i < value.Count; i++)
-            {
-                _itemStates[i] = new ItemState(false, false);
-            }
-        }
-
-        _selectedIndex = -1; //reset it
+        _selectState.Value = -1; //reset it
         _listViewController.DataSource = value;
     }
 
     private Widget BuildItem(T data, int index)
     {
-        var states = _itemStates![index];
-
-        return new SelectableItem(index, states.HoverState, states.SelectedState, OnSelectByTap)
+        return new SelectableItem(index, _selectState)
         {
             Width = _child.Width, Height = _itemExtent,
-            Child = _itemBuilder(data, index, states.HoverState, states.SelectedState)
+            Child = _itemBuilder(data, index, _selectState)
         };
     }
 
@@ -90,7 +69,9 @@ public class ListPopup<T> : Popup
     {
         if (_listViewController.DataSource != null && _listViewController.DataSource.Count > 0)
         {
-            Select(0, false);
+            _selectByTap = false;
+            _selectState.Value = 0;
+            _selectByTap = true;
             _listViewController.ScrollController.OffsetY = 0;
         }
     }
@@ -98,32 +79,7 @@ public class ListPopup<T> : Popup
     /// <summary>
     /// 用于显示前初始化选择的项
     /// </summary>
-    public void InitSelect(T item)
-    {
-        var index = _listViewController.DataSource!.IndexOf(item);
-        if (index < 0) return;
-
-        _selectedIndex = index;
-        _itemStates![_selectedIndex].SelectedState.Value = true;
-    }
-
-    private void Select(int index, bool raiseChangedEvent = false)
-    {
-        if (_selectedIndex == index) return;
-
-        if (_selectedIndex >= 0)
-            _itemStates![_selectedIndex].SelectedState.Value = false;
-
-        _selectedIndex = index;
-
-        if (_selectedIndex >= 0)
-            _itemStates![_selectedIndex].SelectedState.Value = true;
-
-        if (raiseChangedEvent)
-            OnSelectionChanged?.Invoke(DataSource![index]);
-
-        Repaint(); //force repaint
-    }
+    public void InitSelect(T item) => _selectState.Value = _listViewController.DataSource!.IndexOf(item);
 
     public void UpdateFilter(Predicate<T> predicate)
     {
@@ -140,31 +96,38 @@ public class ListPopup<T> : Popup
 
     #region ====EventHandlers====
 
-    private void OnSelectByTap(int index)
+    private void OnSelectChanged(State state)
     {
-        Select(index, true);
-        Hide();
+        if (_selectByTap && _selectState.Value >= 0)
+        {
+            OnSelectionChanged?.Invoke(DataSource![_selectState.Value]);
+            Hide();
+        }
     }
 
     private void OnKeysUp()
     {
-        if (_selectedIndex <= 0) return;
-        Select(_selectedIndex - 1, false);
-        _listViewController.ScrollTo(_selectedIndex);
+        if (_selectState.Value <= 0) return;
+        _selectByTap = false;
+        _selectState.Value -= 1;
+        _selectByTap = true;
+        _listViewController.ScrollTo(_selectState.Value);
     }
 
     private void OnKeysDown()
     {
-        if (_selectedIndex == DataSource!.Count - 1) return;
-        Select(_selectedIndex + 1, false);
-        _listViewController.ScrollTo(_selectedIndex);
+        if (_selectState.Value == DataSource!.Count - 1) return;
+        _selectByTap = false;
+        _selectState.Value += 1;
+        _selectByTap = true;
+        _listViewController.ScrollTo(_selectState.Value);
     }
 
     private void OnKeysReturn()
     {
-        if (_selectedIndex >= 0)
+        if (_selectState.Value >= 0)
         {
-            OnSelectionChanged?.Invoke(DataSource![_selectedIndex]);
+            OnSelectionChanged?.Invoke(DataSource![_selectState.Value]);
             Hide();
         }
     }
@@ -174,7 +137,7 @@ public class ListPopup<T> : Popup
     #region ====Overrides====
 
     public override void VisitChildren<TVisitor>(ref TVisitor visitor) => visitor.Visit(_child);
-    
+
     protected override void OnLayout(Size maxSize)
     {
         if (DataSource == null) return;

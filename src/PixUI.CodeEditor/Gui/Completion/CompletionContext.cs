@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PixUI;
 
 namespace PixUI.CodeEditor;
 
@@ -122,7 +121,7 @@ internal sealed class CompletionContext
         if (_completionWindow == null)
         {
             _completionWindow = new ListPopup<ICompletionItem>(_controller.Widget.Overlay!,
-                static (item, _, _, isSelected) => new CompletionItemWidget(item, isSelected),
+                static (item, _, _) => new CompletionItemWidget(item /*, isSelected*/),
                 250, 18, 8);
             _completionWindow.OnSelectionChanged = OnCompletionDone;
         }

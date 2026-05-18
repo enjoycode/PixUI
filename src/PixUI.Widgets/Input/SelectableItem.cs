@@ -1,26 +1,49 @@
-using System;
-
 namespace PixUI;
 
 /// <summary>
-/// 可点击选择的组件
+/// 可点击选择的列表项组件
 /// </summary>
 public sealed class SelectableItem : SingleChildWidget, IMouseRegion
 {
-    private readonly State<bool> _hoverState;
-    private readonly State<bool> _selectedState;
-
-    public SelectableItem(int index, State<bool> hoverState, State<bool> selectedState, Action<int> onSelect)
+    public SelectableItem(int index, State<int> selectState)
     {
-        Bind(ref _hoverState!, hoverState, RepaintOnStateChanged);
-        _selectedState = selectedState;
+        _index = index;
+        _selectState = selectState;
+        _selectState.AddListener(OnSelectChanged);
+        _isSelected = _selectState.Value == _index;
 
         MouseRegion = new MouseRegion(() => Cursors.Hand);
-        MouseRegion.HoverChanged += isHover => hoverState.Value = isHover;
-        MouseRegion.PointerTap += _ => onSelect(index);
+        MouseRegion.HoverChanged += OnHoverChanged;
+        MouseRegion.PointerTap += _ => selectState.Value = _index;
     }
 
-    public MouseRegion MouseRegion { get; private set; }
+    private readonly State<int> _selectState;
+    private readonly int _index;
+    private bool _isHover;
+    private bool _isSelected;
+
+    public MouseRegion MouseRegion { get; }
+
+    private void OnHoverChanged(bool isHover)
+    {
+        _isHover = isHover;
+        Repaint();
+    }
+
+    private void OnSelectChanged(State state)
+    {
+        if (_isSelected)
+        {
+            _isSelected = false;
+            Repaint();
+        }
+
+        if (_selectState.Value == _index)
+        {
+            _isSelected = true;
+            Repaint();
+        }
+    }
 
     protected override void OnLayout(Size maxSize)
     {
@@ -38,10 +61,10 @@ public sealed class SelectableItem : SingleChildWidget, IMouseRegion
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         //TODO: 根据样式属性绘制选择状态及Hover状态
-        if (_selectedState.Value)
-            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(Theme.FocusedColor));
-        else if (_hoverState.Value)
-            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), PixUI.Paint.Shared(Theme.AccentColor));
+        if (_isSelected)
+            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), Paint.Shared(Theme.FocusedColor));
+        else if (_isHover)
+            canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), Paint.Shared(Theme.AccentColor));
 
         base.OnPaint(canvas, area);
     }

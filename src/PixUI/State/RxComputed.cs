@@ -7,21 +7,14 @@ namespace PixUI;
 /// </summary>
 public sealed class RxComputed<T> : State<T>
 {
-    private RxComputed(Func<T> getter, Action<T>? setter /*, Func<bool>? notifier = null*/)
+    private RxComputed(Func<T> getter, Action<T>? setter)
     {
         _getter = getter;
         _setter = setter;
-        // _notifier = notifier;
     }
 
     private readonly Func<T> _getter;
-
     private readonly Action<T>? _setter;
-
-    // /// <summary>
-    // /// 是否允许在源变更时通知自身变更的委托
-    // /// </summary>
-    // private readonly Func<bool>? _notifier;
 
     public static RxComputed<string> MakeAsString<R>(State<R> s,
         Func<R, string>? formatter = null, Func<string, R>? parser = null)
@@ -34,10 +27,9 @@ public sealed class RxComputed<T> : State<T>
         return computed;
     }
 
-    public static RxComputed<R> Make<TS, R>(State<TS> source, Func<TS, R> getter,
-        Action<R>? setter = null /*, Func<bool>? notifier = null*/)
+    public static RxComputed<R> Make<TS, R>(State<TS> source, Func<TS, R> getter, Action<R>? setter = null)
     {
-        var computed = new RxComputed<R>(() => getter(source.Value), setter /*, notifier*/);
+        var computed = new RxComputed<R>(() => getter(source.Value), setter);
         source.AddListener(computed.OnStateChanged);
         return computed;
     }
@@ -50,9 +42,9 @@ public sealed class RxComputed<T> : State<T>
     }
 
     public static RxComputed<R> Make<T1, T2, R>(State<T1> s1, State<T2> s2,
-        Func<T1, T2, R> getter, Action<R>? setter = null /*, Func<bool>? notifier = null*/)
+        Func<T1, T2, R> getter, Action<R>? setter = null)
     {
-        var computed = new RxComputed<R>(() => getter(s1.Value, s2.Value), setter /*, notifier*/);
+        var computed = new RxComputed<R>(() => getter(s1.Value, s2.Value), setter);
         s1.AddListener(computed.OnStateChanged);
         s2.AddListener(computed.OnStateChanged);
         return computed;
@@ -80,7 +72,7 @@ public sealed class RxComputed<T> : State<T>
 
     private void OnStateChanged(State state)
     {
-        // if (_notifier == null || _notifier.Invoke())
+        //考虑加入旧值变量，判断旧值与新值是否变更再通知
         NotifyValueChanged();
     }
 }

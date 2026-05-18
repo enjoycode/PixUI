@@ -205,11 +205,9 @@ public sealed class DemoPage : View
         _lastName.Value = person == null ? "" : person.Name;
     }
 
-    private Widget BuildPopupItem(Person person, int index, State<bool> isHover,
-        State<bool> isSelected)
+    private Widget BuildPopupItem(Person person, int index, State<int> isSelected)
     {
-        var color = RxComputed<Color>.Make(isSelected,
-            v => v ? Colors.White : Colors.Black);
+        var color = isSelected.ToComputed(i => i == index ? Colors.White : Colors.Black);
         return new Text(person.Name) { TextColor = color };
     }
 
