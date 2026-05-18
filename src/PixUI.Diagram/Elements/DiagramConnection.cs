@@ -52,9 +52,11 @@ public class DiagramConnection : DiagramItem, IConnection
             if (_cachedLayout == null)
             {
                 using var ps = ParagraphStyle.Create();
+                ps.Height = 1;
                 using var pb = ParagraphBuilder.Create(ps);
                 using var ts = TextStyle.Create(); //TODO: fix font
                 ts.Color = ForeColor;
+                ts.Height = 1;
                 pb.PushStyle(ts);
                 pb.AddText(Title);
                 _cachedLayout = pb.Build();
@@ -1385,7 +1387,7 @@ public class DiagramConnection : DiagramItem, IConnection
         var size = CachedTextSize;
         var rect = Rect.FromLTWH(_editingPoint.X + 0.5f, _editingPoint.Y + 1f, size.Width, size.Height);
         canvas.FillRoundRectangle(Colors.White, rect, 2, 2);
-        canvas.DrawParagraph(CachedLayout!, _editingPoint.X, _editingPoint.Y);
+        canvas.DrawParagraph(CachedLayout!, _editingPoint.X, _editingPoint.Y + CachedLayout!.Height / 2);
     }
 
     #endregion
