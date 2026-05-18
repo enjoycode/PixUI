@@ -55,7 +55,7 @@ internal sealed class BindPropertyStateDialog : Dialog
         };
     }
 
-    protected override ValueTask<bool> OnClosing(string result)
+    protected override ValueTask<bool> OnClosing(DialogResult result)
     {
         if (result == DialogResult.OK)
         {

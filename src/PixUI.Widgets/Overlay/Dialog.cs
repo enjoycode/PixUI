@@ -13,7 +13,7 @@ public abstract class Dialog : Popup
     private Card? _child;
     private Widget? _body;
     protected readonly State<string> Title = "";
-    private TaskCompletionSource<string>? _closeDone;
+    private TaskCompletionSource<DialogResult>? _closeDone;
 
     protected sealed override bool IsDialog => true;
 
@@ -77,8 +77,8 @@ public abstract class Dialog : Popup
                 Children =
                 {
                     new Expanded(),
-                    new Button(DialogResult.Cancel) { Width = 80, OnTap = _ => Close(DialogResult.Cancel) },
-                    new Button(DialogResult.OK) { Width = 80, OnTap = _ => Close(DialogResult.OK) }
+                    new Button(nameof(DialogResult.Cancel)) { Width = 80, OnTap = _ => Close(DialogResult.Cancel) },
+                    new Button(nameof(DialogResult.OK)) { Width = 80, OnTap = _ => Close(DialogResult.OK) }
                 }
             }
         };
@@ -96,7 +96,7 @@ public abstract class Dialog : Popup
         return dlg;
     }
 
-    public static Task<string> ShowAsync(string title, Func<Dialog, Widget> bodyBuilder,
+    public static Task<DialogResult> ShowAsync(string title, Func<Dialog, Widget> bodyBuilder,
         Func<Dialog, Widget>? footerBuilder = null, Size? size = null)
     {
         var dlg = new WrapDialog(title, bodyBuilder, footerBuilder, size);
@@ -106,7 +106,7 @@ public abstract class Dialog : Popup
     /// <summary>
     /// 显示确认操作的对话框
     /// </summary>
-    public static Task<string> ShowConfirmAsync(string title, string message, Size? size = null)
+    public static Task<DialogResult> ShowConfirmAsync(string title, string message, Size? size = null)
     {
         return ShowAsync(title,
             _ => new Center()
@@ -129,8 +129,8 @@ public abstract class Dialog : Popup
                     Children =
                     {
                         new Expanded(),
-                        new Button(DialogResult.No) { Width = 80, OnTap = _ => dlg.Close(DialogResult.No) },
-                        new Button(DialogResult.Yes) { Width = 80, OnTap = _ => dlg.Close(DialogResult.Yes) }
+                        new Button(nameof(DialogResult.No)) { Width = 80, OnTap = _ => dlg.Close(DialogResult.No) },
+                        new Button(nameof(DialogResult.Yes)) { Width = 80, OnTap = _ => dlg.Close(DialogResult.Yes) }
                     }
                 }
             },
@@ -156,10 +156,10 @@ public abstract class Dialog : Popup
     /// <summary>
     /// 显示并等待关闭
     /// </summary>
-    public Task<string> ShowAsync()
+    public Task<DialogResult> ShowAsync()
     {
         Show();
-        _closeDone = new TaskCompletionSource<string>();
+        _closeDone = new TaskCompletionSource<DialogResult>();
         return _closeDone.Task;
     }
 
@@ -167,9 +167,9 @@ public abstract class Dialog : Popup
     /// 关闭前处理
     /// </summary>
     /// <returns>true=abort close</returns>
-    protected virtual ValueTask<bool> OnClosing(string result) => new(false);
+    protected virtual ValueTask<bool> OnClosing(DialogResult result) => new(false);
 
-    public async void Close(string result)
+    public async void Close(DialogResult result)
     {
         if (await OnClosing(result)) return; //aborted
         Hide();
