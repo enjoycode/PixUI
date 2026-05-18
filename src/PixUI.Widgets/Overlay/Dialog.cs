@@ -11,6 +11,7 @@ public abstract class Dialog : Popup
     }
 
     private Card? _child;
+    private Widget? _body;
     protected readonly State<string> Title = "";
     private TaskCompletionSource<string>? _closeDone;
 
@@ -22,6 +23,7 @@ public abstract class Dialog : Popup
     {
         if (_child != null) return;
 
+        _body = BuildBody();
         _child = new Card
         {
             Elevation = 20,
@@ -30,7 +32,7 @@ public abstract class Dialog : Popup
                 Children =
                 {
                     BuildTitle(),
-                    new Expanded(BuildBody()),
+                    new Expanded(_body),
                     BuildFooter()
                 }
             }
@@ -140,7 +142,16 @@ public abstract class Dialog : Popup
     /// 显示不等待关闭
     /// </summary>
     public void Show()
-        => base.Show(null, null, DialogTransitionBuilder);
+    {
+        base.Show(null, null, DialogTransitionBuilder);
+
+        if (_body != null)
+        {
+            var focusable = FocusManager.FindFocusableForward(_body, null);
+            if (focusable != null && Overlay != null)
+                FocusManager.Focus(focusable, Overlay.Window);
+        }
+    }
 
     /// <summary>
     /// 显示并等待关闭
@@ -149,7 +160,6 @@ public abstract class Dialog : Popup
     {
         Show();
         _closeDone = new TaskCompletionSource<string>();
-        // @ts-ignore
         return _closeDone.Task;
     }
 

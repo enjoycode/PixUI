@@ -19,15 +19,16 @@ public sealed class FocusManager
 
         if (FocusedWidget != null)
         {
-            ((IFocusable)FocusedWidget).FocusNode.RaiseFocusChanged(
-                new FocusChangedEvent(false, oldFocused, widget, window));
+            var eventArg = new FocusChangedEvent(false, oldFocused, widget, window);
+            ((IFocusable)FocusedWidget).FocusNode.RaiseFocusChanged(eventArg);
             FocusedWidget = null;
         }
 
         if (widget is IFocusable focusable)
         {
             FocusedWidget = widget;
-            focusable.FocusNode.RaiseFocusChanged(new FocusChangedEvent(true, oldFocused, widget, window));
+            var eventArg = new FocusChangedEvent(true, oldFocused, widget, window);
+            focusable.FocusNode.RaiseFocusChanged(eventArg);
         }
     }
 
@@ -116,7 +117,7 @@ public sealed class FocusManager
         }
     }
 
-    private static Widget? FindFocusableForward(Widget container, Widget? start)
+    internal static Widget? FindFocusableForward(Widget container, Widget? start)
     {
         //start == null 表示向下
         while (true)
