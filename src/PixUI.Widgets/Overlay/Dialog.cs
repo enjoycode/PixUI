@@ -141,16 +141,18 @@ public abstract class Dialog : Popup
     /// <summary>
     /// 显示简单文本输入框的对话框
     /// </summary>
-    public static Task<DialogResult> ShowTextInputAsync(string title, State<string> value, Size? size = null)
+    public static Task<DialogResult> ShowTextInputAsync(string title, string label, State<string> value,
+        Size? size = null)
     {
         return ShowAsync(title,
-            _ => new Center()
+            _ => new Container()
             {
+                Padding = EdgeInsets.Only(20, 20, 20, 0),
                 Child = new Row()
                 {
                     Children =
                     [
-                        new Icon(MaterialIcons.Help) { Size = 25, Color = Colors.Red },
+                        new Text(label),
                         new TextInput(value),
                     ]
                 }
