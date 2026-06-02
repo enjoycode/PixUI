@@ -7,7 +7,7 @@ namespace PixUI.CodeEditor;
 public sealed class CodeEditorController : WidgetController<CodeEditorWidget>, IDisposable
 {
     public CodeEditorController(string fileName, ITextBuffer textBuffer, ISyntaxParser syntaxParser,
-        ICompletionProvider? completionProvider = null, string? tag = null)
+        ICompletionProvider? completionProvider = null, object? tag = null)
     {
         _editActions = MakeShortcuts();
         Theme = new TextEditorTheme();

@@ -4,7 +4,7 @@ namespace PixUI.CodeEditor;
 
 public sealed class Document : IDisposable
 {
-    public Document(string fileName, ITextBuffer textBuffer, ISyntaxParser syntaxParser, string? tag = null)
+    public Document(string fileName, ITextBuffer textBuffer, ISyntaxParser syntaxParser, object? tag = null)
     {
         _fileName = fileName;
         Tag = tag;
@@ -27,7 +27,7 @@ public sealed class Document : IDisposable
     #region ====Fields & Properties====
 
     private string _fileName;
-    public readonly string? Tag;
+    public readonly object? Tag;
     public readonly ITextBuffer TextBuffer;
     public readonly ISyntaxParser SyntaxParser;
     private readonly LineManager _lineManager;
