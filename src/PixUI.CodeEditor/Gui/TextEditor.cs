@@ -23,7 +23,7 @@ public sealed class TextEditor
         //TODO: Caret position changed to matching bracket
     }
 
-    internal readonly CodeEditorController Controller;
+    public readonly CodeEditorController Controller;
     public readonly Caret Caret;
     internal readonly SelectionManager SelectionManager;
 
