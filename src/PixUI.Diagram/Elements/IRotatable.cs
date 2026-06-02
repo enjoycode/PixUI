@@ -5,10 +5,10 @@ namespace PixUI.Diagram;
 /// </summary>
 public interface IRotatable
 {
-    // /// <summary>
-    // /// Gets the actual bounds.
-    // /// </summary>
-    // Rect ActualBounds { get; }
+    /// <summary>
+    /// Gets the actual bounds.
+    /// </summary>
+    Rect ActualBounds { get; }
 
     /// <summary>
     /// Gets or sets the rotation angle.

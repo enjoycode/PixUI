@@ -5,7 +5,7 @@ namespace PixUI;
 
 public static class FloatUtils
 {
-    internal const float NearlyZero = 1.0f / (1 << 12);
+    public const float NearlyZero = 1.0f / (1 << 12);
 
     public static bool NearlyEqual(this float a, float b) => Math.Abs(a - b) <= NearlyZero;
 

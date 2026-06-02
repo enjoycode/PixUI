@@ -34,4 +34,9 @@ public static class DiagramConstants
     /// Gets or sets the radius of the connection bridge or gap.
     /// </summary>
     public static float CrossingRadius { get; set; } = 5f;
+
+    /// <summary>
+    /// The value around the shapes, which the router inflates the shapes with if implemented.
+    /// </summary>
+    public static float RouterInflationValue { get; set; } = 20f;
 }

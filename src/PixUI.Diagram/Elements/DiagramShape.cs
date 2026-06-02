@@ -19,6 +19,8 @@ public class DiagramShape : DiagramItem, IShape
         set => SetBounds(value.X, value.Y, value.Width, value.Height, BoundsSpecified.All);
     }
 
+    public Rect ActualBounds => Bounds; //TODO:
+
     /// <summary>
     /// Gets or sets the style of outline the gliding connection should follow.
     /// </summary>

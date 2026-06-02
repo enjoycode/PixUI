@@ -48,6 +48,17 @@ public interface IConnection : IDiagramItem
     ConnectionType ConnectionType { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the default Bezier handles have been altered or an intermediate point have been added/removed.
+    /// </summary>
+    /// <remarks>
+    /// This property is set to <c>true</c> as soon as one of the Bezier handles has been manually modified
+    /// or the intermediate points have changed. 
+    /// If this property is <c>true</c> the connection routing and the automatic bezier handles are halted.
+    /// You re-enable this functionality by re-setting this property to <c>false</c>.
+    /// </remarks>
+    bool IsModified { get; set; }
+
+    /// <summary>
     /// Attaches the connection to specific source and target.
     /// </summary>
     /// <param name="source">The source connector to attach to.</param>

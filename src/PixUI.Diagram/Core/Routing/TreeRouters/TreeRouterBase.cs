@@ -3,7 +3,6 @@
 /// <summary>
 /// Base class for the Connection Routers.
 /// </summary>
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
 internal abstract class TreeRouterBase
 {
     /// <summary>
@@ -36,19 +35,17 @@ internal abstract class TreeRouterBase
     {
         Connection = connection;
         ConnectionSpacing = connectionSpacing;
-        SourceInflatedRect = Rect.Inflate(Connection.Source.Bounds, connectionSpacing, connectionSpacing);
-        TargetInflatedRect = Rect.Inflate(Connection.Target.Bounds, connectionSpacing, connectionSpacing);
+        SourceInflatedRect = Rect.Inflate(Connection.Source!.Bounds, connectionSpacing, connectionSpacing);
+        TargetInflatedRect = Rect.Inflate(Connection.Target!.Bounds, connectionSpacing, connectionSpacing);
 
-        bool areRectsIntersected = SourceInflatedRect.IntersectsWith(TargetInflatedRect);
+        var areRectsIntersected = SourceInflatedRect.IntersectsWith(TargetInflatedRect);
         if (areRectsIntersected)
         {
             SetConnectorsWhenShapesOverlap();
             return GetUnionRectangleRoutePoints();
         }
-        else
-        {
-            SetSourceAndTargetConnectors();
-        }
+
+        SetSourceAndTargetConnectors();
 
         return GetRoutePoints();
     }
@@ -85,20 +82,23 @@ internal abstract class TreeRouterBase
     /// </summary>
     protected void SetConnectorsWhenShapesOverlap()
     {
-        IShape source = Connection.Source;
-        IShape target = Connection.Target;
-        Rect sourceRect = source.Bounds;
-        Rect targetRect = target.Bounds;
-        Rect unionRect = Rect.Union(sourceRect, targetRect); // Utils.Union(sourceRect, targetRect);
-        Rect unionInflated = Rect.Inflate(unionRect, -1, -1); //unionRect.InflateRect(-1);
+        var source = Connection.Source!;
+        var target = Connection.Target!;
+        var sourceRect = source.Bounds;
+        var targetRect = target.Bounds;
+        var unionRect = Rect.Union(sourceRect, targetRect); // Utils.Union(sourceRect, targetRect);
+        var unionInflated = Rect.Inflate(unionRect, -1, -1); //unionRect.InflateRect(-1);
 
-        List<IConnector> sourceRectPoints = source.Connectors
+        var sourceRectPoints = source.Connectors
             .Where(x => x.Name != ConnectorPosition.Auto &&
-                        unionRect.Contains(x.AbsolutePosition) && !unionInflated.Contains(x.AbsolutePosition))
+                        unionRect.Contains(x.AbsolutePosition) &&
+                        !unionInflated.Contains(x.AbsolutePosition))
             .ToList();
-        List<IConnector> targetRectPoints = target.Connectors
-            .Where(x => x.Name != ConnectorPosition.Auto && unionRect.Contains(x.AbsolutePosition) &&
-                        !unionInflated.Contains(x.AbsolutePosition)).ToList();
+        var targetRectPoints = target.Connectors
+            .Where(x => x.Name != ConnectorPosition.Auto &&
+                        unionRect.Contains(x.AbsolutePosition) &&
+                        !unionInflated.Contains(x.AbsolutePosition))
+            .ToList();
         var shortestTuple = GetShortestDistancedPoints(sourceRectPoints, targetRectPoints);
         if (shortestTuple != null)
         {
@@ -239,8 +239,8 @@ internal abstract class TreeRouterBase
         List<IConnector> targetList)
     {
         // connector.AbsolutePosition is very costly operation.  
-        IConnector resultSourceConnector = null;
-        IConnector resultTargetConnector = null;
+        IConnector? resultSourceConnector = null;
+        IConnector? resultTargetConnector = null;
         var minDistance = double.MaxValue;
         foreach (var xItem in sourceList)
         {

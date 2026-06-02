@@ -3,7 +3,6 @@
 /// <summary>
 /// This router routes the connections when the shape layout is TreeDown, TreeUp, TreeLeft or TreeRight.
 /// </summary>
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
 internal class DirectionalRouter : TreeRouterBase
 {
     private readonly DirectionalRoutingSettings _settings;
@@ -14,7 +13,7 @@ internal class DirectionalRouter : TreeRouterBase
     /// <param name="settings">The settings.</param>
     public DirectionalRouter(DirectionalRoutingSettings settings)
     {
-        this._settings = settings;
+        _settings = settings;
     }
 
     /// <summary>
@@ -22,11 +21,12 @@ internal class DirectionalRouter : TreeRouterBase
     /// </summary>
     protected override void SetSourceAndTargetConnectors()
     {
-        //todo: Rick 暂取消
-        //if (this.Connection.SourceConnectorPosition != ConnectorPosition.Gliding || this.settings.SourceConnectorName == ConnectorPosition.Gliding)
-        //    this.Connection.SourceConnectorPosition = this.settings.SourceConnectorName;
-        //if (this.Connection.TargetConnectorPosition != ConnectorPosition.Gliding || this.settings.TargetConnectorName == ConnectorPosition.Gliding)
-        //    this.Connection.TargetConnectorPosition = this.settings.TargetConnectorName;
+        if (Connection.SourceConnectorPosition != ConnectorPosition.Gliding ||
+            _settings.SourceConnectorName == ConnectorPosition.Gliding)
+            Connection.SourceConnectorPosition = _settings.SourceConnectorName;
+        if (Connection.TargetConnectorPosition != ConnectorPosition.Gliding ||
+            _settings.TargetConnectorName == ConnectorPosition.Gliding)
+            Connection.TargetConnectorPosition = _settings.TargetConnectorName;
     }
 
     /// <summary>
@@ -45,7 +45,8 @@ internal class DirectionalRouter : TreeRouterBase
         float minWidth = Math.Min(SourceInflatedRect.Width, TargetInflatedRect.Width);
         float minHeight = Math.Min(SourceInflatedRect.Height, TargetInflatedRect.Height);
         bool shouldAddSinglePointHor = xDiff * _settings.DirectionParameter <= 0 && _settings.HorizontalIndicator == 1;
-        bool shouldAddSinglePointVert = yDiff * _settings.DirectionParameter <= 0 && _settings.HorizontalIndicator == -1;
+        bool shouldAddSinglePointVert =
+            yDiff * _settings.DirectionParameter <= 0 && _settings.HorizontalIndicator == -1;
 
         // connection is completely between source and target shape.
         if (shouldAddSinglePointHor || shouldAddSinglePointVert)
@@ -69,6 +70,7 @@ internal class DirectionalRouter : TreeRouterBase
             // connection intersects with source shape.
             list.AddRange(GetUnionRectangleRoutePoints());
         }
+
         list.Add(target);
         return list;
     }

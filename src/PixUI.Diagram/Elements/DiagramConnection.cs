@@ -274,21 +274,7 @@ public class DiagramConnection : DiagramItem, IConnection
     #endregion
 
     #region ----连接相关属性----
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the default Bezier definition (Bezier tangents) has been altered.
-    /// </summary>
-    /// <remarks>
-    ///   <list type="bullet">
-    ///   <item> This property is set to <c>true</c> as soon as one of the Bezier handles has been manually modified.
-    /// This means that the automatically calculated handle positions in the function of the connector will be halted.
-    /// You re-enable this auto-handle calculation by re-setting this property to <c>false</c>.
-    ///   </item>
-    ///   <item>
-    ///     Setting this property has no effect if the <see cref="ConnectionType" />
-    ///     is not <see cref="ConnectionType.Bezier" />.</item>
-    ///   </list>
-    /// </remarks>
+    
     public bool IsModified { get; set; }
 
     private IShape? _source;

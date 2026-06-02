@@ -3,7 +3,6 @@
 /// <summary>
 /// Settings for Directional Router.
 /// </summary>
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
 public class DirectionalRoutingSettings
 {
     /// <summary>

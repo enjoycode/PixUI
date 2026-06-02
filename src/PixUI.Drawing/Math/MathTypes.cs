@@ -470,6 +470,8 @@ public partial struct Rect
         Bottom += dy;
     }
 
+    public static Rect Inflate(in Rect rect, float offset) => Inflate(rect, offset, offset);
+    
     public static Rect Inflate(in Rect rect, float x, float y)
     {
         var res = rect;

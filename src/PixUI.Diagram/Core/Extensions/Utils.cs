@@ -24,6 +24,12 @@ internal static class Utils
         return result;
     }
 
+    internal static bool IsNanOrInfinity(this Point point) =>
+        float.IsNaN(point.X) || float.IsInfinity(point.X) ||
+        float.IsNaN(point.Y) || float.IsInfinity(point.Y);
+
+    public static bool IsInClosedInterval(this float value, float min, float max) => min <= value && value <= max;
+
     /// <summary>
     /// Gets a point from the minimum X and Y values from the specified points.
     /// </summary>

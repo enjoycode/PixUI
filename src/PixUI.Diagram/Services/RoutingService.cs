@@ -22,23 +22,23 @@ public sealed class RoutingService
     {
         var result = new ConnectionRoute();
         if (connection == null) return result;
-        //if (connection.IsModified) return new ConnectionRoute(connection.ConnectionPoints.ToList());
+        if (connection.IsModified) return new ConnectionRoute(connection.ConnectionPoints.ToList());
 
         if (connection.ConnectionType != ConnectionType.Bezier)
         {
-            //IExtendedRouter extendetRouter = this.Router as IExtendedRouter;
-            IRouter router = Router;
+            var extendedRouter = Router as IExtendedRouter;
+            var router = Router;
             if (connection.Source == null || connection.Target == null)
             {
                 return new ConnectionRoute(connection.ConnectionPoints.ToList());
-                //extendetRouter = this.FreeRouter as IExtendedRouter;
-                //router = this.FreeRouter;
+                // extendedRouter = FreeRouter as IExtendedRouter;
+                // router = FreeRouter;
             }
 
-            //if (extendetRouter != null)
-            //    result = extendetRouter.GetRoutePoints(connection);
-            //else if (router != null)
-            result = new ConnectionRoute(router.GetRoutePoints(connection, false));
+            if (extendedRouter != null)
+                result = extendedRouter.GetRoutePoints(connection);
+            else if (router != null!)
+                result = new ConnectionRoute(router.GetRoutePoints(connection, false));
         }
 
         return result;
