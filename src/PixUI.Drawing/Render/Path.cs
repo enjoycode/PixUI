@@ -40,6 +40,8 @@ public interface IPath : IDisposable
 
     void AddRRect(RRect rect, bool isCCW = false);
 
+    void AddArc(Rect oval, float startAngle, float sweepAngle);
+
     void AddPath(IPath other, PathAddMode mode = PathAddMode.Append);
 
     bool Op(IPath other, PathOp op);

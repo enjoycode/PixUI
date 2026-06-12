@@ -55,10 +55,17 @@ public class DiagramShape : DiagramItem, IShape
     {
         var oldBounds = Bounds;
 
-        _bounds.X = x;
-        _bounds.Y = y;
-        _bounds.Width = width;
-        _bounds.Height = height;
+        if (specified.HasFlag(BoundsSpecified.X))
+            _bounds.X = x;
+        if (specified.HasFlag(BoundsSpecified.Y))
+            _bounds.Y = y;
+        if (specified.HasFlag(BoundsSpecified.Width))
+            _bounds.Width = width;
+        if (specified.HasFlag(BoundsSpecified.Height))
+            _bounds.Height = height;
+
+        if (specified == BoundsSpecified.None)
+            return;
 
         //通知Canvas刷新相关区域
         InvalidateOnBoundsChanged(oldBounds);
@@ -67,7 +74,7 @@ public class DiagramShape : DiagramItem, IShape
         if (Surface != null)
         {
             var connections = Surface.GetConnections();
-            for (int i = 0; i < connections.Count; i++)
+            for (var i = 0; i < connections.Count; i++)
             {
                 if (connections[i].Source == this || connections[i].Target == this)
                     connections[i].Update(false);
