@@ -17,10 +17,10 @@ public interface IConnection : IDiagramItem
     /// </summary>
     IShape? Source { get; set; }
 
-    string SourceConnectorPosition { get; set; }
+    string? SourceConnectorPosition { get; set; }
 
     /// <summary>
-    /// Gets the actual source connector of this connection if the connector is dynamically assigned (<see cref="ConnectorPosition.Auto"/>).
+    /// Gets the actual source connector of this connection if the connector is dynamically assigned.
     /// </summary>
     IConnector SourceConnectorResult { get; }
 
@@ -29,10 +29,10 @@ public interface IConnection : IDiagramItem
     /// </summary>
     IShape? Target { get; set; }
 
-    string TargetConnectorPosition { get; set; }
+    string? TargetConnectorPosition { get; set; }
 
     /// <summary>
-    /// Gets the actual target connector of this connection if the connector is dynamically assigned (<see cref="ConnectorPosition.Auto"/>).
+    /// Gets the actual target connector of this connection if the connector is dynamically assigned.
     /// </summary>
     IConnector TargetConnectorResult { get; }
 
@@ -48,7 +48,8 @@ public interface IConnection : IDiagramItem
     ConnectionType ConnectionType { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the default Bezier handles have been altered or an intermediate point have been added/removed.
+    /// Gets or sets a value indicating whether the default Bezier handles have been altered
+    /// or an intermediate point have been added/removed.
     /// </summary>
     /// <remarks>
     /// This property is set to <c>true</c> as soon as one of the Bezier handles has been manually modified

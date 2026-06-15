@@ -6,6 +6,11 @@ namespace PixUI.Diagram;
 
 public class DiagramConnection : DiagramItem, IConnection
 {
+    public DiagramConnection()
+    {
+        EnsureConnectionPoints();
+    }
+
     #region ====Fields & Properties====
 
     private bool _isDirty;
@@ -15,14 +20,9 @@ public class DiagramConnection : DiagramItem, IConnection
     private Point _startPoint;
     private Point _endPoint;
     private Point _editingPoint;
-    private Point _position;
-
     private readonly ObservableCollection<Point> _connectionPoints = [];
 
-    private Geometry _geometry;
     private PathFigure? _sourceCap, _targetCap;
-
-    private string _title = string.Empty;
     private IParagraph? _cachedLayout;
 
     public string TypeName => "Connection";
@@ -31,16 +31,16 @@ public class DiagramConnection : DiagramItem, IConnection
 
     public virtual string Title
     {
-        get => _title;
+        get;
         set
         {
-            if (_title != value)
+            if (field != value)
             {
-                _title = value;
+                field = value;
                 _cachedLayout = null;
             }
         }
-    }
+    } = string.Empty;
 
     private IParagraph? CachedLayout
     {
@@ -82,13 +82,12 @@ public class DiagramConnection : DiagramItem, IConnection
 
     #region ----形状相关属性----
 
-    [Browsable(false)]
     public Geometry Geometry
     {
-        get => _geometry;
+        get;
         set
         {
-            if (_geometry != value) _geometry = value;
+            if (field != value) field = value;
         }
     }
 
@@ -96,10 +95,8 @@ public class DiagramConnection : DiagramItem, IConnection
     /// Gets the connection points of the connection.
     /// </summary>
     /// <remarks>The positions are absolute coordinates with respect to the canvas.</remarks>
-    [Browsable(false)]
     public IList<Point> ConnectionPoints => _connectionPoints;
 
-    [Browsable(false)]
     public Point StartPoint
     {
         get
@@ -162,7 +159,6 @@ public class DiagramConnection : DiagramItem, IConnection
         }
     }
 
-    [Browsable(false)]
     public Point EndPoint
     {
         get
@@ -246,18 +242,16 @@ public class DiagramConnection : DiagramItem, IConnection
 
     #region ----布局相关属性----
 
-    [Browsable(false)]
     public Point Position
     {
-        get => _position;
+        get;
         set
         {
-            if (_position != value)
-                _position = value;
+            if (field != value)
+                field = value;
         }
     }
 
-    [Browsable(false)]
     public override Rect Bounds
     {
         get
@@ -274,42 +268,36 @@ public class DiagramConnection : DiagramItem, IConnection
     #endregion
 
     #region ----连接相关属性----
-    
-    public bool IsModified { get; set; }
 
-    private IShape? _source;
+    public bool IsModified { get; set; }
 
     public IShape? Source
     {
-        get => _source;
+        get;
         set
         {
-            if (_source != value)
+            if (field != value)
             {
-                var oldSource = _source;
-                _source = value;
+                var oldSource = field;
+                field = value;
                 OnSourceChanged(oldSource);
             }
         }
     }
 
-    private IShape? _target;
-
     public IShape? Target
     {
-        get => _target;
+        get;
         set
         {
-            if (_target != value)
+            if (field != value)
             {
-                var oldTarget = _target;
-                _target = value;
+                var oldTarget = field;
+                field = value;
                 OnTargetChanged(oldTarget);
             }
         }
     }
-
-    private string? _sourceConnectorPosition;
 
     /// <summary>
     /// Gets or sets the source connector position.
@@ -319,19 +307,17 @@ public class DiagramConnection : DiagramItem, IConnection
     /// </value>
     public string? SourceConnectorPosition
     {
-        get => _sourceConnectorPosition;
+        get;
         set
         {
-            if (_sourceConnectorPosition != value)
+            if (field != value)
             {
-                var oldValue = _sourceConnectorPosition;
-                _sourceConnectorPosition = value;
+                var oldValue = field;
+                field = value;
                 OnSourceConnectorPositionChanged(value, oldValue);
             }
         }
     }
-
-    private string? _targetConnectorPosition;
 
     /// <summary>
     /// Gets or sets the target connector position.
@@ -341,13 +327,13 @@ public class DiagramConnection : DiagramItem, IConnection
     /// </value>
     public string? TargetConnectorPosition
     {
-        get => _targetConnectorPosition;
+        get;
         set
         {
-            if (_targetConnectorPosition != value)
+            if (field != value)
             {
-                var oldValue = _targetConnectorPosition;
-                _targetConnectorPosition = value;
+                var oldValue = field;
+                field = value;
                 OnTargetConnectorPositionChanged(value, oldValue);
             }
         }
@@ -356,13 +342,11 @@ public class DiagramConnection : DiagramItem, IConnection
     /// <summary>
     /// Gets the source connector result.
     /// </summary>
-    [Browsable(false)]
     public IConnector? SourceConnectorResult { get; private set; }
 
     /// <summary>
     /// Gets the target connector result.
     /// </summary>
-    [Browsable(false)]
     public IConnector? TargetConnectorResult { get; private set; }
 
     /// <summary>
@@ -382,7 +366,17 @@ public class DiagramConnection : DiagramItem, IConnection
     /// <value>
     /// The type of the connection.
     /// </value>
-    public ConnectionType ConnectionType { get; set; }
+    public ConnectionType ConnectionType
+    {
+        get;
+        set
+        {
+            //var oldValue = field;
+            field = value;
+            EnsureConnectionPoints();
+            Update();
+        }
+    }
 
     /// <summary>
     /// Gets or sets the type of the source cap.
@@ -425,12 +419,11 @@ public class DiagramConnection : DiagramItem, IConnection
     /// A value or zero turns the Bezier connection into a straight line,
     /// a value of one and above increase the sharpness of the Bezier curve.
     /// </value>
-    [Browsable(false)]
     public float BezierTension { get; set; } = 0.5f;
 
-    [Browsable(false)] public Color BackColor { get; set; } = Colors.DarkGray;
+    public Color BackColor { get; set; } = Colors.DarkGray;
 
-    [Browsable(false)] public Color ForeColor { get; set; } = Colors.Black;
+    public Color ForeColor { get; set; } = Colors.Black;
 
     #endregion
 
@@ -473,6 +466,28 @@ public class DiagramConnection : DiagramItem, IConnection
     #endregion
 
     #region ====连接路径计算方法====
+
+    private void EnsureConnectionPoints()
+    {
+        if (ConnectionType == ConnectionType.Bezier)
+        {
+            if (ConnectionPoints.Count >= 2)
+            {
+                for (var i = 1; i < ConnectionPoints.Count - 1; i++)
+                    ConnectionPoints.RemoveAt(i);
+
+                // better to assume the Bezier handles are custom and the auto-Bezier calculation is not altering things
+                IsModified = true;
+            }
+            else
+            {
+                // clear the current ConnectionPoints and set default bezier handles - that's why we set IsModified to false.
+                IsModified = false;
+                ConnectionPoints.Clear();
+                UpdateAutoBezierHandles();
+            }
+        }
+    }
 
     /// <summary>
     /// Attaches the connection to specific source and target.
@@ -764,9 +779,9 @@ public class DiagramConnection : DiagramItem, IConnection
             //    (this.ParentContainer != null && this.ParentContainer.IsCollapsed))
             //    return;
 
-            if (Route && Surface.RoutingService != null)
+            if (Route && Surface.RoutingService != null!)
             {
-                ConnectionRoute route = Surface.RoutingService.FindExtendedRoute(this);
+                var route = Surface.RoutingService.FindExtendedRoute(this);
 
                 // Note that the routing only returns the intermediate points(ConnectionPoints), not the start/end points.
                 ConnectionPoints.Clear();
@@ -834,9 +849,9 @@ public class DiagramConnection : DiagramItem, IConnection
         {
             var pt = ConnectionPoints[index - 1];
             ConnectionPoints[index - 1] = new Point(pt.X + offsetX, pt.Y + offsetY);
+            IsModified = true;
         }
 
-        IsModified = true;
         Update();
     }
 
