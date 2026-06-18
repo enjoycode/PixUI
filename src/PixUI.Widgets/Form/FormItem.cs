@@ -112,17 +112,26 @@ public sealed class FormItem : Widget
         Parent?.Relayout();
     }
 
-    public override void VisitChildren<TVisitor>(ref TVisitor visitor) => visitor.Visit(Child);
+    public override void VisitChildren<TVisitor>(ref TVisitor visitor)
+    {
+        if (Child != null!) visitor.Visit(Child);
+    }
 
     protected override void OnLayout(Size maxSize)
     {
         EnsureBuildLabelParagraph();
 
         var labelWidth = ((Form)Parent!).LabelWidth + 5;
-        Child.PerformLayout(new(AvailableSize.Width - labelWidth, AvailableSize.Height));
-        Child.SetLayoutLocation(labelWidth, 0);
-
-        SetLayoutSize(AvailableSize.Width, Math.Max(_cachedLabelParagraph!.Height, Child.H));
+        if (Child != null!)
+        {
+            Child.PerformLayout(new(AvailableSize.Width - labelWidth, AvailableSize.Height));
+            Child.SetLayoutLocation(labelWidth, 0);
+            SetLayoutSize(AvailableSize.Width, Math.Max(_cachedLabelParagraph!.Height, Child.H));
+        }
+        else
+        {
+            SetLayoutSize(AvailableSize.Width, _cachedLabelParagraph!.Height);
+        }
     }
 
     private void EnsureBuildLabelParagraph()
