@@ -181,6 +181,28 @@ public class ListPopup<T> : Popup
                 OnKeysReturn();
                 return EventPreviewResult.NoDispatch;
             }
+
+            if (keyEvent.KeyCode == Keys.Escape)
+            {
+                Hide();
+                return EventPreviewResult.NoDispatch;
+            }
+        }
+        else if (type == EventType.PointerDown)
+        {
+            //TODO:应转换为本地坐标点再判断是否包含
+            var pointerEvent = (PointerEvent)e!;
+            var localPos = LocalToWindow(0, 0);
+            var winBounds = Rect.FromLTWH(localPos.X, localPos.Y, W, H);
+            if (!winBounds.Contains(pointerEvent.X, pointerEvent.Y))
+            {
+                Hide();
+                //return EventPreviewResult.Processed;
+            }
+        }
+        else if (type == EventType.MoveOutWindow)
+        {
+            Hide();
         }
 
         return base.PreviewEvent(type, e);
