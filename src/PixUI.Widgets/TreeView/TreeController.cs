@@ -28,7 +28,7 @@ public sealed class TreeController<T>
     /// <summary>
     /// 获取根节点只读列表
     /// </summary>
-    public TreeNode<T>[] RootNodes => Nodes.ToArray();
+    public IReadOnlyList<TreeNode<T>> RootNodes => Nodes;
 
     internal void AttachTreeView(TreeView<T> treeView)
     {
