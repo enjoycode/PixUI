@@ -34,9 +34,9 @@ public sealed class DiagramView : Transform, IScrollable, IMouseRegion
 
     Offset IScrollable.OnScroll(float dx, float dy)
     {
-        _scrollOffsetX += dx;
-        _scrollOffsetY += dy;
         //TODO:
+        // _scrollOffsetX += dx;
+        // _scrollOffsetY += dy;
         return new(0, 0);
     }
 

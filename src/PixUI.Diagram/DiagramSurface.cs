@@ -175,7 +175,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
                 (int)HoverItem.Bounds.Height);
             if (!rectCanvas.Contains(new Point(e.X, e.Y))) //已离开该区域 //todo:改判断为HitTest()，因为Connection不能判断边框
             {
-                //todo: 
+                //todo:
             }
             else
             {
