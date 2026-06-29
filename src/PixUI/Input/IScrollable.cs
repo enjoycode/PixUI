@@ -32,10 +32,12 @@ public enum ScrollBarVisibility
     /// 不显示
     /// </summary>
     Never,
+
     /// <summary>
     /// Hover时显示
     /// </summary>
     Hover,
+
     /// <summary>
     /// 始终显示
     /// </summary>
@@ -54,6 +56,12 @@ public sealed class ScrollController
     public ScrollController(ScrollDirection direction)
     {
         Direction = direction;
+    }
+
+    public void Reset()
+    {
+        OffsetX = 0;
+        OffsetY = 0;
     }
 
     /// <summary>
@@ -82,7 +90,7 @@ public sealed class ScrollController
     {
         if (OffsetX <= maxOffsetX && OffsetY <= maxOffsetY)
             return false;
-        
+
         if (Direction is ScrollDirection.Both or ScrollDirection.Horizontal)
             OffsetX = Math.Clamp(OffsetX, 0, maxOffsetX);
 

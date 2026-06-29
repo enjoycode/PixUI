@@ -6,7 +6,6 @@ namespace PixUI;
 public sealed class ListViewController<T> : WidgetController<ListViewBase<T>>
 {
     internal readonly ScrollController ScrollController;
-    private IList<T>? _dataSource;
 
     public ListViewController(Axis axis = Axis.Vertical)
     {
@@ -17,10 +16,11 @@ public sealed class ListViewController<T> : WidgetController<ListViewBase<T>>
 
     public IList<T>? DataSource
     {
-        get => _dataSource;
+        get;
         set
         {
-            _dataSource = value;
+            field = value;
+            ScrollController.Reset();
             if (Widget != null!)
                 Widget.OnDataSourceChanged();
         }
@@ -66,9 +66,9 @@ public sealed class ListViewController<T> : WidgetController<ListViewBase<T>>
     /// <summary>
     /// 重置滚动位置
     /// </summary>
-    public void ResetScroll()
+    public void ResetScroll() //TODO: use ScrollController.Reset() ?
     {
-        if (ScrollController.OffsetX == 0 && ScrollController.OffsetY == 0)
+        if (ScrollController is { OffsetX: 0, OffsetY: 0 })
             return;
 
         var offset = ((IScrollable)Widget).OnScroll(-ScrollController.OffsetX, -ScrollController.OffsetY);
