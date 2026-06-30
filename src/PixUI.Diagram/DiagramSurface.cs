@@ -117,6 +117,13 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
 
     private void OnMouseDown(PointerEvent e)
     {
+        //开始HitTest
+        FindHoverItemOnMouseDown(e);
+        if (HoverItem != null && HoverItem.PreviewMouseDown(e))
+        {
+            return;
+        }
+
         //先判断有没有命中已选择项的锚点
         if (Adorners.HitTestItem != null)
         {
@@ -128,14 +135,6 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
         if (e.Buttons == PointerButtons.Left && ToolboxService.SelectedItem != null)
         {
             ToolboxService.BeginCreation((int)e.X, (int)e.Y);
-            return;
-        }
-
-        //开始HitTest
-        FindHoverItemOnMouseDown(e);
-
-        if (HoverItem != null && HoverItem.PreviewMouseDown(e))
-        {
             return;
         }
 
