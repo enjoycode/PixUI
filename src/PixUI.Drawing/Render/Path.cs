@@ -22,6 +22,8 @@ public interface IPath : IDisposable
 
     bool Contains(float x, float y);
 
+    IPath? GetOutlinePath(float strokeWidth);
+
     void MoveTo(float x, float y);
 
     void LineTo(float x, float y);

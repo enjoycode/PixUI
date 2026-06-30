@@ -392,6 +392,29 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
     public RawIterator CreateRawIterator() =>
         new RawIterator(this);
 
+    public IPath? GetOutlinePath(float strokeWidth)
+    {
+        if (strokeWidth <= 0)
+            throw new ArgumentOutOfRangeException(nameof(strokeWidth), "Stroke width must be positive.");
+
+        var strokedPath = new SKPath();
+        using var strokePaint = new SKPaint();
+        strokePaint.Style = PaintStyle.Stroke;
+        strokePaint.StrokeWidth = strokeWidth;
+        strokePaint.StrokeCap = StrokeCap.Butt;
+        strokePaint.StrokeJoin = StrokeJoin.Miter;
+        strokePaint.AntiAlias = true;
+
+        var ok = SkiaApi.sk_paint_get_fill_path(strokePaint.Handle, Handle, strokedPath.Handle, null, 1);
+        if (!ok)
+        {
+            strokedPath.Dispose();
+            return null;
+        }
+
+        return strokedPath;
+    }
+
     public bool Op(IPath other, PathOp op)
     {
         if (other == null)
@@ -539,12 +562,12 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
 
     public sealed class RawIterator : SKObject, ISKSkipObjectRegistration
     {
-        private readonly SKPath path;
+        private readonly SKPath _path;
 
         internal RawIterator(SKPath path)
             : base(SkiaApi.sk_path_create_rawiter(path.Handle), true)
         {
-            this.path = path;
+            this._path = path;
         }
 
         protected override void Dispose(bool disposing) =>

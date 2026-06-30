@@ -1,9 +1,16 @@
 using NUnit.Framework;
+using PixUI.Drawing.Skia;
 
 namespace PixUI.UnitTests;
 
 public class PathTest
 {
+    [SetUp]
+    public void Setup()
+    {
+        Render.Init(new SkiaRender());
+    }
+
     [Test]
     public void OpIntersectTest1()
     {
@@ -47,5 +54,19 @@ public class PathTest
         var path2 = Path.Create();
         path2.AddRect(Rect.FromLTWH(0, 0, 10, 10));
         Assert.True(path2.IsClosed());
+    }
+
+    [Test]
+    public void OutlineContainsTest()
+    {
+        var path1 = Path.Create();
+        path1.MoveTo(10, 10);
+        path1.LineTo(20, 10);
+
+        var path2 = path1.GetOutlinePath(4);
+        Assert.IsTrue(path2 != null);
+        Assert.IsTrue(path2!.Contains(11, 11));
+        Assert.IsFalse(path2.Contains(21, 10));
+        Assert.IsFalse(path2.Contains(11, 13));
     }
 }

@@ -2594,11 +2594,11 @@ public unsafe partial class SkiaApi
 	internal static extern sk_colorfilter_t sk_paint_get_colorfilter (sk_paint_t param0);
 		
 
-	// // bool sk_paint_get_fill_path(const sk_paint_t*, const sk_path_t* src, sk_path_t* dst, const sk_rect_t* cullRect, float resScale)
-	//
-	// [DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
-	// [return: MarshalAs (UnmanagedType.I1)]
-	// internal static extern bool sk_paint_get_fill_path (sk_paint_t param0, sk_path_t src, sk_path_t dst, Rect* cullRect, Single resScale);
+	// bool sk_paint_get_fill_path(const sk_paint_t*, const sk_path_t* src, sk_path_t* dst, const sk_rect_t* cullRect, float resScale)
+	
+	[DllImport (SKIA, CallingConvention = CallingConvention.Cdecl)]
+	[return: MarshalAs (UnmanagedType.I1)]
+	internal static extern bool sk_paint_get_fill_path (sk_paint_t param0, sk_path_t src, sk_path_t dst, Rect* cullRect, Single resScale);
 		
 
 	// sk_filter_quality_t sk_paint_get_filter_quality(sk_paint_t*)
