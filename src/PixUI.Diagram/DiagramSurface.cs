@@ -33,7 +33,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
     public MouseRegion MouseRegion { get; }
     public FocusNode FocusNode { get; }
 
-    private DiagramItem? _hoverItem;
+    public DiagramItem? HoverItem { get; private set; }
 
     #endregion
 
@@ -130,17 +130,17 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
             ToolboxService.BeginCreation((int)e.X, (int)e.Y);
             return;
         }
-        
+
         //开始HitTest
         FindHoverItemOnMouseDown(e);
-        
-        if (_hoverItem != null && _hoverItem.PreviewMouseDown(e))
+
+        if (HoverItem != null && HoverItem.PreviewMouseDown(e))
         {
             return;
         }
 
         //设置选择的Item
-        SelectionService.SelectItem(_hoverItem);
+        SelectionService.SelectItem(HoverItem);
         //TODO:暂在这里强制装饰层命中检测，如果UI层实现了装饰器呈现时命中检测可以移除
         var winPt = LocalToWindow(e.X, e.Y);
         Adorners.HitTest(winPt.X, winPt.Y);
@@ -162,23 +162,23 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
             //TODO:清空选择框
         }
     }
-    
+
     private void FindHoverItemOnMouseDown(PointerEvent e)
     {
-        if (_hoverItem != null)
+        if (HoverItem != null)
         {
-            var localPt = _hoverItem.PointToClient(new Point(e.X, e.Y));
-            if (_hoverItem.HitTest(localPt)) //仍旧在旧区域内
+            var localPt = HoverItem.PointToClient(new Point(e.X, e.Y));
+            if (HoverItem.HitTest(localPt)) //仍旧在旧区域内
             {
                 //如果是容器类的元素，尝试在hoverItem内部查找
-                if (_hoverItem.IsContainer) 
-                    _hoverItem = _hoverItem.FindHoverItem(localPt);
+                if (HoverItem.IsContainer)
+                    HoverItem = HoverItem.FindHoverItem(localPt);
                 return;
             }
         }
 
         //重新开始查找hoverItem
-        _hoverItem = GetItemUnderMouse((int)e.X, (int)e.Y);
+        HoverItem = GetItemUnderMouse((int)e.X, (int)e.Y);
         //if (hoverItem != null)
         //    Cursor.Current = Cursors.SizeAll;
         //else
@@ -223,7 +223,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
 
     internal void ResetHoverItem()
     {
-        _hoverItem = null;
+        HoverItem = null;
         //TODO:最好重新查找HoverItem
     }
 
