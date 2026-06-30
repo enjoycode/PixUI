@@ -523,12 +523,12 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
 
     public sealed class Iterator : SKObject, ISKSkipObjectRegistration
     {
-        private readonly SKPath path;
+        private readonly SKPath _path;
 
         internal Iterator(SKPath path, bool forceClose)
             : base(SkiaApi.sk_path_create_iter(path.Handle, forceClose ? 1 : 0), true)
         {
-            this.path = path;
+            this._path = path;
         }
 
         protected override void DisposeNative() => SkiaApi.sk_path_iter_destroy(Handle);
@@ -538,11 +538,8 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
 
         public SKPathVerb Next(Span<Point> points)
         {
-            if (points == null)
-                throw new ArgumentNullException(nameof(points));
             if (points.Length != 4)
-                throw new ArgumentException("Must be an array of four elements.",
-                    nameof(points));
+                throw new ArgumentException("Must be an array of four elements.", nameof(points));
 
             fixed (Point* p = points)
             {
@@ -550,14 +547,11 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
             }
         }
 
-        public float ConicWeight() =>
-            SkiaApi.sk_path_iter_conic_weight(Handle);
+        public float ConicWeight() => SkiaApi.sk_path_iter_conic_weight(Handle);
 
-        public bool IsCloseLine() =>
-            SkiaApi.sk_path_iter_is_close_line(Handle) != 0;
+        public bool IsCloseLine() => SkiaApi.sk_path_iter_is_close_line(Handle) != 0;
 
-        public bool IsCloseContour() =>
-            SkiaApi.sk_path_iter_is_closed_contour(Handle) != 0;
+        public bool IsCloseContour() => SkiaApi.sk_path_iter_is_closed_contour(Handle) != 0;
     }
 
     public sealed class RawIterator : SKObject, ISKSkipObjectRegistration
@@ -579,22 +573,17 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
 
         public SKPathVerb Next(Span<Point> points)
         {
-            if (points == null)
-                throw new ArgumentNullException(nameof(points));
             if (points.Length != 4)
-                throw new ArgumentException("Must be an array of four elements.",
-                    nameof(points));
+                throw new ArgumentException("Must be an array of four elements.", nameof(points));
             fixed (Point* p = points)
             {
                 return SkiaApi.sk_path_rawiter_next(Handle, p);
             }
         }
 
-        public float ConicWeight() =>
-            SkiaApi.sk_path_rawiter_conic_weight(Handle);
+        public float ConicWeight() => SkiaApi.sk_path_rawiter_conic_weight(Handle);
 
-        public SKPathVerb Peek() =>
-            SkiaApi.sk_path_rawiter_peek(Handle);
+        public SKPathVerb Peek() => SkiaApi.sk_path_rawiter_peek(Handle);
     }
 
     public sealed class OpBuilder : SKObject, ISKSkipObjectRegistration

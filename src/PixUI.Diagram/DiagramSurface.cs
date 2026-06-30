@@ -33,7 +33,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
     public MouseRegion MouseRegion { get; }
     public FocusNode FocusNode { get; }
 
-    internal DiagramItem? HoverItem { get; private set; }
+    private DiagramItem? _hoverItem;
 
     #endregion
 
@@ -97,7 +97,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
 
     private void OnMouseMove(PointerEvent e)
     {
-        //1.处理Mouse拖动
+        //处理Mouse拖动
         if (e.Buttons == PointerButtons.Left)
         {
             if (Adorners.HitTestItem != null) //先处理装饰层的拖动
@@ -113,18 +113,10 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
                 DiagramService.MoveSelection(new Offset(e.DeltaX, e.DeltaY));
             }
         }
-
-        //2.处理Mouse下的HoverItem
-        FindHoverItemOnMouseMove(e);
     }
 
     private void OnMouseDown(PointerEvent e)
     {
-        if (HoverItem != null && HoverItem.PreviewMouseDown(e))
-        {
-            return;
-        }
-
         //先判断有没有命中已选择项的锚点
         if (Adorners.HitTestItem != null)
         {
@@ -138,9 +130,17 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
             ToolboxService.BeginCreation((int)e.X, (int)e.Y);
             return;
         }
+        
+        //开始HitTest
+        FindHoverItemOnMouseDown(e);
+        
+        if (_hoverItem != null && _hoverItem.PreviewMouseDown(e))
+        {
+            return;
+        }
 
         //设置选择的Item
-        SelectionService.SelectHoverItem();
+        SelectionService.SelectItem(_hoverItem);
         //TODO:暂在这里强制装饰层命中检测，如果UI层实现了装饰器呈现时命中检测可以移除
         var winPt = LocalToWindow(e.X, e.Y);
         Adorners.HitTest(winPt.X, winPt.Y);
@@ -162,36 +162,23 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
             //TODO:清空选择框
         }
     }
-
-    /// <summary>
-    /// MouseMove时查找其下的设计对象
-    /// </summary>
-    private void FindHoverItemOnMouseMove(PointerEvent e)
+    
+    private void FindHoverItemOnMouseDown(PointerEvent e)
     {
-        if (HoverItem != null)
+        if (_hoverItem != null)
         {
-            var ptCanvas = HoverItem.PointToSurface(Point.Empty);
-            var rectCanvas = Rect.FromLTWH(ptCanvas.X, ptCanvas.Y, (int)HoverItem.Bounds.Width,
-                (int)HoverItem.Bounds.Height);
-            if (!rectCanvas.Contains(new Point(e.X, e.Y))) //已离开该区域 //todo:改判断为HitTest()，因为Connection不能判断边框
-            {
-                //todo:
-            }
-            else
+            var localPt = _hoverItem.PointToClient(new Point(e.X, e.Y));
+            if (_hoverItem.HitTest(localPt)) //仍旧在旧区域内
             {
                 //如果是容器类的元素，尝试在hoverItem内部查找
-                if (HoverItem.IsContainer)
-                {
-                    var clientPt = new Point(e.X - ptCanvas.X, e.Y - ptCanvas.Y);
-                    HoverItem = HoverItem.FindHoverItem(clientPt);
-                }
-
+                if (_hoverItem.IsContainer) 
+                    _hoverItem = _hoverItem.FindHoverItem(localPt);
                 return;
             }
         }
 
         //重新开始查找hoverItem
-        HoverItem = GetItemUnderMouse((int)e.X, (int)e.Y);
+        _hoverItem = GetItemUnderMouse((int)e.X, (int)e.Y);
         //if (hoverItem != null)
         //    Cursor.Current = Cursors.SizeAll;
         //else
@@ -200,15 +187,16 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
 
     private DiagramItem? GetItemUnderMouse(int x, int y)
     {
+        var surfacePoint = new Point(x, y);
         DiagramItem? found = null;
         for (var i = 0; i < _items.Count; i++)
         {
-            if (_items[i].Visible && _items[i].Bounds.Contains(new Point(x, y))) //todo:改用HitTest判断
+            if (_items[i].Visible && _items[i].HitTest(_items[i].PointToClient(surfacePoint)))
             {
                 found = _items[i];
                 if (found.IsContainer)
                 {
-                    found = found.FindHoverItem(new Point(x - (int)found.Bounds.X, y - (int)found.Bounds.Y));
+                    found = found.FindHoverItem(new Point(x - (int)found.Location.X, y - (int)found.Location.Y));
                 }
             }
         }
@@ -235,7 +223,7 @@ public sealed class DiagramSurface : Widget, IMouseRegion, IFocusable
 
     internal void ResetHoverItem()
     {
-        HoverItem = null;
+        _hoverItem = null;
         //TODO:最好重新查找HoverItem
     }
 

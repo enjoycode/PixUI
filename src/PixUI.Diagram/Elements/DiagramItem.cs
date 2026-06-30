@@ -4,13 +4,10 @@ public abstract class DiagramItem
 {
     #region ====Fields & Properties====
 
-    private DiagramSurface? _surface;
-    private bool _isSelected;
-
     public DiagramSurface? Surface
     {
-        get => Parent == null ? _surface : Parent.Surface;
-        set => _surface = value;
+        get => Parent == null ? field : Parent.Surface;
+        set;
     }
 
     public abstract Rect Bounds { get; set; }
@@ -19,13 +16,13 @@ public abstract class DiagramItem
 
     public bool IsSelected
     {
-        get => _isSelected;
+        get;
         internal set
         {
-            if (_isSelected != value)
+            if (field != value)
             {
-                _isSelected = value;
-                OnIsSelectedChanged(!_isSelected, _isSelected);
+                field = value;
+                OnIsSelectedChanged(!field, field);
             }
         }
     }
@@ -94,6 +91,11 @@ public abstract class DiagramItem
     #endregion
 
     #region ====Layout Methods====
+
+    protected internal virtual bool HitTest(Point clientPt)
+    {
+        return Rect.FromLS(Point.Empty, Bounds.Size).Contains(clientPt);
+    }
 
     /// <summary>
     /// 将本地坐标转换为画布坐标

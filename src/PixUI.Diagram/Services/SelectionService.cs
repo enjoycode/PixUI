@@ -27,9 +27,7 @@ public sealed class SelectionService
             item.IsSelected = false;
         _selectedItems.Clear();
     }
-
-    public void SelectHoverItem() => SelectItem(_surface.HoverItem);
-
+    
     public void SelectItem(DiagramItem? item)
     {
         if (item == null && _selectedItems.Count > 0)

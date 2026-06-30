@@ -24,6 +24,7 @@ public class DiagramConnection : DiagramItem, IConnection
 
     private PathFigure? _sourceCap, _targetCap;
     private IParagraph? _cachedLayout;
+    private IPath? _cachedOutlinePath; // for HitTest only
 
     public string TypeName => "Connection";
 
@@ -82,12 +83,13 @@ public class DiagramConnection : DiagramItem, IConnection
 
     #region ----形状相关属性----
 
-    public Geometry Geometry
+    public Geometry? Geometry
     {
         get;
         set
         {
-            if (field != value) field = value;
+            field = value;
+            _cachedOutlinePath = null;
         }
     }
 
@@ -466,6 +468,21 @@ public class DiagramConnection : DiagramItem, IConnection
     #endregion
 
     #region ====连接路径计算方法====
+
+    private void EnsureOutlinePath()
+    {
+        if (_cachedOutlinePath != null)
+            return;
+
+        using var path = GetPath(true);
+        if (path.IsEmpty())
+        {
+            _cachedOutlinePath = path;
+            return;
+        }
+
+        _cachedOutlinePath = path.GetOutlinePath(4);
+    }
 
     private void EnsureConnectionPoints()
     {
@@ -1001,7 +1018,7 @@ public class DiagramConnection : DiagramItem, IConnection
     /// <summary>
     /// Creates the connection's geometry.
     /// </summary>
-    private Geometry CreateGeometry(BridgeType bridgeType, bool roundedCorners)
+    private Geometry? CreateGeometry(BridgeType bridgeType, bool roundedCorners)
     {
         var sourcePoint = StartPoint.Substract(Position);
         var targetPoint = EndPoint.Substract(Position);
@@ -1149,6 +1166,16 @@ public class DiagramConnection : DiagramItem, IConnection
 
     #region ====Overrides Methods====
 
+    protected internal override bool HitTest(Point clientPt)
+    {
+        EnsureOutlinePath();
+        if (_cachedOutlinePath == null || _cachedOutlinePath.IsEmpty()) return false;
+
+        var isHit = _cachedOutlinePath.Contains(clientPt.X, clientPt.Y);
+        //TODO: not hit then hit test title
+        return isHit;
+    }
+
     protected internal override void Invalidate()
     {
         Surface?.Repaint();
@@ -1223,10 +1250,8 @@ public class DiagramConnection : DiagramItem, IConnection
         return Path.Create();
     }
 
-    private IPath GetPathCore(PathGeometry? geometry, bool transforms = false)
+    private IPath GetPathCore(PathGeometry geometry, bool transforms = false)
     {
-        if (geometry == null) return Path.Create();
-
         var segment = geometry.Figures[0].Segments[0];
         if (segment is LineSegment lineSegment)
         {

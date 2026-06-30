@@ -112,7 +112,7 @@ internal static class GeometryExtensions
     /// </remarks>
     /// <param name="specs">The specs.</param>
     /// <returns></returns>
-    public static PathGeometry CreateBaseLineGeometry(LineSpecification specs)
+    public static PathGeometry? CreateBaseLineGeometry(LineSpecification specs)
     {
         if (specs == null) throw new ArgumentNullException(nameof(specs));
         if (specs.StartPoint == specs.EndPoint && specs.Points == null) return null;
@@ -146,8 +146,8 @@ internal static class GeometryExtensions
                 baseFigure.IsFilled = false;
                 baseFigure.IsClosed = false;
                 geometry.Figures.Add(baseFigure);
-            }
                 break;
+            }
             case ConnectionType.Polyline:
             {
                 var figs = GetPolylineLineFigures(new PolylineSpecification
@@ -161,8 +161,8 @@ internal static class GeometryExtensions
                     Bounds = specs.Bounds
                 });
                 geometry.Figures.AddRange(figs);
-            }
                 break;
+            }
             case ConnectionType.Spline:
             {
                 var points = new List<Point> { startBaseLinePoint };
@@ -170,8 +170,8 @@ internal static class GeometryExtensions
                 points.Add(endBaseLinePoint);
                 var figs = CreateSplineFigures(points);
                 geometry.Figures.AddRange(figs);
-            }
                 break;
+            }
         }
 
         return geometry;
@@ -333,7 +333,9 @@ internal static class GeometryExtensions
             {
                 // by design, the number of segment crossing points will always contain the begin and end of the segment
                 var segmentCrossings = crossings.SegmentCrossings[segmentIndex];
-                for (var segmentPositionIndex = 0; segmentPositionIndex < segmentCrossings.Count - 1; ++segmentPositionIndex)
+                for (var segmentPositionIndex = 0;
+                     segmentPositionIndex < segmentCrossings.Count - 1;
+                     ++segmentPositionIndex)
                 {
                     var segmentStartPoint = segmentCrossings[segmentPositionIndex];
                     var segmentEndPoint = segmentCrossings[segmentPositionIndex + 1];
