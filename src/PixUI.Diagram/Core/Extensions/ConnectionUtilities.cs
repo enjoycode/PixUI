@@ -85,7 +85,7 @@ internal static class ConnectionUtilities
     }
 
     /// <summary>
-    /// Shifts the <see cref="IConnection.ConnectionPoints"/> by adding or subtracting the <see cref="IDiagramItem.Position"/> vector.
+    /// Shifts the <see cref="IConnection.ConnectionPoints"/> by adding or subtracting the <see cref="IDiagramItem.Location"/> vector.
     /// </summary>
     /// <remarks>The start/end points are not taken into account here.</remarks>
     /// <param name="connection">The connection to shift.</param>
