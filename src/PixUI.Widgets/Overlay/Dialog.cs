@@ -183,6 +183,14 @@ public abstract class Dialog : Popup
     {
         base.Show(null, null, DialogTransitionBuilder);
 
+        OnShowed();
+    }
+
+    /// <summary>
+    /// 已显示后的操作，默认Focus第一个IFocusable组件
+    /// </summary>
+    protected virtual void OnShowed()
+    {
         if (_body != null)
         {
             var focusable = FocusManager.FindFocusableForward(_body, null);

@@ -10,7 +10,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         MouseRegion.PointerDown += _OnPointerDown;
         MouseRegion.PointerMove += _OnPointerMove;
 
-        FocusNode = new FocusNode();
+        FocusNode = new FocusNode(true);
         FocusNode.FocusChanged += _OnFocusChanged;
         FocusNode.TextInput += _OnTextInput;
         FocusNode.KeyDown += _OnKeyDown;

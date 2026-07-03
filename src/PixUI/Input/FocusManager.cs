@@ -117,7 +117,7 @@ public sealed class FocusManager
         }
     }
 
-    internal static Widget? FindFocusableForward(Widget container, Widget? start)
+    public static Widget? FindFocusableForward(Widget container, Widget? start)
     {
         //start == null 表示向下
         while (true)
@@ -202,7 +202,7 @@ internal sealed class FocusManagerStack
         _stack.Add(new FocusManager()); // for UIWindow
     }
 
-    private readonly List<FocusManager> _stack = new();
+    private readonly List<FocusManager> _stack = [];
 
     internal void Push(FocusManager manager) => _stack.Add(manager);
 
@@ -210,6 +210,16 @@ internal sealed class FocusManagerStack
     {
         if (manager == _stack[0]) throw new NotSupportedException();
         _stack.Remove(manager);
+
+        //以下用于弹出Popup并Focus了支持TextInput的组件，
+        //然后关闭后判断当前Manager.FocusedWidget是否支持TextInput,
+        //是则需要调用UIWindow.StartTextInput()重新开始文本输入
+        var lastManager = _stack[^1];
+        if (lastManager.FocusedWidget is IFocusable { FocusNode.ForTextInput: true })
+        {
+            var window = lastManager.FocusedWidget.Root?.Window;
+            window?.StartTextInput();
+        }
     }
 
     internal void Focus(Widget? widget, UIWindow window)

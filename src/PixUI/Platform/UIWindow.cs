@@ -388,6 +388,9 @@ public abstract class UIWindow
 
     #region ====TextInput Methods====
 
+    /// <summary>
+    /// 启动文本输入监听(可能重入,由实现者判断重入)
+    /// </summary>
     public virtual void StartTextInput() { }
 
     public virtual void SetTextInputRect(Rect rect) { }

@@ -20,6 +20,16 @@ public readonly struct FocusChangedEvent
 
 public sealed class FocusNode
 {
+    public FocusNode(bool forTextInput = false)
+    {
+        ForTextInput = forTextInput;
+    }
+
+    /// <summary>
+    /// 是否用于文本输入
+    /// </summary>
+    public readonly bool ForTextInput;
+
     public event Action<KeyEvent>? KeyDown;
     public event Action<KeyEvent>? KeyUp;
     public event Action<FocusChangedEvent>? FocusChanged;

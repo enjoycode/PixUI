@@ -10,7 +10,7 @@ public abstract class Popup : Widget, IEventHook
     }
 
     internal readonly Overlay Owner;
-    internal readonly FocusManager FocusManager = new();
+    protected internal readonly FocusManager FocusManager = new();
     protected virtual bool IsDialog => false;
     private PopupTransitionWrap? _transition;
     private PopupProxy? _proxy;

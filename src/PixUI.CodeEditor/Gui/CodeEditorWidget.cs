@@ -7,7 +7,7 @@ public sealed class CodeEditorWidget : Widget, IMouseRegion, IFocusable, IScroll
     public CodeEditorWidget(CodeEditorController controller)
     {
         MouseRegion = new MouseRegion();
-        FocusNode = new FocusNode();
+        FocusNode = new FocusNode(true);
 
         Controller = controller;
         Controller.AttachWidget(this);
