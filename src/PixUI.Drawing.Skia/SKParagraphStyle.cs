@@ -31,4 +31,18 @@ public sealed class SKParagraphStyle : SKObject, IParagraphStyle
         get => throw new NotImplementedException();
         set => SkiaApi.sk_paragraph_style_set_text_style(Handle, (value as SKTextStyle)?.Handle ?? IntPtr.Zero);
     }
+
+    public string? Ellipsis
+    {
+        get
+        {
+            using var skString = SKString.GetObject(SkiaApi.sk_paragraph_style_get_ellipsis(Handle));
+            return skString?.ToString();
+        }
+        set
+        {
+            using var skString = new SKString(value ?? string.Empty);
+            SkiaApi.sk_paragraph_style_set_ellipsis(Handle, skString.Handle);
+        }
+    }
 }

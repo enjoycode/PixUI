@@ -128,6 +128,12 @@ partial class SkiaApi
     [DllImport(SKIA, CallingConvention = CallingConvention.Cdecl)]
     internal static extern void sk_paragraph_style_set_height(IntPtr style, float height);
 
+    [DllImport(SKIA, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void sk_paragraph_style_set_ellipsis(IntPtr style, IntPtr ellipsis);
+
+    [DllImport(SKIA, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr sk_paragraph_style_get_ellipsis(IntPtr style);
+
     #endregion
 
     #region ====ParagraphBuilder====

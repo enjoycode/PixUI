@@ -23,6 +23,7 @@ public static class DataGridPainter
         ps.TextStyle = ts;
         ps.Height = 1;
         ps.TextAlign = textAlign;
+        ps.Ellipsis = "...";
         using var pb = ParagraphBuilder.Create(ps);
 
         pb.PushStyle(ts);

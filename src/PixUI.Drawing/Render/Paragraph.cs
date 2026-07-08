@@ -38,6 +38,7 @@ public interface IParagraphStyle : IDisposable
     TextAlign TextAlign { get; set; }
     float Height { get; set; }
     ITextStyle? TextStyle { get; set; }
+    string? Ellipsis { get; set; }
 }
 
 public interface IParagraphBuilder : IDisposable
