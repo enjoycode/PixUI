@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 
 namespace PixUI;
@@ -84,19 +85,20 @@ public sealed class DataGridController<T> /* where T : notnull*/
     /// <summary>
     /// 数据源
     /// </summary>
+    /// <remarks>
+    /// 如果数据源实现了INotifyCollectionChanged接口，集合变更时会自动刷新
+    /// </remarks>
     public IList<T>? DataSource
     {
         get => _dataSource;
         set
         {
-            var oldEmpty = _dataSource == null || _dataSource.Count == 0;
-            var newEmpty = value == null || value.Count == 0;
-
+            if (_dataSource is INotifyCollectionChanged oldCollection)
+                oldCollection.CollectionChanged -= OnCollectionChanged;
             _dataSource = value;
-            ClearAllCache();
-
-            if (oldEmpty && newEmpty) return;
-            _owner?.Repaint();
+            if (_dataSource is INotifyCollectionChanged newCollection)
+                newCollection.CollectionChanged += OnCollectionChanged;
+            OnCollectionChanged(NotifyCollectionChangedAction.Reset);
         }
     }
 
@@ -136,7 +138,7 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
     #region ----Selection----
 
-    private readonly List<int> _selectedRows = new();
+    private readonly List<int> _selectedRows = [];
 
     public event Action? SelectionChanged;
 
@@ -594,12 +596,29 @@ public sealed class DataGridController<T> /* where T : notnull*/
 
     #region ====Add / Remove / Refresh=====
 
+    private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        OnCollectionChanged(e.Action);
+    }
+
+    private void OnCollectionChanged(NotifyCollectionChangedAction action)
+    {
+        if (action is NotifyCollectionChangedAction.Remove or NotifyCollectionChangedAction.Reset)
+        {
+            ClearSelection(); //TODO: rowIndex when in selection
+            ClearAllCache(); //TODO:仅移除并重设缓存
+        }
+
+        //TODO: refresh DataView
+        _owner?.Body.Repaint();
+    }
+
     public void Add(T item)
     {
         _dataSource ??= new List<T>();
         _dataSource.Add(item);
-        //TODO: refresh DataView
-        _owner?.Body.Repaint();
+        if (_dataSource is not INotifyCollectionChanged)
+            OnCollectionChanged(NotifyCollectionChangedAction.Add);
     }
 
     public void Remove(T item)
@@ -619,9 +638,8 @@ public sealed class DataGridController<T> /* where T : notnull*/
         }
 
         _dataSource!.RemoveAt(rowIndex);
-        ClearSelection(); //TODO: rowIndex when in selection
-        ClearAllCache(); //TODO:仅移除并重设缓存
-        _owner?.Body.Repaint();
+        if (_dataSource is not INotifyCollectionChanged)
+            OnCollectionChanged(NotifyCollectionChangedAction.Remove);
     }
 
     /// <summary>
