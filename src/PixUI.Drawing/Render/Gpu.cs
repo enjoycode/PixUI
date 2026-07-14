@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace PixUI;
 
 public interface IGRContext : IDisposable
