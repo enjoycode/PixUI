@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -127,7 +128,7 @@ public struct RRect
 
         if (xRad <= 0 || yRad <= 0)
         {
-            SetRect(rect); // all corners are square in this case
+            SetRect(in rect); // all corners are square in this case
             return;
         }
 
@@ -172,7 +173,6 @@ public struct RRect
         if (!IsValid())
         {
             SetRect(in rect);
-            return;
         }
     }
 
@@ -223,6 +223,7 @@ public struct RRect
         return scale < 1.0;
     }
 
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     private void ComputeType()
     {
         if (_rect.IsEmpty)
@@ -278,11 +279,12 @@ public struct RRect
 
         if (!IsValid())
         {
-            SetRect(_rect);
+            SetRect(ref _rect);
             Debug.Assert(IsValid());
         }
     }
 
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     private bool IsValid()
     {
         if (!AreRectAndRadiiValid(ref _rect, _radius))
@@ -385,6 +387,7 @@ public struct RRect
         return true;
     }
 
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     private static bool RadiiAreNinePatch(ReadOnlySpan<Radius> radius)
     {
         return radius[UpperLeftCorner].X == radius[LowerLeftCorner].X &&
@@ -433,6 +436,7 @@ public struct RRect
     /// If we can't distinguish one of the radii relative to the other, force it to zero so it
     /// doesn't confuse us later.
     /// </summary>
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     private static void FlushToZero(ref float a, ref float b)
     {
         Debug.Assert(a >= 0 && b >= 0);
