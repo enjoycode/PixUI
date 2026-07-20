@@ -305,5 +305,3 @@ bin\gn gen out/win-arm64 --args="target_cpu=\"arm64\" is_official_build=true is_
 
 ninja -C out/win-arm64 skia
 ```
-
-注意: skia_use_gl=true skia_use_angle=true
