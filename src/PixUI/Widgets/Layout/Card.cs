@@ -98,7 +98,7 @@ public sealed class Card : SingleChildWidget
         //Clip外形后填充背景及边框
         canvas.Save();
         canvas.ClipPath(outerPath, ClipOp.Intersect, true);
-        var fill = PixUI.Paint.Shared(color);
+        var fill = Paint.Shared(color);
         canvas.DrawRect(rect, fill);
         shape.Paint(canvas, rect);
 
