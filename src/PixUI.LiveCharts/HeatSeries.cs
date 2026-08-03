@@ -20,13 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Collections.Generic;
+using LiveChartsCore;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Kernel;
-using LiveCharts.Drawing;
-using LiveCharts.Drawing.Geometries;
-using LiveChartsCore;
+using PixUI.LiveCharts.Drawing.Geometries;
 
-namespace LiveCharts;
+namespace PixUI.LiveCharts;
 
 /// <summary>
 /// Defines a heat series in the user interface.
@@ -34,11 +34,38 @@ namespace LiveCharts;
 /// <typeparam name="TModel">
 /// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
 /// to use a custom type, you must register the type globally 
-/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
+/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Func{TModel, int, Coordinate})"/>)
 /// or at the series level 
-/// (<see cref="Series{TModel,TVisual,TLabel,TDrawingContext}.Mapping"/>).
+/// (<see cref="Series{TModel,TVisual,TLabel}.Mapping"/>).
 /// </typeparam>
-public class HeatSeries<TModel> : HeatSeries<TModel, ColoredRectangleGeometry, LabelGeometry> { }
+public class HeatSeries<TModel>
+    : HeatSeries<TModel, ColoredRectangleGeometry, LabelGeometry>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ColumnSeries{TModel, TVisual, TLabel}"/> class.
+    /// </summary>
+    public HeatSeries()
+        : base()
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HeatSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
+    /// </summary>
+    /// <param name="values">The values to plot.</param>
+    public HeatSeries(IReadOnlyCollection<TModel>? values)
+        : base(values)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HeatSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
+    /// </summary>
+    /// <param name="values">The values to plot.</param>
+    public HeatSeries(params TModel[] values)
+        : base(values)
+    { }
+}
 
 /// <summary>
 /// Defines a heat series in the user interface.
@@ -46,15 +73,42 @@ public class HeatSeries<TModel> : HeatSeries<TModel, ColoredRectangleGeometry, L
 /// <typeparam name="TModel">
 /// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
 /// to use a custom type, you must register the type globally 
-/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
+/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Func{TModel, int, Coordinate})"/>)
 /// or at the series level 
-/// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
+/// (<see cref="Series{TModel, TVisual, TLabel}.Mapping"/>).
 /// </typeparam>
 /// <typeparam name="TVisual">
 /// The type of the geometry of every point of the series.
 /// </typeparam>
-public class HeatSeries<TModel, TVisual> : HeatSeries<TModel, TVisual, LabelGeometry>
-    where TVisual : class, ISizedGeometry<SkiaDrawingContext>, IColoredGeometry<SkiaDrawingContext>, new() { }
+public class HeatSeries<TModel, TVisual>
+    : HeatSeries<TModel, TVisual, LabelGeometry>
+        where TVisual : BoundedDrawnGeometry, IColoredGeometry, new()
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ColumnSeries{TModel, TVisual, TLabel}"/> class.
+    /// </summary>
+    public HeatSeries()
+        : base()
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HeatSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
+    /// </summary>
+    /// <param name="values">The values to plot.</param>
+    public HeatSeries(IReadOnlyCollection<TModel>? values)
+        : base(values)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HeatSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
+    /// </summary>
+    /// <param name="values">The values to plot.</param>
+    public HeatSeries(params TModel[] values)
+        : base(values)
+    { }
+}
 
 /// <summary>
 /// Defines a heat series in the user interface.
@@ -62,9 +116,9 @@ public class HeatSeries<TModel, TVisual> : HeatSeries<TModel, TVisual, LabelGeom
 /// <typeparam name="TModel">
 /// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
 /// to use a custom type, you must register the type globally 
-/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
+/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Func{TModel, int, Coordinate})"/>)
 /// or at the series level 
-/// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
+/// (<see cref="Series{TModel, TVisual, TLabel}.Mapping"/>).
 /// </typeparam>
 /// <typeparam name="TVisual">
 /// The type of the geometry of every point of the series.
@@ -72,15 +126,38 @@ public class HeatSeries<TModel, TVisual> : HeatSeries<TModel, TVisual, LabelGeom
 /// <typeparam name="TLabel">
 /// The type of the data label of every point.
 /// </typeparam>
-public class HeatSeries<TModel, TVisual, TLabel> : HeatSeries<TModel, TVisual, TLabel, SkiaDrawingContext>
-    where TVisual : class, ISizedGeometry<SkiaDrawingContext>, IColoredGeometry<SkiaDrawingContext>, new()
-    where TLabel : class, ILabelGeometry<SkiaDrawingContext>, new()
+public class HeatSeries<TModel, TVisual, TLabel>
+    : CoreHeatSeries<TModel, TVisual, TLabel>
+        where TVisual : BoundedDrawnGeometry, IColoredGeometry, new()
+        where TLabel : BaseLabelGeometry, new()
 {
+    static HeatSeries()
+    {
+        LiveChartsSkiaSharp.EnsureInitialized();
+    }
+
     /// <summary>
-    /// Initializes a new instance of the <see cref="HeatSeries{TModel, TVisual, TLabel}"/> class.
+    /// Initializes a new instance of the <see cref="ColumnSeries{TModel, TVisual, TLabel}"/> class.
     /// </summary>
     public HeatSeries()
-    {
-        LiveChartsCore.LiveCharts.Configure(config => config.UseDefaults());
-    }
+        : base(null)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HeatSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
+    /// </summary>
+    /// <param name="values">The values to plot.</param>
+    public HeatSeries(IReadOnlyCollection<TModel>? values)
+        : base(values)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HeatSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
+    /// </summary>
+    /// <param name="values">The values to plot.</param>
+    public HeatSeries(params TModel[] values)
+        : base(values)
+    { }
 }

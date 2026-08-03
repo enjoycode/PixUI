@@ -20,48 +20,57 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using LiveCharts.Drawing;
+using System.Collections.Generic;
 
-
-namespace LiveCharts.Painting.Effects;
+namespace PixUI.LiveCharts.Painting;
 
 /// <summary>
 /// A wrapper object for skia sharp path effects.
 /// </summary>
-/// <seealso cref="IDisposable" />
-public abstract class PathEffect : IDisposable
+public abstract class PathEffect(object key)
 {
-    /// <summary>
-    /// Gets or sets the sk path effect.
-    /// </summary>
-    /// <value>
-    /// The sk path effect.
-    /// </value>
-    public SKPathEffect? SKPathEffect { get; set; }
-
-    /// <summary>
-    /// Creates a new object that is a copy of the current instance.
-    /// </summary>
-    /// <returns>
-    /// A new object that is a copy of this instance.
-    /// </returns>
-    public abstract PathEffect Clone();
-
-    /// <summary>
-    /// Creates the path effect.
-    /// </summary>
-    /// <param name="drawingContext">The drawing context.</param>
-    public abstract void CreateEffect(SkiaDrawingContext drawingContext);
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-    /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
-    public virtual void Dispose()
+    private readonly object _key = key;
+    private static readonly Dictionary<object, PathEffect> s_defaultEffects = new()
     {
-        if (SKPathEffect is null) return;
-        SKPathEffect.Dispose();
-        SKPathEffect = null;
+        { DashEffect.s_key, new DashEffect([1, 0], 0) }
+    };
+
+    /// <summary>
+    /// Builds the native Skia path effect from this effect's parameters. The returned object is owned
+    /// by the caller (the <see cref="SkiaPaint"/>), which caches and disposes it — the effect itself
+    /// holds no native resource, so it is a lightweight, shareable value.
+    /// </summary>
+    /// <returns>A new native path effect.</returns>
+    public abstract SKPathEffect CreateNative();
+
+    /// <summary>
+    /// Returns the effect interpolated toward <paramref name="target"/> at the given progress.
+    /// </summary>
+    /// <param name="progress">The progress.</param>
+    /// <param name="target">The end target.</param>
+    /// <returns>A new interpolated effect.</returns>
+    public abstract PathEffect? Transitionate(float progress, PathEffect? target);
+
+    /// <summary>
+    /// Adds a default filter.
+    /// </summary>
+    /// <param name="key">The key.</param>
+    /// <param name="effect">The effect.</param>
+    public static void AddDefaultEffect(byte key, PathEffect effect) =>
+        s_defaultEffects[key] = effect;
+
+    internal static PathEffect? Transitionate(PathEffect? from, PathEffect? to, float progress)
+    {
+        if (from is null && to is null) return null;
+
+        var key = (from ?? to)!._key;
+
+        // Transition a null endpoint to/from the effect's registered no-op default (e.g. a dash
+        // fades to "no dash"). An effect without a registered default — e.g. a custom self-animating
+        // effect — falls back to the present endpoint instead of throwing.
+        from ??= s_defaultEffects.TryGetValue(key, out var dFrom) ? dFrom : to;
+        to ??= s_defaultEffects.TryGetValue(key, out var dTo) ? dTo : from;
+
+        return from!.Transitionate(progress, to);
     }
 }

@@ -15,3 +15,5 @@ global using SKStrokeCap = PixUI.StrokeCap;
 global using SKStrokeJoin = PixUI.StrokeJoin;
 global using SKShaderTileMode = PixUI.TileMode;
 global using SKFontStyle = PixUI.FontStyle;
+global using SKTextBlob = PixUI.IParagraph;
+global using SKFont = PixUI.IFont;

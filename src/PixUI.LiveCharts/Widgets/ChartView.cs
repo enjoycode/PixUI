@@ -12,7 +12,7 @@ using LiveChartsCore.VisualElements;
 using PixUI;
 using LCC = LiveChartsCore;
 
-namespace LiveCharts;
+namespace PixUI.LiveCharts;
 
 public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingContext>, IPaintEmptyClip
 {
@@ -241,7 +241,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
     public event VisualElementsHandler<SkiaDrawingContext>? VisualElementsPointerDown;
 
     public bool AutoUpdateEnabled { get; set; } = true;
-    public MotionCanvas<SkiaDrawingContext> CoreCanvas => _motionCanvas.CanvasCore;
+    public CoreMotionCanvas CoreCanvas => _motionCanvas.CanvasCore;
 
     public IChartLegend<SkiaDrawingContext>? Legend
     {
@@ -301,7 +301,7 @@ public abstract class ChartView : Widget, IMouseRegion, IChartView<SkiaDrawingCo
     {
         base.OnMounted();
         core?.Load();
-
+        
         CoreCanvas.Invalidated += _motionCanvas.CanvasCore_Invalidated;
     }
 

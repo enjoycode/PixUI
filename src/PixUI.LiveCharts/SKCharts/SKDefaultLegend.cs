@@ -20,123 +20,163 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
 using System.Linq;
+using LiveChartsCore;
 using LiveChartsCore.Drawing;
+using LiveChartsCore.Drawing.Layouts;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.Measure;
-using LiveCharts.Drawing;
-using LiveCharts.Drawing.Geometries;
-using LiveCharts.Painting;
-using LiveCharts.VisualElements;
-using LiveChartsCore;
-using LiveChartsCore.VisualElements;
+using LiveChartsCore.Motion;
+using LiveChartsCore.Painting;
+using PixUI.LiveCharts.Drawing;
+using PixUI.LiveCharts.Drawing.Geometries;
+using PixUI.LiveCharts.Painting;
 
-
-namespace LiveCharts.SKCharts;
+namespace PixUI.LiveCharts.SKCharts;
 
 /// <summary>
 /// Defines the default legend for a chart.
 /// </summary>
-public class SKDefaultLegend : IChartLegend<SkiaDrawingContext>
+public class SKDefaultLegend : PixUI.LiveCharts.Drawing.Container, IChartLegend
 {
-    private static readonly int s_zIndex = 10050;
-
-    // marked as internal only for testing purposes
-    internal readonly StackPanel<RoundedRectangleGeometry, SkiaDrawingContext> _stackPanel = new()
-    {
-        Padding = new Padding(15, 4),
-        HorizontalAlignment = Align.Start,
-        VerticalAlignment = Align.Middle
-    };
+    private bool _isInitialized;
+    private object? _themeId;
+    private DrawnTask? _drawnTask;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SKDefaultLegend"/> class.
+    /// Gets or sets the easing function.
     /// </summary>
-    public SKDefaultLegend()
-    {
-        FontPaint = SolidColorPaint.MakeByColor(new SKColor(30, 30, 30, 255));
-    }
+    public Func<float, float> Easing { get; set; } = EasingFunctions.EaseOut;
 
     /// <summary>
-    /// Gets or sets the legend font paint.
+    /// Gets or sets the animations speed.
     /// </summary>
-    public IPaint<SkiaDrawingContext>? FontPaint { get; set; }
+    public TimeSpan AnimationsSpeed { get; set; } = TimeSpan.FromMilliseconds(150);
 
-    /// <summary>
-    /// Gets or sets the fonts size.
-    /// </summary>
-    public double TextSize { get; set; } = 15;
-
-    /// <inheritdoc cref="IChartLegend{TDrawingContext}.Draw(Chart{TDrawingContext})"/>
-    public void Draw(Chart<SkiaDrawingContext> chart)
+    /// <inheritdoc cref="IChartLegend.Draw(Chart)"/>
+    public virtual void Draw(Chart chart)
     {
+        var theme = chart.GetTheme();
+
+        if (!_isInitialized || _themeId != theme.ThemeId || chart.View.LegendBackgroundPaint is not null)
+        {
+            Initialize(chart);
+            _themeId = theme.ThemeId;
+            _isInitialized = true;
+        }
+
+        if (_drawnTask is null || _drawnTask.IsEmpty)
+        {
+            _drawnTask = chart.Canvas.AddGeometry(CanvasZone.Overlay, this);
+            _drawnTask.ZIndex = 10099;
+        }
+
         var legendPosition = chart.GetLegendPosition();
 
-        _stackPanel.X = legendPosition.X;
-        _stackPanel.Y = legendPosition.Y;
+        X = legendPosition.X;
+        Y = legendPosition.Y;
 
-        chart.AddVisual(_stackPanel);
-        if (chart.LegendPosition == LegendPosition.Hidden) chart.RemoveVisual(_stackPanel);
-    }
-
-    /// <inheritdoc cref="IChartLegend{TDrawingContext}.Measure(Chart{TDrawingContext})"/>
-    public LvcSize Measure(Chart<SkiaDrawingContext> chart)
-    {
-        BuildLayout(chart);
-        return _stackPanel.Measure(chart);
-    }
-
-    private void BuildLayout(Chart<SkiaDrawingContext> chart)
-    {
-        if (chart.View.LegendTextPaint is not null) FontPaint = chart.View.LegendTextPaint;
-        if (chart.View.LegendTextSize is not null) TextSize = chart.View.LegendTextSize.Value;
-
-        if (FontPaint is not null) FontPaint.ZIndex = s_zIndex + 1;
-
-        _stackPanel.Orientation = chart.LegendPosition is LegendPosition.Left or LegendPosition.Right
-            ? ContainerOrientation.Vertical
-            : ContainerOrientation.Horizontal;
-
-        if (_stackPanel.Orientation == ContainerOrientation.Horizontal)
+        if (chart.LegendPosition == LegendPosition.Hidden && _drawnTask is not null)
         {
-            _stackPanel.MaxWidth = chart.ControlSize.Width;
-            _stackPanel.MaxHeight = double.MaxValue;
+            chart.Canvas.RemovePaintTask(_drawnTask);
+            _drawnTask = null;
+        }
+    }
+
+    /// <inheritdoc cref="IChartLegend.Measure(Chart)"/>
+    public virtual LvcSize Measure(Chart chart)
+    {
+        Content = (IDrawnElement<SkiaSharpDrawingContext>)GetLayout(chart);
+
+        return Measure();
+    }
+
+    /// <inheritdoc cref="IChartLegend.Hide(Chart)"/>
+    public virtual void Hide(Chart chart)
+    {
+        if (_drawnTask is not null)
+        {
+            chart.Canvas.RemovePaintTask(_drawnTask);
+            _drawnTask = null;
+        }
+    }
+
+    /// <summary>
+    /// Gets the content of the legend.
+    /// </summary>
+    /// <param name="chart">The chart.</param>
+    /// <returns>The content layout.</returns>
+    protected virtual Layout<SkiaSharpDrawingContext> GetLayout(Chart chart)
+    {
+        var theme = chart.GetTheme();
+
+        var textSize = (float)chart.View.LegendTextSize;
+        if (textSize < 0) textSize = theme.LegendTextSize;
+
+        var fontPaint =
+            chart.View.LegendTextPaint ??
+            theme.LegendTextPaint ??
+            new SolidColorPaint(new SKColor(30, 30, 30, 255));
+
+        var rtl = LiveChartsSkiaSharp.DefaultTextSettings.IsRTL;
+
+        var stackLayout = new StackLayout
+        {
+            Padding = new Padding(15, 4),
+            HorizontalAlignment = rtl ? Align.End : Align.Start,
+            VerticalAlignment = Align.Middle,
+            Orientation = chart.LegendPosition is LegendPosition.Left or LegendPosition.Right
+                ? ContainerOrientation.Vertical
+                : ContainerOrientation.Horizontal
+        };
+
+        if (stackLayout.Orientation == ContainerOrientation.Horizontal)
+        {
+            stackLayout.MaxWidth = chart.ControlSize.Width;
+            stackLayout.MaxHeight = double.MaxValue;
         }
         else
         {
-            _stackPanel.MaxWidth = double.MaxValue;
-            _stackPanel.MaxHeight = chart.ControlSize.Height;
-        }
-
-        foreach (var visual in _stackPanel.Children.ToArray())
-        {
-            _ = _stackPanel.Children.Remove(visual);
-            chart.RemoveVisual(visual);
+            stackLayout.MaxWidth = double.MaxValue;
+            stackLayout.MaxHeight = chart.ControlSize.Height;
         }
 
         foreach (var series in chart.Series.Where(x => x.IsVisibleAtLegend))
         {
-            _stackPanel.Children.Add(new StackPanel<RectangleGeometry, SkiaDrawingContext>
+            var miniature = (IDrawnElement<SkiaSharpDrawingContext>)series.GetMiniatureGeometry(null);
+            var label = new LabelGeometry
+            {
+                Text = series.Name ?? string.Empty,
+                Paint = fontPaint,
+                TextSize = textSize,
+                Padding = new Padding(8, 2, 8, 2),
+                MaxWidth = (float)LiveChartsCore.LiveCharts.DefaultSettings.MaxTooltipsAndLegendsLabelsWidth,
+                VerticalAlign = Align.Start,
+                HorizontalAlign = Align.Start
+            };
+
+            stackLayout.Children.Add(new StackLayout
             {
                 Padding = new Padding(12, 6),
                 VerticalAlignment = Align.Middle,
                 HorizontalAlignment = Align.Middle,
-                Children =
-                {
-                    series.GetMiniaturesSketch().AsDrawnControl(s_zIndex),
-                    new LabelVisual
-                    {
-                        Text = series.Name ?? string.Empty,
-                        Paint = FontPaint,
-                        TextSize = TextSize,
-                        Padding = new Padding(8, 0, 0, 0),
-                        MaxWidth = (float)LiveChartsCore.LiveCharts.DefaultSettings.MaxTooltipsAndLegendsLabelsWidth,
-                        VerticalAlignment = Align.Start,
-                        HorizontalAlignment = Align.Start,
-                        ClippingMode = ClipMode.None
-                    }
-                }
+                Children = rtl
+                    ? [label, miniature]
+                    : [miniature, label]
             });
         }
+
+        return stackLayout;
+    }
+
+    /// <summary>
+    /// Called to initialize the tooltip.
+    /// </summary>
+    protected virtual void Initialize(Chart chart)
+    {
+        Geometry.Fill =
+            chart.View.LegendBackgroundPaint ??
+            chart.GetTheme().LegendBackgroundPaint;
     }
 }

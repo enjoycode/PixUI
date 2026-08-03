@@ -96,3 +96,8 @@ public interface IFont : IDisposable
 
     Size MeasureString(string text);
 }
+
+public static class FontExtensions
+{
+    public static bool ContainsGlyph(this IFont font, int codepoint) => font.GetGlyphId(codepoint) > 0;
+}

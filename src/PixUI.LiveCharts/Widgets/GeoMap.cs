@@ -11,7 +11,7 @@ using LiveChartsCore.Motion;
 using LCC = LiveChartsCore;
 using PixUI;
 
-namespace LiveCharts;
+namespace PixUI.LiveCharts;
 
 public sealed class GeoMap : Widget, IMouseRegion, IGeoMapView<SkiaDrawingContext>, IPaintEmptyClip
 {

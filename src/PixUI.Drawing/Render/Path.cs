@@ -30,6 +30,8 @@ public interface IPath : IDisposable
 
     void ArcTo(Rect oval, float startAngle, float sweepAngle, bool forceMoveTo);
 
+    void ArcTo(Point point1, Point point2, float radius);
+
     void ArcTo(float rx, float ry, float xAxisRotate, bool useSmallArc, bool isCCW, float x, float y);
 
     void CubicTo(float x0, float y0, float x1, float y1, float x2, float y2);
@@ -40,6 +42,8 @@ public interface IPath : IDisposable
 
     void AddOval(Rect rect, PathDirection direction = PathDirection.Clockwise);
 
+    void AddCircle(float x, float y, float radius, PathDirection dir = PathDirection.Clockwise);
+
     void AddRRect(RRect rect, bool isCCW = false);
 
     void AddArc(Rect oval, float startAngle, float sweepAngle);
@@ -49,6 +53,8 @@ public interface IPath : IDisposable
     bool Op(IPath other, PathOp op);
 
     void Transform(Matrix3 matrix);
+
+    void Reset();
 
     void Close();
 }

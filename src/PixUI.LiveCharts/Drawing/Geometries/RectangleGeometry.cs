@@ -20,22 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace LiveCharts.Drawing.Geometries;
+using LiveChartsCore.Drawing;
+
+namespace PixUI.LiveCharts.Drawing.Geometries;
 
 /// <summary>
 /// Defines a rectangle geometry.
 /// </summary>
-/// <seealso cref="SizedGeometry" />
-public class RectangleGeometry : SizedGeometry
+public class RectangleGeometry : BoundedDrawnGeometry, IDrawnElement<SkiaSharpDrawingContext>
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RectangleGeometry"/> class.
-    /// </summary>
-    public RectangleGeometry() : base() { }
-
-    /// <inheritdoc cref="Geometry.OnDraw(SkiaSharpDrawingContext, SKPaint)" />
-    public override void OnDraw(SkiaDrawingContext context, SKPaint paint)
+    /// <inheritdoc cref="IDrawnElement{TDrawingContext}.Draw(TDrawingContext)" />
+    public virtual void Draw(SkiaSharpDrawingContext context)
     {
-        context.Canvas.DrawRect(SKRect.FromLTWH(X, Y, Height, Width), paint);
+        context.Canvas.DrawRect(Rect.FromLTWH(X, Y, Width, Height), context.ActiveSkiaPaint);
     }
 }

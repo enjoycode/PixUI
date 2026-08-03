@@ -20,47 +20,42 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using LiveCharts.Drawing;
+using System;
 
-
-namespace LiveCharts.Painting.Effects;
+namespace PixUI.LiveCharts.Painting;
 
 /// <summary>
 /// Creates a stroke dash effect.
 /// </summary>
 /// <seealso cref="PathEffect" />
-public class DashEffect : PathEffect
+/// <remarks>
+/// Initializes a new instance of the <see cref="DashEffect"/> class.
+/// </remarks>
+public class DashEffect(float[] dashArray, float phase = 0)
+    : PathEffect(s_key)
 {
-    private readonly float[] _dashArray;
-    private readonly float _phase = 0;
+    internal static object s_key = new();
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DashEffect"/> class.
-    /// </summary>
-    public DashEffect(float[] dashArray, float phase = 0)
-    {
-        _dashArray = dashArray;
-        _phase = phase;
-    }
+    private float[] DashArray { get; } = dashArray;
+    private float Phase { get; } = phase;
 
-    /// <summary>
-    /// Creates a new object that is a copy of the current instance.
-    /// </summary>
-    /// <returns>
-    /// A new object that is a copy of this instance.
-    /// </returns>
-    /// <exception cref="System.NotImplementedException"></exception>
-    public override PathEffect Clone()
-    {
-        return new DashEffect(_dashArray, _phase);
-    }
+    /// <inheritdoc cref="PathEffect.CreateNative()"/>
+    public override SKPathEffect CreateNative() => PixUI.PathEffect.CreateDash(DashArray, Phase)!;
 
-    /// <summary>
-    /// Creates the path effect.
-    /// </summary>
-    /// <param name="drawingContext">The drawing context.</param>
-    public override void CreateEffect(SkiaDrawingContext drawingContext)
+    /// <inheritdoc cref="PathEffect.Transitionate(float, PathEffect)"/>
+    public override PathEffect? Transitionate(float progress, PathEffect? target)
     {
-        SKPathEffect = PixUI.PathEffect.CreateDash(_dashArray, _phase);
+        if (target is not DashEffect dashEffect) return target;
+
+        if (DashArray.Length != dashEffect.DashArray.Length)
+            throw new Exception("The dash arrays must have the same length");
+
+        var dashArray = new float[DashArray.Length];
+        for (var i = 0; i < dashArray.Length; i++)
+            dashArray[i] = DashArray[i] + (dashEffect.DashArray[i] - DashArray[i]) * progress;
+
+        var phase = Phase + (dashEffect.Phase - Phase) * progress;
+
+        return new DashEffect(dashArray, phase);
     }
 }

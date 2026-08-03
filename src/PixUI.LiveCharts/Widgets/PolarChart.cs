@@ -13,7 +13,7 @@ using LiveChartsCore.Measure;
 using LiveChartsCore.VisualElements;
 using PixUI;
 
-namespace LiveCharts;
+namespace PixUI.LiveCharts;
 
 public sealed class PolarChart : ChartView, IPolarChartView<SkiaDrawingContext>
 {

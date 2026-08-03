@@ -24,14 +24,15 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using LiveChartsCore.Geo;
 
-namespace LiveCharts.Drawing.Geometries;
+namespace PixUI.LiveCharts.Drawing.Geometries;
+
+// NOTE: this should be in the core? there is no reference to SkiaSharp
 
 /// <summary>
 /// Defines a heat lane.
 /// </summary>
 public class HeatLand : IWeigthedMapLand
 {
-    private double _value;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HeatLand"/> class.
@@ -60,15 +61,13 @@ public class HeatLand : IWeigthedMapLand
     public string Name { get; set; } = string.Empty;
 
     /// <inheritdoc cref="IWeigthedMapLand.Value"/>
-    public double Value { get => _value; set { _value = value; OnPropertyChanged(); } }
+    public double Value { get; set { field = value; OnPropertyChanged(); } }
 
     /// <summary>
     /// Called when a property changes.
     /// </summary>
     /// <param name="propertyName"></param>
-    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 
 }

@@ -20,26 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace LiveCharts.Drawing.Geometries;
+using LiveChartsCore.Drawing;
+
+namespace PixUI.LiveCharts.Drawing.Geometries;
 
 /// <summary>
 /// Defines a circle geometry.
 /// </summary>
-/// <seealso cref="SizedGeometry" />
-public class CircleGeometry : SizedGeometry
+public class CircleGeometry : BoundedDrawnGeometry, IDrawnElement<SkiaSharpDrawingContext>
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CircleGeometry"/> class.
-    /// </summary>
-    public CircleGeometry() : base()
-    {
-        matchDimensions = true;
-    }
-
-    /// <inheritdoc cref="Geometry.OnDraw(SkiaSharpDrawingContext, SKPaint)" />
-    public override void OnDraw(SkiaDrawingContext context, SKPaint paint)
+    /// <inheritdoc cref="IDrawnElement{TDrawingContext}.Draw(TDrawingContext)" />
+    public virtual void Draw(SkiaSharpDrawingContext context)
     {
         var rx = Width / 2f;
-        context.Canvas.DrawCircle(X + rx, Y + rx, rx, paint);
+        context.Canvas.DrawCircle(X + rx, Y + rx, rx, context.ActiveSkiaPaint);
     }
 }

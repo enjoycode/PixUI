@@ -20,13 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Collections.Generic;
+using LiveChartsCore;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Kernel;
-using LiveCharts.Drawing;
-using LiveCharts.Drawing.Geometries;
-using LiveChartsCore;
+using PixUI.LiveCharts.Drawing.Geometries;
 
-namespace LiveCharts;
+namespace PixUI.LiveCharts;
 
 /// <summary>
 /// Defines a pie series in the user interface.
@@ -34,23 +34,44 @@ namespace LiveCharts;
 /// <typeparam name="TModel">
 /// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
 /// to use a custom type, you must register the type globally 
-/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
+/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Func{TModel, int, Coordinate})"/>)
 /// or at the series level 
-/// (<see cref="Series{TModel,TVisual,TLabel,TDrawingContext}.Mapping"/>).
+/// (<see cref="Series{TModel,TVisual,TLabel}.Mapping"/>).
 /// </typeparam>
-public class PieSeries<TModel> : PieSeries<TModel, DoughnutGeometry, LabelGeometry>
+public class PieSeries<TModel>
+    : PieSeries<TModel, DoughnutGeometry, LabelGeometry>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="PieSeries{TModel}"/> class.
+    /// Initializes a new instance of the <see cref="PieSeries{TModel, TVisual, TLabel}"/> class.
     /// </summary>
-    public PieSeries() : base(false, false) { }
+    public PieSeries()
+        : base()
+    { }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PieSeries{TModel}"/> class.
+    /// Initializes a new instance of the <see cref="PieSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
     /// </summary>
-    /// <param name="isGauge"></param>
-    /// <param name="isGaugeFill"></param>
-    public PieSeries(bool isGauge = false, bool isGaugeFill = false) : base(isGauge, isGaugeFill) { }
+    /// <param name="values">The values to plot.</param>
+    public PieSeries(IReadOnlyCollection<TModel>? values)
+        : base(values)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PieSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
+    /// </summary>
+    /// <param name="values">The values to plot.</param>
+    public PieSeries(params TModel[] values)
+        : base(values)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PieSeries{TModel, TVisual, TLabel}"/> class.
+    /// </summary>
+    public PieSeries(bool isGauge = false, bool isGaugeFill = false)
+        : base(isGauge, isGaugeFill)
+    { }
 }
 
 /// <summary>
@@ -59,27 +80,48 @@ public class PieSeries<TModel> : PieSeries<TModel, DoughnutGeometry, LabelGeomet
 /// <typeparam name="TModel">
 /// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
 /// to use a custom type, you must register the type globally 
-/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
+/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Func{TModel, int, Coordinate})"/>)
 /// or at the series level 
-/// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
+/// (<see cref="Series{TModel, TVisual, TLabel}.Mapping"/>).
 /// </typeparam>
 /// <typeparam name="TVisual">
 /// The type of the geometry of every point of the series.
 /// </typeparam>
-public class PieSeries<TModel, TVisual> : PieSeries<TModel, TVisual, LabelGeometry>
-    where TVisual : class, IDoughnutGeometry<SkiaDrawingContext>, new()
+public class PieSeries<TModel, TVisual>
+    : PieSeries<TModel, TVisual, LabelGeometry>
+        where TVisual : BaseDoughnutGeometry, new()
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="PieSeries{TModel}"/> class.
+    /// Initializes a new instance of the <see cref="PieSeries{TModel, TVisual, TLabel}"/> class.
     /// </summary>
-    public PieSeries() : base(false, false) { }
+    public PieSeries()
+        : base()
+    { }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PieSeries{TModel, TVisual}"/> class.
+    /// Initializes a new instance of the <see cref="PieSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
     /// </summary>
-    /// <param name="isGauge"></param>
-    /// <param name="isGaugeFill"></param>
-    public PieSeries(bool isGauge = false, bool isGaugeFill = false) : base(isGauge, isGaugeFill) { }
+    /// <param name="values">The values to plot.</param>
+    public PieSeries(IReadOnlyCollection<TModel>? values)
+        : base(values)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PieSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
+    /// </summary>
+    /// <param name="values">The values to plot.</param>
+    public PieSeries(params TModel[] values)
+        : base(values)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PieSeries{TModel, TVisual, TLabel}"/> class.
+    /// </summary>
+    public PieSeries(bool isGauge = false, bool isGaugeFill = false)
+        : base(isGauge, isGaugeFill)
+    { }
 }
 
 /// <summary>
@@ -88,9 +130,9 @@ public class PieSeries<TModel, TVisual> : PieSeries<TModel, TVisual, LabelGeomet
 /// <typeparam name="TModel">
 /// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
 /// to use a custom type, you must register the type globally 
-/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
+/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Func{TModel, int, Coordinate})"/>)
 /// or at the series level 
-/// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
+/// (<see cref="Series{TModel, TVisual, TLabel}.Mapping"/>).
 /// </typeparam>
 /// <typeparam name="TVisual">
 /// The type of the geometry of every point of the series.
@@ -98,19 +140,45 @@ public class PieSeries<TModel, TVisual> : PieSeries<TModel, TVisual, LabelGeomet
 /// <typeparam name="TLabel">
 /// The type of the data label of every point.
 /// </typeparam>
-public class PieSeries<TModel, TVisual, TLabel> : PieSeries<TModel, TVisual, TLabel, CircleGeometry, SkiaDrawingContext>
-    where TVisual : class, IDoughnutGeometry<SkiaDrawingContext>, new()
-    where TLabel : class, ILabelGeometry<SkiaDrawingContext>, new()
+public class PieSeries<TModel, TVisual, TLabel>
+    : CorePieSeries<TModel, TVisual, TLabel, CircleGeometry>
+        where TVisual : BaseDoughnutGeometry, new()
+        where TLabel : BaseLabelGeometry, new()
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PieSeries{TModel}"/> class.
-    /// </summary>
-    public PieSeries() : base(false, false) { }
+    static PieSeries()
+    {
+        LiveChartsSkiaSharp.EnsureInitialized();
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PieSeries{TModel, TVisual, TLabel}"/> class.
     /// </summary>
-    /// <param name="isGauge"></param>
-    /// <param name="isGaugeFill"></param>
-    public PieSeries(bool isGauge = false, bool isGaugeFill = false) : base(isGauge, isGaugeFill) { }
+    public PieSeries()
+        : base(null, false, false)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PieSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
+    /// </summary>
+    /// <param name="values">The values to plot.</param>
+    public PieSeries(IReadOnlyCollection<TModel>? values)
+        : base(values, false, false)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PieSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
+    /// </summary>
+    /// <param name="values">The values to plot.</param>
+    public PieSeries(params TModel[] values)
+        : base(values, false, false)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PieSeries{TModel, TVisual, TLabel}"/> class.
+    /// </summary>
+    public PieSeries(bool isGauge = false, bool isGaugeFill = false)
+        : base(null, isGauge, isGaugeFill)
+    { }
 }

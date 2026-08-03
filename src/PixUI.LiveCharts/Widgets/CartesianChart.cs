@@ -15,7 +15,7 @@ using LiveCharts.Painting;
 using LiveChartsCore.VisualElements;
 using PixUI;
 
-namespace LiveCharts;
+namespace PixUI.LiveCharts;
 
 public sealed class CartesianChart : ChartView, ICartesianChartView<SkiaDrawingContext>
 {

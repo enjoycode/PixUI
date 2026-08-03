@@ -11,7 +11,7 @@ using LiveCharts.Drawing;
 using LiveChartsCore.VisualElements;
 using PixUI;
 
-namespace LiveCharts;
+namespace PixUI.LiveCharts;
 
 public sealed class PieChart : ChartView, IPieChartView<SkiaDrawingContext>
 {

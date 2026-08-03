@@ -21,41 +21,39 @@
 // SOFTWARE.
 
 using LiveChartsCore.Drawing;
-using LiveChartsCore.Motion;
-using PixUI;
+using LiveChartsCore.Generators;
 
-namespace LiveCharts.Drawing.Geometries;
+namespace PixUI.LiveCharts.Drawing.Geometries;
 
 /// <summary>
 /// Defines a rectangle geometry with a specified color.
 /// </summary>
-/// <seealso cref="SizedGeometry" />
-public class ColoredRectangleGeometry : SizedGeometry, IColoredGeometry<SkiaDrawingContext>
+public partial class ColoredRectangleGeometry : BoundedDrawnGeometry, IColoredGeometry,
+    IDrawnElement<SkiaSharpDrawingContext>
 {
-    private readonly ColorMotionProperty _colorProperty;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ColoredRectangleGeometry"/> class.
     /// </summary>
-    public ColoredRectangleGeometry() : base()
+    public ColoredRectangleGeometry()
     {
-        _colorProperty = RegisterMotionProperty(new ColorMotionProperty(nameof(Color)));
+        _ColorMotionProperty = new(LvcColor.Empty);
     }
 
-    /// <inheritdoc cref="ISolidColorGeometry{TDrawingContext}.Color" />
-    public LvcColor Color
-    {
-        get => _colorProperty.GetMovement(this);
-        set => _colorProperty.SetMovement(value, this);
-    }
+    /// <inheritdoc cref="IColoredGeometry.Color" />
+    [MotionProperty]
+    public partial LvcColor Color { get; set; }
 
-    /// <inheritdoc cref="Geometry.OnDraw(SkiaSharpDrawingContext, SKPaint)" />
-    public override void OnDraw(SkiaDrawingContext context, SKPaint paint)
+    /// <inheritdoc cref="IDrawnElement{TDrawingContext}.Draw(TDrawingContext)" />
+    public virtual void Draw(SkiaSharpDrawingContext context)
     {
+        // it seems strange that this geometry modifies the paint of the context
+        // but this geometry is normally used in heat maps, i guess we can live with it.
+
         var c = Color;
-        paint.Color = new SKColor(c.R, c.G, c.B, c.A);
+        var activePaint = context.ActiveSkiaPaint;
 
-        context.Canvas.DrawRect(
-            new SKRect { Top = Y, Left = X, Size = new Size { Height = Height, Width = Width } }, paint);
+        activePaint.Color = new SKColor(c.R, c.G, c.B, c.A);
+
+        context.Canvas.DrawRect(Rect.FromLTWH(X, Y, Width, Height), activePaint);
     }
 }

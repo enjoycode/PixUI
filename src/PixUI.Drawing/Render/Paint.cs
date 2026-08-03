@@ -14,6 +14,7 @@ public interface IPaint : IDisposable
     IShader? Shader { get; set; }
     IMaskFilter? MaskFilter { get; set; }
     IImageFilter? ImageFilter { get; set; }
+    IColorFilter? ColorFilter { get; set; }
     void Reset();
 }
 

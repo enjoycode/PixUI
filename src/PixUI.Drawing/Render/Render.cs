@@ -49,11 +49,15 @@ public interface IRender
 
     IImageFilter? MakeImageFilterBlur(float sigmaX, float sigmaY, TileMode tileMode, IImageFilter? input);
 
+    IColorFilter? MakeColorFilterBlendMode(Color color, BlendMode blendMode);
+
     IPath MakePath();
 
     IPath MakePathFromSvgData(string svgPath);
 
     IPathEffect? MakePathEffectDash(float[] intervals, float phase);
+
+    IPathEffect? MakePathEffectCorner(float radius);
 
     #region ====Surface Factory====
 
