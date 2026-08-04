@@ -2,27 +2,25 @@ using System.Collections.Generic;
 using System.IO;
 using LiveChartsCore;
 using LiveChartsCore.Measure;
-using LiveCharts;
-using LiveCharts.Drawing;
-using LiveCharts.Painting;
-using LiveCharts.VisualElements;
+using PixUI.LiveCharts;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Geo;
+using PixUI.LiveCharts.Painting;
 
 namespace PixUI.Demo;
 
 public sealed class DemoCharts : View
 {
-    private static float[] data1 = { 3, 2, 5, 6, 4, 1, 2 };
-    private static float[] data2 = { 2, 1, 3, 5, 3, 4, 6 };
+    private static readonly float[] _data1 = [3, 2, 5, 6, 4, 1, 2];
+    private static readonly float[] _data2 = [2, 1, 3, 5, 3, 4, 6];
 
-    private ISeries[] series =
+    private readonly ISeries[] _series =
     {
-        new ColumnSeries<float> { Values = data1, },
-        new LineSeries<float> { Values = data2, Fill = null },
+        new ColumnSeries<float> { Values = _data1, },
+        new LineSeries<float> { Values = _data2, Fill = null },
     };
 
-    private IEnumerable<ISeries> pieSeries = data1.AsLiveChartsPieSeries((value, s) =>
+    private readonly IEnumerable<ISeries> _pieSeries = _data1.AsPieSeries((value, s) =>
     {
         // here you can configure the series assigned to each value.
         s.Name = $"S{value}";
@@ -32,40 +30,32 @@ public sealed class DemoCharts : View
         s.DataLabelsFormatter = p => $"{p.StackedValue.Share:P2}";
     });
 
-    private ISeries[] polarSeries =
+    private readonly ISeries[] _polarSeries =
     {
         new PolarLineSeries<int>
         {
-            Values = new[] { 7, 5, 7, 5, 6 },
+            Values = [7, 5, 7, 5, 6],
             LineSmoothness = 0,
             GeometrySize = 0,
             Fill = new SolidColorPaint { Color = Colors.Blue.WithAlpha(90) }
         },
         new PolarLineSeries<int>
         {
-            Values = new[] { 2, 7, 5, 9, 7 },
+            Values = [2, 7, 5, 9, 7],
             LineSmoothness = 1,
             GeometrySize = 0,
             Fill = new SolidColorPaint { Color = Colors.Red.WithAlpha(90) }
         }
     };
 
-    private PolarAxis[] polarAngleAxes =
+    private readonly PolarAxis[] _polarAngleAxes =
     {
         new PolarAxis
         {
             // LabelsRotation = LiveChartsCore.LiveCharts.TangentAngle,
             LabelsBackground = LvcColor.Empty,
-            Labels = new[] { "first", "second", "third", "forth", "fifth" }
+            Labels = ["first", "second", "third", "forth", "fifth"]
         }
-    };
-
-    private LabelVisual title = new LabelVisual()
-    {
-        Text = "My Chart Title",
-        TextSize = 25,
-        Padding = new LiveChartsCore.Drawing.Padding(15),
-        Paint = new SolidColorPaint { Color = Colors.Gray }
     };
 
     public DemoCharts()
@@ -87,10 +77,10 @@ public sealed class DemoCharts : View
         //var center = projector.ToMap(gcp2);
         // var ox = mapWidth / 2f - center.X;
         // var oy = mapHeight / 2f - center.Y;
-        var min = projector.ToMap(minBounds);
-        var max = projector.ToMap(maxBounds);
-        var cx = (max.X - min.X) / 2f + min.X;
-        var cy = (max.Y - min.Y) / 2f + min.Y;
+        projector.ToMap(minBounds.X, minBounds.Y, out var minX, out var minY);
+        projector.ToMap(maxBounds.X, maxBounds.Y, out var maxX, out var maxY);
+        var cx = (maxX - minX) / 2f + minX;
+        var cy = (maxY - minY) / 2f + minY;
         var ox = mapWidth / 2f - cx;
         var oy = mapHeight / 2f - cy;
 
@@ -115,7 +105,7 @@ public sealed class DemoCharts : View
                             Height = 300,
                             Child = new CartesianChart
                             {
-                                Series = series,
+                                Series = _series,
                                 //Title = title,
                             }
                         },
@@ -125,7 +115,7 @@ public sealed class DemoCharts : View
                             Height = 300,
                             Child = new PieChart
                             {
-                                Series = pieSeries,
+                                Series = _pieSeries,
                                 LegendPosition = LegendPosition.Right,
                             }
                         }
@@ -159,8 +149,7 @@ public sealed class DemoCharts : View
                                                 //     Colors.Black /*new Color(50, 0, 0, 100)*/
                                                 // )
                                             },
-                                            ActiveMap = Maps.GetMapFromStreamReader<SkiaDrawingContext>(
-                                                new StreamReader(geoJson))
+                                            ActiveMap = Maps.GetMapFromStreamReader(new StreamReader(geoJson))
                                         }
                                     }
                                 }
@@ -172,8 +161,8 @@ public sealed class DemoCharts : View
                             {
                                 Child = new PolarChart()
                                 {
-                                    Series = polarSeries,
-                                    AngleAxes = polarAngleAxes,
+                                    Series = _polarSeries,
+                                    AngleAxes = _polarAngleAxes,
                                     InitialRotation = -45,
                                 }
                             }

@@ -1,11 +1,9 @@
 using System;
 using System.Text.Json;
-using LiveCharts.Drawing;
-using LiveCharts.Drawing.Geometries;
-using LiveCharts.Drawing.Segments;
-using LiveCharts.Painting;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Geo;
+using PixUI.CodeEditor;
+using PixUI.LiveCharts.Painting;
 
 namespace PixUI.Demo;
 
@@ -23,11 +21,11 @@ public sealed class WuxiMap : Widget
         {
             var jsonOpts = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
             var cityJosn = JsonSerializer.Deserialize<GeoJsonFile>(wuxi, jsonOpts);
-            _cityLayer = new MapLayer<SkiaDrawingContext>("city",
+            _cityLayer = new MapLayer("city",
                 new SolidColorPaint { Color = Colors.Black },
                 new SolidColorPaint { Color = Colors.Gray });
             _areasJson = JsonSerializer.Deserialize<GeoJsonFile>(areas, jsonOpts);
-            _areasLayer = new MapLayer<SkiaDrawingContext>("default",
+            _areasLayer = new MapLayer("default",
                 new SolidColorPaint { Color = Colors.Black },
                 new SolidColorPaint { Color = Colors.Gray });
 
@@ -59,8 +57,8 @@ public sealed class WuxiMap : Widget
     }
 
     private readonly GeoJsonFile? _areasJson;
-    private readonly MapLayer<SkiaDrawingContext> _cityLayer = null!;
-    private readonly MapLayer<SkiaDrawingContext> _areasLayer = null!;
+    private readonly MapLayer _cityLayer = null!;
+    private readonly MapLayer _areasLayer = null!;
     private MapProjector _projector = null!;
     private Matrix4 _matrix = Matrix4.CreateIdentity();
     private float _scale = 1f;
@@ -85,52 +83,52 @@ public sealed class WuxiMap : Widget
         // var center = projector.ToMap(new LvcPointD(120.357298, 31.585559));
         // var ox = W / 2f - center.X;
         // var oy = H / 2f - center.Y;
-
-        var min = _projector.ToMap(new LvcPointD(_boundsLeft, _boundsTop));
-        var max = _projector.ToMap(new LvcPointD(_boundsRight, _boundsBottom));
-        var cx = (max.X - min.X) / 2f + min.X;
-        var cy = (max.Y - min.Y) / 2f + min.Y;
+        _projector.ToMap(_boundsLeft, _boundsTop, out var minX, out var minY);
+        _projector.ToMap(_boundsRight, _boundsBottom, out var maxX, out var maxY);
+        var cx = (maxX - minX) / 2f + minX;
+        var cy = (maxY - minY) / 2f + minY;
         var ox = W / 2f - cx;
         var oy = H / 2f - cy;
 
-        _scale = _projector.MapWidth / (max.X - min.X); //180f;
+        _scale = _projector.MapWidth / (maxX - minX); //180f;
         _matrix = Matrix4.CreateTranslation(W / 2f, H / 2f);
         _matrix.Scale(_scale, _scale);
         _matrix.Translate(-(W / 2f), -(H / 2f));
         _matrix.Translate(ox, oy);
     }
 
-    private static void BuildShapes(MapLayer<SkiaDrawingContext> layer, MapProjector projector)
+    private static void BuildShapes(MapLayer layer, MapProjector projector)
     {
         foreach (var landDefinition in layer.Lands.Values)
         {
             foreach (var landData in landDefinition.Data)
             {
-                HeatPathShape shape;
-                if (landData.Shape is null)
-                    landData.Shape = shape = new HeatPathShape { IsClosed = true };
-                else
-                    shape = (HeatPathShape)landData.Shape;
-                shape.ClearCommands();
-
-                var isFirst = true;
-
-                foreach (var point in landData.Coordinates)
-                {
-                    var p = projector.ToMap(point);
-
-                    var x = p.X;
-                    var y = p.Y;
-
-                    if (isFirst)
-                    {
-                        _ = shape.AddLast(new MoveToPathCommand { X = x, Y = y });
-                        isFirst = false;
-                        continue;
-                    }
-
-                    _ = shape.AddLast(new LineSegment { X = x, Y = y });
-                }
+                //TODO:
+                // HeatPathShape shape;
+                // if (landData.Shape is null)
+                //     landData.Shape = shape = new HeatPathShape { IsClosed = true };
+                // else
+                //     shape = (HeatPathShape)landData.Shape;
+                // shape.ClearCommands();
+                //
+                // var isFirst = true;
+                //
+                // foreach (var point in landData.Coordinates)
+                // {
+                //     projector.ToMap(point.X, point.Y, out var px, out var py);
+                //
+                //     var x = px;
+                //     var y = py;
+                //
+                //     if (isFirst)
+                //     {
+                //         _ = shape.AddLast(new MoveToPathCommand { X = x, Y = y });
+                //         isFirst = false;
+                //         continue;
+                //     }
+                //
+                //     _ = shape.AddLast(new LineSegment { X = x, Y = y });
+                // }
             }
         }
     }
@@ -148,12 +146,12 @@ public sealed class WuxiMap : Widget
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         const float s = 4;
-        using var fillPaint = PixUI.Paint.Create();
+        using var fillPaint = Paint.Create();
         fillPaint.Color = new Color(0xFF295EBC);
         fillPaint.Style = PaintStyle.Fill;
         fillPaint.ImageFilter = ImageFilter.CreateDropShadow(s / _scale, s / _scale,
             s * 2 / _scale, s * 2 / _scale, Colors.Black, null);
-        var strokePaint = PixUI.Paint.Shared(Colors.Black, PaintStyle.Stroke, 2f / _scale);
+        var strokePaint = Paint.Shared(Colors.Black, PaintStyle.Stroke, 2f / _scale);
 
         PaintLayer(_cityLayer, canvas, strokePaint, fillPaint);
         fillPaint.ImageFilter = null;
@@ -167,38 +165,38 @@ public sealed class WuxiMap : Widget
                 if (feature.Properties?["name"] is JsonElement { ValueKind: JsonValueKind.String } name &&
                     feature.Properties?["centroid"] is JsonElement { ValueKind: JsonValueKind.Array } center)
                 {
-                    var cp = _projector.ToMap(new LvcPointD(center[0].GetDouble(), center[1].GetDouble()));
+                    _projector.ToMap(center[0].GetDouble(), center[1].GetDouble(), out var cpX, out var cpY);
                     using var ph =
                         TextPainter.BuildParagraph(name.GetString()!, float.MaxValue, 10 / _scale, Colors.White);
-                    canvas.DrawParagraph(ph, cp.X - ph.MaxIntrinsicWidth / 2f, cp.Y);
+                    canvas.DrawParagraph(ph, cpX - ph.MaxIntrinsicWidth / 2f, cpY);
                 }
             }
         }
     }
 
-    private static void PaintLayer(MapLayer<SkiaDrawingContext> layer, ICanvas canvas,
-        IPaint strokePaint, IPaint fillPaint)
+    private static void PaintLayer(MapLayer layer, ICanvas canvas, IPaint strokePaint, IPaint fillPaint)
     {
         foreach (var landDefinition in layer.Lands.Values)
         {
             foreach (var landData in landDefinition.Data)
             {
-                if (landData.Shape is HeatPathShape heatPathShape)
-                {
-                    using var path = Path.Create();
-                    var temp = heatPathShape.FirstCommand;
-                    while (temp != null)
-                    {
-                        temp.Value.Execute(path, 0, heatPathShape);
-                        temp = temp.Next;
-                    }
-
-                    if (heatPathShape.IsClosed)
-                        path.Close();
-
-                    canvas.DrawPath(path, strokePaint);
-                    canvas.DrawPath(path, fillPaint);
-                }
+                //TODO:
+                // if (landData.Shape is HeatPathShape heatPathShape)
+                // {
+                //     using var path = Path.Create();
+                //     var temp = heatPathShape.FirstCommand;
+                //     while (temp != null)
+                //     {
+                //         temp.Value.Execute(path, 0, heatPathShape);
+                //         temp = temp.Next;
+                //     }
+                //
+                //     if (heatPathShape.IsClosed)
+                //         path.Close();
+                //
+                //     canvas.DrawPath(path, strokePaint);
+                //     canvas.DrawPath(path, fillPaint);
+                // }
             }
         }
     }

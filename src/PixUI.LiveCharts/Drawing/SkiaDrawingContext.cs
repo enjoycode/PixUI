@@ -204,7 +204,7 @@ public class SkiaSharpDrawingContext(
         {
             // we will draw using the active paint while the element paint is null
 
-            if (ActiveLvcPaint.PaintStyle.HasFlag(PaintStyle.Fill))
+            if (ActiveLvcPaint.PaintStyle.HasFlag(LiveChartsCore.Painting.PaintStyle.Fill))
             {
                 var elementFill = element.Fill;
 
@@ -214,7 +214,7 @@ public class SkiaSharpDrawingContext(
                     DrawByPaint(elementFill, element, opacity);
             }
 
-            if (ActiveLvcPaint.PaintStyle.HasFlag(PaintStyle.Stroke))
+            if (ActiveLvcPaint.PaintStyle.HasFlag(LiveChartsCore.Painting.PaintStyle.Stroke))
             {
                 var elementStroke = element.Stroke;
 

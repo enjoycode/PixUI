@@ -4,6 +4,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <RootNamespace>PixUI.LiveCharts</RootNamespace>
     </PropertyGroup>
 
     <Import Project="..\..\ext\LiveCharts2\src\skiasharp\_Shared\_Shared.projitems" Label="Shared" />
@@ -22,7 +23,7 @@
 
     <ItemGroup>
       <Compile Include="..\..\ext\LiveCharts2\src\skiasharp\_Shared\SourceGenDrawnView.shared.cs">
-        <Link>Widgets\SourceGenDrawnView.shared.cs</Link>
+        <Link>SourceGenDrawnView.shared.cs</Link>
       </Compile>
     </ItemGroup>
 
