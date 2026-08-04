@@ -22,7 +22,7 @@
 
 using LiveChartsCore.Motion;
 
-namespace LiveChartsCore.SkiaSharpView.Motion;
+namespace PixUI.LiveCharts.Motion;
 
 /// <summary>
 /// Defines the <see cref="SKColor"/> array motion property class. Each element is interpolated

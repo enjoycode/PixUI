@@ -22,7 +22,7 @@
 
 using LiveChartsCore.Motion;
 
-namespace LiveChartsCore.SkiaSharpView.Motion;
+namespace PixUI.LiveCharts.Motion;
 
 /// <summary>
 /// Defines the <see cref="SKPoint"/> motion property class.

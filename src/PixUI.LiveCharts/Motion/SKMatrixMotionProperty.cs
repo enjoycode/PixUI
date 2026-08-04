@@ -21,9 +21,8 @@
 // SOFTWARE.
 
 using LiveChartsCore.Motion;
-using PixUI;
 
-namespace LiveChartsCore.SkiaSharpView.Motion;
+namespace PixUI.LiveCharts.Motion;
 
 /// <summary>
 /// Defines a motion property to handle the <see cref="SKMatrix"/> type.

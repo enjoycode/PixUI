@@ -27,11 +27,11 @@ using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.Measure;
 using PixUI.LiveCharts.Drawing.Geometries;
 using PixUI.LiveCharts.Painting;
-using PixUI.LiveCharts.SKCharts;
 using PixUI.LiveCharts.VisualElements;
 using LiveChartsCore.Themes;
 using LiveChartsCore.VisualElements;
 using LiveChartsCore.VisualStates;
+using PixUI.LiveCharts.SKCharts;
 
 namespace PixUI.LiveCharts;
 
