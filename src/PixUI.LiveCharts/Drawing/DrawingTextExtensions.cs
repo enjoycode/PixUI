@@ -100,11 +100,9 @@ internal static class DrawingTextExtensions
                 };
 
             canvas.DrawParagraph(pb.Blob, (int)(rax + blobPosition.X + lao), (int)(ray + blobPosition.Y));
-            // canvas.DrawText(
-            //     pb.Blob,
+            // canvas.DrawText(pb.Blob,
             //     (int)(rax + blobPosition.X + lao), // truncate to avoid subpixel rendering issues
-            //     (int)(ray + blobPosition.Y),
-            //     paint);
+            //     (int)(ray + blobPosition.Y), paint);
         }
     }
 
@@ -342,7 +340,8 @@ internal static class DrawingTextExtensions
                     knownHeight = y;
                 }
 
-                pb.Position = new SKPoint(x + padding.Left, y + padding.Top - metrics.Ascent);
+                //pb.Position = new SKPoint(x + padding.Left, y + padding.Top - metrics.Ascent);
+                pb.Position = new SKPoint(x + padding.Left, y + padding.Top + metrics.Descent - metrics.Leading);
                 x += w;
 
                 if (x > knownWidth)
