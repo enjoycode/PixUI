@@ -115,8 +115,11 @@ public struct Matrix4 : IEquatable<Matrix4>
             0, 0, z, 0,
             0, 0, 0, 1);
 
-    public static Matrix4 CreateScaleTranslation(float sx, float sy, float tx, float ty)
-        => new Matrix4(Matrix3.CreateScaleTranslation(sx, sy, tx, ty));
+    public static Matrix4 CreateScale(float x, float y, float pivotX, float pivotY) =>
+        new(Matrix3.CreateScale(x, y, pivotX, pivotY));
+
+    public static Matrix4 CreateScaleTranslation(float sx, float sy, float tx, float ty) =>
+        new(Matrix3.CreateScaleTranslation(sx, sy, tx, ty));
 
     public static Matrix4 CreateRotation(float x, float y, float z, float radians)
     {
@@ -440,9 +443,7 @@ public struct Matrix4 : IEquatable<Matrix4>
         M33 = 1;
     }
 
-    public void SetConcat(Matrix4 a, Matrix4 b) => this = Concat(a, b);
-
-    public static Matrix4 Concat(Matrix4 a, Matrix4 b) => new(
+    public void SetConcat(Matrix4 a, Matrix4 b) => this = new(
         a.M00 * b.M00 + a.M01 * b.M10 + a.M02 * b.M20 + a.M03 * b.M30,
         a.M00 * b.M01 + a.M01 * b.M11 + a.M02 * b.M21 + a.M03 * b.M31,
         a.M00 * b.M02 + a.M01 * b.M12 + a.M02 * b.M22 + a.M03 * b.M32,
@@ -552,57 +553,41 @@ public struct Matrix4 : IEquatable<Matrix4>
         M13 = t8;
     }
 
-    public void Multiply(in Matrix4 arg)
+    public void Multiply(in Matrix4 b)
     {
-        var aM0 = M00;
-        var aM4 = M10;
-        var aM8 = M20;
-        var aM12 = M30;
-        var aM1 = M01;
-        var aM5 = M11;
-        var aM9 = M21;
-        var aM13 = M31;
-        var aM2 = M02;
-        var aM6 = M12;
-        var aM10 = M22;
-        var aM14 = M32;
-        var aM3 = M03;
-        var aM7 = M13;
-        var aM11 = M23;
-        var aM15 = M33;
-
-        var bM0 = arg.M00;
-        var bM4 = arg.M10;
-        var bM8 = arg.M20;
-        var bM12 = arg.M30;
-        var bM1 = arg.M01;
-        var bM5 = arg.M11;
-        var bM9 = arg.M21;
-        var bM13 = arg.M31;
-        var bM2 = arg.M02;
-        var bM6 = arg.M12;
-        var bM10 = arg.M22;
-        var bM14 = arg.M32;
-        var bM3 = arg.M03;
-        var bM7 = arg.M13;
-        var bM11 = arg.M23;
-        var bM15 = arg.M33;
-        M00 = (aM0 * bM0) + (aM4 * bM1) + (aM8 * bM2) + (aM12 * bM3);
-        M10 = (aM0 * bM4) + (aM4 * bM5) + (aM8 * bM6) + (aM12 * bM7);
-        M20 = (aM0 * bM8) + (aM4 * bM9) + (aM8 * bM10) + (aM12 * bM11);
-        M30 = (aM0 * bM12) + (aM4 * bM13) + (aM8 * bM14) + (aM12 * bM15);
-        M01 = (aM1 * bM0) + (aM5 * bM1) + (aM9 * bM2) + (aM13 * bM3);
-        M11 = (aM1 * bM4) + (aM5 * bM5) + (aM9 * bM6) + (aM13 * bM7);
-        M21 = (aM1 * bM8) + (aM5 * bM9) + (aM9 * bM10) + (aM13 * bM11);
-        M31 = (aM1 * bM12) + (aM5 * bM13) + (aM9 * bM14) + (aM13 * bM15);
-        M02 = (aM2 * bM0) + (aM6 * bM1) + (aM10 * bM2) + (aM14 * bM3);
-        M12 = (aM2 * bM4) + (aM6 * bM5) + (aM10 * bM6) + (aM14 * bM7);
-        M22 = (aM2 * bM8) + (aM6 * bM9) + (aM10 * bM10) + (aM14 * bM11);
-        M32 = (aM2 * bM12) + (aM6 * bM13) + (aM10 * bM14) + (aM14 * bM15);
-        M03 = (aM3 * bM0) + (aM7 * bM1) + (aM11 * bM2) + (aM15 * bM3);
-        M13 = (aM3 * bM4) + (aM7 * bM5) + (aM11 * bM6) + (aM15 * bM7);
-        M23 = (aM3 * bM8) + (aM7 * bM9) + (aM11 * bM10) + (aM15 * bM11);
-        M33 = (aM3 * bM12) + (aM7 * bM13) + (aM11 * bM14) + (aM15 * bM15);
+        var a00 = M00;
+        var a10 = M10;
+        var a20 = M20;
+        var a30 = M30;
+        var a01 = M01;
+        var a11 = M11;
+        var a21 = M21;
+        var a31 = M31;
+        var a02 = M02;
+        var a12 = M12;
+        var a22 = M22;
+        var a32 = M32;
+        var a03 = M03;
+        var a13 = M13;
+        var a23 = M23;
+        var a33 = M33;
+        
+        M00 = (a00 * b.M00) + (a10 * b.M01) + (a20 * b.M02) + (a30 * b.M03);
+        M10 = (a00 * b.M10) + (a10 * b.M11) + (a20 * b.M12) + (a30 * b.M13);
+        M20 = (a00 * b.M20) + (a10 * b.M21) + (a20 * b.M22) + (a30 * b.M23);
+        M30 = (a00 * b.M30) + (a10 * b.M31) + (a20 * b.M32) + (a30 * b.M33);
+        M01 = (a01 * b.M00) + (a11 * b.M01) + (a21 * b.M02) + (a31 * b.M03);
+        M11 = (a01 * b.M10) + (a11 * b.M11) + (a21 * b.M12) + (a31 * b.M13);
+        M21 = (a01 * b.M20) + (a11 * b.M21) + (a21 * b.M22) + (a31 * b.M23);
+        M31 = (a01 * b.M30) + (a11 * b.M31) + (a21 * b.M32) + (a31 * b.M33);
+        M02 = (a02 * b.M00) + (a12 * b.M01) + (a22 * b.M02) + (a32 * b.M03);
+        M12 = (a02 * b.M10) + (a12 * b.M11) + (a22 * b.M12) + (a32 * b.M13);
+        M22 = (a02 * b.M20) + (a12 * b.M21) + (a22 * b.M22) + (a32 * b.M23);
+        M32 = (a02 * b.M30) + (a12 * b.M31) + (a22 * b.M32) + (a32 * b.M33);
+        M03 = (a03 * b.M00) + (a13 * b.M01) + (a23 * b.M02) + (a33 * b.M03);
+        M13 = (a03 * b.M10) + (a13 * b.M11) + (a23 * b.M12) + (a33 * b.M13);
+        M23 = (a03 * b.M20) + (a13 * b.M21) + (a23 * b.M22) + (a33 * b.M23);
+        M33 = (a03 * b.M30) + (a13 * b.M31) + (a23 * b.M32) + (a33 * b.M33);
     }
 
     #endregion

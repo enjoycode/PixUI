@@ -201,7 +201,14 @@ public unsafe struct Matrix3 : IEquatable<Matrix3>
             this = inverse;
     }
 
-    // *Concat
+    public static Matrix3 Concat(Matrix3 a, Matrix3 b)
+    {
+        var r = b;
+        r.Multiply(a);
+        return r;
+    }
+
+    
     public void Multiply(in Matrix3 arg)
     {
         var m00 = ScaleX;

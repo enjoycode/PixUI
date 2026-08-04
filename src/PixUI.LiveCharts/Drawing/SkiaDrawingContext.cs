@@ -147,7 +147,7 @@ public class SkiaSharpDrawingContext(
     internal override void OnBeginZone(CanvasZone zone)
     {
         if (zone.Clip == LvcRectangle.Empty) return;
-
+        
         zone.StateId = Canvas.Save();
         Canvas.ClipRect(new(zone.Clip.X, zone.Clip.Y, zone.Clip.X + zone.Clip.Width, zone.Clip.Y + zone.Clip.Height));
     }
@@ -155,7 +155,7 @@ public class SkiaSharpDrawingContext(
     internal override void OnEndZone(CanvasZone zone)
     {
         if (zone.Clip == LvcRectangle.Empty) return;
-
+        
         Canvas.RestoreToCount(zone.StateId);
     }
 
@@ -361,7 +361,7 @@ public class SkiaSharpDrawingContext(
         }
     }
 
-    private static SKMatrix BuildTransform(IDrawnElement<SkiaSharpDrawingContext> element)
+    private static Matrix3 BuildTransform(IDrawnElement<SkiaSharpDrawingContext> element)
     {
         var m = element.Measure();
         var o = element.TransformOrigin;
@@ -370,24 +370,25 @@ public class SkiaSharpDrawingContext(
         var yo = m.Height * o.Y;
 
         var origin = new SKPoint(p.X + xo, p.Y + yo);
-        var matrix = SKMatrix.CreateIdentity();
+        var matrix = Matrix3.CreateIdentity();
 
         if (element.HasTranslate)
         {
             var t = element.TranslateTransform;
-            matrix = SKMatrix.Concat(matrix, SKMatrix.CreateTranslation(t.X, t.Y));
+            //matrix = Matrix3.Concat(matrix, Matrix3.CreateTranslation(t.X, t.Y));
+            matrix = Matrix3.CreateTranslation(t.X, t.Y);
         }
 
         if (element.HasRotation)
         {
-            matrix = SKMatrix.Concat(matrix, SKMatrix.CreateRotationDegrees(
+            matrix = Matrix3.Concat(matrix, Matrix3.CreateRotationDegrees(
                 element.RotateTransform, origin.X, origin.Y));
         }
 
         if (element.HasScale)
         {
             var s = element.ScaleTransform;
-            matrix = SKMatrix.Concat(matrix, SKMatrix.CreateScaleTranslation(s.X, s.Y, origin.X, origin.Y));
+            matrix = Matrix3.Concat(matrix, Matrix3.CreateScale(s.X, s.Y, origin.X, origin.Y));
         }
 
         if (element.HasSkew)
@@ -396,11 +397,11 @@ public class SkiaSharpDrawingContext(
             var skewMatrix = Matrix3.CreateSkew((float)Math.Tan(skew.X * Math.PI / 180),
                 (float)Math.Tan(skew.Y * Math.PI / 180));
             
-            var translateToOrigin = SKMatrix.CreateTranslation(origin.X, origin.Y);
-            var translateBack = SKMatrix.CreateTranslation(-origin.X, -origin.Y);
-            matrix = SKMatrix.Concat(matrix, translateToOrigin);
-            matrix = SKMatrix.Concat(matrix, skewMatrix);
-            matrix = SKMatrix.Concat(matrix, translateBack);
+            var translateToOrigin = Matrix3.CreateTranslation(origin.X, origin.Y);
+            var translateBack = Matrix3.CreateTranslation(-origin.X, -origin.Y);
+            matrix = Matrix3.Concat(matrix, translateToOrigin);
+            matrix = Matrix3.Concat(matrix, skewMatrix);
+            matrix = Matrix3.Concat(matrix, translateBack);
         }
 
         return matrix;

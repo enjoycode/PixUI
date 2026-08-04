@@ -8,11 +8,13 @@ internal sealed class MotionCanvas : IRenderMode
     static MotionCanvas()
     {
         _ = LiveChartsSkiaSharp.EnsureInitialized();
+        LiveChartsCore.LiveCharts.RenderingSettings.TryUseVSync = false; //暂禁用
     }
 
     public MotionCanvas(Widget chartView)
     {
         _chartView = chartView;
+        // CanvasCore.DisableAnimations = true;
     }
 
     private readonly Widget _chartView;
