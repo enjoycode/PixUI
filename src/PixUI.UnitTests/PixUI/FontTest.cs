@@ -1,10 +1,17 @@
 using System;
 using NUnit.Framework;
+using PixUI.Drawing.Skia;
 
 namespace PixUI.UnitTests;
 
 public class FontTest
 {
+    [SetUp]
+    public static void Setup()
+    {
+        Render.Init(new SkiaRender());
+    }
+    
     private const string fontFamilyName = "PingFang SC";
 
     private static ITypeface GetTypeface(string familyName, bool bold, bool italic) =>
@@ -57,5 +64,8 @@ public class FontTest
         using var ph = pb.Build();
         ph.Layout(500);
         Console.WriteLine($"{ph.LongestLine} {ph.MaxIntrinsicWidth} {ph.Height}");
+
+        var textBlobPtr = SkiaApi.sk_paragraph_get_line_first_textblob(((SKParagraph)ph).Handle, 0);
+        Console.WriteLine(textBlobPtr);
     }
 }

@@ -5,6 +5,7 @@ using LiveChartsCore.Measure;
 using PixUI.LiveCharts;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Geo;
+using PixUI.LiveCharts.Drawing.Geometries;
 using PixUI.LiveCharts.Painting;
 
 namespace PixUI.Demo;
@@ -17,7 +18,7 @@ public sealed class DemoCharts : View
     private readonly ISeries[] _series =
     {
         new ColumnSeries<float> { Values = _data1, },
-        new LineSeries<float> { Values = _data2, Fill = null },
+        new LineSeries<float, StarGeometry> { Values = _data2, Fill = null },
     };
 
     private readonly IEnumerable<ISeries> _pieSeries = _data1.AsPieSeries((value, s) =>

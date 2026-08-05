@@ -46,6 +46,9 @@ public sealed class SkiaRender : IRender
     public IParagraphBuilder MakeParagraphBuilder(IParagraphStyle paragraphStyle) =>
         new SKParagraphBuilder((SKParagraphStyle)paragraphStyle);
 
+    public ITextBlob? MakeTextBlob(ReadOnlySpan<char> text, IFont font, out float width, Point origin = default)
+        => SKTextBlob.Create(text, font, out width, origin);
+
     public IPath MakePath() => new SKPath();
 
     public IPath MakePathFromSvgData(string svgPath) => SKPath.ParseSvgPathData(svgPath);

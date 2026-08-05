@@ -42,6 +42,8 @@ public interface IRender
 
     #endregion
 
+    ITextBlob? MakeTextBlob(ReadOnlySpan<char> text, IFont font, out float width, Point origin = default);
+
     IMaskFilter? MakeMaskFilterBlur(BlurStyle blurStyle, float sigma);
 
     IImageFilter? MakeImageFilterDropShadow(float dx, float dy, float sigmaX, float sigmaY,

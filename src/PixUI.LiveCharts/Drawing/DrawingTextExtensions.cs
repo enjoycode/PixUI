@@ -27,17 +27,19 @@ using System.Linq;
 using System.Text;
 using LiveChartsCore.Drawing;
 using PixUI.LiveCharts.Drawing.Geometries;
+using PixUI.LiveCharts.Painting;
 
 namespace PixUI.LiveCharts.Drawing;
 
 internal static class DrawingTextExtensions
 {
     internal static readonly PositionedBlob s_newLine =
-        new(TextPainter.BuildParagraph(string.Empty, float.PositiveInfinity, 12, Colors.Black), -1);
+        new(TextBlob.Create(string.Empty, SkiaPaint.FallbackTypeface.MakeFont(12), out _)!, -1);
 
     internal static void DrawLabel(this SKCanvas canvas, LabelGeometry label, float opacity = 1)
     {
-        label.PeekPaintInfo(out var paint, out _);
+        label.PeekPaintInfo(out var paint, out var font);
+        // Console.WriteLine($"DrawLabel: \"{label.Text}\" Opacity:{label.Opacity} Paint.Alpha:{paint.Color.Alpha}");
 
         var blobArray = label.BlobArray;
         var size = blobArray.Size;
@@ -80,6 +82,7 @@ internal static class DrawingTextExtensions
             canvas.DrawRect(rax, ray, size.Width, size.Height, bgPaint);
         }
 
+        if (paint.Color.Alpha == 0) return; //TODO:临时处理文本Opacity
         var contentWidth = size.Width - label.Padding.Left - label.Padding.Right;
 
         foreach (var pb in blobArray.Blobs)
@@ -99,7 +102,8 @@ internal static class DrawingTextExtensions
                     _ => 0f
                 };
 
-            canvas.DrawParagraph(pb.Blob, (int)(rax + blobPosition.X + lao), (int)(ray + blobPosition.Y));
+            canvas.DrawTextBlob(pb.Blob, (int)(rax + blobPosition.X + lao), (int)(ray + blobPosition.Y), paint);
+            //canvas.DrawParagraph(pb.Blob, (int)(rax + blobPosition.X + lao), (int)(ray + blobPosition.Y));
             // canvas.DrawText(pb.Blob,
             //     (int)(rax + blobPosition.X + lao), // truncate to avoid subpixel rendering issues
             //     (int)(ray + blobPosition.Y), paint);
@@ -278,8 +282,8 @@ internal static class DrawingTextExtensions
 
         public static BlobArray Empty() => new();
 
-        public static BlobArray Create(
-            TokenResult tokenResult, SKPaint paint, SKFont font, float maxWidth, Padding padding)
+        public static BlobArray Create(TokenResult tokenResult, SKPaint paint, SKFont font,
+            float maxWidth, Padding padding)
         {
             var blobs = tokenResult.Tokens
                 .Select(token => ShapeAndPlace(token, font, paint))
@@ -301,13 +305,14 @@ internal static class DrawingTextExtensions
             if (text == "\n")
                 return s_newLine;
 
-            var typeface = font.Typeface ??
-                           throw new Exception("A Typeface is required at this point.");
+            // var typeface = font.Typeface ??
+            //                throw new Exception("A Typeface is required at this point.");
 
-            //TODO: fix font family
-            var paragraph = TextPainter.BuildParagraph(text, float.PositiveInfinity, font.Size, paint.Color,
-                forceHeight: true);
-            return new(paragraph, paragraph.MaxIntrinsicWidth);
+            // var paragraph = TextPainter.BuildParagraph(text, float.PositiveInfinity, font.Size, paint.Color,
+            //     forceHeight: true);
+            //TODO: 暂简单实现
+            var blob = TextBlob.Create(text, font, out var width)!;
+            return new(blob, width);
         }
 
         private static (LvcSize Size, List<float> LineWidths) Measure(
@@ -328,7 +333,7 @@ internal static class DrawingTextExtensions
             foreach (var pb in orderedBlobs)
             {
                 pb.Line = lineCount;
-                var b = pb.Blob;
+                // var b = pb.Blob;
                 var w = pb.Width;
 
                 if (x + w > maxWidth || pb == s_newLine)
@@ -340,8 +345,8 @@ internal static class DrawingTextExtensions
                     knownHeight = y;
                 }
 
-                //pb.Position = new SKPoint(x + padding.Left, y + padding.Top - metrics.Ascent);
-                pb.Position = new SKPoint(x + padding.Left, y + padding.Top + metrics.Descent - metrics.Leading);
+                pb.Position = new SKPoint(x + padding.Left, y + padding.Top - metrics.Ascent);
+                //pb.Position = new SKPoint(x + padding.Left, y + padding.Top + metrics.Descent - metrics.Leading);
                 x += w;
 
                 if (x > knownWidth)
@@ -359,12 +364,12 @@ internal static class DrawingTextExtensions
         }
     }
 
-    internal class PositionedBlob(SKTextBlob blob, float width)
+    internal class PositionedBlob(ITextBlob blob, float width)
     {
         public int Line { get; set; }
         public SKPoint Position { get; set; }
         public float Width { get; } = width;
-        public SKTextBlob Blob { get; } = blob;
+        public ITextBlob Blob { get; } = blob;
 #if DEBUG
         public string Text = string.Empty;
 #endif

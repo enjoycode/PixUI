@@ -1612,7 +1612,7 @@ public unsafe struct SKPngEncoderOptions : IEquatable<SKPngEncoderOptions>
 // sk_rsxform_t
 [StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-public struct SKRotationScaleMatrix : IEquatable<SKRotationScaleMatrix>
+public partial struct SKRotationScaleMatrix : IEquatable<SKRotationScaleMatrix>
 {
     // public float fSCos
     private Single fSCos;

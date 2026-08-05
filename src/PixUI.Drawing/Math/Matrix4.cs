@@ -553,7 +553,7 @@ public struct Matrix4 : IEquatable<Matrix4>
         M13 = t8;
     }
 
-    public void Multiply(in Matrix4 b)
+    public void Concat(in Matrix4 b)
     {
         var a00 = M00;
         var a10 = M10;

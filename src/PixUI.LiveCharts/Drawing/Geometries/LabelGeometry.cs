@@ -52,10 +52,11 @@ public class LabelGeometry : BaseLabelGeometry, IDrawnElement<SkiaSharpDrawingCo
             var lvcPaint = PeekPaintCore();
             var skPaint = lvcPaint._skiaPaint;
 
-            var changed =                                  // changed if:
-                skPaint is null ||                         //   - never set up yet (first access; force cache miss)
-                _previousKey != BuildBlobKey() ||          //   - the key changed, structural equality between previous and current
-                _previousPaint != skPaint;                 //   - the paint changed, otherwise we will be using disposed resources
+            var changed = // changed if:
+                skPaint is null || //   - never set up yet (first access; force cache miss)
+                _previousKey !=
+                BuildBlobKey() || //   - the key changed, structural equality between previous and current
+                _previousPaint != skPaint; //   - the paint changed, otherwise we will be using disposed resources
 
             if (!changed || string.IsNullOrEmpty(Text))
                 return _activeBlobs;
@@ -64,7 +65,7 @@ public class LabelGeometry : BaseLabelGeometry, IDrawnElement<SkiaSharpDrawingCo
 
             _activeBlobs = this.AsBlobArray();
             _previousKey = BuildBlobKey();
-            _previousPaint = lvcPaint._skiaPaint;          // non-null after AsBlobArray ran
+            _previousPaint = lvcPaint._skiaPaint; // non-null after AsBlobArray ran
 
             return _activeBlobs;
         }
@@ -89,8 +90,7 @@ public class LabelGeometry : BaseLabelGeometry, IDrawnElement<SkiaSharpDrawingCo
         var lvcSkiaPaint = PeekPaintCore();
         skPaint = lvcSkiaPaint.UpdateSkiaPaint(null, null);
 
-        font = lvcSkiaPaint._fontBuilder(
-            skPaint, lvcSkiaPaint.GetSKTypeface(), TextSize);
+        font = lvcSkiaPaint._fontBuilder(skPaint, lvcSkiaPaint.GetSKTypeface(), TextSize);
     }
 
     private SkiaPaint PeekPaintCore() =>

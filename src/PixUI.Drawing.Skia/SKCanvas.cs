@@ -111,6 +111,16 @@ public sealed unsafe class SKCanvas : SKObject, ICanvas
         }
     }
 
+    public void DrawTextBlob(ITextBlob textBlob, float x, float y, IPaint paint)
+    {
+        if (textBlob == null!)
+            throw new ArgumentNullException(nameof(textBlob));
+        if (paint == null)
+            throw new ArgumentNullException(nameof(paint));
+
+        SkiaApi.sk_canvas_draw_text_blob(Handle, ((SKTextBlob)textBlob).Handle, x, y, ((SKPaint)paint).Handle);
+    }
+
     public void DrawParagraph(IParagraph paragraph, float x, float y)
     {
         ((SKParagraph)paragraph).Paint(this, x, y);
