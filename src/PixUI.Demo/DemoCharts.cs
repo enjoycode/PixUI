@@ -134,24 +134,25 @@ public sealed class DemoCharts : View
                                 Child = new Center
                                 {
                                     DebugLabel = "ChartCenter",
-                                    Child = new Transform(matrix)
+                                    Child = new GeoMap()
                                     {
-                                        Child = new GeoMap()
+                                        Width = mapWidth,
+                                        Height = mapHeight,
+                                        MapProjection = projection,
+                                        MinLongitude = minBounds.X,
+                                        MinLatitude = minBounds.Y,
+                                        MaxLongitude = maxBounds.X,
+                                        MaxLatitude = maxBounds.Y,
+                                        Stroke = new SolidColorPaint { Color = Colors.Green },
+                                        Fill = new SolidColorPaint
                                         {
-                                            Width = mapWidth,
-                                            Height = mapHeight,
-                                            MapProjection = projection,
-                                            Stroke = new SolidColorPaint { Color = Colors.Green },
-                                            Fill = new SolidColorPaint
-                                            {
-                                                Color = Colors.Red,
-                                                // ImageFilter = new DropShadow(
-                                                //     2 / scale, 2 / scale, 6 / scale, 6 / scale,
-                                                //     Colors.Black /*new Color(50, 0, 0, 100)*/
-                                                // )
-                                            },
-                                            ActiveMap = Maps.GetMapFromStreamReader(new StreamReader(geoJson))
-                                        }
+                                            Color = Colors.Red,
+                                            // ImageFilter = new DropShadow(
+                                            //     2 / scale, 2 / scale, 6 / scale, 6 / scale,
+                                            //     Colors.Black /*new Color(50, 0, 0, 100)*/
+                                            // )
+                                        },
+                                        ActiveMap = Maps.GetMapFromStreamReader(new StreamReader(geoJson))
                                     }
                                 }
                             }
