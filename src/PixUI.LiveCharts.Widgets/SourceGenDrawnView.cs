@@ -37,6 +37,14 @@ public abstract partial class SourceGenDrawnView : Widget
         OnDrawnViewUnloaded();
     }
 
+    protected override void OnLayout(Size maxSize)
+    {
+        var oldSize = LayoutSize;
+        SetLayoutSize(maxSize.Width, maxSize.Height);
+        if (oldSize != Size.Empty && oldSize != LayoutSize)
+            OnDrawnViewSizeChanged();
+    }
+
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         var backColor = (this as IChartView)?.BackColor.AsSKColor() ?? Color.Empty;
