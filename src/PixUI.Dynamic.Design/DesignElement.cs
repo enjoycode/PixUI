@@ -786,7 +786,7 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
     {
         using var dash = PathEffect.CreateDash(new[] { 5f, 5f }, 10);
         var paint = PixUI.Paint.Shared(Colors.Gray, PaintStyle.Stroke);
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
         paint.PathEffect = dash;
         canvas.DrawRect(Rect.FromLTWH(0.5f, 0.5f, W - 1, H - 1), paint);
         canvas.DrawLine(0, 0, W, H, paint);

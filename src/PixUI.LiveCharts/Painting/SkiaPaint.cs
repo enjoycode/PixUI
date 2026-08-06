@@ -161,7 +161,7 @@ public abstract partial class SkiaPaint(float strokeThickness = 1f, float stroke
             paint = _skiaPaint;
         }
 
-        paint.AntiAlias = IsAntialias;
+        paint.IsAntialias = IsAntialias;
         paint.StrokeCap = StrokeCap;
         paint.StrokeJoin = StrokeJoin;
         paint.StrokeMiter = StrokeMiter;

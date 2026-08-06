@@ -46,14 +46,10 @@ public sealed class SKPaint : SKObject, ISKSkipObjectRegistration, IPaint
 
     #region ====Properties====
 
-    public bool AntiAlias
+    public bool IsAntialias
     {
         get => SkiaApi.sk_paint_is_antialias(Handle);
-        set
-        {
-            SkiaApi.sk_paint_set_antialias(Handle, value);
-            // UpdateFontEdging (value);
-        }
+        set => SkiaApi.sk_paint_set_antialias(Handle, value);
     }
 
     public PaintStyle Style

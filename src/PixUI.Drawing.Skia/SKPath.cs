@@ -403,7 +403,7 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
         strokePaint.StrokeWidth = strokeWidth;
         strokePaint.StrokeCap = StrokeCap.Butt;
         strokePaint.StrokeJoin = StrokeJoin.Miter;
-        strokePaint.AntiAlias = true;
+        strokePaint.IsAntialias = true;
 
         var ok = SkiaApi.sk_paint_get_fill_path(strokePaint.Handle, Handle, strokedPath.Handle, null, 1);
         if (!ok)

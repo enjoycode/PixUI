@@ -241,7 +241,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         var paint = PixUI.Paint.Shared();
         paint.Style = Style == ButtonStyle.Solid ? PaintStyle.Fill : PaintStyle.Stroke;
         paint.StrokeWidth = Style == ButtonStyle.Outline ? (_borderWidth?.Value ?? 2) : 0;
-        paint.AntiAlias = Shape != ButtonShape.Square;
+        paint.IsAntialias = Shape != ButtonShape.Square;
         paint.Color = _fillColor?.Value ?? new Color(0xFF3880FF);
 
         switch (Shape)
@@ -264,7 +264,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     private void PaintMask(ICanvas canvas, Color color)
     {
         var paint = PixUI.Paint.Shared(color);
-        paint.AntiAlias = Shape != ButtonShape.Square;
+        paint.IsAntialias = Shape != ButtonShape.Square;
 
         var x = 0f;
         var y = 0f;

@@ -16,7 +16,7 @@ internal sealed class SelectedDecorator : FlowDecorator<DesignElement>
         canvas.DrawRect(Rect.FromLTWH(0, 0, Target.W, Target.H), paint);
 
         paint = PixUI.Paint.Shared(Theme.AccentColor, PaintStyle.Fill, 1f * scaleRatio);
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
 
         DrawAnchor(canvas, paint, Target.GetAnchorRect(AnchorPosition.TopMiddle));
         DrawAnchor(canvas, paint, Target.GetAnchorRect(AnchorPosition.MiddleLeft));

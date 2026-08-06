@@ -73,7 +73,7 @@ public sealed class OutlineInputBorder : InputBorder
 
         var paint = PixUI.Paint.Shared();
         BorderSide.ApplyPaint(paint);
-        paint.AntiAlias = true; //TODO: no radius no need
+        paint.IsAntialias = true; //TODO: no radius no need
         canvas.DrawRRect(outer, paint);
     }
 }

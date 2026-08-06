@@ -6,7 +6,7 @@ public interface IPaint : IDisposable
     Color Color { get; set; }
     float StrokeWidth { get; set; }
     BlendMode BlendMode { get; set; }
-    bool AntiAlias { get; set; }
+    bool IsAntialias { get; set; }
     float StrokeMiter { get; set; }
     StrokeCap StrokeCap { get; set; }
     StrokeJoin StrokeJoin { get; set; }

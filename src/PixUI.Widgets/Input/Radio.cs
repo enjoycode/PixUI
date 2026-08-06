@@ -33,7 +33,7 @@ public sealed class Radio : Toggleable
 
         // outer circle
         var paint = PixUI.Paint.Shared(color, PaintStyle.Stroke, 2);
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
         canvas.DrawCircle(center.Dx, center.Dy, _kOuterRadius, paint);
 
         // inner circle

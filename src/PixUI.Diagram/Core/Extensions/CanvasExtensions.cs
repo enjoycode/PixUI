@@ -6,7 +6,7 @@ public static class CanvasExtensions
     {
         var paint = Paint.Shared(color, PaintStyle.Stroke, width);
         if (Math.Abs(x0 - x1) > 0.001 || Math.Abs(y0 - y1) > 0.001)
-            paint.AntiAlias = true;
+            paint.IsAntialias = true;
         canvas.DrawLine(x0, y0, x1, y1, paint);
     }
 
@@ -26,21 +26,21 @@ public static class CanvasExtensions
         float thickness = 1f)
     {
         var paint = Paint.Shared(color, PaintStyle.Stroke, thickness);
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
         canvas.DrawRRect(RRect.FromRectAndRadius(rect, rx, ry), paint);
     }
 
     public static void FillRoundRectangle(this ICanvas canvas, Color color, Rect rect, float rx, float ry)
     {
         var paint = Paint.Shared(color);
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
         canvas.DrawRRect(RRect.FromRectAndRadius(rect, rx, ry), paint);
     }
 
     public static void DrawPath(this ICanvas canvas, Color color, float width, IPath path)
     {
         var paint = Paint.Shared(color, PaintStyle.Stroke, width);
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
         canvas.DrawPath(path, paint);
     }
 
@@ -48,7 +48,7 @@ public static class CanvasExtensions
     {
         using var dashEffect = PathEffect.CreateDash(dash, 10);
         var paint = Paint.Shared(color, PaintStyle.Stroke, width);
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
         paint.PathEffect = dashEffect;
         canvas.DrawPath(path, paint);
         paint.Reset();
@@ -57,21 +57,21 @@ public static class CanvasExtensions
     public static void FillPath(this ICanvas canvas, Color color, IPath path)
     {
         var paint = Paint.Shared(color);
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
         canvas.DrawPath(path, paint);
     }
 
     public static void DrawEllipse(this ICanvas canvas, Color color, float penWidth, Rect rect)
     {
         var paint = Paint.Shared(color, PaintStyle.Stroke, penWidth);
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
         canvas.DrawOval(rect, paint);
     }
 
     public static void FillEllipse(this ICanvas canvas, Color color, Rect rect)
     {
         var paint = Paint.Shared(color);
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
         canvas.DrawOval(rect, paint);
     }
 }

@@ -15,7 +15,7 @@ internal class SolidColorBrushCreator : ISkiaBrushCreator
     public SolidColorBrushCreator(DeviceColor color)
     {
         _value = Paint.Create();
-        _value.AntiAlias = true;
+        _value.IsAntialias = true;
         _value.Color = color.AsSkColor();
     }
 

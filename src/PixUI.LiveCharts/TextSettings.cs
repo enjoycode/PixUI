@@ -45,7 +45,7 @@ public class TextSettings
         {
             // paint.TextSize = size;
             // paint.Typeface = typeface;
-            paint.AntiAlias = true;
+            paint.IsAntialias = true;
             // paint.LcdRenderText = true;
 
             // could this be improved?
