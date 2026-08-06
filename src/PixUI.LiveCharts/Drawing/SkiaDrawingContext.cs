@@ -126,16 +126,14 @@ public class SkiaSharpDrawingContext(
         }
 
         // if tranparency, we need to clear the canvas with a paint that has the background color and the clear blend mode
-        // each skiasharp view depending on the platform or if GPU is eneabled could behave differently, adjust
+        // each skiasharp view depending on the platform or if GPU is enabled could behave differently, adjust
         // the ClearBlendMode if needed at the MotionCanvas class.
 
         using var backgroundPaint = Paint.Create(Background, PaintStyle.Fill);
-        backgroundPaint.BlendMode = ClearBlendMode;
-
+        //backgroundPaint.BlendMode = ClearBlendMode;
 
         var bounds = Canvas.ClipBounds; //Canvas.DeviceClipBounds;
         Canvas.DrawRect(bounds, backgroundPaint);
-        //Canvas.DrawRect(SKRect.FromLTWH(0, 0, Width, Height), backgroundPaint);
     }
 
     internal override void OnEndDraw()
@@ -147,7 +145,7 @@ public class SkiaSharpDrawingContext(
     internal override void OnBeginZone(CanvasZone zone)
     {
         if (zone.Clip == LvcRectangle.Empty) return;
-        
+
         zone.StateId = Canvas.Save();
         Canvas.ClipRect(new(zone.Clip.X, zone.Clip.Y, zone.Clip.X + zone.Clip.Width, zone.Clip.Y + zone.Clip.Height));
     }
@@ -155,7 +153,7 @@ public class SkiaSharpDrawingContext(
     internal override void OnEndZone(CanvasZone zone)
     {
         if (zone.Clip == LvcRectangle.Empty) return;
-        
+
         Canvas.RestoreToCount(zone.StateId);
     }
 
@@ -396,7 +394,7 @@ public class SkiaSharpDrawingContext(
             var skew = element.SkewTransform;
             var skewMatrix = Matrix3.CreateSkew((float)Math.Tan(skew.X * Math.PI / 180),
                 (float)Math.Tan(skew.Y * Math.PI / 180));
-            
+
             var translateToOrigin = Matrix3.CreateTranslation(origin.X, origin.Y);
             var translateBack = Matrix3.CreateTranslation(-origin.X, -origin.Y);
             matrix = Matrix3.Concat(matrix, translateToOrigin);

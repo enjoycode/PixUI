@@ -47,8 +47,11 @@ public abstract partial class SourceGenDrawnView : Widget
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
-        var backColor = (this as IChartView)?.BackColor.AsSKColor() ?? Color.Empty;
+        var backColor = Color.Empty; //(this as IChartView)?.BackColor.AsSKColor() ?? Color.Empty;
+        canvas.Save();
+        canvas.ClipRect(Rect.FromLTWH(0, 0, LayoutSize.Width, LayoutSize.Height));
         CoreCanvas.DrawFrame(new SkiaSharpDrawingContext(CoreCanvas, canvas, backColor));
+        canvas.Restore();
     }
 
     #endregion
