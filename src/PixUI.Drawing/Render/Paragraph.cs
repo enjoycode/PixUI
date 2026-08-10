@@ -18,6 +18,8 @@ public interface IParagraph : IDisposable
         BoxHeightStyle heightStyle, BoxWidthStyle widthStyle);
 
     void Layout(float width);
+
+    ITextBlob? GetLineFirstTextBlob(int lineNumber);
 }
 
 public interface ITextStyle : IDisposable

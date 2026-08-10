@@ -1,6 +1,6 @@
-using LiveCharts;
 using LiveChartsCore;
 using PixUI;
+using PixUI.LiveCharts;
 using PixUI.Drawing.Skia;
 using PixUI.Platform.Wasm;
 

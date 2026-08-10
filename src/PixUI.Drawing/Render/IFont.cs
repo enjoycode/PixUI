@@ -90,9 +90,18 @@ public interface IFont : IDisposable
     /// </summary>
     float Size { get; set; }
 
-    ushort GetGlyphId(int codepoint);
+    ushort GetGlyph(int codepoint);
+
+    ushort[] GetGlyphs(string text);
+
+    float[] GetGlyphWidths(ReadOnlySpan<ushort> glyphs);
 
     FontMetrics GetMetrics();
 
     Size MeasureString(string text);
+}
+
+public static class FontExtensions
+{
+    public static bool ContainsGlyph(this IFont font, int codepoint) => font.GetGlyph(codepoint) > 0;
 }

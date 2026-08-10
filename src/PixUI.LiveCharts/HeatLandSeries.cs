@@ -20,27 +20,61 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using LiveCharts.Drawing;
+using System.Collections.Generic;
+using LiveChartsCore;
+using LiveChartsCore.Drawing;
+using LiveChartsCore.Geo;
+using PixUI.LiveCharts.Drawing.Geometries;
 
-namespace LiveCharts;
+namespace PixUI.LiveCharts;
 
-/// <inheritdoc cref="HeatLandSeries{TDrawingContext}"/>
-public class HeatLandSeries : LiveChartsCore.HeatLandSeries<SkiaDrawingContext>
+/// <inheritdoc cref="CoreHeatLandSeries{TModel}"/>
+public class HeatLandSeries : HeatLandSeries<HeatLand>
+{ }
+
+/// <inheritdoc cref="CoreHeatLandSeries{TModel}"/>
+public class HeatLandSeries<TModel>
+    : CoreHeatLandSeries<TModel>
+        where TModel : IWeigthedMapLand
 {
+    static HeatLandSeries()
+    {
+        LiveChartsSkiaSharp.EnsureInitialized();
+    }
+
     /// <summary>
-    /// Initializes a new instance of the <see cref="HeatLandSeries"/> class.
+    /// Initializes a new instance of the <see cref="HeatLandSeries{TModel}"/> class.
     /// </summary>
     public HeatLandSeries()
+        : this(null)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HeatLandSeries{TModel}"/> class.
+    /// </summary>
+    /// <param name="lands">The lands.</param>
+    public HeatLandSeries(ICollection<TModel>? lands)
+        : this(lands, [LvcColor.FromArgb(255, 179, 229, 252), LvcColor.FromArgb(255, 2, 136, 209)])
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HeatLandSeries{TModel}"/> class.
+    /// </summary>
+    /// <param name="lands">The lands.</param>
+    public HeatLandSeries(params TModel[]? lands)
+        : this(lands, [LvcColor.FromArgb(255, 179, 229, 252), LvcColor.FromArgb(255, 2, 136, 209)])
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HeatLandSeries{TModel}"/> class.
+    /// </summary>
+    /// <param name="lands">The lands.</param>
+    /// <param name="heatMap">The heat map.</param>
+    public HeatLandSeries(ICollection<TModel>? lands, LvcColor[] heatMap)
+        : base(lands)
     {
-        throw new NotImplementedException();
-        // HeatMap = new[]
-        // {
-        //     LvcColor.FromArgb(255, 179, 229, 252), // cold (min value)
-        //     LvcColor.FromArgb(255, 2, 136, 209) // hot (max value)
-        // };
-        //
-        // if (!LiveCharts.IsConfigured) LiveCharts.Configure(config => config.UseDefaults());
-        // IntitializeSeries(LiveCharts.DefaultSettings.GetProvider<SkiaSharpDrawingContext>().GetSolidColorPaint());
+        HeatMap = heatMap;
+
+        IntitializeSeries(LiveChartsCore.LiveCharts.DefaultSettings.GetProvider().GetSolidColorPaint());
     }
 }

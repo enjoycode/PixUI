@@ -36,6 +36,9 @@ public sealed class SkiaRender : IRender
     public IImageFilter? MakeImageFilterBlur(float sigmaX, float sigmaY, TileMode tileMode, IImageFilter? input)
         => SKImageFilter.CreateBlur(sigmaX, sigmaY, tileMode, input as SKImageFilter);
 
+    public IColorFilter? MakeColorFilterBlendMode(Color color, BlendMode blendMode)
+        => SKColorFilter.CreateBlendMode(color, blendMode);
+
     public ITextStyle MakeTextStyle() => new SKTextStyle();
 
     public IParagraphStyle MakeParagraphStyle() => new SKParagraphStyle();
@@ -43,12 +46,17 @@ public sealed class SkiaRender : IRender
     public IParagraphBuilder MakeParagraphBuilder(IParagraphStyle paragraphStyle) =>
         new SKParagraphBuilder((SKParagraphStyle)paragraphStyle);
 
+    public ITextBlob? MakeTextBlob(ReadOnlySpan<char> text, IFont font, out float width, Point origin = default)
+        => SKTextBlob.Create(text, font, out width, origin);
+
     public IPath MakePath() => new SKPath();
 
     public IPath MakePathFromSvgData(string svgPath) => SKPath.ParseSvgPathData(svgPath);
 
     public IPathEffect? MakePathEffectDash(float[] intervals, float phase) =>
         SKPathEffect.CreateDash(intervals, phase);
+
+    public IPathEffect? MakePathEffectCorner(float radius) => SKPathEffect.CreateCorner(radius);
 
     public IGRContext? MakeGRContextWebGL(int webglHandle)
     {

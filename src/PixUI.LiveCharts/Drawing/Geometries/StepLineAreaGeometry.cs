@@ -22,18 +22,17 @@
 
 using LiveChartsCore.Drawing.Segments;
 
-
-namespace LiveCharts.Drawing.Geometries;
+namespace PixUI.LiveCharts.Drawing.Geometries;
 
 /// <summary>
 /// Defines an area drawin using bezier segments.
 /// </summary>
-public class StepLineAreaGeometry : VectorGeometry<StepLineSegment>
+public class StepLineAreaGeometry : VectorGeometry
 {
     private bool _isFirst = true;
 
-    /// <inheritdoc cref="VectorGeometry{TSegment}.OnDrawSegment(SkiaDrawingContext, SKPath, TSegment)"/>
-    protected override void OnDrawSegment(SkiaDrawingContext context, SKPath path, StepLineSegment segment)
+    /// <inheritdoc cref="VectorGeometry.OnDrawSegment(SkiaSharpDrawingContext, SKPath, Segment)"/>
+    protected override void OnDrawSegment(SkiaSharpDrawingContext context, SKPath path, Segment segment)
     {
         if (_isFirst)
         {
@@ -45,8 +44,8 @@ public class StepLineAreaGeometry : VectorGeometry<StepLineSegment>
         path.LineTo(segment.Xj, segment.Yj);
     }
 
-    /// <inheritdoc cref="VectorGeometry{TSegment}.OnOpen(SkiaDrawingContext, SKPath, TSegment)"/>
-    protected override void OnOpen(SkiaDrawingContext context, SKPath path, StepLineSegment segment)
+    /// <inheritdoc cref="VectorGeometry.OnOpen(SkiaSharpDrawingContext, SKPath, Segment)"/>
+    protected override void OnOpen(SkiaSharpDrawingContext context, SKPath path, Segment segment)
     {
         if (ClosingMethod == LiveChartsCore.Drawing.VectorClosingMethod.NotClosed)
         {
@@ -62,8 +61,8 @@ public class StepLineAreaGeometry : VectorGeometry<StepLineSegment>
         }
     }
 
-    /// <inheritdoc cref="VectorGeometry{TSegment}.OnClose(SkiaDrawingContext, SKPath, TSegment)"/>
-    protected override void OnClose(SkiaDrawingContext context, SKPath path, StepLineSegment segment)
+    /// <inheritdoc cref="VectorGeometry.OnClose(SkiaSharpDrawingContext, SKPath, Segment)"/>
+    protected override void OnClose(SkiaSharpDrawingContext context, SKPath path, Segment segment)
     {
         _isFirst = true;
 

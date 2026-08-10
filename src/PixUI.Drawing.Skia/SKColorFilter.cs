@@ -1,6 +1,6 @@
 namespace PixUI.Drawing.Skia;
 
-public sealed unsafe class SKColorFilter : SKObject, ISKReferenceCounted
+public sealed unsafe class SKColorFilter : SKObject, ISKReferenceCounted, IColorFilter
 {
     private SKColorFilter(IntPtr handle, bool owns) : base (handle, owns) { }
         

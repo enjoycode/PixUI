@@ -42,6 +42,8 @@ public interface IRender
 
     #endregion
 
+    ITextBlob? MakeTextBlob(ReadOnlySpan<char> text, IFont font, out float width, Point origin = default);
+
     IMaskFilter? MakeMaskFilterBlur(BlurStyle blurStyle, float sigma);
 
     IImageFilter? MakeImageFilterDropShadow(float dx, float dy, float sigmaX, float sigmaY,
@@ -49,11 +51,15 @@ public interface IRender
 
     IImageFilter? MakeImageFilterBlur(float sigmaX, float sigmaY, TileMode tileMode, IImageFilter? input);
 
+    IColorFilter? MakeColorFilterBlendMode(Color color, BlendMode blendMode);
+
     IPath MakePath();
 
     IPath MakePathFromSvgData(string svgPath);
 
     IPathEffect? MakePathEffectDash(float[] intervals, float phase);
+
+    IPathEffect? MakePathEffectCorner(float radius);
 
     #region ====Surface Factory====
 

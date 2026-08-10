@@ -87,12 +87,12 @@ public sealed class CircularProgressPainter : IDisposable
         if (bgColor != null)
         {
             var bgPaint = PixUI.Paint.Shared(bgColor.Value, PaintStyle.Stroke, strokeWidth);
-            bgPaint.AntiAlias = true;
+            bgPaint.IsAntialias = true;
             canvas.DrawArc(rect, 0, (float)_sweep, false, bgPaint);
         }
 
         var paint = PixUI.Paint.Shared(valueColor, PaintStyle.Stroke, strokeWidth);
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
         if (value == null) // Indeterminate
             paint.StrokeCap = StrokeCap.Square;
 

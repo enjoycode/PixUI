@@ -46,14 +46,10 @@ public sealed class SKPaint : SKObject, ISKSkipObjectRegistration, IPaint
 
     #region ====Properties====
 
-    public bool AntiAlias
+    public bool IsAntialias
     {
         get => SkiaApi.sk_paint_is_antialias(Handle);
-        set
-        {
-            SkiaApi.sk_paint_set_antialias(Handle, value);
-            // UpdateFontEdging (value);
-        }
+        set => SkiaApi.sk_paint_set_antialias(Handle, value);
     }
 
     public PaintStyle Style
@@ -110,10 +106,10 @@ public sealed class SKPaint : SKObject, ISKSkipObjectRegistration, IPaint
         set => SkiaApi.sk_paint_set_maskfilter(Handle, (value as SKMaskFilter)?.Handle ?? IntPtr.Zero);
     }
 
-    public SKColorFilter? ColorFilter
+    public IColorFilter? ColorFilter
     {
         get => SKColorFilter.GetObject(SkiaApi.sk_paint_get_colorfilter(Handle));
-        set => SkiaApi.sk_paint_set_colorfilter(Handle, value?.Handle ?? IntPtr.Zero);
+        set => SkiaApi.sk_paint_set_colorfilter(Handle, (value as SKColorFilter)?.Handle ?? IntPtr.Zero);
     }
 
     public IImageFilter? ImageFilter

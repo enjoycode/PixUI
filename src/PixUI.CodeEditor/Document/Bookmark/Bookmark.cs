@@ -128,7 +128,7 @@ public class Bookmark
     public virtual void Draw(ICanvas canvas, Rect bounds)
     {
         var paint = Paint.Shared(Colors.Red);
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
         canvas.DrawCircle(9.5f, bounds.Y + bounds.Height / 2 + 1, 6, paint);
     }
 }

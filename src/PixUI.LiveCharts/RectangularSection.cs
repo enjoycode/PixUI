@@ -20,13 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using LiveCharts.Drawing;
-using LiveCharts.Drawing.Geometries;
 using LiveChartsCore;
+using PixUI.LiveCharts.Drawing.Geometries;
 
-namespace LiveCharts;
+namespace PixUI.LiveCharts;
 
 /// <summary>
 /// Defines a rectangular section in a Cartesian chart.
 /// </summary>
-public class RectangularSection : Section<RectangleGeometry, LabelGeometry, SkiaDrawingContext> { }
+public class RectangularSection : CoreSection<RectangleGeometry, LabelGeometry>
+{
+    static RectangularSection()
+    {
+        _ = LiveChartsSkiaSharp.EnsureInitialized();
+    }
+}

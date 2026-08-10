@@ -1,14 +1,34 @@
+// The MIT License(MIT)
+//
+// Copyright(c) 2021 Alberto Rodriguez Orozco & LiveCharts Contributors
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using LiveCharts.Drawing;
 using LiveChartsCore;
 using LiveChartsCore.Drawing;
-using LiveChartsCore.Kernel;
 using LiveChartsCore.Kernel.Sketches;
 
-namespace LiveCharts;
+namespace PixUI.LiveCharts;
 
 /// <summary>
 /// Defines the pie chart esxtensions.
@@ -21,15 +41,13 @@ public static class PieChartExtensions
     /// <typeparam name="TModel">The type of the model.</typeparam>
     /// <param name="source">The data source.</param>
     /// <param name="builder">An optional builder.</param>
-    /// <param name="gaugeOptions">Defines whether the series are treaded as gauge.</param>
+    /// <param name="gaugeOptions">Defines whether the series are treated as gauge.</param>
     /// <returns></returns>
-    public static ObservableCollection<PieSeries<TModel>> AsPieSeries<TModel>(
+    public static PieSeries<TModel>[] AsPieSeries<TModel>(
         this IEnumerable<TModel> source,
         Action<TModel, PieSeries<TModel>>? builder = null,
-        GaugeOptions gaugeOptions = GaugeOptions.None)
-    {
-        return AsPieSeries<TModel, PieSeries<TModel>>(source, builder, gaugeOptions);
-    }
+        GaugeOptions gaugeOptions = GaugeOptions.None) =>
+        AsPieSeries<TModel, PieSeries<TModel>>(source, builder, gaugeOptions);
 
     /// <summary>
     /// Converts an IEnumerable to an ObservableCollection of pie series.
@@ -38,16 +56,14 @@ public static class PieChartExtensions
     /// <typeparam name="TVisual">The type of the visual.</typeparam>
     /// <param name="source">The data source.</param>
     /// <param name="builder">An optional builder.</param>
-    /// <param name="gaugeOptions">Defines whether the series are treaded as gauge.</param>
+    /// <param name="gaugeOptions">Defines whether the series are treated as gauge.</param>
     /// <returns></returns>
-    public static ObservableCollection<PieSeries<TModel, TVisual>> AsPieSeries<TModel, TVisual>(
+    public static PieSeries<TModel, TVisual>[] AsPieSeries<TModel, TVisual>(
         this IEnumerable<TModel> source,
         Action<TModel, PieSeries<TModel, TVisual>>? builder = null,
         GaugeOptions gaugeOptions = GaugeOptions.None)
-        where TVisual : class, IDoughnutGeometry<SkiaDrawingContext>, new()
-    {
-        return AsPieSeries<TModel, PieSeries<TModel, TVisual>>(source, builder, gaugeOptions);
-    }
+        where TVisual : BaseDoughnutGeometry, new() =>
+        AsPieSeries<TModel, PieSeries<TModel, TVisual>>(source, builder, gaugeOptions);
 
     /// <summary>
     /// Converts an IEnumerable to an ObservableCollection of pie series.
@@ -57,17 +73,15 @@ public static class PieChartExtensions
     /// <typeparam name="TLabel">The type of the label.</typeparam>
     /// <param name="source">The data source.</param>
     /// <param name="builder">An optional builder.</param>
-    /// <param name="gaugeOptions">Defines whether the series are treaded as gauge.</param>
+    /// <param name="gaugeOptions">Defines whether the series are treated as gauge.</param>
     /// <returns></returns>
-    public static ObservableCollection<PieSeries<TModel, TVisual, TLabel>> AsPieSeries<TModel, TVisual, TLabel>(
+    public static PieSeries<TModel, TVisual, TLabel>[] AsPieSeries<TModel, TVisual, TLabel>(
         this IEnumerable<TModel> source,
         Action<TModel, PieSeries<TModel, TVisual, TLabel>>? builder = null,
         GaugeOptions gaugeOptions = GaugeOptions.None)
-        where TVisual : class, IDoughnutGeometry<SkiaDrawingContext>, new()
-        where TLabel : class, ILabelGeometry<SkiaDrawingContext>, new()
-    {
-        return AsPieSeries<TModel, PieSeries<TModel, TVisual, TLabel>>(source, builder, gaugeOptions);
-    }
+        where TVisual : BaseDoughnutGeometry, new()
+        where TLabel : BaseLabelGeometry, new() =>
+        AsPieSeries<TModel, PieSeries<TModel, TVisual, TLabel>>(source, builder, gaugeOptions);
 
     /// <summary>
     /// Converts an IEnumerable to an ObservableCollection of pie series.
@@ -76,20 +90,19 @@ public static class PieChartExtensions
     /// <typeparam name="TSeries">The type of the series.</typeparam>
     /// <param name="source">The data source.</param>
     /// <param name="builder">An optional builder.</param>
-    /// <param name="gaugeOptions">Defines whether the series are treaded as gauge.</param>
+    /// <param name="gaugeOptions">Defines whether the series are treated as gauge.</param>
     /// <returns></returns>
-    public static ObservableCollection<TSeries> AsPieSeries<TModel, TSeries>(
+    public static TSeries[] AsPieSeries<TModel, TSeries>(
         this IEnumerable<TModel> source,
         Action<TModel, TSeries>? builder = null,
         GaugeOptions gaugeOptions = GaugeOptions.None)
-        where TSeries : IPieSeries<SkiaDrawingContext>, new()
+        where TSeries : IPieSeries, new()
     {
         var count = source.Count();
         builder ??= (instance, series) => { };
         var i = 0;
 
-        return new ObservableCollection<TSeries>(
-            source.Select(instance => AsSeries(instance, builder, i++, count, gaugeOptions)));
+        return [.. source.Select(instance => AsSeries(instance, builder, i++, count, gaugeOptions))];
     }
 
     internal static TSeries AsSeries<TModel, TSeries>(
@@ -98,7 +111,7 @@ public static class PieChartExtensions
         int i,
         int count,
         GaugeOptions gaugeOptions)
-        where TSeries : IPieSeries<SkiaDrawingContext>, new()
+        where TSeries : IPieSeries, new()
     {
         var isGauge = gaugeOptions > 0;
         var series = new TSeries();
@@ -106,20 +119,20 @@ public static class PieChartExtensions
         if (isGauge)
         {
             var baseSeries = (IInternalSeries)series;
-            baseSeries.SeriesProperties |= SeriesProperties.Gauge;
+            baseSeries.SeriesProperties |= LiveChartsCore.Kernel.SeriesProperties.Gauge;
         }
 
         ObservableCollection<TModel> values;
         if (gaugeOptions == GaugeOptions.Solid)
         {
-            values = new ObservableCollection<TModel>();
+            values = [];
             while (values.Count < count - 1)
                 values.Add(default!);
             values.Insert(i, instance);
         }
         else
         {
-            values = new ObservableCollection<TModel> { instance };
+            values = [instance];
             if (gaugeOptions == GaugeOptions.Angular)
             {
                 series.HoverPushout = 0;

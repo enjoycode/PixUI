@@ -198,5 +198,8 @@ partial class SkiaApi
     internal static extern unsafe void sk_paragraph_get_rect_for_position(IntPtr paragraph,
         int pos, int rectHeightStyle, int rectWidthStyle, void* textbox);
 
+    [DllImport(SKIA, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr sk_paragraph_get_line_first_textblob(IntPtr paragraph, int lineNum);
+
     #endregion
 }

@@ -352,7 +352,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         var rect = new Rect(s.Rect.Left, 0, e.Rect.Right, H);
         var paint = PixUI.Paint.Shared(0xFFB3D7FF);
         paint.BlendMode = BlendMode.Difference;
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
         canvas.DrawRect(rect, paint);
     }
 

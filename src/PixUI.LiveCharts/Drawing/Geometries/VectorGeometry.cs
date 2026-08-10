@@ -23,136 +23,60 @@
 using System.Collections.Generic;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Drawing.Segments;
-using LiveChartsCore.Motion;
 
-
-namespace LiveCharts.Drawing.Geometries;
+namespace PixUI.LiveCharts.Drawing.Geometries;
 
 /// <summary>
 /// Defines an area geometry.
 /// </summary>
-/// <typeparam name="TSegment">The type of the segment.</typeparam>
-public abstract class VectorGeometry<TSegment> : Drawable, IVectorGeometry<TSegment, SkiaDrawingContext>
-    where TSegment : class, IAnimatable, IConsecutivePathSegment
+public abstract class VectorGeometry : BaseVectorGeometry, IDrawnElement<SkiaSharpDrawingContext>
 {
-    private readonly FloatMotionProperty _pivotProperty;
+    // Cached path reused across Draw calls — SkPath::reset() is cheap on the native side,
+    // and skipping the per-call SKPath managed alloc + Dispose adds up in perf-sensitive
+    // chart paths where a vector is redrawn every invalidation.
+    private SKPath? _cachedPath;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="VectorGeometry{TSegment}"/> class.
+    /// Called when the area begins the draw.
     /// </summary>
-    public VectorGeometry()
-    {
-        _pivotProperty = RegisterMotionProperty(new FloatMotionProperty(nameof(Pivot), 0f));
-    }
+    /// <param name="context">The context.</param>
+    /// <param name="path">The path.</param>
+    /// <param name="segment">The segment.</param>
+    protected abstract void OnOpen(SkiaSharpDrawingContext context, SKPath path, Segment segment);
 
     /// <summary>
-    /// Gets the commands in the vector.
+    /// Called to close the area.
     /// </summary>
-    public LinkedList<TSegment> Commands { get; } = new();
+    /// <param name="context">The context.</param>
+    /// <param name="path">The path.</param>
+    /// <param name="segment">The segment.</param>
+    protected abstract void OnClose(SkiaSharpDrawingContext context, SKPath path, Segment segment);
 
-    /// <inheritdoc cref="IVectorGeometry{TSegment, TDrawingContext}.FirstCommand" />
-    public LinkedListNode<TSegment>? FirstCommand => Commands.First;
+    /// <summary>
+    /// Called to draw the segment.
+    /// </summary>
+    /// <param name="context">The context.</param>
+    /// <param name="path">The path.</param>
+    /// <param name="segment">The segment.</param>
+    protected abstract void OnDrawSegment(SkiaSharpDrawingContext context, SKPath path, Segment segment);
 
-    /// <inheritdoc cref="IVectorGeometry{TSegment, TDrawingContext}.LastCommand" />
-    public LinkedListNode<TSegment>? LastCommand => Commands.Last;
-
-    /// <inheritdoc cref="IVectorGeometry{TSegment, TDrawingContext}.CountCommands" />
-    public int CountCommands => Commands.Count;
-
-    /// <inheritdoc cref="IVectorGeometry{TSegment, TDrawingContext}.ClosingMethod" />
-    public VectorClosingMethod ClosingMethod { get; set; }
-
-    /// <inheritdoc cref="IVectorGeometry{TSegment, TDrawingContext}.Pivot" />
-    public float Pivot
-    {
-        get => _pivotProperty.GetMovement(this);
-        set => _pivotProperty.SetMovement(value, this);
-    }
-
-    /// <inheritdoc cref="IVectorGeometry{TSegment, TDrawingContext}.AddLast(TSegment)" />
-    public LinkedListNode<TSegment> AddLast(TSegment command)
-    {
-        IsValid = false;
-        return Commands.AddLast(command);
-    }
-
-    /// <inheritdoc cref="IVectorGeometry{TSegment, TDrawingContext}.AddFirst(TSegment)" />
-    public LinkedListNode<TSegment> AddFirst(TSegment command)
-    {
-        IsValid = false;
-        return Commands.AddFirst(command);
-    }
-
-    /// <inheritdoc cref="IVectorGeometry{TSegment, TDrawingContext}.AddAfter(LinkedListNode{TSegment}, TSegment)" />
-    public LinkedListNode<TSegment> AddAfter(LinkedListNode<TSegment> node, TSegment command)
-    {
-        IsValid = false;
-        return Commands.AddAfter(node, command);
-    }
-
-    /// <inheritdoc cref="IVectorGeometry{TSegment, TDrawingContext}.AddBefore(LinkedListNode{TSegment}, TSegment)" />
-    public LinkedListNode<TSegment> AddBefore(LinkedListNode<TSegment> node, TSegment command)
-    {
-        IsValid = false;
-        return Commands.AddBefore(node, command);
-    }
-
-    /// <inheritdoc cref="IVectorGeometry{TSegment, TDrawingContext}.ContainsCommand(TSegment)" />
-    public bool ContainsCommand(TSegment segment)
-    {
-        return Commands.Contains(segment);
-    }
-
-    // /// <inheritdoc cref="IVectorGeometry{TSegment, TDrawingContext}.RemoveCommand(TSegment)" />
-    // public bool RemoveCommand(TSegment command)
-    // {
-    //     IsValid = false;
-    //     return Commands.Remove(command);
-    // }
-
-    /// <inheritdoc cref="IVectorGeometry{TSegment, TDrawingContext}.RemoveCommand(LinkedListNode{TSegment})" />
-    public void RemoveCommand(LinkedListNode<TSegment> node)
-    {
-        IsValid = false;
-        Commands.Remove(node);
-    }
-
-    /// <inheritdoc cref="IVectorGeometry{TSegment, TDrawingContext}.ClearCommands" />
-    public void ClearCommands()
-    {
-        IsValid = false;
-        Commands.Clear();
-    }
-
-    /// <inheritdoc cref="IAnimatable.CompleteTransition(string[])" />
-    public override void CompleteTransition(params string[]? propertyName)
-    {
-        foreach (var segment in Commands)
-        {
-            segment.CompleteTransition(propertyName);
-        }
-
-        base.CompleteTransition(propertyName);
-    }
-
-    /// <inheritdoc cref="Geometry.OnDraw(SkiaDrawingContext, SKPaint)" />
-    public override void Draw(SkiaDrawingContext context)
+    /// <inheritdoc cref="IDrawnElement{TDrawingContext}.Draw(TDrawingContext)" />
+    public void Draw(SkiaSharpDrawingContext context)
     {
         if (Commands.Count == 0) return;
 
-        var toRemoveSegments = new List<TSegment>();
+        var path = _cachedPath ??= Path.Create();
+        path.Reset();
 
-        using var path = PixUI.Path.Create();
         var isValid = true;
+        List<Segment>? toRemoveSegments = null;
 
-        var currentTime = CurrentTime;
         var isFirst = true;
-        TSegment? last = null;
+        Segment? last = null;
 
         foreach (var segment in Commands)
         {
             segment.IsValid = true;
-            segment.CurrentTime = currentTime;
 
             if (isFirst)
             {
@@ -163,44 +87,35 @@ public abstract class VectorGeometry<TSegment> : Drawable, IVectorGeometry<TSegm
             OnDrawSegment(context, path, segment);
             isValid = isValid && segment.IsValid;
 
-            if (segment.IsValid && segment.RemoveOnCompleted) toRemoveSegments.Add(segment);
+            if (segment.IsValid && segment.RemoveOnCompleted)
+                (toRemoveSegments ??= []).Add(segment);
             last = segment;
         }
 
-        foreach (var segment in toRemoveSegments)
+        if (toRemoveSegments is not null)
         {
-            _ = Commands.Remove(segment);
-            isValid = false;
+            foreach (var segment in toRemoveSegments)
+            {
+                _ = Commands.Remove(segment);
+                isValid = false;
+            }
         }
 
         if (last is not null) OnClose(context, path, last);
 
-        context.Canvas.DrawPath(path, context.Paint);
+        context.Canvas.DrawPath(path, context.ActiveSkiaPaint);
 
         if (!isValid) IsValid = false;
     }
 
-    /// <summary>
-    /// Called when the area begins the draw.
-    /// </summary>
-    /// <param name="context">The context.</param>
-    /// <param name="path">The path.</param>
-    /// <param name="segment">The segment.</param>
-    protected virtual void OnOpen(SkiaDrawingContext context, SKPath path, TSegment segment) { }
+    internal override void OnDisposed()
+    {
+        // Release the cached native SKPath deterministically when the geometry is removed
+        // from its paint task. GC finalization is the safety net if a geometry is dropped
+        // without going through the normal removal path.
+        _cachedPath?.Dispose();
+        _cachedPath = null;
 
-    /// <summary>
-    /// Called to close the area.
-    /// </summary>
-    /// <param name="context">The context.</param>
-    /// <param name="path">The path.</param>
-    /// <param name="segment">The segment.</param>
-    protected virtual void OnClose(SkiaDrawingContext context, SKPath path, TSegment segment) { }
-
-    /// <summary>
-    /// Called to draw the segment.
-    /// </summary>
-    /// <param name="context">The context.</param>
-    /// <param name="path">The path.</param>
-    /// <param name="segment">The segment.</param>
-    protected virtual void OnDrawSegment(SkiaDrawingContext context, SKPath path, TSegment segment) { }
+        base.OnDisposed();
+    }
 }

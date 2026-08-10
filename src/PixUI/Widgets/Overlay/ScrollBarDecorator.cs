@@ -257,7 +257,7 @@ public sealed class ScrollBar : Widget, IMouseRegion
         }
 
         paint = PixUI.Paint.Shared(Colors.Gray);
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
         var thumb = RRect.FromRectAndRadius(_thumbRect, (Size - 2) / 2, (Size - 2) / 2);
         canvas.DrawRRect(thumb, paint);
     }

@@ -21,140 +21,99 @@
 // SOFTWARE.
 
 using LiveChartsCore.Drawing;
-using LiveChartsCore.Motion;
-using LiveCharts.Drawing;
-using PixUI;
+using LiveChartsCore.Generators;
+using PixUI.LiveCharts.Drawing;
 
-
-namespace LiveCharts.Painting;
+namespace PixUI.LiveCharts.Painting;
 
 /// <summary>
 /// Defines a set of geometries that will be painted using a solid color.
 /// </summary>
 /// <seealso cref="Paint" />
-public class SolidColorPaint : Paint
+public partial class SolidColorPaint : SkiaPaint
 {
-    private SkiaDrawingContext? _drawingContext;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SolidColorPaint"/> class.
+    /// </summary>
+    public SolidColorPaint()
+        : base() { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SolidColorPaint"/> class.
     /// </summary>
-    public SolidColorPaint() { }
-
-    public static SolidColorPaint MakeByColor(SKColor color) => new() { Color = color };
-
-    public static SolidColorPaint MakeByColorAndStroke(SKColor color, float strokeWidth)
+    /// <param name="color">The color.</param>
+    public SolidColorPaint(SKColor color)
+        : base()
     {
-        var p = new SolidColorPaint();
-        p._strokeWidthTransition =
-            p.RegisterMotionProperty(new FloatMotionProperty(nameof(StrokeThickness), strokeWidth));
-        p.Color = color;
-        return p;
+        // Seed the motion property so the color is the baseline value, not an animation target from
+        // the type default. Assigning via the Color setter would leave the motion's From/Default at
+        // the default color and treat the constructed color as a transition.
+        _ColorMotionProperty = new(color);
     }
 
-    /// <inheritdoc cref="IPaint{TDrawingContext}.CloneTask" />
-    public override IPaint<SkiaDrawingContext> CloneTask()
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SolidColorPaint"/> class.
+    /// </summary>
+    /// <param name="color">The color.</param>
+    /// <param name="strokeWidth">Width of the stroke.</param>
+    public SolidColorPaint(SKColor color, float strokeWidth)
+        : base(strokeWidth)
     {
-        var clone = new SolidColorPaint
-        {
-            Style = Style,
-            IsStroke = IsStroke,
-            IsFill = IsFill,
-            Color = Color,
-            IsAntialias = IsAntialias,
-            StrokeThickness = StrokeThickness,
-            StrokeCap = StrokeCap,
-            StrokeJoin = StrokeJoin,
-            StrokeMiter = StrokeMiter,
-            FontFamily = FontFamily,
-            SKFontStyle = SKFontStyle,
-            SKTypeface = SKTypeface,
-            PathEffect = PathEffect?.Clone(),
-            ImageFilter = ImageFilter?.Clone()
-        };
+        _ColorMotionProperty = new(color);
+    }
+
+    /// <summary>
+    /// Gets or sets the color.
+    /// </summary>
+    /// <value>
+    /// The color.
+    /// </value>
+    [MotionProperty]
+    public partial SKColor Color { get; set; }
+
+    /// <inheritdoc cref="LiveChartsCore.Painting.Paint.CloneTask" />
+    public override LiveChartsCore.Painting.Paint CloneTask()
+    {
+        // Use the seeding constructor (not an object initializer through the Color setter) so the
+        // clone's color is its baseline value, matching the original.
+        var clone = new SolidColorPaint(Color);
+        Map(this, clone);
 
         return clone;
     }
 
-    /// <inheritdoc cref="IPaint{TDrawingContext}.InitializeTask(TDrawingContext)" />
-    public override void InitializeTask(SkiaDrawingContext drawingContext)
+    internal override void OnPaintStarted(DrawingContext drawingContext, IDrawnElement? drawnElement)
     {
-        _skiaPaint ??= PixUI.Paint.Create();
+        var skiaContext = (SkiaSharpDrawingContext)drawingContext;
+        _skiaPaint = UpdateSkiaPaint(skiaContext, drawnElement);
 
-        _skiaPaint.Color = Color;
-        _skiaPaint.AntiAlias = IsAntialias;
-        _skiaPaint.Style = IsStroke ? PaintStyle.Stroke : PaintStyle.Fill;
-        _skiaPaint.StrokeCap = StrokeCap;
-        _skiaPaint.StrokeJoin = StrokeJoin;
-        _skiaPaint.StrokeMiter = StrokeMiter;
-        _skiaPaint.StrokeWidth = StrokeThickness;
-        _skiaPaint.Style = IsStroke ? SKPaintStyle.Stroke : SKPaintStyle.Fill;
-
-        //if (HasCustomFont) _skiaPaint.Typeface = GetSKTypeface();
-
-        if (PathEffect is not null)
-        {
-            PathEffect.CreateEffect(drawingContext);
-            _skiaPaint.PathEffect = PathEffect.SKPathEffect;
-        }
-
-        if (ImageFilter is not null)
-        {
-            ImageFilter.CreateFilter(drawingContext);
-            _skiaPaint.ImageFilter = ImageFilter.SKImageFilter;
-        }
-
-        var clip = GetClipRectangle(drawingContext.MotionCanvas);
-        if (clip != LvcRectangle.Empty)
-        {
-            drawingContext.Canvas.Save();
-            drawingContext.Canvas.ClipRect(SKRect.FromLTWH(clip.X, clip.Y, clip.Width, clip.Height), ClipOp.Intersect,
-                true);
-            _drawingContext = drawingContext;
-        }
-
-        drawingContext.Paint = _skiaPaint;
-        drawingContext.PaintTask = this;
+        // SKPaint.Color is a managed property that marshals to the native paint on next use;
+        // skipping the write when the source color hasn't moved avoids that pair on every
+        // paint-task selection. Most paints carry a static color in steady state.
+        if (_skiaPaint.Color != Color) _skiaPaint.Color = Color;
     }
 
-    /// <inheritdoc cref="IPaint{TDrawingContext}.ApplyOpacityMask(TDrawingContext, IPaintable{TDrawingContext})" />
-    public override void ApplyOpacityMask(SkiaDrawingContext context, IPaintable<SkiaDrawingContext> geometry)
+    internal override void ApplyOpacityMask(DrawingContext context, float opacity, IDrawnElement? drawnElement)
     {
-        if (context.PaintTask is null || context.Paint is null) return;
-
-        var baseColor = context.PaintTask.Color;
-        context.Paint.Color =
-            new SKColor(baseColor.Red, baseColor.Green, baseColor.Blue, unchecked((byte)(255 * geometry.Opacity)));
+        var skiaContext = (SkiaSharpDrawingContext)context;
+        var baseColor = Color;
+        skiaContext.ActiveSkiaPaint.Color =
+            new SKColor(
+                baseColor.Red,
+                baseColor.Green,
+                baseColor.Blue,
+                (byte)(baseColor.Alpha * opacity));
     }
 
-    /// <inheritdoc cref="IPaint{TDrawingContext}.RestoreOpacityMask(TDrawingContext, IPaintable{TDrawingContext})" />
-    public override void RestoreOpacityMask(SkiaDrawingContext context, IPaintable<SkiaDrawingContext> geometry)
+    internal override void RestoreOpacityMask(DrawingContext context, float opacity, IDrawnElement? drawnElement)
     {
-        if (context.PaintTask is null || context.Paint is null) return;
-
-        var baseColor = context.PaintTask.Color;
-        context.Paint.Color = baseColor;
+        var skiaContext = (SkiaSharpDrawingContext)context;
+        skiaContext.ActiveSkiaPaint.Color = Color;
     }
 
     /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// Returns a string that represents the current object.
     /// </summary>
-    public override void Dispose()
-    {
-        // Note #301222
-        // Disposing typefaces could cause render issues.
-        // Does this causes memory leaks?
-        // Should the user dispose typefaces manually?
-        //if (HasCustomFont && _skiaPaint != null) _skiaPaint.Typeface.Dispose();
-        PathEffect?.Dispose();
-        ImageFilter?.Dispose();
-
-        if (_drawingContext is not null && GetClipRectangle(_drawingContext.MotionCanvas) != LvcRectangle.Empty)
-        {
-            _drawingContext.Canvas.Restore();
-            _drawingContext = null;
-        }
-
-        base.Dispose();
-    }
+    /// <returns>a string.</returns>
+    public override string ToString() => $"({Color.Red}, {Color.Green}, {Color.Blue})";
 }

@@ -107,7 +107,7 @@ public sealed unsafe class SKFont : SKObject, IFont
         return res;
     }
 
-    public ushort GetGlyphId(int codepoint) => SkiaApi.sk_font_unichar_to_glyph(Handle, codepoint);
+    public ushort GetGlyph(int codepoint) => SkiaApi.sk_font_unichar_to_glyph(Handle, codepoint);
 
     public float GetGlyphWidth(ushort glyphId)
     {
@@ -128,7 +128,48 @@ public sealed unsafe class SKFont : SKObject, IFont
         }
     }
 
-    public ushort[] TextToGlyphs(string text)
+    public int CountGlyphs(ReadOnlySpan<byte> text, SKTextEncoding encoding)
+    {
+        fixed (void* t = text)
+        {
+            return CountGlyphs(t, text.Length, encoding);
+        }
+    }
+
+    internal int CountGlyphs(void* text, int length, SKTextEncoding encoding)
+    {
+        if (!ValidateTextArgs(text, length, encoding))
+            return 0;
+
+        return SkiaApi.sk_font_text_to_glyphs(Handle, text, (IntPtr)length, encoding, null, 0);
+    }
+
+    internal ushort[] GetGlyphs(void* text, int length, SKTextEncoding encoding)
+    {
+        if (!ValidateTextArgs(text, length, encoding))
+            return [];
+
+        var n = CountGlyphs(text, length, encoding);
+        if (n <= 0)
+            return [];
+
+        var glyphs = new ushort[n];
+        GetGlyphs(text, length, encoding, glyphs);
+        return glyphs;
+    }
+
+    internal void GetGlyphs(void* text, int length, SKTextEncoding encoding, Span<ushort> glyphs)
+    {
+        if (!ValidateTextArgs(text, length, encoding))
+            return;
+
+        fixed (ushort* gp = glyphs)
+        {
+            SkiaApi.sk_font_text_to_glyphs(Handle, text, (IntPtr)length, encoding, gp, glyphs.Length);
+        }
+    }
+
+    public ushort[] GetGlyphs(string text)
     {
         var glyphs = new ushort[text.Length];
         fixed (ushort* glyphsPtr = glyphs)
@@ -142,7 +183,67 @@ public sealed unsafe class SKFont : SKObject, IFont
         }
     }
 
-    public Rect[] GetBounds(ushort[] glyphs)
+    public void GetGlyphPositions(ReadOnlySpan<char> text, Span<Point> offsets, Point origin = default)
+    {
+        fixed (void* t = text)
+        {
+            GetGlyphPositions(t, text.Length * 2, SKTextEncoding.Utf16, offsets, origin);
+        }
+    }
+
+    internal void GetGlyphPositions(void* text, int length, SKTextEncoding encoding, Span<Point> offsets, Point origin)
+    {
+        if (!ValidateTextArgs(text, length, encoding))
+            return;
+
+        var n = offsets.Length;
+        if (n <= 0)
+            return;
+
+        using var glyphs = Utils.RentArray<ushort>(n);
+        GetGlyphs(text, length, encoding, glyphs);
+        GetGlyphPositions(glyphs, offsets, origin);
+    }
+
+    public void GetGlyphPositions(ReadOnlySpan<ushort> glyphs, Span<Point> positions, Point origin = default)
+    {
+        if (glyphs.Length != positions.Length)
+            throw new ArgumentException("The length of glyphs must be the same as the length of positions.",
+                nameof(positions));
+
+        fixed (ushort* gp = glyphs)
+        fixed (Point* pp = positions)
+        {
+            SkiaApi.sk_font_get_pos(Handle, gp, glyphs.Length, pp, &origin);
+        }
+    }
+
+    public void GetGlyphWidths(ReadOnlySpan<ushort> glyphs, Span<float> widths, Span<Rect> bounds,
+        SKPaint? paint = null)
+    {
+        fixed (ushort* gp = glyphs)
+        fixed (float* wp = widths)
+        fixed (Rect* bp = bounds)
+        {
+            var w = widths.Length > 0 ? wp : null;
+            var b = bounds.Length > 0 ? bp : null;
+            SkiaApi.sk_font_get_widths_bounds(Handle, gp, glyphs.Length, w, b, paint?.Handle ?? IntPtr.Zero);
+        }
+    }
+
+    public float[] GetGlyphWidths(ReadOnlySpan<ushort> glyphs)
+    {
+        var res = new float[glyphs.Length];
+        fixed (float* widthsPtr = res)
+        fixed (ushort* glyphsPtr = glyphs)
+        {
+            SkiaApi.sk_font_get_widths_bounds(Handle, glyphsPtr, glyphs.Length, widthsPtr, null, IntPtr.Zero);
+        }
+
+        return res;
+    }
+
+    public Rect[] GetBounds(ReadOnlySpan<ushort> glyphs)
     {
         var bounds = new Rect[glyphs.Length];
         fixed (Rect* boundsPtr = bounds)
@@ -154,15 +255,14 @@ public sealed unsafe class SKFont : SKObject, IFont
         return bounds;
     }
 
-    public float[] GetWidths(ushort[] glyphs)
+    private static bool ValidateTextArgs(void* text, int length, SKTextEncoding encoding)
     {
-        var res = new float[glyphs.Length];
-        fixed (float* widthsPtr = res)
-        fixed (ushort* glyphsPtr = glyphs)
-        {
-            SkiaApi.sk_font_get_widths_bounds(Handle, glyphsPtr, glyphs.Length, widthsPtr, null, IntPtr.Zero);
-        }
+        if (length == 0)
+            return false;
 
-        return res;
+        if (text == null)
+            throw new ArgumentNullException(nameof(text));
+
+        return true;
     }
 }

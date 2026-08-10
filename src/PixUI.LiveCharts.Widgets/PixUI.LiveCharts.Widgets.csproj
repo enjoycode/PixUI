@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>PixUI.LiveCharts</RootNamespace>
+    </PropertyGroup>
+
+    <Import Project="..\..\ext\LiveCharts2\src\skiasharp\_Shared\_Shared.projitems" Label="Shared" />
+
+    <ItemGroup>
+      <ProjectReference Include="..\PixUI.LiveCharts\PixUI.LiveCharts.csproj" />
+      <ProjectReference Include="..\PixUI\PixUI.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\ext\LiveCharts2\generators\LiveChartsGenerators\LiveChartsGenerators.csproj">
+            <OutputItemType>Analyzer</OutputItemType>
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+        </ProjectReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Include="..\..\ext\LiveCharts2\src\skiasharp\_Shared\SourceGenDrawnView.shared.cs">
+        <Link>SourceGenDrawnView.shared.cs</Link>
+      </Compile>
+    </ItemGroup>
+
+</Project>

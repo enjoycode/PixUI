@@ -20,13 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Collections.Generic;
+using LiveChartsCore;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Kernel;
-using LiveCharts.Drawing;
-using LiveCharts.Drawing.Geometries;
-using LiveChartsCore;
+using PixUI.LiveCharts.Drawing.Geometries;
 
-namespace LiveCharts;
+namespace PixUI.LiveCharts;
 
 /// <summary>
 /// Defines a stacked area series in the user interface.
@@ -34,12 +34,38 @@ namespace LiveCharts;
 /// <typeparam name="TModel">
 /// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
 /// to use a custom type, you must register the type globally 
-/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
+/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Func{TModel, int, Coordinate})"/>)
 /// or at the series level 
-/// (<see cref="Series{TModel,TVisual,TLabel,TDrawingContext}.Mapping"/>).
+/// (<see cref="Series{TModel,TVisual,TLabel}.Mapping"/>).
 /// </typeparam>
 public class StackedStepAreaSeries<TModel>
-    : StackedStepAreaSeries<TModel, CircleGeometry, LabelGeometry> { }
+    : StackedStepAreaSeries<TModel, CircleGeometry, LabelGeometry>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StackedStepAreaSeries{TModel, TVisual, TLabel}"/> class.
+    /// </summary>
+    public StackedStepAreaSeries()
+        : base()
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StackedStepAreaSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
+    /// </summary>
+    /// <param name="values">The values to plot.</param>
+    public StackedStepAreaSeries(IReadOnlyCollection<TModel>? values)
+        : base(values)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StackedStepAreaSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
+    /// </summary>
+    /// <param name="values">The values to plot.</param>
+    public StackedStepAreaSeries(params TModel[] values)
+        : base(values)
+    { }
+}
 
 /// <summary>
 /// Defines a stacked area series in the user interface.
@@ -47,16 +73,42 @@ public class StackedStepAreaSeries<TModel>
 /// <typeparam name="TModel">
 /// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
 /// to use a custom type, you must register the type globally 
-/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
+/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Func{TModel, int, Coordinate})"/>)
 /// or at the series level 
-/// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
+/// (<see cref="Series{TModel, TVisual, TLabel}.Mapping"/>).
 /// </typeparam>
 /// <typeparam name="TVisual">
 /// The type of the geometry of every point of the series.
 /// </typeparam>
 public class StackedStepAreaSeries<TModel, TVisual>
     : StackedStepAreaSeries<TModel, TVisual, LabelGeometry>
-    where TVisual : class, ISizedGeometry<SkiaDrawingContext>, new() { }
+        where TVisual : BoundedDrawnGeometry, new()
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StackedStepAreaSeries{TModel, TVisual, TLabel}"/> class.
+    /// </summary>
+    public StackedStepAreaSeries()
+        : base()
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StackedStepAreaSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
+    /// </summary>
+    /// <param name="values">The values to plot.</param>
+    public StackedStepAreaSeries(IReadOnlyCollection<TModel>? values)
+        : base(values)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StackedStepAreaSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
+    /// </summary>
+    /// <param name="values">The values to plot.</param>
+    public StackedStepAreaSeries(params TModel[] values)
+        : base(values)
+    { }
+}
 
 /// <summary>
 /// Defines a stacked area series in the user interface.
@@ -64,9 +116,9 @@ public class StackedStepAreaSeries<TModel, TVisual>
 /// <typeparam name="TModel">
 /// The type of the points, you can use any type, the library already knows how to handle the most common numeric types,
 /// to use a custom type, you must register the type globally 
-/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Action{TModel, ChartPoint})"/>)
+/// (<see cref="LiveChartsSettings.HasMap{TModel}(System.Func{TModel, int, Coordinate})"/>)
 /// or at the series level 
-/// (<see cref="Series{TModel, TVisual, TLabel, TDrawingContext}.Mapping"/>).
+/// (<see cref="Series{TModel, TVisual, TLabel}.Mapping"/>).
 /// </typeparam>
 /// <typeparam name="TVisual">
 /// The type of the geometry of every point of the series.
@@ -75,6 +127,37 @@ public class StackedStepAreaSeries<TModel, TVisual>
 /// The type of the data label of every point.
 /// </typeparam>
 public class StackedStepAreaSeries<TModel, TVisual, TLabel>
-    : StackedStepAreaSeries<TModel, TVisual, TLabel, SkiaDrawingContext, StepLineAreaGeometry>
-    where TVisual : class, ISizedGeometry<SkiaDrawingContext>, new()
-    where TLabel : class, ILabelGeometry<SkiaDrawingContext>, new() { }
+    : CoreStackedStepAreaSeries<TModel, TVisual, TLabel, StepLineAreaGeometry, LineGeometry>
+        where TVisual : BoundedDrawnGeometry, new()
+        where TLabel : BaseLabelGeometry, new()
+{
+    static StackedStepAreaSeries()
+    {
+        LiveChartsSkiaSharp.EnsureInitialized();
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StackedStepAreaSeries{TModel, TVisual, TLabel}"/> class.
+    /// </summary>
+    public StackedStepAreaSeries()
+        : base(null)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StackedStepAreaSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
+    /// </summary>
+    /// <param name="values">The values to plot.</param>
+    public StackedStepAreaSeries(IReadOnlyCollection<TModel>? values)
+        : base(values)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StackedStepAreaSeries{TModel, TVisual, TLabel}"/> class,
+    /// with a given collection of values.
+    /// </summary>
+    /// <param name="values">The values to plot.</param>
+    public StackedStepAreaSeries(params TModel[] values)
+        : base(values)
+    { }
+}

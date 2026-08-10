@@ -19,6 +19,7 @@ public interface ICanvas : IDisposable
     void DrawArc(Rect oval, float startAngle, float sweepAngle, bool useCenter, IPaint paint);
     void DrawPath(IPath path, IPaint paint);
     void DrawString(string text, float x, float y, IFont font, Color color);
+    void DrawTextBlob(ITextBlob textBlob, float x, float y, IPaint paint);
     void DrawParagraph(IParagraph paragraph, float x, float y);
     void DrawGlyph(ushort glyphId, float posX, float posY, float originX, float originY, IFont font, IPaint paint);
     void DrawImage(IImage image, float x, float y, IPaint? paint = null);

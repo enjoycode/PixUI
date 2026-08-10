@@ -13,6 +13,7 @@
         <ProjectReference Include="..\PixUI.CodeEditor\PixUI.CodeEditor.csproj"/>
         <ProjectReference Include="..\PixUI.Diagram\PixUI.Diagram.csproj" />
         <ProjectReference Include="..\PixUI.Dynamic.Design\PixUI.Dynamic.Design.csproj"/>
+        <ProjectReference Include="..\PixUI.LiveCharts.Widgets\PixUI.LiveCharts.Widgets.csproj" />
         <ProjectReference Include="..\PixUI.LiveCharts\PixUI.LiveCharts.csproj"/>
         <ProjectReference Include="..\PixUI.Misc\PixUI.Misc.csproj"/>
         <ProjectReference Include="..\PixUI.PdfViewer\PixUI.PdfViewer.csproj"/>

@@ -55,4 +55,11 @@ public sealed class SKParagraph : SKObject, IParagraph
 
     internal void Paint(SKCanvas canvas, float x, float y) =>
         SkiaApi.sk_paragraph_paint(Handle, canvas.Handle, x, y);
+
+    public ITextBlob? GetLineFirstTextBlob(int lineNumber)
+    {
+        var handle = SkiaApi.sk_paragraph_get_line_first_textblob(Handle, lineNumber);
+        if (handle == IntPtr.Zero) return null;
+        return new SKTextBlob(handle, false);
+    }
 }

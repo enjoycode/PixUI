@@ -125,7 +125,7 @@ internal sealed class ConnectionSelectionAdorner : DesignAdorner, ISelectionAdor
 
         var dotEffect = PathEffect.CreateDash([1, 1], 1);
         var paint = Paint.Shared(Colors.Gray, PaintStyle.Stroke, connection.StrokeThickness);
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
         paint.PathEffect = dotEffect;
 
         canvas.DrawLine(startHandleBezierPoint, startBezierPoint, paint);

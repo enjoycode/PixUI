@@ -21,38 +21,20 @@
 // SOFTWARE.
 
 using LiveChartsCore.Drawing;
-using LiveChartsCore.Motion;
 
-namespace LiveCharts.Drawing.Geometries;
+namespace PixUI.LiveCharts.Drawing.Geometries;
 
 /// <summary>
 /// Defines a rounded rectangle geometry.
 /// </summary>
-/// <seealso cref="SizedGeometry" />
-public class RoundedRectangleGeometry : SizedGeometry, IRoundedGeometry<SkiaDrawingContext>
+public class RoundedRectangleGeometry : BaseRoundedRectangleGeometry, IDrawnElement<SkiaSharpDrawingContext>
 {
-    private readonly PointMotionProperty _borderRadius;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RoundedRectangleGeometry"/> class.
-    /// </summary>
-    public RoundedRectangleGeometry()
+    /// <inheritdoc cref="IDrawnElement{TDrawingContext}.Draw(TDrawingContext)" />
+    public void Draw(SkiaSharpDrawingContext context)
     {
-        _borderRadius = RegisterMotionProperty(new PointMotionProperty(nameof(BorderRadius), new LvcPoint(8f, 8f)));
-    }
+        var br = BorderRadius;
 
-    /// <inheritdoc cref="IRoundedGeometry{TDrawingContext}.BorderRadius"/>
-    public LvcPoint BorderRadius
-    {
-        get => _borderRadius.GetMovement(this);
-        set => _borderRadius.SetMovement(value, this);
-    }
-
-    /// <inheritdoc cref="Geometry.OnDraw(SkiaSharpDrawingContext, SKPaint)" />
-    public override void OnDraw(SkiaDrawingContext context, SKPaint paint)
-    {
-        var rect = SKRect.FromLTWH(X, Y, Width, Height);
-        var rrect = PixUI.RRect.FromRectAndRadius(rect, BorderRadius.X, BorderRadius.Y);
-        context.Canvas.DrawRRect(rrect, paint);
+        var roundRect = RRect.FromRectAndRadius(Rect.FromLTWH(X, Y, Width, Height), br.X, br.Y);
+        context.Canvas.DrawRRect(roundRect, context.ActiveSkiaPaint);
     }
 }

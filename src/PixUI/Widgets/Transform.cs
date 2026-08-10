@@ -62,7 +62,7 @@ public class Transform : SingleChildWidget
             if (_origin != null)
                 result.Translate(_origin.Value.Dx, _origin.Value.Dy);
 
-            result.Multiply(_transform);
+            result.Concat(_transform);
 
             if (_origin != null)
                 result.Translate(-_origin.Value.Dx, -_origin.Value.Dy);

@@ -20,11 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using LiveChartsCore;
 using LiveChartsCore.Kernel.Sketches;
-using LiveCharts.Drawing;
-using LiveCharts.Drawing.Geometries;
+using PixUI.LiveCharts.Drawing.Geometries;
 
-namespace LiveCharts;
+namespace PixUI.LiveCharts;
 
 /// <inheritdoc cref="ICartesianAxis" />
-public sealed class Axis : LiveChartsCore.Axis<SkiaDrawingContext, LabelGeometry, LineGeometry> { }
+public class Axis : CoreAxis<LabelGeometry, LineGeometry>
+{
+    static Axis()
+    {
+        LiveChartsSkiaSharp.EnsureInitialized();
+    }
+}

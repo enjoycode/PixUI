@@ -21,70 +21,61 @@
 // SOFTWARE.
 
 using System;
-using LiveCharts.Drawing;
+using System.Linq;
 
-
-namespace LiveCharts.Painting.ImageFilters;
+namespace PixUI.LiveCharts.Painting;
 
 /// <summary>
 /// Merges multiple image filters.
 /// </summary>
 /// <seealso cref="ImageFilter" />
-public class ImageFiltersMergeOperation : ImageFilter
+/// <remarks>
+/// Initializes a new instance of the <see cref="ImageFiltersMergeOperation"/> class.
+/// </remarks>
+/// <param name="imageFilters">The image filters.</param>
+public class ImageFiltersMergeOperation(ImageFilter[] imageFilters) : ImageFilter(s_key)
 {
-    private readonly ImageFilter[] _filters;
-    // private readonly SKImageFilter.CropRect? _cropRect = null;
+    internal static object s_key = new();
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ImageFiltersMergeOperation"/> class.
-    /// </summary>
-    /// <param name="imageFilters">The image filters.</param>
-    /// <param name="cropRect">The crop rect.</param>
-    public ImageFiltersMergeOperation(ImageFilter[] imageFilters/*, SKImageFilter.CropRect? cropRect = null*/)
-    {
-        _filters = imageFilters;
-        // _cropRect = cropRect;
-    }
+    private ImageFilter[] Filters { get; } = imageFilters;
 
-    /// <summary>
-    /// Clones this instance.
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="System.NotImplementedException"></exception>
-    public override ImageFilter Clone()
+    /// <inheritdoc cref="ImageFilter.CreateNative()"/>
+    public override SKImageFilter CreateNative()
     {
-        return new ImageFiltersMergeOperation(_filters/*, _cropRect*/);
-    }
-
-    /// <summary>
-    /// Creates the image filter.
-    /// </summary>
-    /// <param name="drawingContext">The drawing context.</param>
-    /// <exception cref="System.NotImplementedException"></exception>
-    public override void CreateFilter(SkiaDrawingContext drawingContext)
-    {
-        throw new NotImplementedException();
-        // var imageFilters = new SKImageFilter[_filters.Length];
-        // var i = 0;
+        throw new NotImplementedException("ImageFiltersMergeOperation.CreateNative() is not implemented");
+        // var natives = new SKImageFilter[Filters.Length];
+        // for (var i = 0; i < natives.Length; i++)
+        //     natives[i] = Filters[i].CreateNative();
         //
-        // foreach (var item in _filters)
-        // {
-        //     item.CreateFilter(drawingContext);
-        //     if (item.SKImageFilter is null) throw new System.Exception("Image filter is not valid");
-        //     imageFilters[i++] = item.SKImageFilter;
-        // }
+        // var merged = PixUI.ImageFilter.CreateMerge(natives);
         //
-        // SKImageFilter = SKImageFilter.CreateMerge(imageFilters, _cropRect);
+        // // CreateMerge takes its own reference to each child, so the transient child handles can be
+        // // released here; only the merged filter is returned, and the paint owns and disposes it.
+        // foreach (var native in natives)
+        //     native.Dispose();
+        //
+        // return merged;
     }
 
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-    /// </summary>
-    public override void Dispose()
+    /// <inheritdoc cref="ImageFilter.Transitionate(float, ImageFilter)"/>
+    protected override ImageFilter Transitionate(float progress, ImageFilter target)
     {
-        foreach (var item in _filters)
+        if (target is not ImageFiltersMergeOperation merge) return target;
+
+        if (merge.Filters.Length != Filters.Length)
+            throw new Exception("The image filters must have the same length");
+
+        var filters = new ImageFilter[Filters.Length];
+
+        var hasNull = false;
+        for (var i = 0; i < Filters.Length; i++)
         {
-            item.Dispose();
+            var transitionated = Transitionate(Filters[i], merge.Filters[i], progress);
+            filters[i] = transitionated!; // ! ignored, will be filtered out later
+            if (transitionated is null) hasNull = true;
         }
+
+        return new ImageFiltersMergeOperation(
+            hasNull ? [.. filters.Where(x => x is not null)] : filters);
     }
 }

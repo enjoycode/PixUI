@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <DefineConstants>$(DefineConstants);SKIA_IMAGE_LVC;</DefineConstants>
+    </PropertyGroup>
+
+    <Import Project="..\..\ext\LiveCharts2\src\skiasharp\_Shared\_Shared.projitems" Label="Shared" />
+
+    <ItemGroup>
+      <ProjectReference Include="..\PixUI.LiveCharts\PixUI.LiveCharts.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\ext\LiveCharts2\generators\LiveChartsGenerators\LiveChartsGenerators.csproj">
+            <OutputItemType>Analyzer</OutputItemType>
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+        </ProjectReference>
+    </ItemGroup>
+
+</Project>

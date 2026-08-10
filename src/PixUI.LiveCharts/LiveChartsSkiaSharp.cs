@@ -21,28 +21,50 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.Kernel;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.Measure;
-using LiveCharts.Drawing;
-using LiveCharts.Painting;
+using LiveChartsCore.Motion;
+using PixUI.LiveCharts.TypeConverters;
 
-
-namespace LiveCharts;
+namespace PixUI.LiveCharts;
 
 /// <summary>
 /// Defines the default LiveCharts-SkiaSharp settings
 /// </summary>
 public static class LiveChartsSkiaSharp
 {
-    /// <summary>
-    /// Gets or sets an SKTypeface instance to use globally on any paint that does not specify any.
-    /// </summary>
-    public static SKTypeface? DefaultSKTypeface { get; set; }
+    internal static MotionCanvasComposer.MotionCanvasRenderingFactoryDelegate MotionCanvasRenderingFactory { get; set; } =
+        (settings) => throw new NotImplementedException(
+            "No motion canvas rendering factory has been set, please use the method 'HasMotionCanvasRenderingFactory' to set one.");
+
+    internal static TextSettings DefaultTextSettings { get; set; } = new();
+
+    internal static LiveChartsSettings EnsureInitialized()
+    {
+        LiveChartsCore.LiveCharts.Configure(settings => settings.UseDefaults());
+
+        var defaultRenderSettings = LiveChartsCore.LiveCharts.RenderingSettings;
+
+#if __GPU_TRUE__
+        defaultRenderSettings.UseGPU = true;
+#endif
+#if __GPU_FALSE__
+        defaultRenderSettings.UseGPU = false;
+#endif
+#if __VSYNC_TRUE__
+        defaultRenderSettings.TryUseVSync = true;
+#endif
+#if __VSYNC_FALSE__
+        defaultRenderSettings.TryUseVSync = false;
+#endif
+#if __DIAGNOSE__
+        defaultRenderSettings.ShowFPS = true;
+#endif
+
+        return LiveChartsCore.LiveCharts.DefaultSettings;
+    }
 
     /// <summary>
     /// Configures LiveCharts using the default settings for SkiaSharp.
@@ -51,22 +73,59 @@ public static class LiveChartsSkiaSharp
     /// <returns>The settings.</returns>
     public static LiveChartsSettings UseDefaults(this LiveChartsSettings settings)
     {
-        if (!LiveChartsCore.LiveCharts.HasBackend) _ = settings.AddSkiaSharp();
-        if (!LiveChartsCore.LiveCharts.HasTheme) _ = settings.AddLightTheme();
-        if (!LiveChartsCore.LiveCharts.HasDefaultMappers) _ = settings.AddDefaultMappers();
+        if (!LiveChartsCore.LiveCharts.DefaultSettings.HasBackedDefined)
+            _ = settings.AddSkiaSharp();
+
+        if (!LiveChartsCore.LiveCharts.DefaultSettings.HasThemeDefined)
+            _ = settings.AddDefaultTheme();
+
+        if (!LiveChartsCore.LiveCharts.DefaultSettings.HasMappersDefined)
+            _ = settings.AddDefaultMappers();
 
         return settings;
     }
 
     /// <summary>
-    /// Adds SkiaSharp as the backend provider for LiveCharts.
+    /// Adds SkiaSharp as the library backend.
     /// </summary>
     /// <param name="settings">The settings.</param>
-    /// <returns></returns>
+    /// <returns>The current settings.</returns>
     public static LiveChartsSettings AddSkiaSharp(this LiveChartsSettings settings)
     {
-        LiveChartsCore.LiveCharts.HasBackend = true;
+        PropertyDefinition.Parsers[typeof(Paint)] = HexToPaintTypeConverter.Parse;
+        PropertyDefinition.Parsers[typeof(LvcColor)] = HexToLvcColorTypeConverter.Parse;
+        PropertyDefinition.Parsers[typeof(Margin)] = MarginTypeConverter.ParseMargin;
+        PropertyDefinition.Parsers[typeof(Padding)] = PaddingTypeConverter.ParsePadding;
+        PropertyDefinition.Parsers[typeof(LvcPointD)] = PointDTypeConverter.ParsePoint;
+        PropertyDefinition.Parsers[typeof(LvcPoint)] = PointTypeConverter.ParsePoint;
+
         return settings.HasProvider(new SkiaSharpProvider());
+    }
+
+    /// <summary>
+    /// Registers the text settings to use for SkiaSharp.
+    /// </summary>
+    /// <param name="settings">The current settings.</param>
+    /// <param name="textSettings">The text settings to use for SkiaSharp text rendering.</param>
+    /// <returns>The current settings.</returns>
+    public static LiveChartsSettings HasTextSettings(
+        this LiveChartsSettings settings, TextSettings textSettings)
+    {
+        DefaultTextSettings = textSettings;
+        return settings;
+    }
+
+    /// <summary>
+    /// Adds a render mode to the available render modes.
+    /// </summary>
+    /// <param name="settings">The current settings.</param>
+    /// <param name="factory">The rendering factory.</param>
+    /// <returns>The current settings.</returns>
+    public static LiveChartsSettings HasRenderingFactory(
+        this LiveChartsSettings settings, MotionCanvasComposer.MotionCanvasRenderingFactoryDelegate factory)
+    {
+        MotionCanvasRenderingFactory = factory;
+        return settings;
     }
 
     /// <summary>
@@ -75,10 +134,10 @@ public static class LiveChartsSkiaSharp
     /// <param name="color">The color.</param>
     /// <param name="alphaOverrides">The alpha overrides.</param>
     /// <returns></returns>
-    public static SKColor AsSKColor(this LvcColor color, byte? alphaOverrides = null)
-    {
-        return new SKColor(color.R, color.G, color.B, alphaOverrides ?? color.A);
-    }
+    public static SKColor AsSKColor(this LvcColor color, byte? alphaOverrides = null) =>
+        color == LvcColor.Empty
+            ? SKColor.Empty
+            : new(color.R, color.G, color.B, alphaOverrides ?? color.A);
 
     /// <summary>
     /// Creates a new color based on the 
@@ -86,61 +145,16 @@ public static class LiveChartsSkiaSharp
     /// <param name="color">The color.</param>
     /// <param name="opacity">The opacity from 0 to 255.</param>
     /// <returns></returns>
-    public static LvcColor WithOpacity(this LvcColor color, byte opacity)
-    {
-        return LvcColor.FromArgb(opacity, color);
-    }
+    public static LvcColor WithOpacity(this LvcColor color, byte opacity) =>
+        LvcColor.FromArgb(opacity, color);
 
     /// <summary>
     /// Converts a <see cref="SKColor"/> to a <see cref="LvcColor"/> intance.
     /// </summary>
     /// <param name="color">The color</param>
     /// <returns></returns>
-    public static LvcColor AsLvcColor(this SKColor color)
-    {
-        return new LvcColor(color.Red, color.Green, color.Blue, color.Alpha);
-    }
-
-#if !__WEB__
-    /// <summary>
-    /// Gets the <see cref="SkiaFontMatchChar"/> key.
-    /// </summary>
-    [Obsolete($"Use {nameof(Paint)}.{nameof(Paint.SKTypeface)} instead.")]
-    public const string SkiaFontMatchChar = "matchChar";
-
-    /// <summary>
-    /// Matches
-    /// </summary>
-    /// <param name="char"></param>
-    /// <returns></returns>
-    [Obsolete($"Use {nameof(Paint)}.{nameof(Paint.SKTypeface)} instead.")]
-    public static string MatchChar(char @char)
-    {
-        return $"{SkiaFontMatchChar}|{@char}";
-    }
-#endif
-
-    /// <summary>
-    /// Converts an IEnumerable to an ObservableCollection of pie series.
-    /// </summary>
-    /// <typeparam name="T">The type.</typeparam>
-    /// <param name="source">The data source.</param>
-    /// <param name="buider">An optional builder.</param>
-    /// <returns></returns>
-    public static ObservableCollection<PieSeries<T>> AsLiveChartsPieSeries<T>(this IEnumerable<T> source,
-        Action<T, PieSeries<T>>? buider = null)
-    {
-        buider ??= (instance, series) => { };
-
-        return new ObservableCollection<PieSeries<T>>(
-            source.Select(instance =>
-                {
-                    var series = new PieSeries<T> { Values = new ObservableCollection<T> { instance } };
-                    buider(instance, series);
-                    return series;
-                })
-                .ToArray());
-    }
+    public static LvcColor AsLvcColor(this SKColor color) =>
+        new(color.Red, color.Green, color.Blue, color.Alpha);
 
     /// <summary>
     /// Calculates the distance in pixels from the target <see cref="ChartPoint"/> to the given location in the UI.
@@ -150,14 +164,11 @@ public static class LiveChartsSkiaSharp
     /// <returns>The distance in pixels.</returns>
     public static double GetDistanceTo(this ChartPoint target, LvcPoint location)
     {
-        LvcPointD dataCoordinates;
         double x, y;
 
-        if (target.Context is ICartesianChartView<SkiaDrawingContext> cartesianChart)
+        if (target.Context.Chart is ICartesianChartView cartesianChart)
         {
-            dataCoordinates = cartesianChart.ScalePixelsToData(new LvcPointD(location));
-
-            var cartesianSeries = (ICartesianSeries<SkiaDrawingContext>)target.Context.Series;
+            var cartesianSeries = (ICartesianSeries)target.Context.Series;
 
             if (target.Context.Series.SeriesProperties.HasFlag(SeriesProperties.PrimaryAxisHorizontalOrientation))
             {
@@ -166,8 +177,8 @@ public static class LiveChartsSkiaSharp
 
                 var drawLocation = cartesianChart.Core.DrawMarginLocation;
                 var drawMarginSize = cartesianChart.Core.DrawMarginSize;
-                var secondaryScale = new Scaler(drawLocation, drawMarginSize, primaryAxis);
-                var primaryScale = new Scaler(drawLocation, drawMarginSize, secondaryAxis);
+                var secondaryScale = primaryAxis.GetScaler(cartesianChart.Core, drawLocation, drawMarginSize);
+                var primaryScale = secondaryAxis.GetScaler(cartesianChart.Core, drawLocation, drawMarginSize);
 
                 var coordinate = target.Coordinate;
 
@@ -182,8 +193,8 @@ public static class LiveChartsSkiaSharp
                 var drawLocation = cartesianChart.Core.DrawMarginLocation;
                 var drawMarginSize = cartesianChart.Core.DrawMarginSize;
 
-                var secondaryScale = new Scaler(drawLocation, drawMarginSize, secondaryAxis);
-                var primaryScale = new Scaler(drawLocation, drawMarginSize, primaryAxis);
+                var secondaryScale = secondaryAxis.GetScaler(cartesianChart.Core, drawLocation, drawMarginSize);
+                var primaryScale = primaryAxis.GetScaler(cartesianChart.Core, drawLocation, drawMarginSize);
 
                 var coordinate = target.Coordinate;
 
@@ -191,11 +202,9 @@ public static class LiveChartsSkiaSharp
                 y = primaryScale.ToPixels(coordinate.PrimaryValue);
             }
         }
-        else if (target.Context is IPolarChartView<SkiaDrawingContext> polarChart)
+        else if (target.Context.Chart is IPolarChartView polarChart)
         {
-            dataCoordinates = polarChart.ScalePixelsToData(new LvcPointD(location));
-
-            var polarSeries = (IPolarSeries<SkiaDrawingContext>)target.Context.Series;
+            var polarSeries = (IPolarSeries)target.Context.Series;
 
             var angleAxis = polarChart.Core.AngleAxes[polarSeries.ScalesAngleAt];
             var radiusAxis = polarChart.Core.RadiusAxes[polarSeries.ScalesRadiusAt];
@@ -216,9 +225,11 @@ public static class LiveChartsSkiaSharp
             throw new NotImplementedException();
         }
 
-        // calculate the distance
-        var dx = dataCoordinates.X - x;
-        var dy = dataCoordinates.Y - y;
+        // both the target (x, y via ToPixels) and the pointer location are in pixels — the
+        // documented unit; earlier this subtracted ScalePixelsToData(location) (chart values)
+        // from the pixel coordinates, mixing units and yielding a meaningless distance.
+        var dx = location.X - x;
+        var dy = location.Y - y;
 
         var distance = Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2));
 

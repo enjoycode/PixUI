@@ -20,54 +20,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using LiveCharts.Drawing;
-using PixUI;
-
-
-namespace LiveCharts.Painting.ImageFilters;
+namespace PixUI.LiveCharts.Painting;
 
 /// <summary>
 /// Creates a blur image filter.
 /// </summary>
 /// <seealso cref="ImageFilter" />
-public class Blur : ImageFilter
+/// <remarks>
+/// Initializes a new instance of the <see cref="Blur"/> class.
+/// </remarks>
+/// <param name="sigmaX">The sigma x.</param>
+/// <param name="sigmaY">The sigma y.</param>
+public class Blur(float sigmaX, float sigmaY) : ImageFilter(s_key)
 {
-    private readonly float _sigmaX;
-    private readonly float _sigmaY;
-    private readonly SKImageFilter? _filter = null;
-    // private readonly SKImageFilter.CropRect? _cropRect = null;
+    internal static object s_key = new();
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Blur"/> class.
-    /// </summary>
-    /// <param name="sigmaX">The sigma x.</param>
-    /// <param name="sigmaY">The sigma y.</param>
-    /// <param name="input">The input.</param>
-    public Blur(float sigmaX, float sigmaY, SKImageFilter? input = null /*, SKImageFilter.CropRect? cropRect = null*/)
-    {
-        _sigmaX = sigmaX;
-        _sigmaY = sigmaY;
-        _filter = input;
-        //_cropRect = cropRect;
-    }
+    private float SigmaX { get; } = sigmaX;
+    private float SigmaY { get; } = sigmaY;
 
-    /// <summary>
-    /// Clones this instance.
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="System.NotImplementedException"></exception>
-    public override ImageFilter Clone()
-    {
-        return new Blur(_sigmaX, _sigmaY, _filter /*, _cropRect*/);
-    }
+    /// <inheritdoc cref="ImageFilter.CreateNative()"/>
+    public override SKImageFilter CreateNative() => PixUI.ImageFilter.CreateBlur(SigmaX, SigmaY, TileMode.Decal, null)!;
 
-    /// <summary>
-    /// Creates the filter.
-    /// </summary>
-    /// <param name="drawingContext">The drawing context.</param>
-    /// <returns></returns>
-    public override void CreateFilter(SkiaDrawingContext drawingContext)
+    /// <inheritdoc cref="ImageFilter.Transitionate(float, ImageFilter)"/>
+    protected override ImageFilter Transitionate(float progress, ImageFilter target)
     {
-        SKImageFilter = PixUI.ImageFilter.CreateBlur(_sigmaX, _sigmaY, TileMode.Decal, _filter /*, _cropRect*/);
+        var blur = (Blur)target;
+
+        return new Blur(
+            SigmaX + (blur.SigmaX - SigmaX) * progress,
+            SigmaY + (blur.SigmaY - SigmaY) * progress);
     }
 }

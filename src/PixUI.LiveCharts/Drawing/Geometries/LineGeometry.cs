@@ -20,42 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
 using LiveChartsCore.Drawing;
-using LiveChartsCore.Motion;
 
-namespace LiveCharts.Drawing.Geometries;
+namespace PixUI.LiveCharts.Drawing.Geometries;
 
-/// <inheritdoc cref="ILineGeometry{TDrawingContext}" />
-public class LineGeometry : Geometry, ILineGeometry<SkiaDrawingContext>
+/// <inheritdoc cref="BaseLineGeometry" />
+public class LineGeometry : BaseLineGeometry, IDrawnElement<SkiaSharpDrawingContext>
 {
-    private readonly FloatMotionProperty _x1;
-    private readonly FloatMotionProperty _y1;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="LineGeometry"/> class.
-    /// </summary>
-    public LineGeometry()
-    {
-        _x1 = RegisterMotionProperty(new FloatMotionProperty(nameof(X1), 0f));
-        _y1 = RegisterMotionProperty(new FloatMotionProperty(nameof(Y1), 0f));
-    }
-
-    /// <inheritdoc cref="ILineGeometry{TDrawingContext}.X1" />
-    public float X1 { get => _x1.GetMovement(this); set => _x1.SetMovement(value, this); }
-
-    /// <inheritdoc cref="ILineGeometry{TDrawingContext}.Y1" />
-    public float Y1 { get => _y1.GetMovement(this); set => _y1.SetMovement(value, this); }
-
-    /// <inheritdoc cref="Geometry.OnDraw(SkiaDrawingContext, SKPaint)" />
-    public override void OnDraw(SkiaDrawingContext context, SKPaint paint)
-    {
-        context.Canvas.DrawLine(X, Y, X1, Y1, paint);
-    }
-
-    /// <inheritdoc cref="Geometry.OnMeasure(IPaint{SkiaDrawingContext})" />
-    protected override LvcSize OnMeasure(IPaint<SkiaDrawingContext> drawable)
-    {
-        return new LvcSize(Math.Abs(X1 - X), Math.Abs(Y1 - Y));
-    }
+    /// <inheritdoc cref="IDrawnElement{TDrawingContext}.Draw(TDrawingContext)" />
+    public virtual void Draw(SkiaSharpDrawingContext context) =>
+        context.Canvas.DrawLine(X, Y, X1, Y1, context.ActiveSkiaPaint);
 }

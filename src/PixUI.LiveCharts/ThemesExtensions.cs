@@ -25,12 +25,15 @@ using LiveChartsCore.Drawing;
 using LiveChartsCore.Kernel;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.Measure;
-using LiveCharts.Drawing;
-using LiveCharts.Painting;
+using PixUI.LiveCharts.Drawing.Geometries;
+using PixUI.LiveCharts.Painting;
+using PixUI.LiveCharts.VisualElements;
 using LiveChartsCore.Themes;
+using LiveChartsCore.VisualElements;
+using LiveChartsCore.VisualStates;
+using PixUI.LiveCharts.SKCharts;
 
-
-namespace LiveCharts;
+namespace PixUI.LiveCharts;
 
 /// <summary>
 /// Defines the light theme extensions.
@@ -38,105 +41,212 @@ namespace LiveCharts;
 public static class ThemesExtensions
 {
     /// <summary>
-    /// Adds the light theme.
+    /// Adds the default theme.
     /// </summary>
     /// <param name="settings">The settings.</param>
-    /// <param name="additionalStyles">the additional styles.</param>
+    /// <param name="requestedTheme">Indicates the theme kind.</param>
+    /// <param name="themeSettings">The adittional theme settings.</param>
     /// <returns>The current LiveCharts settings.</returns>
-    public static LiveChartsSettings AddLightTheme(
-        this LiveChartsSettings settings, Action<Theme<SkiaDrawingContext>>? additionalStyles = null)
+    public static LiveChartsSettings AddDefaultTheme(
+        this LiveChartsSettings settings,
+        Action<LiveChartsCore.Themes.Theme>? themeSettings = null,
+        LvcThemeKind requestedTheme = LvcThemeKind.Unknown)
     {
         return settings
-            .HasTheme((Theme<SkiaDrawingContext> theme) =>
+            .HasTheme(theme =>
             {
-                _ = LiveChartsCore.LiveCharts.DefaultSettings
-                    .WithAnimationsSpeed(TimeSpan.FromMilliseconds(800))
-                    .WithEasingFunction(LiveChartsCore.EasingFunctions.ExponentialOut);
-
-                theme.Colors = ColorPalletes.MaterialDesign500;
-
                 _ = theme
+                    .OnInitialized(() =>
+                    {
+                        theme.RequestedTheme = requestedTheme;
+
+                        if (theme.IsDark)
+                        {
+                            theme.Colors = ColorPalletes.MaterialDesign200;
+                            theme.VirtualBackroundColor = new(0, 0, 0);
+                            theme.TooltipBackgroundPaint =
+                                new SolidColorPaint(new(45, 45, 45, 230))
+                                {
+                                    ImageFilter = new DropShadow(4, 4, 12, 12, new(0, 0, 0, 255))
+                                };
+                            theme.TooltipTextPaint = new SolidColorPaint(new(245, 245, 245));
+                            theme.LegendTextPaint = new SolidColorPaint(new(245, 245, 245));
+                        }
+                        else
+                        {
+                            theme.Colors = ColorPalletes.MaterialDesign500;
+                            theme.VirtualBackroundColor = new(255, 255, 255);
+                            theme.TooltipBackgroundPaint =
+                                new SolidColorPaint(new(235, 235, 235, 230))
+                                {
+                                    ImageFilter = new DropShadow(2, 2, 6, 6, new(0, 0, 0, 100))
+                                };
+                            theme.TooltipTextPaint = new SolidColorPaint(new(30, 30, 30));
+                            theme.LegendTextPaint = new SolidColorPaint(new(30, 30, 30));
+                        }
+                    })
+                    .HasDefaultTooltip(() => new SKDefaultTooltip())
+                    .HasDefaultLegend(() => new SKDefaultLegend())
                     .HasRuleForAxes(axis =>
                     {
                         axis.TextSize = 16;
                         axis.ShowSeparatorLines = true;
-                        axis.NamePaint = new SolidColorPaint { Color = new SKColor(35, 35, 35) };
-                        axis.LabelsPaint = new SolidColorPaint { Color = new SKColor(70, 70, 70) };
+                        axis.NamePaint = new SolidColorPaint(theme.IsDark ? new(235, 235, 235) : new(35, 35, 35));
+                        axis.LabelsPaint = new SolidColorPaint(theme.IsDark ? new(200, 200, 200) : new(70, 70, 70));
+
+                        SKColor lineColor = theme.IsDark ? new(90, 90, 90) : new(235, 235, 235);
+
                         if (axis is ICartesianAxis cartesian)
                         {
                             axis.SeparatorsPaint = cartesian.Orientation == AxisOrientation.X
                                 ? null
-                                : new SolidColorPaint {Color = new SKColor(235, 235, 235)};
+                                : new SolidColorPaint(lineColor);
                             cartesian.Padding = new Padding(12);
+                        }
+                        else if (axis is IPolarAxis polar)
+                        {
+                            polar.LabelsBackground = theme.IsDark ? new(0, 0, 0) : new(255, 255, 255);
+                            axis.SeparatorsPaint = new SolidColorPaint(lineColor);
                         }
                         else
                         {
-                            axis.SeparatorsPaint = new SolidColorPaint {Color = new SKColor(235, 235, 235)};
+                            axis.SeparatorsPaint = new SolidColorPaint(lineColor);
                         }
+                    })
+                    .HasRuleForAnySeries(series =>
+                    {
+                        series.Name = LiveChartsCore.LiveCharts.IgnoreSeriesName;
+
+                        if (series.ShowDataLabels)
+                            series.DataLabelsPaint = theme.IsDark
+                                ? new SolidColorPaint(new(245, 245, 245))
+                                : new SolidColorPaint(new(45, 45, 45));
+
+                        _ = series.HasState("Hover", [
+                                (nameof(DrawnGeometry.Opacity), 0.8f)
+                            ]);
                     })
                     .HasRuleForLineSeries(lineSeries =>
                     {
-                        var color = theme.GetSeriesColor(lineSeries).AsSKColor();
+                        // Order-dependent: write Stroke first (no-op when the user
+                        // touched it — gated by CanSetProperty), then read the resulting
+                        // Stroke back as the series identity color for Fill and marker
+                        // defaults. That makes the area Fill, legend miniature, and
+                        // per-point markers all match the line whether it's user-set or
+                        // theme-rotated. Keeps theme switches (dark/light) correct
+                        // because the second-apply Stroke is rewritten to the new
+                        // palette before we derive from it. See #2064.
+                        var paletteColor = theme.GetSeriesColor(lineSeries).AsSKColor();
 
-                        lineSeries.Name = $"Series #{lineSeries.SeriesId + 1}";
+                        lineSeries.Stroke = new SolidColorPaint(paletteColor, 4);
+
+                        var identityColor = lineSeries.Stroke is SolidColorPaint actualStroke
+                            ? actualStroke.Color
+                            : paletteColor;
+
+                        lineSeries.Fill = new SolidColorPaint(identityColor.WithAlpha(50));
                         lineSeries.GeometrySize = 12;
-                        lineSeries.GeometryStroke = SolidColorPaint.MakeByColorAndStroke(color, 4);
-                        lineSeries.GeometryFill = SolidColorPaint.MakeByColor(new SKColor(250, 250, 250));
-                        lineSeries.Stroke = SolidColorPaint.MakeByColorAndStroke(color, 4);
-                        lineSeries.Fill = SolidColorPaint.MakeByColor(color.WithAlpha(50));
+                        lineSeries.GeometryStroke = new SolidColorPaint(identityColor, 4);
+                        lineSeries.GeometryFill =
+                            new SolidColorPaint(theme.IsDark ? new(30, 30, 30) : new(250, 250, 250));
+
+                        if (lineSeries.ShowError)
+                            lineSeries.ErrorPaint = theme.IsDark
+                                ? new SolidColorPaint(new(245, 245, 245))
+                                : new SolidColorPaint(new(45, 45, 45));
+
+                        _ = lineSeries.HasState("Hover", [
+                                (nameof(DrawnGeometry.ScaleTransform), new LvcPoint(1.35f, 1.35f))
+                            ]);
                     })
                     .HasRuleForStepLineSeries(steplineSeries =>
                     {
-                        var color = theme.GetSeriesColor(steplineSeries).AsSKColor();
+                        var paletteColor = theme.GetSeriesColor(steplineSeries).AsSKColor();
 
-                        steplineSeries.Name = $"Series #{steplineSeries.SeriesId + 1}";
+                        steplineSeries.Stroke = new SolidColorPaint(paletteColor, 4);
+
+                        var identityColor = steplineSeries.Stroke is SolidColorPaint actualStroke
+                            ? actualStroke.Color
+                            : paletteColor;
+
+                        steplineSeries.Fill = new SolidColorPaint(identityColor.WithAlpha(50));
                         steplineSeries.GeometrySize = 12;
-                        steplineSeries.GeometryStroke = SolidColorPaint.MakeByColorAndStroke(color, 4);
-                        steplineSeries.GeometryFill = SolidColorPaint.MakeByColor(new SKColor(250, 250, 250));
-                        steplineSeries.Stroke = SolidColorPaint.MakeByColorAndStroke(color, 4);
-                        steplineSeries.Fill = SolidColorPaint.MakeByColor(color.WithAlpha(50));
+                        steplineSeries.GeometryStroke = new SolidColorPaint(identityColor, 4);
+                        steplineSeries.GeometryFill =
+                            new SolidColorPaint(theme.IsDark ? new(30, 30, 30) : new(250, 250, 250));
+
+                        _ = steplineSeries.HasState("Hover", [
+                                (nameof(DrawnGeometry.ScaleTransform), new LvcPoint(1.35f, 1.35f))
+                            ]);
                     })
                     .HasRuleForStackedLineSeries(stackedLine =>
                     {
                         var color = theme.GetSeriesColor(stackedLine).AsSKColor();
 
-                        stackedLine.Name = $"Series #{stackedLine.SeriesId + 1}";
                         stackedLine.GeometrySize = 0;
                         stackedLine.GeometryStroke = null;
                         stackedLine.GeometryFill = null;
                         stackedLine.Stroke = null;
-                        stackedLine.Fill = SolidColorPaint.MakeByColor(color);
+                        stackedLine.Fill = new SolidColorPaint(color);
                     })
                     .HasRuleForBarSeries(barSeries =>
                     {
                         var color = theme.GetSeriesColor(barSeries).AsSKColor();
 
-                        barSeries.Name = $"Series #{barSeries.SeriesId + 1}";
                         barSeries.Stroke = null;
-                        barSeries.Fill = SolidColorPaint.MakeByColor(color);
-                        barSeries.Rx = 4;
-                        barSeries.Ry = 4;
+                        barSeries.Fill = new SolidColorPaint(color);
+                        barSeries.Rx = 3;
+                        barSeries.Ry = 3;
+
+                        if (barSeries.ShowDataLabels)
+                            barSeries.DataLabelsPaint =
+                                barSeries.DataLabelsPosition == DataLabelsPosition.Middle
+                                    ? theme.IsDark
+                                        ? new SolidColorPaint(new(45, 45, 45))
+                                        : new SolidColorPaint(new(245, 245, 245))
+                                    : theme.IsDark
+                                        ? new SolidColorPaint(new(245, 245, 245))
+                                        : new SolidColorPaint(new(45, 45, 45));
+
+                        if (barSeries.ShowError)
+                            barSeries.ErrorPaint = theme.IsDark
+                                ? new SolidColorPaint(new(245, 245, 245))
+                                : new SolidColorPaint(new(45, 45, 45));
                     })
                     .HasRuleForStackedBarSeries(stackedBarSeries =>
                     {
                         var color = theme.GetSeriesColor(stackedBarSeries).AsSKColor();
 
-                        stackedBarSeries.Name = $"Series #{stackedBarSeries.SeriesId + 1}";
                         stackedBarSeries.Stroke = null;
-                        stackedBarSeries.Fill = SolidColorPaint.MakeByColor(color);
+                        stackedBarSeries.Fill = new SolidColorPaint(color);
                         stackedBarSeries.Rx = 0;
                         stackedBarSeries.Ry = 0;
+                        stackedBarSeries.DataLabelsPosition = DataLabelsPosition.Middle;
+
+                        if (stackedBarSeries.ShowDataLabels)
+                            stackedBarSeries.DataLabelsPaint =
+                                theme.IsDark
+                                    ? new SolidColorPaint(new(45, 45, 45))
+                                    : new SolidColorPaint(new(245, 245, 245));
                     })
                     .HasRuleForStackedStepLineSeries(stackedStep =>
                     {
                         var color = theme.GetSeriesColor(stackedStep).AsSKColor();
 
-                        stackedStep.Name = $"Series #{stackedStep.SeriesId + 1}";
                         stackedStep.GeometrySize = 0;
                         stackedStep.GeometryStroke = null;
                         stackedStep.GeometryFill = null;
                         stackedStep.Stroke = null;
-                        stackedStep.Fill = SolidColorPaint.MakeByColor(color);
+                        stackedStep.Fill = new SolidColorPaint(color);
+                    })
+                    .HasRuleForBoxSeries(boxSeries =>
+                    {
+                        var color = theme.GetSeriesColor(boxSeries).AsSKColor();
+
+                        boxSeries.MaxBarWidth = 60;
+                        boxSeries.Stroke =
+                            new SolidColorPaint(theme.IsDark ? new(220, 220, 220) : new(30, 30, 30), 2);
+                        boxSeries.Fill = new SolidColorPaint(color);
                     })
                     .HasRuleForHeatSeries(heatSeries =>
                     {
@@ -144,56 +254,129 @@ public static class ThemesExtensions
                     })
                     .HasRuleForFinancialSeries(financialSeries =>
                     {
-                        financialSeries.Name = $"Series #{financialSeries.SeriesId + 1}";
-
-                        financialSeries.UpFill = SolidColorPaint.MakeByColor(new SKColor(139, 195, 74));
-                        financialSeries.UpStroke = SolidColorPaint.MakeByColorAndStroke(new SKColor(139, 195, 74), 3);
-                        financialSeries.DownFill = SolidColorPaint.MakeByColor(new SKColor(239, 83, 80));
-                        financialSeries.DownStroke = SolidColorPaint.MakeByColorAndStroke(new SKColor(239, 83, 80), 3);
+                        financialSeries.UpFill = new SolidColorPaint(new(139, 195, 74, 255));
+                        financialSeries.UpStroke = new SolidColorPaint(new(139, 195, 74, 255), 3);
+                        financialSeries.DownFill = new SolidColorPaint(new(239, 83, 80, 255));
+                        financialSeries.DownStroke = new SolidColorPaint(new(239, 83, 80, 255), 3);
                     })
                     .HasRuleForScatterSeries(scatterSeries =>
                     {
                         var color = theme.GetSeriesColor(scatterSeries).AsSKColor();
 
-                        scatterSeries.Name = $"Series #{scatterSeries.SeriesId + 1}";
                         scatterSeries.Stroke = null;
-                        scatterSeries.Fill = SolidColorPaint.MakeByColor(color.WithAlpha(200));
+                        scatterSeries.Fill = new SolidColorPaint(color.WithAlpha(200));
+
+                        if (scatterSeries.ShowError)
+                            scatterSeries.ErrorPaint = theme.IsDark
+                                ? new SolidColorPaint(new(245, 245, 245))
+                                : new SolidColorPaint(new(45, 45, 45));
                     })
                     .HasRuleForPieSeries(pieSeries =>
                     {
                         var color = theme.GetSeriesColor(pieSeries).AsSKColor();
 
-                        pieSeries.Name = $"Series #{pieSeries.SeriesId + 1}";
                         pieSeries.Stroke = null;
-                        pieSeries.Fill = SolidColorPaint.MakeByColor(color);
+                        pieSeries.Fill = new SolidColorPaint(color);
+
+                        if (pieSeries.ShowDataLabels)
+                            pieSeries.DataLabelsPaint =
+                                pieSeries.DataLabelsPosition == PolarLabelsPosition.Outer
+                                    ? theme.IsDark
+                                        ? new SolidColorPaint(new(245, 245, 245))
+                                        : new SolidColorPaint(new(45, 45, 45))
+                                    : theme.IsDark
+                                        ? new SolidColorPaint(new(45, 45, 45))
+                                        : new SolidColorPaint(new(245, 245, 245));
+
+                        _ = pieSeries.HasState("Hover", [
+                            (nameof(DoughnutGeometry.PushOut), (float)pieSeries.HoverPushout),
+                            (nameof(DoughnutGeometry.Opacity), 0.8f)
+                        ]);
                     })
                     .HasRuleForPolarLineSeries(polarLine =>
                     {
-                        var color = theme.GetSeriesColor(polarLine).AsSKColor();
+                        var paletteColor = theme.GetSeriesColor(polarLine).AsSKColor();
 
-                        polarLine.Name = $"Series #{polarLine.SeriesId + 1}";
+                        polarLine.Stroke = new SolidColorPaint(paletteColor, 4);
+
+                        var identityColor = polarLine.Stroke is SolidColorPaint actualStroke
+                            ? actualStroke.Color
+                            : paletteColor;
+
+                        polarLine.Fill = new SolidColorPaint(identityColor.WithAlpha(50));
                         polarLine.GeometrySize = 12;
-                        polarLine.GeometryStroke = SolidColorPaint.MakeByColorAndStroke(color, 4);
-                        polarLine.GeometryFill = SolidColorPaint.MakeByColor(new SKColor(250, 250, 250));
-                        polarLine.Stroke = SolidColorPaint.MakeByColorAndStroke(color, 4);
-                        polarLine.Fill = SolidColorPaint.MakeByColor(color.WithAlpha(50));
+                        polarLine.GeometryStroke = new SolidColorPaint(identityColor, 4);
+                        polarLine.GeometryFill =
+                            new SolidColorPaint(theme.IsDark ? new(30, 30, 30) : new(250, 250, 250));
+
+                        _ = polarLine.HasState("Hover", [
+                                (nameof(DrawnGeometry.ScaleTransform), new LvcPoint(1.35f, 1.35f))
+                            ]);
                     })
                     .HasRuleForGaugeSeries(gaugeSeries =>
                     {
                         var color = theme.GetSeriesColor(gaugeSeries).AsSKColor();
 
-                        gaugeSeries.Name = $"Series #{gaugeSeries.SeriesId + 1}";
                         gaugeSeries.Stroke = null;
-                        gaugeSeries.Fill = SolidColorPaint.MakeByColor(color);
+                        gaugeSeries.Fill = new SolidColorPaint(color);
                         gaugeSeries.DataLabelsPosition = PolarLabelsPosition.ChartCenter;
-                        gaugeSeries.DataLabelsPaint = SolidColorPaint.MakeByColor(new SKColor(70, 70, 70));
+                        gaugeSeries.DataLabelsPaint =
+                            new SolidColorPaint(theme.IsDark ? new(200, 200, 200) : new(70, 70, 70));
+                        gaugeSeries.CornerRadius = 8;
                     })
                     .HasRuleForGaugeFillSeries(gaugeFill =>
                     {
-                        gaugeFill.Fill = SolidColorPaint.MakeByColor(new SKColor(30, 30, 30, 10));
+                        gaugeFill.Fill =
+                            new SolidColorPaint(theme.IsDark ? new(255, 255, 255, 30) : new(30, 30, 30, 10));
+                    })
+                    .HasRuleForSankeySeries(sankey =>
+                    {
+                        // Palette colour for nodes; ribbons inherit Fill at
+                        // ~35% alpha so the source-node colour reads through
+                        // without overpowering the destination. Users can
+                        // override per-node via NodeColorMapper or
+                        // per-link via LinkColorMapper on the typed series.
+                        var color = theme.GetSeriesColor(sankey).AsSKColor();
+
+                        sankey.Stroke = null;
+                        sankey.Fill = new SolidColorPaint(color);
+                        if (sankey.LinkFill is null)
+                            sankey.LinkFill = new SolidColorPaint(color.WithAlpha(90));
+
+                        if (sankey.ShowDataLabels)
+                            sankey.DataLabelsPaint =
+                                new SolidColorPaint(theme.IsDark ? new(245, 245, 245) : new(45, 45, 45));
+                    })
+                    // CS0618: BaseLabelVisual is obsolete and still themed, a LabelVisual that is
+                    // already out there has to keep following the theme.
+#pragma warning disable CS0618
+                    .HasRuleFor<BaseLabelVisual>(label =>
+                    {
+                        label.Paint =
+                            new SolidColorPaint(theme.IsDark ? new(200, 200, 200) : new(30, 30, 30));
+                    })
+#pragma warning restore CS0618
+                    .HasRuleFor<DrawnLabelVisual>(label =>
+                    {
+                        label.Paint =
+                            new SolidColorPaint(theme.IsDark ? new(200, 200, 200) : new(30, 30, 30));
+                    })
+                    .HasRuleFor<BaseNeedleVisual>(needle =>
+                    {
+                        needle.Width = 20;
+                        needle.Fill =
+                            new SolidColorPaint(theme.IsDark ? new(200, 200, 200) : new(30, 30, 30));
+                    })
+                    .HasRuleFor<BaseAngularTicksVisual>(ticks =>
+                    {
+                        ticks.Stroke =
+                            new SolidColorPaint(theme.IsDark ? new(200, 200, 200) : new(30, 30, 30));
+                        ticks.LabelsPaint =
+                            new SolidColorPaint(theme.IsDark ? new(200, 200, 200) : new(30, 30, 30));
                     });
 
-                additionalStyles?.Invoke(theme);
+                if (themeSettings is not null)
+                    themeSettings(theme);
             });
     }
 
@@ -201,151 +384,21 @@ public static class ThemesExtensions
     /// Adds the light theme.
     /// </summary>
     /// <param name="settings">The settings.</param>
-    /// <param name="additionalStyles">The additional styles.</param>
-    /// <returns></returns>
+    /// /// <param name="themeSettings">The adittional theme settings.</param>
+    /// <returns>The current LiveCharts settings.</returns>
+    public static LiveChartsSettings AddLightTheme(
+        this LiveChartsSettings settings,
+        Action<LiveChartsCore.Themes.Theme>? themeSettings = null) =>
+            settings.AddDefaultTheme(themeSettings, LvcThemeKind.Light);
+
+    /// <summary>
+    /// Adds the dark theme.
+    /// </summary>
+    /// <param name="settings">The settings.</param>
+    /// /// <param name="themeSettings">The adittional theme settings.</param>
+    /// <returns>The current LiveCharts settings.</returns>
     public static LiveChartsSettings AddDarkTheme(
-        this LiveChartsSettings settings, Action<Theme<SkiaDrawingContext>>? additionalStyles = null)
-    {
-        return settings
-            .HasTheme((Theme<SkiaDrawingContext> theme) =>
-            {
-                _ = LiveChartsCore.LiveCharts.DefaultSettings
-                    .WithAnimationsSpeed(TimeSpan.FromMilliseconds(800))
-                    .WithEasingFunction(LiveChartsCore.EasingFunctions.ExponentialOut)
-                    .WithTooltipBackgroundPaint(SolidColorPaint.MakeByColor(new SKColor(45, 45, 45)))
-                    .WithTooltipTextPaint(SolidColorPaint.MakeByColor(new SKColor(245, 245, 245)));
-
-                theme.Colors = ColorPalletes.MaterialDesign200;
-
-                _ = theme
-                    .HasRuleForAxes(axis =>
-                    {
-                        axis.TextSize = 16;
-                        axis.ShowSeparatorLines = true;
-                        axis.NamePaint = SolidColorPaint.MakeByColor(new SKColor(235, 235, 235));
-                        axis.LabelsPaint = SolidColorPaint.MakeByColor(new SKColor(200, 200, 200));
-                        if (axis is ICartesianAxis cartesian)
-                        {
-                            axis.SeparatorsPaint = cartesian.Orientation == AxisOrientation.X
-                                ? null
-                                : SolidColorPaint.MakeByColor(new SKColor(90, 90, 90));
-                            cartesian.Padding = new Padding(12);
-                        }
-                        else
-                        {
-                            axis.SeparatorsPaint = SolidColorPaint.MakeByColor(new SKColor(90, 90, 90));
-                        }
-                    })
-                    .HasRuleForLineSeries(lineSeries =>
-                    {
-                        var color = theme.GetSeriesColor(lineSeries).AsSKColor();
-
-                        lineSeries.Name = $"Series #{lineSeries.SeriesId + 1}";
-                        lineSeries.GeometrySize = 12;
-                        lineSeries.GeometryStroke = SolidColorPaint.MakeByColorAndStroke(color, 4);
-                        lineSeries.GeometryFill = SolidColorPaint.MakeByColor(new SKColor(30, 30, 30));
-                        lineSeries.Stroke = SolidColorPaint.MakeByColorAndStroke(color, 4);
-                        lineSeries.Fill = SolidColorPaint.MakeByColor(color.WithAlpha(50));
-                    })
-                    .HasRuleForStepLineSeries(steplineSeries =>
-                    {
-                        var color = theme.GetSeriesColor(steplineSeries).AsSKColor();
-
-                        steplineSeries.Name = $"Series #{steplineSeries.SeriesId + 1}";
-                        steplineSeries.GeometrySize = 12;
-                        steplineSeries.GeometryStroke = SolidColorPaint.MakeByColorAndStroke(color, 4);
-                        steplineSeries.GeometryFill = SolidColorPaint.MakeByColor(new SKColor(30, 30, 30));
-                        steplineSeries.Stroke = SolidColorPaint.MakeByColorAndStroke(color, 4);
-                        steplineSeries.Fill = SolidColorPaint.MakeByColor(color.WithAlpha(50));
-                    })
-                    .HasRuleForStackedLineSeries(stackedLine =>
-                    {
-                        var color = theme.GetSeriesColor(stackedLine).AsSKColor();
-
-                        stackedLine.Name = $"Series #{stackedLine.SeriesId + 1}";
-                        stackedLine.GeometrySize = 0;
-                        stackedLine.GeometryStroke = null;
-                        stackedLine.GeometryFill = null;
-                        stackedLine.Stroke = null;
-                        stackedLine.Fill = SolidColorPaint.MakeByColor(color);
-                    })
-                    .HasRuleForBarSeries(barSeries =>
-                    {
-                        var color = theme.GetSeriesColor(barSeries).AsSKColor();
-
-                        barSeries.Name = $"Series #{barSeries.SeriesId + 1}";
-                        barSeries.Stroke = null;
-                        barSeries.Fill = SolidColorPaint.MakeByColor(color);
-                        barSeries.Rx = 4;
-                        barSeries.Ry = 4;
-                    })
-                    .HasRuleForStackedBarSeries(stackedBarSeries =>
-                    {
-                        var color = theme.GetSeriesColor(stackedBarSeries).AsSKColor();
-
-                        stackedBarSeries.Name = $"Series #{stackedBarSeries.SeriesId + 1}";
-                        stackedBarSeries.Stroke = null;
-                        stackedBarSeries.Fill = SolidColorPaint.MakeByColor(color);
-                        stackedBarSeries.Rx = 0;
-                        stackedBarSeries.Ry = 0;
-                    })
-                    .HasRuleForPieSeries(pieSeries =>
-                    {
-                        var color = theme.GetSeriesColor(pieSeries).AsSKColor();
-
-                        pieSeries.Name = $"Series #{pieSeries.SeriesId + 1}";
-                        pieSeries.Stroke = null;
-                        pieSeries.Fill = SolidColorPaint.MakeByColor(color);
-                    })
-                    .HasRuleForStackedStepLineSeries(stackedStep =>
-                    {
-                        var color = theme.GetSeriesColor(stackedStep).AsSKColor();
-
-                        stackedStep.Name = $"Series #{stackedStep.SeriesId + 1}";
-                        stackedStep.GeometrySize = 0;
-                        stackedStep.GeometryStroke = null;
-                        stackedStep.GeometryFill = null;
-                        stackedStep.Stroke = null;
-                        stackedStep.Fill = SolidColorPaint.MakeByColor(color);
-                    })
-                    .HasRuleForHeatSeries(heatSeries =>
-                    {
-                        // ... rules here
-                    })
-                    .HasRuleForFinancialSeries(financialSeries =>
-                    {
-                        financialSeries.Name = $"Series #{financialSeries.SeriesId + 1}";
-                        financialSeries.UpFill = SolidColorPaint.MakeByColor(new SKColor(139, 195, 74));
-                        financialSeries.UpStroke = SolidColorPaint.MakeByColorAndStroke(new SKColor(139, 195, 74), 3);
-                        financialSeries.DownFill = SolidColorPaint.MakeByColor(new SKColor(239, 83, 80));
-                        financialSeries.DownStroke = SolidColorPaint.MakeByColorAndStroke(new SKColor(239, 83, 80), 3);
-                    })
-                    .HasRuleForPolarLineSeries(polarLine =>
-                    {
-                        var color = theme.GetSeriesColor(polarLine).AsSKColor();
-
-                        polarLine.Name = $"Series #{polarLine.SeriesId + 1}";
-                        polarLine.GeometrySize = 12;
-                        polarLine.GeometryStroke = SolidColorPaint.MakeByColorAndStroke(color, 4);
-                        polarLine.GeometryFill = SolidColorPaint.MakeByColor(new SKColor(0));
-                        polarLine.Stroke = SolidColorPaint.MakeByColorAndStroke(color, 4);
-                        polarLine.Fill = SolidColorPaint.MakeByColor(color.WithAlpha(50));
-                    })
-                    .HasRuleForGaugeSeries(gaugeSeries =>
-                    {
-                        var color = theme.GetSeriesColor(gaugeSeries).AsSKColor();
-
-                        gaugeSeries.Name = $"Series #{gaugeSeries.SeriesId + 1}";
-                        gaugeSeries.Stroke = null;
-                        gaugeSeries.Fill = SolidColorPaint.MakeByColor(color);
-                        gaugeSeries.DataLabelsPaint = SolidColorPaint.MakeByColor(new SKColor(200, 200, 200));
-                    })
-                    .HasRuleForGaugeFillSeries(gaugeFill =>
-                    {
-                        gaugeFill.Fill = SolidColorPaint.MakeByColor(new SKColor(255, 255, 255, 30));
-                    });
-
-                additionalStyles?.Invoke(theme);
-            });
-    }
+        this LiveChartsSettings settings,
+        Action<LiveChartsCore.Themes.Theme>? themeSettings = null) =>
+            settings.AddDefaultTheme(themeSettings, LvcThemeKind.Dark);
 }

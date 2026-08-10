@@ -45,7 +45,7 @@ public sealed class Switch : Toggleable
         var activeColor = Theme.AccentColor;
         var trackColor = new Color(0x52000000);
         var paint = PixUI.Paint.Shared(Color.Lerp(trackColor, activeColor, currentValue));
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
 
         // track
         var trackRect = Rect.FromLTWH(
@@ -85,7 +85,7 @@ public sealed class Switch : Toggleable
         var rrect = RRect.FromRectAndRadius(rect, shortestSide / 2f, shortestSide / 2f);
 
         var paint = PixUI.Paint.Shared(Color.Empty);
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
 
         // shadow
         rrect.Shift(0, 3);

@@ -784,9 +784,9 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
 
     private void DrawPlaceholder(ICanvas canvas)
     {
-        using var dash = PathEffect.CreateDash([5f, 5f], 10);
-        var paint = Paint.Shared(Colors.Gray, PaintStyle.Stroke);
-        paint.AntiAlias = true;
+        using var dash = PathEffect.CreateDash(new[] { 5f, 5f }, 10);
+        var paint = PixUI.Paint.Shared(Colors.Gray, PaintStyle.Stroke);
+        paint.IsAntialias = true;
         paint.PathEffect = dash;
         canvas.DrawRect(Rect.FromLTWH(0.5f, 0.5f, W - 1, H - 1), paint);
         canvas.DrawLine(0, 0, W, H, paint);

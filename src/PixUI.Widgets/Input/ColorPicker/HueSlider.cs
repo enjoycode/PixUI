@@ -19,7 +19,7 @@ public sealed class HueSlider : SliderBase
             LinearColors, LinearPositions, TileMode.Clamp);
         var paint = PixUI.Paint.Shared();
         paint.Shader = linearGradient;
-        paint.AntiAlias = true;
+        paint.IsAntialias = true;
         var rRect = RRect.FromRectAndRadius(GetSliderRect(), SLIDER_HEIGHT / 2f, SLIDER_HEIGHT / 2f);
         canvas.DrawRRect(rRect, paint);
         paint.Reset();

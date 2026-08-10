@@ -10,7 +10,18 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\ext\LiveCharts2\src\LiveChartsCore\LiveChartsCore.csproj" />
-      <ProjectReference Include="..\PixUI\PixUI.csproj" />
+      <ProjectReference Include="..\PixUI.Drawing\PixUI.Drawing.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\ext\LiveCharts2\generators\LiveChartsGenerators\LiveChartsGenerators.csproj">
+            <OutputItemType>Analyzer</OutputItemType>
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+        </ProjectReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="TypeConverters\" />
     </ItemGroup>
 
 </Project>

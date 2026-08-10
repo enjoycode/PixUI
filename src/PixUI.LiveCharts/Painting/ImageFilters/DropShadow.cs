@@ -20,62 +20,49 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using LiveCharts.Drawing;
-
-
-namespace LiveCharts.Painting.ImageFilters;
+namespace PixUI.LiveCharts.Painting;
 
 /// <summary>
 /// Creates a drop shadow image filter.
 /// </summary>
 /// <seealso cref="ImageFilter" />
-public class DropShadow : ImageFilter
+/// <remarks>
+/// Initializes a new instance of the <see cref="DropShadow"/> class.
+/// </remarks>
+/// <param name="dx">The dx.</param>
+/// <param name="dy">The dy.</param>
+/// <param name="sigmaX">The sigma x.</param>
+/// <param name="sigmaY">The sigma y.</param>
+/// <param name="color">The color.</param>
+public class DropShadow(float dx, float dy, float sigmaX, float sigmaY, SKColor color) : ImageFilter(s_key)
 {
-    private readonly float _dx;
-    private readonly float _dy;
-    private readonly float _sigmaX;
-    private readonly float _sigmaY;
-    private readonly SKColor _color;
-    private readonly SKImageFilter? _filter = null;
-    // private readonly SKImageFilter.CropRect? _cropRect = null;
+    internal static object s_key = new();
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DropShadow"/> class.
-    /// </summary>
-    /// <param name="dx">The dx.</param>
-    /// <param name="dy">The dy.</param>
-    /// <param name="sigmaX">The sigma x.</param>
-    /// <param name="sigmaY">The sigma y.</param>
-    /// <param name="color">The color.</param>
-    /// <param name="input">The input.</param>
-    public DropShadow(float dx, float dy, float sigmaX, float sigmaY, SKColor color,
-        SKImageFilter? input = null /*, SKImageFilter.CropRect? cropRect = null*/)
-    {
-        _dx = dx;
-        _dy = dy;
-        _sigmaX = sigmaX;
-        _sigmaY = sigmaY;
-        _color = color;
-        _filter = input;
-        // _cropRect = cropRect;
-    }
+    // internal so the drawing context can floor a per-element shadow at the paint's own shadow.
+    internal float Dx { get; } = dx;
+    internal float Dy { get; } = dy;
+    internal float SigmaX { get; } = sigmaX;
+    internal float SigmaY { get; } = sigmaY;
+    internal SKColor Color { get; } = color;
 
-    /// <summary>
-    /// Clones this instance.
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="System.NotImplementedException"></exception>
-    public override ImageFilter Clone()
-    {
-        return new DropShadow(_dx, _dy, _sigmaX, _sigmaY, _color, _filter /*, _cropRect*/);
-    }
+    /// <inheritdoc cref="ImageFilter.CreateNative()"/>
+    public override SKImageFilter CreateNative() =>
+        PixUI.ImageFilter.CreateDropShadow(Dx, Dy, SigmaX, SigmaY, Color, null)!;
 
-    /// <summary>
-    /// Creates the image filter.
-    /// </summary>
-    /// <param name="drawingContext">The drawing context.</param>
-    public override void CreateFilter(SkiaDrawingContext drawingContext)
+    /// <inheritdoc cref="ImageFilter.Transitionate(float, ImageFilter)"/>
+    protected override ImageFilter Transitionate(float progress, ImageFilter target)
     {
-        SKImageFilter = PixUI.ImageFilter.CreateDropShadow(_dx, _dy, _sigmaX, _sigmaY, _color, _filter /*, _cropRect*/);
+        var dropShadow = (DropShadow)target;
+
+        return new DropShadow(
+            Dx + (dropShadow.Dx - Dx) * progress,
+            Dy + (dropShadow.Dy - Dy) * progress,
+            SigmaX + (dropShadow.SigmaX - SigmaX) * progress,
+            SigmaY + (dropShadow.SigmaY - SigmaY) * progress,
+            new SKColor(
+                (byte)(Color.Red + (dropShadow.Color.Red - Color.Red) * progress),
+                (byte)(Color.Green + (dropShadow.Color.Green - Color.Green) * progress),
+                (byte)(Color.Blue + (dropShadow.Color.Blue - Color.Blue) * progress),
+                (byte)(Color.Alpha + (dropShadow.Color.Alpha - Color.Alpha) * progress)));
     }
 }
