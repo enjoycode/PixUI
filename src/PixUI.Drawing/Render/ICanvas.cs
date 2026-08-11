@@ -25,6 +25,7 @@ public interface ICanvas : IDisposable
     void DrawImage(IImage image, float x, float y, IPaint? paint = null);
     void DrawImage(IImage image, Rect dest, IPaint? paint = null);
     void DrawImage(IImage image, Rect source, Rect dest, IPaint? paint = null);
+    void DrawPicture(IPicture picture, float x, float y, IPaint? paint = null);
     void DrawShadow(IPath path, Color color, float elevation, bool transparentOccluder, float devicePixelRatio);
 
     #endregion

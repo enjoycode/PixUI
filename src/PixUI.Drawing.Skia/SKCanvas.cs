@@ -135,6 +135,9 @@ public sealed unsafe class SKCanvas : SKObject, ICanvas
             ((SKFont)font).Handle, ((SKPaint)paint).Handle);
     }
 
+    public void DrawImage(IImage image, Rect dest, IPaint? paint = null) =>
+        DrawImage(image, Rect.FromLTWH(0, 0, image.Width, image.Height), dest, paint);
+
     public void DrawImage(IImage image, float x, float y, IPaint? paint = null)
     {
         if (image == null)
@@ -143,15 +146,30 @@ public sealed unsafe class SKCanvas : SKObject, ICanvas
             (paint as SKPaint)?.Handle ?? IntPtr.Zero);
     }
 
-    public void DrawImage(IImage image, Rect dest, IPaint? paint = null) =>
-        DrawImage(image, Rect.FromLTWH(0, 0, image.Width, image.Height), dest, paint);
-
     public void DrawImage(IImage image, Rect source, Rect dest, IPaint? paint = null)
     {
         if (image == null)
             throw new ArgumentNullException(nameof(image));
         SkiaApi.sk_canvas_draw_image_rect(Handle, ((SKImage)image).Handle, &source, &dest,
             (paint as SKPaint)?.Handle ?? IntPtr.Zero);
+    }
+
+    public void DrawPicture(IPicture picture, float x, float y, IPaint? paint = null)
+    {
+        var matrix = Matrix3.CreateTranslation(x, y);
+        DrawPicture(picture, matrix, paint);
+    }
+
+    public void DrawPicture(IPicture picture, in Matrix3 matrix, IPaint? paint = null)
+    {
+        if (picture == null)
+            throw new ArgumentNullException(nameof(picture));
+        fixed (Matrix3* m = &matrix)
+            SkiaApi.sk_canvas_draw_picture(Handle, ((SKPicture)picture).Handle, m,
+                ((SKPaint?)paint)?.Handle ?? IntPtr.Zero);
+        GC.KeepAlive(picture);
+        GC.KeepAlive(paint);
+        GC.KeepAlive(this);
     }
 
     public void DrawShadow(IPath path, Color color, float elevation, bool transparentOccluder, float devicePixelRatio)
