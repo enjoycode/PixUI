@@ -20,8 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using System.IO;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.Motion;
 using PixUI.LiveCharts.Drawing;
@@ -114,6 +112,15 @@ public abstract class InMemorySkiaSharpChart(IDrawnView? drawnView = null)
         // return surface.Snapshot();
     }
 
+    public IPicture GetPicture()
+    {
+        using var recorder = PictureRecorder.Create();
+        using var canvas = recorder.BeginRecording(Rect.FromLTWH(0, 0, Width, Height));
+        DrawOnCanvas(canvas);
+        var picture = recorder.EndRecording();
+        return picture;
+    }
+
     /// <summary>
     /// Saves the image to the specified path.
     /// </summary>
@@ -158,7 +165,7 @@ public abstract class InMemorySkiaSharpChart(IDrawnView? drawnView = null)
     {
         var coreChart = GetCoreChart();
 
-        if (coreChart is null || coreChart is not LiveChartsCore.Chart skiaChart)
+        if (coreChart is not LiveChartsCore.Chart skiaChart)
             throw new Exception("Something is missing :(");
 
         var bg = Background == Color.Empty
@@ -167,8 +174,7 @@ public abstract class InMemorySkiaSharpChart(IDrawnView? drawnView = null)
 
         if (_drawnView is not null)
         {
-            _drawnView.CoreCanvas.DrawFrame(
-                new SkiaSharpDrawingContext(CoreCanvas, canvas, bg));
+            _drawnView.CoreCanvas.DrawFrame(new SkiaSharpDrawingContext(CoreCanvas, canvas, bg));
             return;
         }
 
@@ -179,9 +185,7 @@ public abstract class InMemorySkiaSharpChart(IDrawnView? drawnView = null)
         if (ExplicitDisposing) skiaChart.DisableTooltipCache = true;
 
         skiaChart.Measure();
-
-        skiaChart.Canvas.DrawFrame(
-            new SkiaSharpDrawingContext(CoreCanvas, canvas, bg));
+        skiaChart.Canvas.DrawFrame(new SkiaSharpDrawingContext(CoreCanvas, canvas, bg));
 
         if (!ExplicitDisposing)
             skiaChart.Unload();
