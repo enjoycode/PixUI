@@ -4,19 +4,24 @@ namespace PixUI;
 
 public static class Colors
 {
-    public static Color White => new(255, 255, 255);
-    public static Color Black => new(0, 0, 0);
-    public static Color Red => new(255, 0, 0);
-    public static Color Blue => new(0, 0, 255);
-    public static Color Green => new(0, 255, 0);
-    public static Color Yellow => new(0xFFFFFF00);
-    public static Color Lime => new(0xFF00FF00);
-    public static Color Cyan => new(0xFF00FFFF);
-    public static Color Magenta => new(0xFFFF00FF);
-    public static Color Gray => new(0xFF5F6368);
-    public static Color DarkGray => new(0xFFA9A9A9);
-    public static Color Silver = new(0xFFC0C0C0);
-    public static Color Transparent => new(0, 0, 0, 0);
+    public static Color White => 0xFFFFFFFF;
+    public static Color Black => 0xFF000000;
+    public static Color Red => 0xFFFF0000;
+    public static Color Blue => 0xFF0000FF;
+    public static Color Green => 0xFF00FF00;
+    public static Color Yellow => 0xFFFFFF00;
+    public static Color Brown => 0xFFA52A2A;
+
+    public static Color Lime => 0xFF00FF00;
+    public static Color Cyan => 0xFF00FFFF;
+    public static Color Magenta => 0xFFFF00FF;
+    public static Color Orange => 0xFFFFA500;
+    public static Color Purple => 0xFF800080;
+    public static Color Gray => 0xFF5F6368;
+    public static Color LightGray => 0xFFD3D3D3;
+    public static Color DarkGray => 0xFFA9A9A9;
+    public static Color Silver = 0xFFC0C0C0;
+    public static Color Transparent => 0x00FFFFFF;
 
     private static Random? _random;
 
