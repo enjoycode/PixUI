@@ -83,11 +83,11 @@ public sealed class DynamicWidgetData
         return exists != null;
     }
 
-    public void SetEventValue(string name, IEventAction action)
+    public void SetEventValue(EventValue eventValue)
     {
         Events ??= new List<EventValue>();
-        Events.RemoveAll(e => e.Name == name);
-        Events.Add(new EventValue { Name = name, Action = action });
+        Events.RemoveAll(e => e.Name == eventValue.Name);
+        Events.Add(eventValue);
     }
 
     public void RemoveEventValue(string name) => Events?.RemoveAll(e => e.Name == name);

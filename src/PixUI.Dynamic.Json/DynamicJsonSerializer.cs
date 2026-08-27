@@ -368,7 +368,7 @@ public sealed class DynamicJsonSerializer : IDynamicSerializer
 
             var eventName = reader.GetString()!;
             var eventAction = ReadEventAction(ref reader);
-            element.Data.SetEventValue(eventName, eventAction);
+            element.Data.SetEventValue(new EventValue() { Name = eventName, Action = eventAction });
         }
     }
 
