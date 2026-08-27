@@ -39,6 +39,7 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AVector_00601_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2026_002E1_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F2727851c4bde47d1beb4d918d3d08fcba130_003F7f_003F03e9de5a_003FVector_00601_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;
   &lt;Assembly Path="/Users/rick/Desktop/Standard/DevExpress.RichEdit.v22.2.Core.dll" /&gt;
+  &lt;Assembly Path="/Users/rick/.nuget/packages/melville.pdf.model/0.6.4/lib/net9.0/Melville.Pdf.Model.dll" /&gt;
 &lt;/AssemblyExplorer&gt;</s:String>
 	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a58cc5d0_002D5832_002D407a_002Db44b_002D89255f8aa24a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="FindTypefaceTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
