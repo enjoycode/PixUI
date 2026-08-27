@@ -1,6 +1,7 @@
 using System.Text;
 using NUnit.Framework;
 using PixUI.Dynamic.Design;
+using PixUI.Dynamic.Json;
 
 namespace PixUI.UnitTests.Dynamic;
 
@@ -11,17 +12,20 @@ public class SerializationTest
     {
         var json = """
                    {
-                     "View": {
+                     "Root": {
                        "Type": "Center",
                        "Child": {
                          "Type": "Button",
-                         "CtorArgs": [ { "Const": "Button1" }, { "Const": null } ],
-                         "Properties": { "TextColor": { "Const": "FFFF0000" } }
+                         "Text": {"Const": "Button1"},
+                         "TextColor": {"Const": "FFFF0000"}
                        }
                      }
                    }
                    """;
         var controller = new DesignController();
-        controller.Load(Encoding.UTF8.GetBytes(json));
+        _ = new DesignCanvas(controller);
+        var jsonSerializer = new DynamicJsonSerializer(controller);
+        jsonSerializer.Load(Encoding.UTF8.GetBytes(json));
+        Assert.IsTrue(controller.RootElement != null);
     }
 }

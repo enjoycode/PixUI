@@ -18,7 +18,7 @@ public sealed partial class DesignController
 
     public DesignCanvas DesignCanvas { get; set; } = null!;
 
-    public DesignElement RootElement { get; internal set; } = null!;
+    public DesignElement RootElement { get; set; } = null!;
 
     private DynamicBackground? _background;
     private IImage? _cachedBgImage;
@@ -67,7 +67,7 @@ public sealed partial class DesignController
     /// <summary>
     /// 状态列表控制器
     /// </summary>
-    internal readonly DataGridController<DynamicState> StatesController = new();
+    public readonly DataGridController<DynamicState> StatesController = new();
 
     public DynamicState? FindState(string name)
     {

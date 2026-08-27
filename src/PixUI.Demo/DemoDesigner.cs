@@ -2,6 +2,7 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using PixUI.Dynamic.Design;
+using PixUI.Dynamic.Json;
 
 namespace PixUI.Demo;
 
@@ -64,7 +65,8 @@ public sealed class DemoDesigner : View
     {
         using var ms = new MemoryStream();
         var writer = new Utf8JsonWriter(ms, new JsonWriterOptions() { Indented = true });
-        _designController.Write(writer);
+        var jsonSerializer = new DynamicJsonSerializer(_designController);
+        jsonSerializer.Write(writer);
         writer.Flush();
 
         json = Encoding.UTF8.GetString(ms.ToArray());
@@ -73,7 +75,8 @@ public sealed class DemoDesigner : View
 
     private void OnLoad(PointerEvent e)
     {
-        _designController.Load(Encoding.UTF8.GetBytes(json));
+        var jsonSerializer = new DynamicJsonSerializer(_designController);
+        jsonSerializer.Load(Encoding.UTF8.GetBytes(json));
     }
 
     private void OnAdd(PointerEvent e)

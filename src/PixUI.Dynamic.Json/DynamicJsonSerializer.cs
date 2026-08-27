@@ -1,13 +1,18 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text.Json;
+using PixUI.Dynamic.Design;
 
-namespace PixUI.Dynamic.Design;
+namespace PixUI.Dynamic.Json;
 
-partial class DesignController
+public sealed class DynamicJsonSerializer : IDynamicSerializer
 {
+    public DynamicJsonSerializer(DesignController controller)
+    {
+        _controller = controller;
+    }
+
+    private readonly DesignController _controller;
+
     public void Write(Utf8JsonWriter writer)
     {
         writer.WriteStartObject();
@@ -20,22 +25,22 @@ partial class DesignController
 
         //Root
         writer.WritePropertyName("Root");
-        WriteWidget(writer, RootElement);
+        WriteWidget(writer, _controller.RootElement);
 
         writer.WriteEndObject();
     }
 
     private void WriteBackground(Utf8JsonWriter writer)
     {
-        if (Background == null) return;
+        if (_controller.Background == null) return;
 
-        writer.WritePropertyName(nameof(Background));
-        JsonSerializer.Serialize(writer, Background);
+        writer.WritePropertyName(nameof(_controller.Background));
+        JsonSerializer.Serialize(writer, _controller.Background);
     }
 
     private void WriteStates(Utf8JsonWriter writer)
     {
-        var states = StatesController.DataSource;
+        var states = _controller.StatesController.DataSource;
         if (states == null || states.Count == 0)
             return;
 
@@ -78,8 +83,8 @@ partial class DesignController
             //element is a placeholder.
             writer.WriteStartObject();
             writer.WriteNull("Type");
-            writer.WriteNumber("Width", element.W);
-            writer.WriteNumber("Height", element.H);
+            writer.WriteNumber("Width", element.LayoutBounds.Width);
+            writer.WriteNumber("Height", element.LayoutBounds.Height);
             writer.WriteEndObject();
             return;
         }
@@ -176,7 +181,7 @@ partial class DesignController
         var ts = Stopwatch.GetTimestamp();
 #endif
 
-        var parent = (SingleChildWidget)RootElement.Parent!;
+        var parent = (SingleChildWidget)_controller.RootElement.Parent!;
         DesignElement? rootElement = null;
         var reader = new Utf8JsonReader(json);
         while (reader.Read())
@@ -201,11 +206,11 @@ partial class DesignController
         if (rootElement != null)
         {
             parent.Child = rootElement;
-            RootElement = rootElement;
+            _controller.RootElement = rootElement;
             parent.Relayout();
         }
 
-        Select(RootElement); // always select root element
+        _controller.Select(_controller.RootElement); // always select root element
 
 #if DEBUG
         Log.Debug($"加载耗时: {Stopwatch.GetElapsedTime(ts).TotalMilliseconds}ms");
@@ -214,7 +219,7 @@ partial class DesignController
 
     private void ReadBackground(ref Utf8JsonReader reader)
     {
-        Background = JsonSerializer.Deserialize<DynamicBackground>(ref reader);
+        _controller.Background = JsonSerializer.Deserialize<DynamicBackground>(ref reader);
     }
 
     private void ReadStates(ref Utf8JsonReader reader)
@@ -230,7 +235,7 @@ partial class DesignController
             ReadState(ref reader, propName, states);
         }
 
-        StatesController.DataSource = states;
+        _controller.StatesController.DataSource = states;
     }
 
     private static void ReadState(ref Utf8JsonReader reader, string name, List<DynamicState> states)
@@ -307,7 +312,7 @@ partial class DesignController
                     reader.Read();
                     reader.Read();
                     var height = reader.GetSingle();
-                    result = element = new DesignElement(this, slotName) { Width = width, Height = height };
+                    result = element = new DesignElement(_controller, slotName) { Width = width, Height = height };
                     continue;
                 }
 
@@ -315,12 +320,12 @@ partial class DesignController
                 if (meta.IsReversedWrapElement)
                 {
                     result = meta.CreateInstance();
-                    element = new DesignElement(this, meta, slotName);
+                    element = new DesignElement(_controller, meta, slotName);
                     meta.DefaultSlot.SetChild(result, element);
                 }
                 else
                 {
-                    result = element = new DesignElement(this, slotName);
+                    result = element = new DesignElement(_controller, slotName);
                     element.ChangeMeta(meta, false);
                     element.Child = meta.CreateInstance();
                 }

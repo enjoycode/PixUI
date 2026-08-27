@@ -32,7 +32,7 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
     /// <summary>
     /// Ctor for design time
     /// </summary>
-    internal DesignElement(DesignController controller, DynamicWidgetMeta meta, string slotName)
+    public DesignElement(DesignController controller, DynamicWidgetMeta meta, string slotName)
         : this(controller, slotName)
     {
         if (slotName == string.Empty)
@@ -53,7 +53,7 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
     /// <summary>
     /// 当前针对上级的Slot属性名
     /// </summary>
-    internal string SlotName { get; }
+    public string SlotName { get; }
 
     public DynamicWidgetMeta? Meta { get; private set; }
 
@@ -133,7 +133,7 @@ public sealed class DesignElement : Widget, IDroppable, IDesignElement
         MouseRegion.Opaque = !IsContainer;
     }
 
-    internal void ChangeMeta(DynamicWidgetMeta meta, bool makeDefaultTarget)
+    public void ChangeMeta(DynamicWidgetMeta meta, bool makeDefaultTarget)
     {
         Meta = meta;
         Data.Properties?.Clear();
