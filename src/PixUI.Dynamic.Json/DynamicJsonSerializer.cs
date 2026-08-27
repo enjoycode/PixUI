@@ -100,7 +100,7 @@ public sealed class DynamicJsonSerializer : IDynamicSerializer
             {
                 var propMeta = meta.GetPropertyMeta(property.Name);
                 writer.WritePropertyName(property.Name);
-                property.Value.Write(writer, propMeta);
+                JsonExtensions.WriteDynamicValue(property.Value, writer, propMeta);
             }
         }
 
@@ -331,7 +331,7 @@ public sealed class DynamicJsonSerializer : IDynamicSerializer
             {
                 var prop = new PropertyValue { Name = propName };
                 var propMeta = meta.GetPropertyMeta(prop.Name);
-                prop.Value = DynamicValue.Read(ref reader, propMeta);
+                prop.Value = JsonExtensions.ReadDynamicValue(ref reader, propMeta);
 
                 element.Data.AddPropertyValue(prop);
                 element.SetPropertyValue(prop);
