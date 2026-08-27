@@ -66,11 +66,11 @@ public sealed class DynamicJsonSerializer : IDynamicSerializer
             {
                 writer.WritePropertyName(nameof(DynamicState.Value));
                 // ReSharper disable once SuspiciousTypeConversion.Global
-                if (state.Value is IDynamicJsonSerializable serializable)
+                if (state.Value is IJsonStateValue serializable)
                     serializable.WriteTo(writer);
                 else
                     throw new JsonException(
-                        $"{state.Value.GetType().Name} must implement {nameof(IDynamicJsonSerializable)}");
+                        $"{state.Value.GetType().Name} must implement {nameof(IJsonStateValue)}");
             }
 
             writer.WriteEndObject();
@@ -119,7 +119,11 @@ public sealed class DynamicJsonSerializer : IDynamicSerializer
                 writer.WritePropertyName(eventValue.Name);
                 writer.WriteStartObject();
                 writer.WriteString("Handler", eventValue.Action.ActionName);
-                eventValue.Action.WriteProperties(writer);
+                if (eventValue.Action is IJsonEventAction serializable)
+                    serializable.WriteProperties(writer);
+                else
+                    throw new JsonException(
+                        $"{eventValue.Action.GetType().Name} must implement {nameof(IJsonEventAction)}");
                 writer.WriteEndObject();
             }
 
@@ -234,10 +238,10 @@ public sealed class DynamicJsonSerializer : IDynamicSerializer
             {
                 var ds = DesignSettings.CreateDynamicStateValue(state.Type);
                 // ReSharper disable once SuspiciousTypeConversion.Global
-                if (ds is IDynamicJsonSerializable serializable)
+                if (ds is IJsonStateValue serializable)
                     serializable.ReadFrom(ref reader, state);
                 else
-                    throw new JsonException($"{ds.GetType().Name} must implement {nameof(IDynamicJsonSerializable)}");
+                    throw new JsonException($"{ds.GetType().Name} must implement {nameof(IJsonStateValue)}");
                 state.Value = ds;
             }
             else
@@ -259,10 +263,10 @@ public sealed class DynamicJsonSerializer : IDynamicSerializer
             {
                 var vs = DesignSettings.CreateDynamicStateValue(state.Type);
                 // ReSharper disable once SuspiciousTypeConversion.Global
-                if (vs is IDynamicJsonSerializable serializable)
+                if (vs is IJsonStateValue serializable)
                     serializable.ReadFrom(ref reader, state);
                 else
-                    throw new JsonException($"{vs.GetType().Name} must implement {nameof(IDynamicJsonSerializable)}");
+                    throw new JsonException($"{vs.GetType().Name} must implement {nameof(IJsonStateValue)}");
                 state.Value = vs;
             }
             else
@@ -377,7 +381,10 @@ public sealed class DynamicJsonSerializer : IDynamicSerializer
         var handler = reader.GetString()!;
         //根据类型创建实例
         var res = DynamicWidgetManager.EventActionManager.Create(handler);
-        res.ReadProperties(ref reader);
+        if (res is IJsonEventAction serializable)
+            serializable.ReadProperties(ref reader);
+        else
+            throw new JsonException($"{res.GetType().Name} must implement {nameof(IJsonEventAction)}");
         return res;
     }
 
