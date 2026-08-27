@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace PixUI.Dynamic;
@@ -16,10 +15,6 @@ public interface IDynamicStateValue
     /// 运行时手动通知状态变更
     /// </summary>
     void NotifyStateChanged();
-
-    void WriteTo(Utf8JsonWriter writer);
-
-    void ReadFrom(ref Utf8JsonReader reader, DynamicState state);
 }
 
 /// <summary>
@@ -75,15 +70,16 @@ public interface IWithChildStates
     IEnumerable<DynamicState> GetChildStates(IDynamicContext context, DynamicState parent);
 }
 
-public enum DynamicStateType
+public enum DynamicStateType : byte
 {
-    DataTable,
-    DataRow,
-    Int,
-    String,
-    DateTime,
-    Float,
-    Double,
+    //Do not change value, because some serializer write value
+    Int = 0,
+    String = 1,
+    Float = 2,
+    Double = 3,
+    DateTime = 4,
+    DataTable = 10,
+    DataRow = 11,
 }
 
 /// <summary>

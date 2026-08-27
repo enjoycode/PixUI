@@ -65,7 +65,12 @@ public sealed class DynamicJsonSerializer : IDynamicSerializer
             else
             {
                 writer.WritePropertyName(nameof(DynamicState.Value));
-                state.Value.WriteTo(writer);
+                // ReSharper disable once SuspiciousTypeConversion.Global
+                if (state.Value is IDynamicJsonSerializable serializable)
+                    serializable.WriteTo(writer);
+                else
+                    throw new JsonException(
+                        $"{state.Value.GetType().Name} must implement {nameof(IDynamicJsonSerializable)}");
             }
 
             writer.WriteEndObject();
@@ -228,7 +233,11 @@ public sealed class DynamicJsonSerializer : IDynamicSerializer
             if (!(peekReader.Read() && peekReader.TokenType == JsonTokenType.Null))
             {
                 var ds = DesignSettings.CreateDynamicStateValue(state.Type);
-                ds.ReadFrom(ref reader, state);
+                // ReSharper disable once SuspiciousTypeConversion.Global
+                if (ds is IDynamicJsonSerializable serializable)
+                    serializable.ReadFrom(ref reader, state);
+                else
+                    throw new JsonException($"{ds.GetType().Name} must implement {nameof(IDynamicJsonSerializable)}");
                 state.Value = ds;
             }
             else
@@ -249,7 +258,11 @@ public sealed class DynamicJsonSerializer : IDynamicSerializer
             if (!(peekReader.Read() && peekReader.TokenType == JsonTokenType.Null))
             {
                 var vs = DesignSettings.CreateDynamicStateValue(state.Type);
-                vs.ReadFrom(ref reader, state);
+                // ReSharper disable once SuspiciousTypeConversion.Global
+                if (vs is IDynamicJsonSerializable serializable)
+                    serializable.ReadFrom(ref reader, state);
+                else
+                    throw new JsonException($"{vs.GetType().Name} must implement {nameof(IDynamicJsonSerializable)}");
                 state.Value = vs;
             }
             else
