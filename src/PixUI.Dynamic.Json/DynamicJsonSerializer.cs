@@ -124,7 +124,7 @@ public sealed class DynamicJsonSerializer : IDynamicSerializer
         // Slots
         if (element is { IsContainer: true, Child: not null })
         {
-            var childs = GetAllChildrenElements(element);
+            var childs = DesignController.GetAllChildrenElements(element);
             var slots = childs.GroupBy(c => c.SlotName);
             foreach (var group in slots)
             {
@@ -149,30 +149,6 @@ public sealed class DynamicJsonSerializer : IDynamicSerializer
         }
 
         writer.WriteEndObject();
-    }
-
-    public static IEnumerable<DesignElement> GetAllChildrenElements(DesignElement parentElement)
-    {
-        if (parentElement.Meta == null)
-            return [];
-
-        var list = new List<DesignElement>();
-        var start = parentElement.Meta.IsReversedWrapElement ? parentElement : parentElement.Child;
-
-        var visitor = new GetAllChildrenVisitor(list);
-        start?.VisitChildren(ref visitor);
-
-        return list;
-    }
-
-    private static DesignElement? GetChildElement(Widget child)
-    {
-        if (child is DesignElement designElement)
-            return designElement;
-
-        var visitor = new GetChildElementVisitor();
-        child.VisitChildren(ref visitor);
-        return visitor.Element;
     }
 
     public void Load(ReadOnlySpan<byte> json)
@@ -401,36 +377,6 @@ public sealed class DynamicJsonSerializer : IDynamicSerializer
 
             var child = ReadWidget(ref reader, childrenSlot.PropertyName);
             childrenSlot.AddChild(parent, child);
-        }
-    }
-
-    private readonly struct GetAllChildrenVisitor : IChildrenVisitor
-    {
-        public GetAllChildrenVisitor(List<DesignElement> list)
-        {
-            _list = list;
-        }
-
-        private readonly List<DesignElement> _list;
-
-        public bool Visit(Widget child)
-        {
-            var childElement = GetChildElement(child);
-            if (childElement != null)
-                _list.Add(childElement);
-
-            return false;
-        }
-    }
-
-    private struct GetChildElementVisitor : IChildrenVisitor
-    {
-        public DesignElement? Element { get; private set; }
-
-        public bool Visit(Widget child)
-        {
-            Element = child as DesignElement;
-            return true;
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace PixUI.Dynamic.Design;
 
-public sealed partial class DesignController
+public sealed class DesignController
 {
     public DesignController()
     {
@@ -20,20 +20,19 @@ public sealed partial class DesignController
 
     public DesignElement RootElement { get; set; } = null!;
 
-    private DynamicBackground? _background;
     private IImage? _cachedBgImage;
 
     public DynamicBackground? Background
     {
-        get => _background;
+        get;
         set
         {
-            _background = value;
+            field = value;
             _cachedBgImage?.Dispose();
             _cachedBgImage = null;
-            if (_background is { ImageData: not null })
+            if (field is { ImageData: not null })
             {
-                _cachedBgImage = Image.FromEncodedData(_background.ImageData);
+                _cachedBgImage = Image.FromEncodedData(field.ImageData);
             }
 
             RootElement.Repaint();
@@ -129,6 +128,64 @@ public sealed partial class DesignController
                 yield return state;
         }
     }
+
+    #region ====GetChildren====
+
+    public static IEnumerable<DesignElement> GetAllChildrenElements(DesignElement parentElement)
+    {
+        if (parentElement.Meta == null)
+            return [];
+
+        var list = new List<DesignElement>();
+        var start = parentElement.Meta.IsReversedWrapElement ? parentElement : parentElement.Child;
+
+        var visitor = new GetAllChildrenVisitor(list);
+        start?.VisitChildren(ref visitor);
+
+        return list;
+    }
+
+    private static DesignElement? GetChildElement(Widget child)
+    {
+        if (child is DesignElement designElement)
+            return designElement;
+
+        var visitor = new GetChildElementVisitor();
+        child.VisitChildren(ref visitor);
+        return visitor.Element;
+    }
+
+    private readonly struct GetAllChildrenVisitor : IChildrenVisitor
+    {
+        public GetAllChildrenVisitor(List<DesignElement> list)
+        {
+            _list = list;
+        }
+
+        private readonly List<DesignElement> _list;
+
+        public bool Visit(Widget child)
+        {
+            var childElement = GetChildElement(child);
+            if (childElement != null)
+                _list.Add(childElement);
+
+            return false;
+        }
+    }
+
+    private struct GetChildElementVisitor : IChildrenVisitor
+    {
+        public DesignElement? Element { get; private set; }
+
+        public bool Visit(Widget child)
+        {
+            Element = child as DesignElement;
+            return true;
+        }
+    }
+
+    #endregion
 
     #region ====ContextMenu====
 
