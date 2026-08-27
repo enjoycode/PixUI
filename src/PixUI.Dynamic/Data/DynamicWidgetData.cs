@@ -130,6 +130,9 @@ public sealed class PropertyValue
 /// </summary>
 public sealed class EventValue
 {
+    /// <summary>
+    /// 事件名称 eg: OnTap
+    /// </summary>
     public string Name { get; init; } = null!;
 
     public IEventAction Action { get; set; } = null!;
