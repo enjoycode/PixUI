@@ -166,7 +166,7 @@ public sealed class DynamicJsonSerializer : IDynamicSerializer
         var ts = Stopwatch.GetTimestamp();
 #endif
 
-        var parent = (SingleChildWidget)_controller.RootElement.Parent!;
+        var parent = (SingleChildWidget?)_controller.RootElement.Parent; //null for unit test
         DesignElement? rootElement = null;
         var reader = new Utf8JsonReader(json);
         while (reader.Read())
@@ -190,9 +190,9 @@ public sealed class DynamicJsonSerializer : IDynamicSerializer
 
         if (rootElement != null)
         {
-            parent.Child = rootElement;
+            parent?.Child = rootElement;
             _controller.RootElement = rootElement;
-            parent.Relayout();
+            parent?.Relayout();
         }
 
         _controller.Select(_controller.RootElement); // always select root element
