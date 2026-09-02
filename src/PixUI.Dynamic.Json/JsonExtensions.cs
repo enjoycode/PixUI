@@ -4,6 +4,17 @@ namespace PixUI.Dynamic.Json;
 
 internal static class JsonExtensions
 {
+    private static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions()
+    {
+        Converters =
+        {
+            new ColorJsonConverter(),
+            new EdgeInsetsJsonConverter(),
+            new IconJsonConverter(),
+            new InputBorderJsonConverter(),
+        }
+    };
+
     public static void WriteDynamicValue(in DynamicValue value, Utf8JsonWriter writer, DynamicPropertyMeta propertyMeta)
     {
         var valueType = propertyMeta.ValueType;
@@ -13,7 +24,7 @@ internal static class JsonExtensions
 
         if (!propertyMeta.IsState)
         {
-            JsonSerializer.Serialize(writer, value.Value, valueType /*必须指定类型以适配某此自定义多态序列化*/);
+            JsonSerializer.Serialize(writer, value.Value, valueType /*必须指定类型以适配某此自定义多态序列化*/, SerializerOptions);
             return;
         }
 
@@ -23,7 +34,7 @@ internal static class JsonExtensions
         {
             case ValueSource.Const:
                 writer.WritePropertyName(nameof(ValueSource.Const));
-                JsonSerializer.Serialize(writer, value.Value, valueType /*必须指定类型以适配某此自定义多态序列化*/);
+                JsonSerializer.Serialize(writer, value.Value, valueType /*必须指定类型以适配某此自定义多态序列化*/, SerializerOptions);
                 break;
             case ValueSource.State:
                 writer.WritePropertyName(nameof(ValueSource.State));
@@ -47,7 +58,7 @@ internal static class JsonExtensions
         if (!propertyMeta.IsState)
         {
             v.From = ValueSource.Const;
-            v.Value = JsonSerializer.Deserialize(ref reader, valueType);
+            v.Value = JsonSerializer.Deserialize(ref reader, valueType, SerializerOptions);
         }
         else
         {
@@ -58,7 +69,7 @@ internal static class JsonExtensions
             {
                 case nameof(ValueSource.Const):
                     v.From = ValueSource.Const;
-                    v.Value = JsonSerializer.Deserialize(ref reader, valueType /*TODO: options*/);
+                    v.Value = JsonSerializer.Deserialize(ref reader, valueType, SerializerOptions);
                     break;
                 case nameof(ValueSource.State):
                     reader.Read();

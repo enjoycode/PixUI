@@ -1,11 +1,7 @@
-#if !__WEB__
 using System.Globalization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace PixUI;
 
-[JsonConverter(typeof(ColorJsonConverter))]
 public readonly struct Color : IEquatable<Color>
 {
     public static readonly Color Empty = 0;
@@ -15,7 +11,7 @@ public readonly struct Color : IEquatable<Color>
 
     public static Color FromArgb(byte alpha, byte red, byte green, byte blue) =>
         new(red, green, blue, alpha);
-    
+
     public static Color FromArgb(uint value) => new Color(value);
 
     public static Color FromHsl(double hue, double saturation = 1, double lightness = 0.5, byte alpha = 255)
@@ -24,7 +20,7 @@ public readonly struct Color : IEquatable<Color>
         double l = lightness;
         double s = saturation;
         double a = alpha;
-        double m2 = 0, m1 = 0;
+        double m2, m1;
 
         if (s == 0.0)
         {
@@ -284,20 +280,3 @@ public readonly struct Color : IEquatable<Color>
         return false;
     }
 }
-
-public sealed class ColorJsonConverter : JsonConverter<Color>
-{
-    public override Color Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    {
-        var stringValue = reader.GetString()!;
-        var intValue = uint.Parse(stringValue, NumberStyles.HexNumber);
-        return new Color(intValue);
-    }
-
-    public override void Write(Utf8JsonWriter writer, Color value, JsonSerializerOptions options)
-    {
-        var number = (uint)value;
-        writer.WriteStringValue(number.ToString("X2"));
-    }
-}
-#endif

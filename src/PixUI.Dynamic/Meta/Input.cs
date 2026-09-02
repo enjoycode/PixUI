@@ -26,12 +26,12 @@ partial class DynamicWidgetManager
         name: "Select",
         properties:
         [
-            new(nameof(Select<string>.Options), typeof(string[]), false),
-            new(nameof(Select<string>.Value), typeof(State<string?>), false, true,
+            new(nameof(Select<>.Options), typeof(string[]), false),
+            new(nameof(Select<>.Value), typeof(State<string?>), false, true,
                 initValue: string.Empty),
-            new(nameof(Select<string>.TextColor), typeof(State<Color>), true),
-            new(nameof(Select<string>.FillColor), typeof(State<Color>), true),
-            new(nameof(Select<string>.Border), typeof(InputBorder), true)
+            new(nameof(Select<>.TextColor), typeof(State<Color>), true),
+            new(nameof(Select<>.FillColor), typeof(State<Color>), true),
+            new(nameof(Select<>.Border), typeof(InputBorder), true)
         ],
         initWidth: 111
     );
