@@ -67,7 +67,7 @@ internal static class DrawingTextExtensions
             // draws the rectangle where the text will be drawn
             canvas.DrawRect(rax, ray, size.Width, size.Height, debugPaint);
 
-            // highlights the relative alignenment, this draws the original coordinates
+            // highlights the relative alignment, this draws the original coordinates
             canvas.DrawRect(x - 4f, y - 4f, 8, 8, debugPaint2);
         }
 #endif
@@ -271,7 +271,7 @@ internal static class DrawingTextExtensions
         };
     }
 
-    internal class BlobArray
+    internal sealed class BlobArray
     {
         private BlobArray() { }
 
@@ -336,7 +336,7 @@ internal static class DrawingTextExtensions
                 // var b = pb.Blob;
                 var w = pb.Width;
 
-                if (x + w > maxWidth || pb == s_newLine)
+                if (/*x + w > maxWidth ||*/ pb == s_newLine)
                 {
                     lineCount++;
                     widths.Add(x); // Store the width of the line, so we can use it later for alignment.
@@ -364,7 +364,7 @@ internal static class DrawingTextExtensions
         }
     }
 
-    internal class PositionedBlob(ITextBlob blob, float width)
+    internal sealed class PositionedBlob(ITextBlob blob, float width)
     {
         public int Line { get; set; }
         public SKPoint Position { get; set; }
