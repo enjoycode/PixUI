@@ -1,6 +1,9 @@
 namespace PixUI;
 
-public static class WrapExtensions
+/// <summary>
+/// 用于链式调用的扩展方法
+/// </summary>
+public static partial class ChainExtensions
 {
     public static Expanded WrapByExpanded(this Widget widget, int flex = 1) =>
         new Expanded(widget, flex);
@@ -22,19 +25,6 @@ public static class WrapExtensions
     public static TParent WithChild<TParent>(this TParent parent, Widget child) where TParent : SingleChildWidget
     {
         parent.Child = child;
-        return parent;
-    }
-
-    public static TParent AddChild<TParent>(this TParent parent, Widget child) where TParent : MultiChildWidget<Widget>
-    {
-        parent.Children.Add(child);
-        return parent;
-    }
-
-    public static TParent AddChild<TParent, TChild>(this TParent parent, TChild child)
-        where TParent : MultiChildWidget<TChild> where TChild : Widget
-    {
-        parent.Children.Add(child);
         return parent;
     }
 }

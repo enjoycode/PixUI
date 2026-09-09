@@ -206,28 +206,6 @@ public abstract partial class Widget : IDisposable
 
     #endregion
 
-    #region ====Ref====
-
-    /// <summary>
-    /// 绑定当前Widget实例至WidgetRef
-    /// </summary>
-    [Obsolete("Use Widget.RefBy()")]
-    public IWidgetRef Ref
-    {
-        set => value.SetWidget(this);
-    }
-
-    /// <summary>
-    /// 设置当前Widget的引用
-    /// </summary>
-    public T RefBy<T>(ref T by) where T : Widget
-    {
-        by = (T)this;
-        return by;
-    }
-
-    #endregion
-
     #region ====Flag Methods====
 
     private void SetFlagValue(bool value, int mask)
