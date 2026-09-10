@@ -45,7 +45,7 @@ namespace PixUI.LiveCharts.Drawing;
 /// <c>true</c> for hosts where SkiaSharp owns the surface and must clear it
 /// explicitly (WPF, MAUI, WinForms, Blazor, in-memory).
 /// </param>
-public class SkiaSharpDrawingContext(
+public sealed class SkiaSharpDrawingContext(
     CoreMotionCanvas motionCanvas,
     SKCanvas canvas,
     SKColor background,
