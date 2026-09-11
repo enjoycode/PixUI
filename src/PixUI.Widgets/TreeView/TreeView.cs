@@ -7,7 +7,7 @@ public sealed class TreeView<T> : Widget, IScrollable
 {
     public TreeView(TreeController<T> controller,
         TreeNodeBuilder<T> nodeBuilder, TreeChildrenGetter<T> childrenGetter,
-        bool showCheckbox = false, float nodeHeight = 30)
+        bool showCheckbox = false, float nodeHeight = 24)
     {
         _controller = controller;
         _controller.NodeBuilder = nodeBuilder;
@@ -172,7 +172,7 @@ public sealed class TreeView<T> : Widget, IScrollable
     {
         // draw background color if has
         if (_fillColor != null)
-            canvas.DrawRect(Rect.FromLTWH(ScrollOffsetX, ScrollOffsetY, W, H), PixUI.Paint.Shared(_fillColor.Value));
+            canvas.DrawRect(Rect.FromLTWH(ScrollOffsetX, ScrollOffsetY, W, H), Paint.Shared(_fillColor.Value));
 
         if (_controller.IsLoading)
         {
