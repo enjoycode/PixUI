@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace PixUI;
 
 /// <summary>
@@ -65,10 +61,6 @@ internal sealed class InvalidWidget
     /// 用于局部重绘的对象,null表示全部重绘
     /// </summary>
     internal IDirtyArea? Area;
-
-#if __WEB__
-    internal InvalidWidget() { } //Need for web now
-#endif
 }
 
 /// <summary>
@@ -85,8 +77,27 @@ internal sealed class InvalidQueue
     /// <returns>false=widget is not mounted and can't add to queue</returns>
     internal static bool Add(Widget widget, InvalidAction action, IDirtyArea? dirtyArea)
     {
-        //暂在这里判断Widget是否已挂载
-        if (!widget.IsMounted || !widget.IsVisible) return false;
+        //先判断Widget是否已挂载
+        if (!widget.IsMounted) return false;
+        //向上查找root，计算level并判断是否Visible
+        var level = 0;
+        var temp = widget;
+        while (temp.Parent != null)
+        {
+            level++;
+            if (!temp.IsVisible) return false;
+            temp = temp.Parent;
+        }
+
+        if (temp is not IRootWidget root)
+        {
+#if DEBUG
+            throw new Exception($"[{widget}] without root");
+#else
+            Log.Warn("Widget without root");
+            return false;
+#endif
+        }
 
 #if DEBUG
         if (Environment.CurrentManagedThreadId != UIApplication.Current.UIThread.ManagedThreadId)
@@ -94,18 +105,6 @@ internal sealed class InvalidQueue
 #endif
 
         //根据Widget所在的画布加入相应的队列
-        var root = widget.Root;
-#if DEBUG
-        if (root == null)
-            throw new Exception($"[{widget}] without root");
-#else
-        if (root == null)
-        {
-            Log.Warn("Widget without root");
-            return false;
-        }
-#endif
-
         var win = root.Window;
         if (widget.Root is Overlay)
         {
@@ -117,7 +116,7 @@ internal sealed class InvalidQueue
 
             //When used for overlay, only Relayout invalid add to queue.
             if (action == InvalidAction.Relayout)
-                win.OverlayInvalidQueue.AddInternal(widget, action, dirtyArea);
+                win.OverlayInvalidQueue.AddInternal(widget, level, action, dirtyArea);
         }
         else
         {
@@ -127,7 +126,7 @@ internal sealed class InvalidQueue
                 return false;
             }
 
-            win.WidgetsInvalidQueue.AddInternal(widget, action, dirtyArea);
+            win.WidgetsInvalidQueue.AddInternal(widget, level, action, dirtyArea);
         }
 
         if (!win.HasPostInvalidateEvent)
@@ -161,10 +160,9 @@ internal sealed class InvalidQueue
     /// Add dirty widget to queue.
     /// </summary>
     /// <returns>true=the first item added to queue</returns>
-    private void AddInternal(Widget widget, InvalidAction action, IDirtyArea? item)
+    private void AddInternal(Widget widget, int level, InvalidAction action, IDirtyArea? item)
     {
         //先尝试合并入现有项
-        var level = GetLevelToTop(widget);
         var insertPos = 0; // -1 mean has merged to exist.
         var relayoutOnly = false;
 
@@ -244,7 +242,7 @@ internal sealed class InvalidQueue
         }
 
         // insert to invalid queue.
-        //TODO:use object pool for InvalidWidget
+        //TODO:use object pool for InvalidWidget or change it to struct
         var target = new InvalidWidget
         {
             Widget = widget,
@@ -254,19 +252,6 @@ internal sealed class InvalidQueue
             RelayoutOnly = relayoutOnly
         };
         _queue.Insert(insertPos, target);
-    }
-
-    private static int GetLevelToTop(Widget widget)
-    {
-        var level = 0;
-        Widget cur = widget;
-        while (cur.Parent != null)
-        {
-            level++;
-            cur = cur.Parent;
-        }
-
-        return level;
     }
 
     /// <summary>

@@ -189,13 +189,15 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     {
         if (includeSelf)
         {
-            _row.SetVisibleWithChildren(visible);
+            IsVisible = visible; //_row.IsVisible = visible;
         }
-
-        if (!IsLeaf && Children != null)
+        else
         {
-            foreach (var child in Children)
-                child.SetChildrenVisible(visible, true);
+            if (!IsLeaf && Children != null)
+            {
+                foreach (var child in Children)
+                    child.IsVisible = visible;
+            }
         }
     }
 

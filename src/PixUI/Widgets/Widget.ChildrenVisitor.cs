@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 public interface IChildrenVisitor
@@ -34,22 +32,6 @@ partial class Widget
                 return true;
             }
 
-            return false;
-        }
-    }
-
-    private readonly struct SetVisibleChildrenVisitor : IChildrenVisitor
-    {
-        public SetVisibleChildrenVisitor(bool visible)
-        {
-            _visible = visible;
-        }
-
-        private readonly bool _visible;
-
-        public bool Visit(Widget child)
-        {
-            child.SetVisibleWithChildren(_visible);
             return false;
         }
     }

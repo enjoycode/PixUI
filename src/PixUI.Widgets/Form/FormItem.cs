@@ -108,7 +108,7 @@ public sealed class FormItem : Widget
 
     private void OnVisibleChanged(State state)
     {
-        SetVisibleWithChildren(((State<bool>)state).Value);
+        IsVisible = ((State<bool>)state).Value;
         Parent?.Relayout();
     }
 
