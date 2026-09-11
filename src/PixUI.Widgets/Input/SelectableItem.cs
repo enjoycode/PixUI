@@ -49,10 +49,11 @@ public sealed class SelectableItem : SingleChildWidget, IMouseRegion
     {
         var fixedWidth = Width?.Value ?? AvailableSize.Width;
         var fixedHeight = Height?.Value ?? 20;
+        const float paddingX = 3f; //暂直接指定，考虑属性
         if (Child != null)
         {
-            Child.PerformLayout(new(fixedWidth, fixedHeight));
-            Child.SetLayoutLocation(0, (fixedHeight - Child.H) / 2f); //暂上下居中
+            Child.PerformLayout(new(fixedWidth - paddingX * 2, fixedHeight));
+            Child.SetLayoutLocation(paddingX, (fixedHeight - Child.H) / 2f); //暂上下居中
         }
 
         SetLayoutSize(fixedWidth, fixedHeight);
