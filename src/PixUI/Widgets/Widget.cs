@@ -471,9 +471,6 @@ public abstract partial class Widget : IDisposable
     /// </summary>
     public void Relayout() => InvalidQueue.Add(this, InvalidAction.Relayout, null);
 
-    [Obsolete("Use Repaint or Relayout")]
-    public void Invalidate(InvalidAction action, IDirtyArea? area = null) => InvalidQueue.Add(this, action, area);
-
     protected virtual void RepaintOnStateChanged(State state) => InvalidQueue.Add(this, InvalidAction.Repaint, null);
 
     protected virtual void RelayoutOnStateChanged(State state) => InvalidQueue.Add(this, InvalidAction.Relayout, null);

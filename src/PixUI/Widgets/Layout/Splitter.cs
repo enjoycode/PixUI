@@ -1,4 +1,4 @@
-using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PixUI;
 
@@ -31,7 +31,7 @@ public sealed class SplitterBar : Widget, IMouseRegion
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         //TODO:暂简单实现
-        var paint = PixUI.Paint.Shared(Color);
+        var paint = Paint.Shared(Color);
         canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), paint);
     }
 }
@@ -45,42 +45,39 @@ public sealed class Splitter : Widget
     }
 
     private readonly SplitterBar _bar;
-    private readonly Widget? _panel1;
-    private readonly Widget? _panel2;
-    private readonly Axis _orientation = Axis.Horizontal;
     private readonly State<bool>? _panel1Collapsed;
     private readonly State<bool>? _panel2Collapsed;
     private float _barDistance = float.NaN;
 
     public Axis Orientation
     {
-        get => _orientation;
+        get;
         init
         {
-            _orientation = value;
+            field = value;
             _bar.Orientation = value;
         }
-    }
+    } = Axis.Horizontal;
 
     public Widget? Panel1
     {
-        get => _panel1;
+        get;
         init
         {
-            _panel1 = value;
-            if (_panel1 != null)
-                _panel1.Parent = this;
+            field = value;
+            if (field != null)
+                field.Parent = this;
         }
     }
 
     public Widget? Panel2
     {
-        get => _panel2;
+        get;
         init
         {
-            _panel2 = value;
-            if (_panel2 != null)
-                _panel2.Parent = this;
+            field = value;
+            if (field != null)
+                field.Parent = this;
         }
     }
 
@@ -157,6 +154,7 @@ public sealed class Splitter : Widget
         visitor.Visit(_bar);
     }
 
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     protected override void OnLayout(Size maxSize)
     {
         var oldW = Math.Max(W, 0);
