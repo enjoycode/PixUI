@@ -95,9 +95,9 @@ public unsafe partial struct SKGraphiteDawnBackendContextInit : IEquatable<SKGra
     public readonly override int GetHashCode()
     {
         var hash = new HashCode();
-        hash.Add(new IntPtr(fInstance));
-        hash.Add(new IntPtr(fDevice));
-        hash.Add(new IntPtr(fQueue));
+        hash.Add(fInstance);
+        hash.Add(fDevice);
+        hash.Add(fQueue);
         hash.Add(fNonYielding);
         return hash.ToHashCode();
     }

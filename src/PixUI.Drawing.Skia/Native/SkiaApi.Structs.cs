@@ -1373,88 +1373,6 @@ internal struct
     }
 }
 
-// sk_managedstream_procs_t
-[StructLayout(LayoutKind.Sequential)]
-internal struct
-    SKManagedStreamDelegates : IEquatable<SKManagedStreamDelegates>
-{
-    // public sk_managedstream_read_proc fRead
-    public SKManagedStreamReadProxyDelegate fRead;
-
-    // public sk_managedstream_peek_proc fPeek
-    public SKManagedStreamPeekProxyDelegate fPeek;
-
-    // public sk_managedstream_isAtEnd_proc fIsAtEnd
-    public SKManagedStreamIsAtEndProxyDelegate fIsAtEnd;
-
-    // public sk_managedstream_hasPosition_proc fHasPosition
-    public SKManagedStreamHasPositionProxyDelegate fHasPosition;
-
-    // public sk_managedstream_hasLength_proc fHasLength
-    public SKManagedStreamHasLengthProxyDelegate fHasLength;
-
-    // public sk_managedstream_rewind_proc fRewind
-    public SKManagedStreamRewindProxyDelegate fRewind;
-
-    // public sk_managedstream_getPosition_proc fGetPosition
-    public SKManagedStreamGetPositionProxyDelegate fGetPosition;
-
-    // public sk_managedstream_seek_proc fSeek
-    public SKManagedStreamSeekProxyDelegate fSeek;
-
-    // public sk_managedstream_move_proc fMove
-    public SKManagedStreamMoveProxyDelegate fMove;
-
-    // public sk_managedstream_getLength_proc fGetLength
-    public SKManagedStreamGetLengthProxyDelegate fGetLength;
-
-    // public sk_managedstream_duplicate_proc fDuplicate
-    public SKManagedStreamDuplicateProxyDelegate fDuplicate;
-
-    // public sk_managedstream_fork_proc fFork
-    public SKManagedStreamForkProxyDelegate fFork;
-
-    // public sk_managedstream_destroy_proc fDestroy
-    public SKManagedStreamDestroyProxyDelegate fDestroy;
-
-    public readonly bool Equals(SKManagedStreamDelegates obj) =>
-        fRead == obj.fRead && fPeek == obj.fPeek && fIsAtEnd == obj.fIsAtEnd &&
-        fHasPosition == obj.fHasPosition && fHasLength == obj.fHasLength &&
-        fRewind == obj.fRewind && fGetPosition == obj.fGetPosition && fSeek == obj.fSeek &&
-        fMove == obj.fMove && fGetLength == obj.fGetLength &&
-        fDuplicate == obj.fDuplicate && fFork == obj.fFork && fDestroy == obj.fDestroy;
-
-    public readonly override bool Equals(object? obj) =>
-        obj is SKManagedStreamDelegates f && Equals(f);
-
-    public static bool operator ==(SKManagedStreamDelegates left,
-        SKManagedStreamDelegates right) =>
-        left.Equals(right);
-
-    public static bool operator !=(SKManagedStreamDelegates left,
-        SKManagedStreamDelegates right) =>
-        !left.Equals(right);
-
-    public readonly override int GetHashCode()
-    {
-        var hash = new HashCode();
-        hash.Add(fRead);
-        hash.Add(fPeek);
-        hash.Add(fIsAtEnd);
-        hash.Add(fHasPosition);
-        hash.Add(fHasLength);
-        hash.Add(fRewind);
-        hash.Add(fGetPosition);
-        hash.Add(fSeek);
-        hash.Add(fMove);
-        hash.Add(fGetLength);
-        hash.Add(fDuplicate);
-        hash.Add(fFork);
-        hash.Add(fDestroy);
-        return hash.ToHashCode();
-    }
-}
-
 // sk_managedtracememorydump_procs_t
 [StructLayout(LayoutKind.Sequential)]
 internal struct
@@ -1486,49 +1404,6 @@ internal struct
         var hash = new HashCode();
         hash.Add(fDumpNumericValue);
         hash.Add(fDumpStringValue);
-        return hash.ToHashCode();
-    }
-}
-
-// sk_managedwstream_procs_t
-[StructLayout(LayoutKind.Sequential)]
-internal struct
-    SKManagedWStreamDelegates : IEquatable<SKManagedWStreamDelegates>
-{
-    // public sk_managedwstream_write_proc fWrite
-    public SKManagedWStreamWriteProxyDelegate fWrite;
-
-    // public sk_managedwstream_flush_proc fFlush
-    public SKManagedWStreamFlushProxyDelegate fFlush;
-
-    // public sk_managedwstream_bytesWritten_proc fBytesWritten
-    public SKManagedWStreamBytesWrittenProxyDelegate fBytesWritten;
-
-    // public sk_managedwstream_destroy_proc fDestroy
-    public SKManagedWStreamDestroyProxyDelegate fDestroy;
-
-    public readonly bool Equals(SKManagedWStreamDelegates obj) =>
-        fWrite == obj.fWrite && fFlush == obj.fFlush &&
-        fBytesWritten == obj.fBytesWritten && fDestroy == obj.fDestroy;
-
-    public readonly override bool Equals(object? obj) =>
-        obj is SKManagedWStreamDelegates f && Equals(f);
-
-    public static bool operator ==(SKManagedWStreamDelegates left,
-        SKManagedWStreamDelegates right) =>
-        left.Equals(right);
-
-    public static bool operator !=(SKManagedWStreamDelegates left,
-        SKManagedWStreamDelegates right) =>
-        !left.Equals(right);
-
-    public readonly override int GetHashCode()
-    {
-        var hash = new HashCode();
-        hash.Add(fWrite);
-        hash.Add(fFlush);
-        hash.Add(fBytesWritten);
-        hash.Add(fDestroy);
         return hash.ToHashCode();
     }
 }

@@ -70,8 +70,8 @@ public unsafe partial struct SKGraphiteMtlBackendContextInit : IEquatable<SKGrap
     public readonly override int GetHashCode()
     {
         var hash = new HashCode();
-        hash.Add(new IntPtr(fDevice));
-        hash.Add(new IntPtr(fQueue));
+        hash.Add(fDevice);
+        hash.Add(fQueue);
         return hash.ToHashCode();
     }
 }

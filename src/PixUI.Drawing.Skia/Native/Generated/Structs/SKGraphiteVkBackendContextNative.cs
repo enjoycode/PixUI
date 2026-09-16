@@ -63,8 +63,8 @@ internal unsafe partial struct SKGraphiteVkBackendContextNative : IEquatable<SKG
         hash.Add(fQueue);
         hash.Add(fGraphicsQueueIndex);
         hash.Add(fMaxAPIVersion);
-        hash.Add(new IntPtr(fGetProc));
-        hash.Add(new IntPtr(fGetProcUserData));
+        hash.Add(fGetProc);
+        hash.Add(fGetProcUserData);
         hash.Add(fProtectedContext);
         return hash.ToHashCode();
     }

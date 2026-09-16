@@ -1,0 +1,18 @@
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+namespace PixUI.Drawing.Skia;
+
+internal static unsafe partial class DelegateProxies
+{
+    /// Proxy for sk_managedstream_peek_proc native function.
+#if USE_LIBRARY_IMPORT
+    public static readonly delegate* unmanaged[Cdecl] <sk_stream_managedstream_t, void*, void*, /* size_t */ IntPtr, /* size_t */ IntPtr> SKManagedStreamPeekProxy = &SKManagedStreamPeekProxyImplementation;
+    [UnmanagedCallersOnly(CallConvs = new [] {typeof(CallConvCdecl)})]
+#else
+	public static readonly SKManagedStreamPeekProxyDelegate SKManagedStreamPeekProxy = SKManagedStreamPeekProxyImplementation;
+	[MonoPInvokeCallback (typeof (SKManagedStreamPeekProxyDelegate))]
+#endif
+    private static partial /* size_t */ IntPtr SKManagedStreamPeekProxyImplementation(sk_stream_managedstream_t s,void* context,void* buffer,/* size_t */ IntPtr size);
+
+}

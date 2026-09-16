@@ -1,27 +1,34 @@
 namespace PixUI.Drawing.Skia;
 
-public abstract unsafe class SKAbstractManagedWStream : SKWStream
+/// <summary>Represents a <see cref="T:SkiaSharp.SKWStream" /> (a writeable Skia stream).</summary>
+/// <remarks />
+public unsafe abstract class SKAbstractManagedWStream : SKWStream
 {
     private static readonly SKManagedWStreamDelegates delegates;
 
-    private int fromNative;
+    internal int fromNative;
 
     static SKAbstractManagedWStream()
     {
         delegates = new SKManagedWStreamDelegates
         {
-            fWrite = WriteInternal,
-            fFlush = FlushInternal,
-            fBytesWritten = BytesWrittenInternal,
-            fDestroy = DestroyInternal,
+            fWrite = DelegateProxies.SKManagedWStreamWriteProxy,
+            fFlush = DelegateProxies.SKManagedWStreamFlushProxy,
+            fBytesWritten = DelegateProxies.SKManagedWStreamBytesWrittenProxy,
+            fDestroy = DelegateProxies.SKManagedWStreamDestroyProxy
         };
 
         SkiaApi.sk_managedwstream_set_procs(delegates);
     }
 
+    /// <summary>Creates a new instance of <see cref="T:SkiaSharp.SKAbstractManagedWStream" />.</summary>
+    /// <remarks />
     protected SKAbstractManagedWStream()
         : this(true) { }
 
+    /// <summary>Creates a new instance of <see cref="T:SkiaSharp.SKAbstractManagedWStream" />.</summary>
+    /// <param name="owns">The value indicating whether this object should destroy the underlying native object.</param>
+    /// <remarks />
     protected SKAbstractManagedWStream(bool owns)
         : base(IntPtr.Zero, owns)
     {
@@ -29,56 +36,33 @@ public abstract unsafe class SKAbstractManagedWStream : SKWStream
         Handle = SkiaApi.sk_managedwstream_new((void*)ctx);
     }
 
+    /// <summary>Releases the unmanaged resources used by the <see cref="T:SkiaSharp.SKAbstractManagedWStream" /> and optionally releases the managed resources.</summary>
+    /// <param name="disposing"><see langword="true" /> to release both managed and unmanaged resources; <see langword="false" /> to release only unmanaged resources.</param>
+    /// <remarks>Always dispose the object before you release your last reference to the <see cref="T:SkiaSharp.SKAbstractManagedWStream" />. Otherwise, the resources it is using will not be freed until the garbage collector calls the finalizer.</remarks>
     protected override void Dispose(bool disposing) =>
         base.Dispose(disposing);
 
+    /// <summary>Implemented by derived <see cref="T:SkiaSharp.SKObject" /> types to destroy any native objects.</summary>
+    /// <remarks />
     protected override void DisposeNative()
     {
         if (Interlocked.CompareExchange(ref fromNative, 0, 0) == 0)
             SkiaApi.sk_managedwstream_destroy(Handle);
     }
 
-    protected abstract bool OnWrite(IntPtr buffer, IntPtr size);
+    /// <summary>Implemented by derived <see cref="T:SkiaSharp.SKAbstractManagedWStream" /> types to copy the specified number of bytes from the specified buffer into the underlying stream.</summary>
+    /// <param name="buffer">The buffer to copy into the underlying stream.</param>
+    /// <param name="size">The number of bytes to copy from the buffer.</param>
+    /// <returns>Returns <see langword="true" /> on success, otherwise <see langword="false" />.</returns>
+    /// <remarks />
+    protected internal abstract bool OnWrite(IntPtr buffer, IntPtr size);
 
-    protected abstract void OnFlush();
+    /// <summary>Implemented by derived <see cref="T:SkiaSharp.SKAbstractManagedWStream" /> types to flush the bytes to the underlying stream.</summary>
+    /// <remarks />
+    protected internal abstract void OnFlush();
 
-    protected abstract IntPtr OnBytesWritten();
-
-    [MonoPInvokeCallback(typeof(SKManagedWStreamWriteProxyDelegate))]
-    private static bool WriteInternal(IntPtr s, void* context, void* buffer, IntPtr size)
-    {
-        var stream =
-            DelegateProxies.GetUserData<SKAbstractManagedWStream>((IntPtr)context, out _);
-        return stream.OnWrite((IntPtr)buffer, size);
-    }
-
-    [MonoPInvokeCallback(typeof(SKManagedWStreamFlushProxyDelegate))]
-    private static void FlushInternal(IntPtr s, void* context)
-    {
-        var stream =
-            DelegateProxies.GetUserData<SKAbstractManagedWStream>((IntPtr)context, out _);
-        stream.OnFlush();
-    }
-
-    [MonoPInvokeCallback(typeof(SKManagedWStreamBytesWrittenProxyDelegate))]
-    private static IntPtr BytesWrittenInternal(IntPtr s, void* context)
-    {
-        var stream =
-            DelegateProxies.GetUserData<SKAbstractManagedWStream>((IntPtr)context, out _);
-        return stream.OnBytesWritten();
-    }
-
-    [MonoPInvokeCallback(typeof(SKManagedWStreamDestroyProxyDelegate))]
-    private static void DestroyInternal(IntPtr s, void* context)
-    {
-        var stream =
-            DelegateProxies.GetUserData<SKAbstractManagedWStream>((IntPtr)context, out var gch);
-        if (stream != null)
-        {
-            Interlocked.Exchange(ref stream.fromNative, 1);
-            stream.Dispose();
-        }
-
-        gch.Free();
-    }
+    /// <summary>Implemented by derived <see cref="T:SkiaSharp.SKAbstractManagedWStream" /> types to specify the number of bytes currently written to the stream.</summary>
+    /// <returns>Returns the number of bytes currently written to the stream.</returns>
+    /// <remarks />
+    protected internal abstract IntPtr OnBytesWritten();
 }
