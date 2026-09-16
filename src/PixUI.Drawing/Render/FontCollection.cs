@@ -46,8 +46,8 @@ public static class FontCollection
     public static ITypeface? TryMatchFamilyFromAsset(string familyName) =>
         Render.Backend.FontCollection.TryMatchFamilyFromAsset(familyName);
 
-    public static void RegisterTypeface(Stream stream, string fontFAmily, bool isAsset) =>
-        Render.Backend.FontCollection.RegisterTypeface(stream, fontFAmily, isAsset);
+    public static void RegisterTypeface(Stream stream, string fontFamily, bool isAsset) =>
+        Render.Backend.FontCollection.RegisterTypeface(stream, fontFamily, isAsset);
 
     public static ITypeface? FindTypeface(string familyName, bool bold, bool italic) =>
         Render.Backend.FontCollection.FindTypeface(familyName, bold, italic);

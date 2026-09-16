@@ -8,7 +8,7 @@ internal unsafe partial struct SKManagedWStreamDelegates : IEquatable<SKManagedW
 {
     // public sk_managedwstream_write_proc fWrite
 #if USE_LIBRARY_IMPORT
-    public delegate* unmanaged[Cdecl] <sk_wstream_managedstream_t, void*, void*, /* size_t */ IntPtr, bool> fWrite;
+    public delegate* unmanaged[Cdecl] <sk_wstream_managedstream_t, void*, void*, /* size_t */ IntPtr, byte> fWrite;
 #else
 		public SKManagedWStreamWriteProxyDelegate fWrite;
 #endif
