@@ -2,7 +2,7 @@ namespace PixUI.Drawing.Skia;
 
 public sealed class SKImage : SKObject, ISKReferenceCounted, IImage
 {
-    private SKImage(IntPtr x, bool owns) : base(x, owns) { }
+    internal SKImage(IntPtr x, bool owns) : base(x, owns) { }
 
     public int Width => SkiaApi.sk_image_get_width(Handle);
 
@@ -45,15 +45,24 @@ public sealed class SKImage : SKObject, ISKReferenceCounted, IImage
     }
 
     public static unsafe SKImage FromPicture(SKPicture picture, SizeI dimensions) =>
-        FromPicture(picture, dimensions, null, null);
+        FromPicture(picture, dimensions, null, null, false, SKColorSpace.SRGB, null);
 
-    private static unsafe SKImage FromPicture(SKPicture picture, SizeI dimensions, Matrix3* matrix, SKPaint? paint)
+    private static unsafe SKImage FromPicture(SKPicture picture, SKSizeI dimensions, Matrix3* matrix, SKPaint? paint,
+        bool useFloatingPointBitDepth, SKColorSpace colorspace, SKSurfaceProperties? props)
     {
         if (picture == null)
             throw new ArgumentNullException(nameof(picture));
 
         var p = paint?.Handle ?? IntPtr.Zero;
-        return GetObject(SkiaApi.sk_image_new_from_picture(picture.Handle, &dimensions, matrix, p))!;
+        var cs = colorspace?.Handle ?? IntPtr.Zero;
+        var prps = props?.Handle ?? IntPtr.Zero;
+        var image = GetObject(SkiaApi.sk_image_new_from_picture(picture.Handle, &dimensions, matrix, p,
+            useFloatingPointBitDepth, cs, prps));
+        GC.KeepAlive(picture);
+        GC.KeepAlive(paint);
+        GC.KeepAlive(colorspace);
+        GC.KeepAlive(props);
+        return image;
     }
 
     public SKData Encode(EncodedImageFormat format, int quality)
@@ -65,10 +74,20 @@ public sealed class SKImage : SKObject, ISKReferenceCounted, IImage
     #region ====ToShader====
 
     public unsafe IShader? ToShader(TileMode tileX = TileMode.Clamp, TileMode tileY = TileMode.Clamp) =>
-        SKShader.GetObject(SkiaApi.sk_image_make_shader(Handle, tileX, tileY, null));
+        SKShader.GetObject(SkiaApi.sk_image_make_shader(Handle, tileX, tileY, null, null));
 
     public unsafe IShader? ToShader(TileMode tileX, TileMode tileY, Matrix3 localMatrix) =>
-        SKShader.GetObject(SkiaApi.sk_image_make_shader(Handle, tileX, tileY, &localMatrix));
+        SKShader.GetObject(SkiaApi.sk_image_make_shader(Handle, tileX, tileY, null, &localMatrix));
 
     #endregion
+
+    internal static SKImage ToTextureImage(SKGraphiteRecorder recorder, SKImage image, bool mipmapped)
+    {
+        if (recorder == null)
+            throw new ArgumentNullException(nameof(recorder));
+        if (image == null)
+            throw new ArgumentNullException(nameof(image));
+
+        return GetObject(SkiaApi.sk_graphite_image_make_texture(recorder.Handle, image.Handle, mipmapped));
+    }
 }

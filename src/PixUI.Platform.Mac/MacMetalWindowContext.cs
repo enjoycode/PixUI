@@ -32,7 +32,7 @@ public sealed class MacMetalWindowContext : MetalWindowContext
 
         //Reset cached offscreen canvas
         OffscreenCanvas?.Dispose();
-        OffscreenCanvas?.Surface.Dispose();
+        OffscreenCanvas?.Surface?.Dispose();
         OffscreenCanvas = null;
     }
 
@@ -55,7 +55,7 @@ public sealed class MacMetalWindowContext : MetalWindowContext
         MetalLayer.ContentsGravity = CALayer.GravityTopLeft;
         MetalLayer.MagnificationFilter = CALayer.FilterNearest;
         MetalLayer.MaximumDrawableCount = 2; //2 or 3, default is 3
-        MetalLayer.ColorSpace = _mainView.Window.ColorSpace.ColorSpace;
+        MetalLayer.ColorSpace = _mainView.Window!.ColorSpace.ColorSpace;
 
         _mainView.Layer = MetalLayer;
         _mainView.WantsLayer = true;

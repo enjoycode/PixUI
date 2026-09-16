@@ -20,31 +20,33 @@ public static class Program
         //调用js获取启动参数
         var jsRuntime = ((IJSInProcessRuntime)BlazorApplication.JSRuntime);
         var runInfo = jsRuntime.Invoke<RunInfo>("PixUI.BeforeRunApp");
-        await Run(runInfo.GLHandle, runInfo.Width, runInfo.Height, runInfo.PixelRatio, runInfo.RoutePath,
+        await Run(runInfo.Width, runInfo.Height, runInfo.PixelRatio, runInfo.RoutePath,
             runInfo.IsMacOS);
         jsRuntime.InvokeVoid("PixUI.BindEvents");
 
         await host.RunAsync();
     }
 
-    private static async Task Run(int glHandle, int width, int height, float ratio, string? routePath, bool isMacOS)
+    private static async Task Run(int width, int height, float ratio, string? routePath, bool isMacOS)
     {
-        //初始化默认字体
-        await using var fontDataStream =
-            await BlazorApplication.HttpClient.GetStreamAsync("/fonts/MiSans-Regular.woff2");
-        //因fontDataStream不支持同步复制(DotNet10)，所以先复制至MemoryStream
-        using var ms = new MemoryStream();
-        await fontDataStream.CopyToAsync(ms);
-        ms.Position = 0;
-        FontCollection.RegisterTypeface(ms, FontCollection.DefaultFamilyName, false);
+        // //初始化默认字体
+        // await using var fontDataStream =
+        //     await BlazorApplication.HttpClient.GetStreamAsync("/fonts/MiSans-Regular.woff2");
+        // //因fontDataStream不支持同步复制(DotNet10)，所以先复制至MemoryStream
+        // using var ms = new MemoryStream();
+        // await fontDataStream.CopyToAsync(ms);
+        // ms.Position = 0;
+        // FontCollection.RegisterTypeface(ms, FontCollection.DefaultFamilyName, false);
+        
+        var adapter = await WebGPU.RequestAdapter();
+        Console.WriteLine(adapter);
 
         //开始执行Blazor应用
-        BlazorApplication.Run(() => new DemoRoute(), glHandle, width, height, ratio, routePath, isMacOS);
+        //BlazorApplication.Run(() => new DemoRoute(), width, height, ratio, routePath, isMacOS);
     }
 
     public struct RunInfo
     {
-        public int GLHandle { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
         public float PixelRatio { get; set; }

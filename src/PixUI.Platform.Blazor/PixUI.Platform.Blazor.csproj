@@ -26,8 +26,7 @@
         <WasmEnableSIMD>true</WasmEnableSIMD>
         <WasmAllowUndefinedSymbols>true</WasmAllowUndefinedSymbols>
         <EmccInitialHeapSize>128MB</EmccInitialHeapSize>
-        <EmccExtraCFlags>-s USE_WEBGL2=1 -s MAX_WEBGL_VERSION=2</EmccExtraCFlags>
-        <EmccExtraLDFlags>-lGL</EmccExtraLDFlags>
+        <EmccExtraLDFlags>-s USE_WEBGL2=0 -s USE_WEBGPU=1</EmccExtraLDFlags>
         <LangVersion>default</LangVersion>
     </PropertyGroup>
 
@@ -37,23 +36,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmccExportedRuntimeMethod Include="GL" />
+        <EmccExportedRuntimeMethod Include="WebGPU" />
         <NativeFileReference Include="libs\skia.a" />
 <!--        <NativeFileReference Include="libs\tree-sitter.o" />-->
 <!--        <NativeFileReference Include="libs\tree-sitter-csharp.a" />-->
     </ItemGroup>
-
-<!--    <Target Name="UseCustomICU" AfterTargets="ResolveRuntimePackAssets">-->
-<!--        <ItemGroup>-->
-<!--            <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.Extension)' == '.dat' AND $([System.String]::Copy('%(ReferenceCopyLocalPaths.FileName)').StartsWith('icudt'))" />-->
-
-<!--            <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)libs\icudt.dat" DestinationSubPath="icudt.dat" />-->
-<!--            <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)libs\icudt_CJK.dat" DestinationSubPath="icudt_CJK.dat" />-->
-<!--            <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)libs\icudt_EFIGS.dat" DestinationSubPath="icudt_EFIGS.dat" />-->
-<!--            <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)libs\icudt_no_CJK.dat" DestinationSubPath="icudt_no_CJK.dat" />-->
-<!--        </ItemGroup>-->
-<!--    </Target>-->
-
+    
     <ItemGroup>
         <ProjectReference Include="..\PixUI.Demo\PixUI.Demo.csproj" />
         <ProjectReference Include="..\PixUI.Drawing.Skia\PixUI.Drawing.Skia.csproj" />

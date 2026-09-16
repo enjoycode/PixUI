@@ -1,5 +1,139 @@
 namespace PixUI.Drawing.Skia;
 
+// gr_surfaceorigin_t
+/// <summary>The origin of a texture.</summary>
+/// <remarks />
+public enum GRSurfaceOrigin
+{
+    // TOP_LEFT_GR_SURFACE_ORIGIN = 0
+    /// <summary>Origin is at the top-left.</summary>
+    TopLeft = 0,
+
+    // BOTTOM_LEFT_GR_SURFACE_ORIGIN = 1
+    /// <summary>Origin is at the bottom-left.</summary>
+    BottomLeft = 1,
+}
+
+// sk_mipmap_mode_t
+/// <summary>Specifies the mipmap mode used when sampling images.</summary>
+/// <remarks />
+public enum SKMipmapMode
+{
+    // NONE_SK_MIPMAP_MODE = 0
+    /// <summary>Disables mipmap filtering.</summary>
+    None = 0,
+
+    // NEAREST_SK_MIPMAP_MODE = 1
+    /// <summary>Selects the nearest mipmap level.</summary>
+    Nearest = 1,
+
+    // LINEAR_SK_MIPMAP_MODE = 2
+    /// <summary>Interpolates between two mipmap levels using linear filtering.</summary>
+    Linear = 2,
+}
+
+// sk_filter_mode_t
+/// <summary>Specifies the filtering algorithm for scaling and transforming images.</summary>
+/// <remarks />
+public enum SKFilterMode
+{
+    // NEAREST_SK_FILTER_MODE = 0
+    /// <summary>Nearest-neighbor sampling that uses the color of the single closest pixel.</summary>
+    Nearest = 0,
+
+    // LINEAR_SK_FILTER_MODE = 1
+    /// <summary>Bilinear interpolation that samples the four nearest pixels and blends them.</summary>
+    Linear = 1,
+}
+
+// sk_graphite_backend_t
+/// <summary>Specifies the graphics backend that drives a Graphite context.</summary>
+/// <remarks />
+public enum SKGraphiteBackend
+{
+    // DAWN_SK_GRAPHITE_BACKEND = 0
+    /// <summary>The Dawn (WebGPU) backend.</summary>
+    Dawn = 0,
+
+    // METAL_SK_GRAPHITE_BACKEND = 1
+    /// <summary>The Apple Metal backend.</summary>
+    Metal = 1,
+
+    // VULKAN_SK_GRAPHITE_BACKEND = 2
+    /// <summary>The Vulkan backend.</summary>
+    Vulkan = 2,
+
+    // UNKNOWN_SK_GRAPHITE_BACKEND = -1
+    /// <summary>An unknown or unsupported backend.</summary>
+    Unknown = -1,
+}
+
+// sk_graphite_insert_status_t
+/// <summary>Describes the result of inserting a recording into a Graphite context.</summary>
+/// <remarks />
+public enum SKGraphiteInsertStatus
+{
+    // SUCCESS_SK_GRAPHITE_INSERT_STATUS = 0
+    /// <summary>The recording was inserted successfully.</summary>
+    Success = 0,
+
+    // INVALID_RECORDING_SK_GRAPHITE_INSERT_STATUS = 1
+    /// <summary>The recording was not valid and could not be inserted.</summary>
+    InvalidRecording = 1,
+
+    // PROMISE_INSTANTIATION_FAILED_SK_GRAPHITE_INSERT_STATUS = 2
+    /// <summary>A promise image referenced by the recording could not be instantiated.</summary>
+    PromiseInstantiationFailed = 2,
+
+    // ADD_COMMANDS_FAILED_SK_GRAPHITE_INSERT_STATUS = 3
+    /// <summary>The commands from the recording could not be added to the backend command buffer.</summary>
+    AddCommandsFailed = 3,
+
+    // ASYNC_SHADER_COMPILES_FAILED_SK_GRAPHITE_INSERT_STATUS = 4
+    /// <summary>One or more asynchronous shader compilations required by the recording failed.</summary>
+    AsyncShaderCompilesFailed = 4,
+
+    // OUT_OF_ORDER_RECORDING_SK_GRAPHITE_INSERT_STATUS = 5
+    /// <summary>The recording was inserted out of the order required when ordered recordings are enforced.</summary>
+    OutOfOrderRecording = 5,
+}
+
+// sk_image_rescale_mode_t
+/// <summary>Specifies the sampling algorithm used to rescale pixels during an asynchronous read-pixels operation.</summary>
+/// <remarks />
+public enum SKImageRescaleMode
+{
+    // NEAREST_SK_IMAGE_RESCALE_MODE = 0
+    /// <summary>Uses nearest-neighbor sampling.</summary>
+    Nearest = 0,
+
+    // LINEAR_SK_IMAGE_RESCALE_MODE = 1
+    /// <summary>Uses a single bilinear sampling step.</summary>
+    Linear = 1,
+
+    // REPEATED_LINEAR_SK_IMAGE_RESCALE_MODE = 2
+    /// <summary>Uses repeated bilinear sampling steps, halving the size each pass, for higher-quality downscaling.</summary>
+    RepeatedLinear = 2,
+
+    // REPEATED_CUBIC_SK_IMAGE_RESCALE_MODE = 3
+    /// <summary>Uses repeated bicubic sampling steps, halving the size each pass, for the highest-quality downscaling.</summary>
+    RepeatedCubic = 3,
+}
+
+// sk_image_rescale_gamma_t
+/// <summary>Specifies the gamma space in which rescaling is performed during an asynchronous read-pixels operation.</summary>
+/// <remarks />
+public enum SKImageRescaleGamma
+{
+    // SRC_SK_IMAGE_RESCALE_GAMMA = 0
+    /// <summary>Rescaling is performed in the color space of the source pixels.</summary>
+    Src = 0,
+
+    // LINEAR_SK_IMAGE_RESCALE_GAMMA = 1
+    /// <summary>Rescaling is performed in a linear gamma space.</summary>
+    Linear = 1,
+}
+
 // gr_backend_t
 internal enum GRBackendNative
 {

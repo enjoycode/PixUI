@@ -5,10 +5,15 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <DefineConstants>$(DefineConstants);USE_LIBRARY_IMPORT</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\PixUI.Drawing\PixUI.Drawing.csproj" />
+        <ProjectReference Include="..\PixUI.Drawing\PixUI.Drawing.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Gpu\Graphite\"/>
     </ItemGroup>
 
 </Project>

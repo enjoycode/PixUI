@@ -2,7 +2,13 @@ export let PixUI = {
     _htmlCanvas: null,
     _htmlInput: null,
     _asmName: "PixUI",
+    M: null,
     _baseHref: (document.getElementsByTagName('base')[0] || {href: document.location.origin + '/'}).href,
+
+    Init: function () {
+        this.CreateCanvas()
+        this.CreateInput()
+    },
 
     CreateCanvas: function () {
         this._htmlCanvas = document.createElement("canvas")
@@ -48,37 +54,6 @@ export let PixUI = {
         //set logical size
         this._htmlCanvas.style.width = width + "px";
         this._htmlCanvas.style.height = height + "px";
-    },
-
-    GetGLContext: function () {
-        let contextAttributes = {
-            'alpha': 1,
-            'depth': 1,
-            'stencil': 8,
-            'antialias': 0,
-            'premultipliedAlpha': 1,
-            'preserveDrawingBuffer': 0,
-            'preferLowPowerToHighPerformance': 0,
-            'failIfMajorPerformanceCaveat': 0,
-            'enableExtensionsByDefault': 1,
-            'explicitSwapControl': 0,
-            'renderViaOffscreenBackBuffer': 0,
-        }
-        contextAttributes['majorVersion'] = (typeof WebGL2RenderingContext !== 'undefined') ? 2 : 1
-        let gl = globalThis.Blazor.runtime.Module.GL;
-        let handle = gl.createContext(this._htmlCanvas, contextAttributes)
-        if (handle) {
-            gl.makeContextCurrent(handle)
-            gl.currentContext.GLctx.getExtension('WEBGL_debug_renderer_info')
-            //https://github.com/dotnet/runtime/issues/76077
-            globalThis.GL = gl
-            globalThis.GLctx = gl.currentContext.GLctx
-        } else {
-            //TODO: fallback to software surface
-            alert("Can't use gpu")
-        }
-
-        return handle;
     },
 
     BindEvents: function () {
@@ -258,25 +233,83 @@ export let PixUI = {
         setTimeout(() => URL.revokeObjectURL(link.href), 10000)
     },
 
-    Init: function () {
-        this.CreateCanvas()
-        this.CreateInput()
-    },
-
     BeforeRunApp: function () {
         this._asmName = Blazor.runtime.getConfig().mainAssemblyName
+        this.M = Blazor.runtime.Module.WebGPU
 
-        let glHandle = this.GetGLContext()
         let routePath = document.location.hash.length > 0 ? document.location.hash.substring(1) : null
         let isMacOS = navigator.userAgent.includes("Mac")
         return {
-            GLHandle: glHandle,
             Width: window.innerWidth,
             Height: window.innerHeight,
             PixelRatio: window.devicePixelRatio,
             RoutePath: routePath,
             IsMacOS: isMacOS
         }
+    },
+
+    WebGPU: {
+        requestAdapter: () => navigator.gpu && navigator.gpu.requestAdapter({powerPreference: 'low-power'}),
+        createInstance: () => (typeof this.M._wgpuCreateInstance === 'function') ? this.M._wgpuCreateInstance(0) : 0,
+        // Port-agnostic handle registration. emdawnwebgpu ships
+        // importJs* on Module.WebGPU; the legacy -sUSE_WEBGPU=1
+        // port shipped mgr* HandleAllocator tables with .create.
+        // emdawnwebgpu tags each imported object's events with the
+        // parent EventSource's InstanceID; leaving parent=0 makes
+        // WaitAny assert(event->mInstanceId == instance) fire on
+        // the first async wait. Pass the current instance handle
+        // so device/queue events resolve against it.
+        registerDevice: (d, parent) => this.M.WebGPU.importJsDevice
+            ? this.M.WebGPU.importJsDevice(d, parent)
+            : this.M.WebGPU.mgrDevice.create(d),
+        registerQueue: (q, parent) => this.M.WebGPU.importJsQueue
+            ? this.M.WebGPU.importJsQueue(q, parent)
+            : this.M.WebGPU.mgrQueue.create(q),
+        registerTexture: (t) => this.M.WebGPU.importJsTexture
+            ? this.M.WebGPU.importJsTexture(t)
+            : this.M.WebGPU.mgrTexture.create(t),
+        // Under emdawnwebgpu, released handles hold real
+        // refcounted C-side WGPUTexture objects — call the C ABI
+        // via the exported symbol. Under the legacy port they
+        // were HandleAllocator table entries with a JS-side
+        // .release. Try the C ABI first (it's the mandatory
+        // path under emdawnwebgpu), fall back to the JS table.
+        releaseTexture: (id) => {
+            if (typeof this.M._wgpuTextureRelease === 'function') {
+                this.M._wgpuTextureRelease(id);
+            } else if (this.M.WebGPU.mgrTexture) {
+                this.M.WebGPU.mgrTexture.release(id);
+            }
+        },
+        requestDevice: (adapter) => adapter.requestDevice(),
+        deviceQueue: (d) => d.queue,
+        createTexture: (d, w, h) => d.createTexture({
+            size: {width: w, height: h, depthOrArrayLayers: 1},
+            format: 'rgba8unorm',
+            usage: 0x10 | 0x01,
+        }),
+        createBuffer: (d, sz) => d.createBuffer({size: sz, usage: 0x09}),
+        createCommandEncoder: (d) => d.createCommandEncoder(),
+        copyTextureToBuffer: (e, tex, buf, bpr, w, h) => e.copyTextureToBuffer(
+            {texture: tex},
+            {buffer: buf, bytesPerRow: bpr, rowsPerImage: h},
+            {width: w, height: h, depthOrArrayLayers: 1}),
+        submitEncoder: (d, e) => d.queue.submit([e.finish()]),
+        mapBufferRead: (b) => b.mapAsync(0x01),
+        getMappedBase64: (b, bpr, w, h) => {
+            const mapped = new Uint8Array(b.getMappedRange());
+            const widthBytes = w * 4;
+            const packed = new Uint8Array(widthBytes * h);
+            for (let r = 0; r < h; r++)
+                packed.set(mapped.subarray(r * bpr, r * bpr + widthBytes), r * widthBytes);
+            b.unmap();
+            b.destroy();
+            let s = '';
+            const CHUNK = 0x8000;
+            for (let i = 0; i < packed.length; i += CHUNK)
+                s += String.fromCharCode.apply(null, packed.subarray(i, i + CHUNK));
+            return btoa(s);
+        },
     }
 
 }
