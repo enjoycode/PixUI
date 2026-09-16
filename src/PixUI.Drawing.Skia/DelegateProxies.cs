@@ -30,7 +30,7 @@ internal static unsafe partial class DelegateProxies
     }
 
     private static partial IntPtr SKGraphiteImageProviderProxyImplementation(void* userData, IntPtr recorder,
-        IntPtr image, bool mipmapped)
+        IntPtr image, byte mipmapped)
     {
         // userData is a GCHandle pinned by SKGraphiteContext.CreateRecorder; the
         // recorder keeps it alive for its own lifetime and frees it in DisposeNative.

@@ -1,6 +1,5 @@
 #nullable disable
 
-using System;
 using System.Runtime.InteropServices;
 
 namespace PixUI.Drawing.Skia;
@@ -256,7 +255,7 @@ public unsafe class SKGraphiteContext : SKObject
 
 		if (findOrCreate != null) {
 			SKGraphiteFindOrCreateImageProxy proxy = (rh, ih, mipmapped) =>
-				InvokeFindOrCreate (findOrCreate, rh, ih, mipmapped);
+				InvokeFindOrCreate (findOrCreate, rh, ih, mipmapped == 1);
 			DelegateProxies.Create (proxy, out pinnedCallback, out var ctx);
 #if USE_LIBRARY_IMPORT
 				providerHandle = SkiaApi.sk_graphite_image_provider_new (
