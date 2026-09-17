@@ -110,7 +110,7 @@ public abstract class SKObject : SKNativeObject
             refcnt.SafeUnRef();
     }
 
-    internal static TSkiaObject? GetOrAddObject<TSkiaObject>(IntPtr handle,
+    internal static TSkiaObject GetOrAddObject<TSkiaObject>(IntPtr handle,
         Func<IntPtr, bool, TSkiaObject> objectFactory)
         where TSkiaObject : SKObject
     {
@@ -120,7 +120,7 @@ public abstract class SKObject : SKNativeObject
         return HandleDictionary.GetOrAddObject(handle, true, true, objectFactory);
     }
 
-    internal static TSkiaObject? GetOrAddObject<TSkiaObject>(IntPtr handle, bool owns,
+    internal static TSkiaObject GetOrAddObject<TSkiaObject>(IntPtr handle, bool owns,
         Func<IntPtr, bool, TSkiaObject> objectFactory)
         where TSkiaObject : SKObject
     {
@@ -130,7 +130,7 @@ public abstract class SKObject : SKNativeObject
         return HandleDictionary.GetOrAddObject(handle, owns, true, objectFactory);
     }
 
-    internal static TSkiaObject? GetOrAddObject<TSkiaObject>(IntPtr handle, bool owns,
+    internal static TSkiaObject GetOrAddObject<TSkiaObject>(IntPtr handle, bool owns,
         bool unrefExisting, Func<IntPtr, bool, TSkiaObject> objectFactory)
         where TSkiaObject : SKObject
     {
@@ -138,6 +138,22 @@ public abstract class SKObject : SKNativeObject
             return null;
 
         return HandleDictionary.GetOrAddObject(handle, owns, unrefExisting, objectFactory);
+    }
+    
+    // Variant that promotes the returned wrapper to dispose-protected
+    // (IgnorePublicDispose = true) inside HandleDictionary's critical section.
+    // Used by the singleton accessors (CreateSrgb, Default, etc.). "Dispose-protected"
+    // means the public Dispose() is short-circuited — the wrapper is NOT immortal
+    // from GC's perspective; finalization and DisposeInternal still tear it down.
+    // The actual long-lived persistence comes from each accessor's static-field
+    // cache acting as a GC root.
+    internal static TSkiaObject GetOrAddDisposeProtectedObject<TSkiaObject> (IntPtr handle, bool owns, bool unrefExisting, Func<IntPtr, bool, TSkiaObject> objectFactory)
+        where TSkiaObject : SKObject
+    {
+        if (handle == IntPtr.Zero)
+            return null;
+
+        return HandleDictionary.GetOrAddObject (handle, owns, unrefExisting, disposeProtected: true, objectFactory);
     }
 
     internal static void RegisterHandle(IntPtr handle, SKObject? instance)

@@ -36,7 +36,7 @@ public sealed class SKFontCollection : IFontCollection
         SKTypeface? typeface;
         if (OperatingSystem.IsBrowser())
         {
-            typeface = SKTypeface.GetObject(SkiaApi.sk_typeface_make_from_data(data.Handle));
+            typeface = SKTypeface.FromData(data);
         }
         else
         {
@@ -64,20 +64,23 @@ public sealed class SKFontCollection : IFontCollection
         {
             var typefaceHandler = SkiaApi.sk_font_collection_find_typeface(_fontCollectionHandle,
                 new IntPtr(namePtr), familyName.Length * 2, bold, italic);
-            return SKTypeface.GetObject(typefaceHandler); //Typeface.PreventPublicDisposal()
+            return typefaceHandler == IntPtr.Zero
+                ? null
+                : new SKTypeface(typefaceHandler, false); //Typeface.PreventPublicDisposal()
         }
     }
 
-    public unsafe ITypeface? DefaultFallback(int unicode, string? familyName, bool bold, bool italic)
+    public ITypeface? DefaultFallback(int unicode, string? familyName, bool bold, bool italic)
     {
         var defaultFontMgr = SkiaApi.sk_font_collection_get_fallback_manager(Handle);
+        var fontManager = new SKFontManager(defaultFontMgr, false);
         var fontStyle = SKFontStyle.Make(bold, italic);
-        var typeface = SkiaApi.sk_fontmgr_match_family_style_character(defaultFontMgr,
-            familyName, &fontStyle, null, 0, unicode);
-        if (typeface == IntPtr.Zero && familyName != null)
-            typeface = SkiaApi.sk_fontmgr_match_family_style_character(Handle, null, &fontStyle, null, 0, unicode);
-        if (typeface == IntPtr.Zero) return null; //TODO:考虑返回默认的
-        return new SKTypeface(typeface, false);
+        var typeface = fontManager.MatchCharacter(familyName, fontStyle.Weight, fontStyle.Width,
+            fontStyle.Slant, null, unicode);
+        if (typeface == null && !string.IsNullOrEmpty(familyName))
+            typeface = fontManager.MatchCharacter(null, fontStyle.Weight, fontStyle.Width,
+                fontStyle.Slant, null, unicode);
+        return typeface;
     }
 
     /// <summary>

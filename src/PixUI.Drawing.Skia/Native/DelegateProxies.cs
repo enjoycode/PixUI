@@ -10,8 +10,21 @@ namespace PixUI.Drawing.Skia;
 /// <remarks />
 public delegate IntPtr SKGraphiteVkGetProcedureAddressDelegate(string name, IntPtr instance, IntPtr device);
 
+/// <summary>Represents a callback method that receives the path and transformation matrix for each glyph when enumerating glyph paths.</summary>
+/// <param name="path">The path of the glyph, or <see langword="null" /> if the glyph has no path.</param>
+/// <param name="matrix">The transformation matrix to position the glyph.</param>
+/// <remarks />
+public delegate void SKGlyphPathDelegate(SKPath path, SKMatrix matrix);
+
 internal static unsafe partial class DelegateProxies
 {
+    private static partial void SKGlyphPathProxyImplementation(IntPtr pathOrNull, SKMatrix* matrix, void* context)
+    {
+        var del = Get<SKGlyphPathDelegate>((IntPtr)context, out _);
+        var path = SKPath.GetObject(pathOrNull, false);
+        del.Invoke(path, *matrix);
+    }
+
     private static partial void SKImageAsyncReadPixelsProxyImplementation(void* context, IntPtr result)
     {
         // The captured Action<IntPtr> is the closure built by SKImage/SKSurface.RequestReadPixels.

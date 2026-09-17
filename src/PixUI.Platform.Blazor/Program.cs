@@ -36,7 +36,8 @@ public static class Program
         using var ms = new MemoryStream();
         await fontDataStream.CopyToAsync(ms);
         ms.Position = 0;
-        FontCollection.RegisterTypeface(ms, FontCollection.DefaultFamilyName, false);
+        var typeface = SKTypeface.FromStream(ms);
+        //FontCollection.RegisterTypeface(ms, FontCollection.DefaultFamilyName, false);
 
         var adapter = await WebGPU.RequestAdapter();
         Console.WriteLine(adapter);

@@ -73,8 +73,6 @@ public struct FontMetrics : IEquatable<FontMetrics>
 
 public interface IFont : IDisposable
 {
-    string Name { get; }
-
     ITypeface? Typeface { get; set; }
 
     /// <summary>

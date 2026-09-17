@@ -2,6 +2,8 @@ namespace PixUI.Drawing.Skia;
 
 public readonly struct SKFontStyle //TODO:合并至FontStyle
 {
+    public static readonly SKFontStyle Normal = new SKFontStyle();
+
     public static SKFontStyle Make(bool bold, bool italic)
     {
         if (bold && italic)
@@ -12,7 +14,7 @@ public readonly struct SKFontStyle //TODO:合并至FontStyle
             return new SKFontStyle(SKFontStyleWeight.Normal, SKFontStyleWidth.Normal, FontSlant.Italic);
         return new SKFontStyle();
     }
-        
+
     private readonly int _fValue;
 
     public SKFontStyle()
@@ -21,7 +23,7 @@ public readonly struct SKFontStyle //TODO:合并至FontStyle
     public SKFontStyle(SKFontStyleWeight weight, SKFontStyleWidth width, FontSlant slant)
         : this((int)weight, (int)width, (int)slant) { }
 
-    private SKFontStyle(int weight, int width, int slant)
+    internal SKFontStyle(int weight, int width, int slant)
     {
         _fValue = weight + (width << 16) + (slant << 24);
     }

@@ -1,93 +1,276 @@
+using System.Diagnostics;
+
 namespace PixUI.Drawing.Skia;
 
-public sealed unsafe class SKFont : SKObject, IFont
+/// <summary>Represents a font used for drawing and measuring text.</summary>
+/// <remarks />
+public unsafe class SKFont : SKObject, IFont
 {
-    private SKFont(IntPtr handle, bool owns) : base(handle, owns) { }
+    internal const float DefaultSize = 12f;
+    internal const float DefaultScaleX = 1f;
+    internal const float DefaultSkewX = 0f;
 
-    public SKFont(SKTypeface typeface, float sizeInPoints, float scaleX = 1, float skewX = 0)
-        : this(SkiaApi.sk_font_new_with_values(typeface.Handle, sizeInPoints, scaleX, skewX), true)
+    internal SKFont(IntPtr handle, bool owns)
+        : base(handle, owns) { }
+
+    /// <summary>Creates a new <see cref="T:SKFont" /> with the default typeface and size.</summary>
+    /// <remarks />
+    public SKFont()
+        : this(SKTypeface.Default, DefaultSize, DefaultScaleX, DefaultSkewX) { }
+
+    /// <summary>Creates a new <see cref="T:SKFont" /> with the specified typeface and settings.</summary>
+    /// <param name="typeface">The <see cref="T:SKTypeface" /> to use, or <see langword="null" /> for the default typeface.</param>
+    /// <param name="size">The font size in points. The default is 12.</param>
+    /// <param name="scaleX">The horizontal scale factor. The default is 1.</param>
+    /// <param name="skewX">The horizontal skew factor for oblique/italic effect. The default is 0.</param>
+    /// <remarks />
+    public SKFont(SKTypeface typeface, float size = DefaultSize, float scaleX = DefaultScaleX,
+        float skewX = DefaultSkewX)
+        : this(SkiaApi.sk_font_new_with_values(typeface?.Handle ?? IntPtr.Zero, size, scaleX, skewX), true)
     {
+        GC.KeepAlive(typeface);
         if (Handle == IntPtr.Zero)
-            throw new InvalidOperationException("Unable to create a new Font instance.");
+            throw new InvalidOperationException("Unable to create a new SKFont instance.");
     }
 
-    protected override void DisposeNative() => SkiaApi.sk_font_delete(Handle);
+    /// <summary>Releases the native resources associated with this font.</summary>
+    /// <remarks />
+    protected override void DisposeNative()
+    {
+        SkiaApi.sk_font_delete(Handle);
+        GC.KeepAlive(this);
+    }
 
-    public string Name => ((SKTypeface)Typeface!).FamilyName;
-
+    /// <summary>Gets or sets a value indicating whether to force auto-hinting instead of using the font's native hints.</summary>
+    /// <value><see langword="true" /> to force auto-hinting; otherwise, <see langword="false" />.</value>
+    /// <remarks />
     public bool ForceAutoHinting
     {
-        get => SkiaApi.sk_font_is_force_auto_hinting(Handle);
-        set => SkiaApi.sk_font_set_force_auto_hinting(Handle, value);
+        get
+        {
+            var r = SkiaApi.sk_font_is_force_auto_hinting(Handle);
+            GC.KeepAlive(this);
+            return r;
+        }
+        set
+        {
+            SkiaApi.sk_font_set_force_auto_hinting(Handle, value);
+            GC.KeepAlive(this);
+        }
     }
 
+    /// <summary>Gets or sets a value indicating whether to use embedded bitmap strikes in the font.</summary>
+    /// <value><see langword="true" /> to use embedded bitmaps; otherwise, <see langword="false" />.</value>
+    /// <remarks />
     public bool EmbeddedBitmaps
     {
-        get => SkiaApi.sk_font_is_embedded_bitmaps(Handle);
-        set => SkiaApi.sk_font_set_embedded_bitmaps(Handle, value);
+        get
+        {
+            var r = SkiaApi.sk_font_is_embedded_bitmaps(Handle);
+            GC.KeepAlive(this);
+            return r;
+        }
+        set
+        {
+            SkiaApi.sk_font_set_embedded_bitmaps(Handle, value);
+            GC.KeepAlive(this);
+        }
     }
 
+    /// <summary>Gets or sets a value indicating whether subpixel glyph positioning is enabled.</summary>
+    /// <value><see langword="true" /> if subpixel positioning is enabled; otherwise, <see langword="false" />.</value>
+    /// <remarks />
     public bool Subpixel
     {
-        get => SkiaApi.sk_font_is_subpixel(Handle);
-        set => SkiaApi.sk_font_set_subpixel(Handle, value);
+        get
+        {
+            var r = SkiaApi.sk_font_is_subpixel(Handle);
+            GC.KeepAlive(this);
+            return r;
+        }
+        set
+        {
+            SkiaApi.sk_font_set_subpixel(Handle, value);
+            GC.KeepAlive(this);
+        }
     }
 
+    /// <summary>Gets or sets a value indicating whether metrics should ignore hinting for improved precision.</summary>
+    /// <value><see langword="true" /> to use linear metrics; otherwise, <see langword="false" />.</value>
+    /// <remarks />
     public bool LinearMetrics
     {
-        get => SkiaApi.sk_font_is_linear_metrics(Handle);
-        set => SkiaApi.sk_font_set_linear_metrics(Handle, value);
+        get
+        {
+            var r = SkiaApi.sk_font_is_linear_metrics(Handle);
+            GC.KeepAlive(this);
+            return r;
+        }
+        set
+        {
+            SkiaApi.sk_font_set_linear_metrics(Handle, value);
+            GC.KeepAlive(this);
+        }
     }
 
+    /// <summary>Gets or sets a value indicating whether to algorithmically embolden (thicken) the glyphs.</summary>
+    /// <value><see langword="true" /> to embolden glyphs; otherwise, <see langword="false" />.</value>
+    /// <remarks />
     public bool Embolden
     {
-        get => SkiaApi.sk_font_is_embolden(Handle);
-        set => SkiaApi.sk_font_set_embolden(Handle, value);
+        get
+        {
+            var r = SkiaApi.sk_font_is_embolden(Handle);
+            GC.KeepAlive(this);
+            return r;
+        }
+        set
+        {
+            SkiaApi.sk_font_set_embolden(Handle, value);
+            GC.KeepAlive(this);
+        }
     }
 
+    /// <summary>Gets or sets a value indicating whether glyphs snap to pixel boundaries on the baseline.</summary>
+    /// <value><see langword="true" /> if glyphs snap to pixels; otherwise, <see langword="false" />.</value>
+    /// <remarks />
     public bool BaselineSnap
     {
-        get => SkiaApi.sk_font_is_baseline_snap(Handle);
-        set => SkiaApi.sk_font_set_baseline_snap(Handle, value);
+        get
+        {
+            var r = SkiaApi.sk_font_is_baseline_snap(Handle);
+            GC.KeepAlive(this);
+            return r;
+        }
+        set
+        {
+            SkiaApi.sk_font_set_baseline_snap(Handle, value);
+            GC.KeepAlive(this);
+        }
     }
 
+    /// <summary>Gets or sets the font edging mode, which controls anti-aliasing.</summary>
+    /// <value>The <see cref="T:SKFontEdging" /> mode.</value>
+    /// <remarks />
     public SKFontEdging Edging
     {
-        get => SkiaApi.sk_font_get_edging(Handle);
-        set => SkiaApi.sk_font_set_edging(Handle, value);
+        get
+        {
+            var r = SkiaApi.sk_font_get_edging(Handle);
+            GC.KeepAlive(this);
+            return r;
+        }
+        set
+        {
+            SkiaApi.sk_font_set_edging(Handle, value);
+            GC.KeepAlive(this);
+        }
     }
 
+    /// <summary>Gets or sets the font hinting level.</summary>
+    /// <value>The <see cref="T:SKFontHinting" /> level.</value>
+    /// <remarks />
     public SKFontHinting Hinting
     {
-        get => SkiaApi.sk_font_get_hinting(Handle);
-        set => SkiaApi.sk_font_set_hinting(Handle, value);
+        get
+        {
+            var r = SkiaApi.sk_font_get_hinting(Handle);
+            GC.KeepAlive(this);
+            return r;
+        }
+        set
+        {
+            SkiaApi.sk_font_set_hinting(Handle, value);
+            GC.KeepAlive(this);
+        }
     }
 
-    public ITypeface? Typeface
+    /// <summary>Gets or sets the typeface used by this font.</summary>
+    /// <value>The <see cref="T:SKTypeface" />, or <see langword="null" /> for the default typeface.</value>
+    /// <remarks />
+    public ITypeface Typeface
     {
-        get => SKTypeface.GetObject(SkiaApi.sk_font_get_typeface(Handle));
-        set => SkiaApi.sk_font_set_typeface(Handle, (value as SKTypeface)?.Handle ?? IntPtr.Zero);
+        get
+        {
+            var r = SKTypeface.GetObject(SkiaApi.sk_font_get_typeface(Handle));
+            GC.KeepAlive(this);
+            return r;
+        }
+        set
+        {
+            SkiaApi.sk_font_set_typeface(Handle, value == null ? IntPtr.Zero : ((SKTypeface)value).Handle);
+            GC.KeepAlive(value);
+            GC.KeepAlive(this);
+        }
     }
 
-    /// <summary>
-    /// Size in points
-    /// </summary>
+    /// <summary>Gets or sets the font size in points.</summary>
+    /// <value>The font size in points. The default is 12.</value>
+    /// <remarks />
     public float Size
     {
-        get => SkiaApi.sk_font_get_size(Handle);
-        set => SkiaApi.sk_font_set_size(Handle, value);
+        get
+        {
+            var r = SkiaApi.sk_font_get_size(Handle);
+            GC.KeepAlive(this);
+            return r;
+        }
+        set
+        {
+            SkiaApi.sk_font_set_size(Handle, value);
+            GC.KeepAlive(this);
+        }
     }
 
+    /// <summary>Gets or sets the horizontal scale factor applied to the font.</summary>
+    /// <value>The horizontal scale factor. The default is 1.</value>
+    /// <remarks />
     public float ScaleX
     {
-        get => SkiaApi.sk_font_get_scale_x(Handle);
-        set => SkiaApi.sk_font_set_scale_x(Handle, value);
+        get
+        {
+            var r = SkiaApi.sk_font_get_scale_x(Handle);
+            GC.KeepAlive(this);
+            return r;
+        }
+        set
+        {
+            SkiaApi.sk_font_set_scale_x(Handle, value);
+            GC.KeepAlive(this);
+        }
     }
 
+    /// <summary>Gets or sets the horizontal skew factor for an oblique or italic effect.</summary>
+    /// <value>The horizontal skew factor. The default is 0.</value>
+    /// <remarks />
     public float SkewX
     {
-        get => SkiaApi.sk_font_get_skew_x(Handle);
-        set => SkiaApi.sk_font_set_skew_x(Handle, value);
+        get
+        {
+            var r = SkiaApi.sk_font_get_skew_x(Handle);
+            GC.KeepAlive(this);
+            return r;
+        }
+        set
+        {
+            SkiaApi.sk_font_set_skew_x(Handle, value);
+            GC.KeepAlive(this);
+        }
+    }
+
+    // FontSpacing
+
+    /// <summary>Gets the recommended line spacing for this font.</summary>
+    /// <value>The line spacing.</value>
+    /// <remarks />
+    public float Spacing
+    {
+        get
+        {
+            var r = SkiaApi.sk_font_get_metrics(Handle, null);
+            GC.KeepAlive(this);
+            return r;
+        }
     }
 
     /// <summary>
@@ -98,16 +281,48 @@ public sealed unsafe class SKFont : SKObject, IFont
     /// </remarks>
     public int Height => (int)Math.Ceiling(Spacing / 0.75); //暂按96dpi算
 
-    public float Spacing => SkiaApi.sk_font_get_metrics(Handle, null);
+    // FontMetrics
 
-    public FontMetrics GetMetrics()
+    /// <summary>Gets the font metrics for this font.</summary>
+    /// <value>The <see cref="T:SkiaSharp.SKFontMetrics" /> for this font.</value>
+    /// <remarks />
+    public SKFontMetrics Metrics
     {
-        var res = new FontMetrics();
-        SkiaApi.sk_font_get_metrics(Handle, &res);
-        return res;
+        get
+        {
+            GetFontMetrics(out var metrics);
+            return metrics;
+        }
     }
 
-    public ushort GetGlyph(int codepoint) => SkiaApi.sk_font_unichar_to_glyph(Handle, codepoint);
+    public FontMetrics GetMetrics() => Metrics;
+
+    /// <summary>Gets the font metrics for this font.</summary>
+    /// <param name="metrics">When this method returns, contains the <see cref="T:SkiaSharp.SKFontMetrics" /> for this font.</param>
+    /// <returns>The recommended line spacing.</returns>
+    /// <remarks />
+    public float GetFontMetrics(out SKFontMetrics metrics)
+    {
+        fixed (SKFontMetrics* m = &metrics)
+        {
+            var r = SkiaApi.sk_font_get_metrics(Handle, m);
+            GC.KeepAlive(this);
+            return r;
+        }
+    }
+
+    // GetGlyph
+
+    /// <summary>Gets the glyph ID for a Unicode codepoint.</summary>
+    /// <param name="codepoint">The Unicode codepoint.</param>
+    /// <returns>The glyph ID, or 0 if the codepoint is not in the font.</returns>
+    /// <remarks />
+    public ushort GetGlyph(int codepoint)
+    {
+        var r = SkiaApi.sk_font_unichar_to_glyph(Handle, codepoint);
+        GC.KeepAlive(this);
+        return r;
+    }
 
     public float GetGlyphWidth(ushort glyphId)
     {
@@ -116,42 +331,132 @@ public sealed unsafe class SKFont : SKObject, IFont
         return width;
     }
 
-    public Size MeasureString(string text)
+    // GetGlyphs
+
+    /// <summary>Converts text to glyph IDs.</summary>
+    /// <param name="codepoints">The Unicode codepoints to convert.</param>
+    /// <returns>An array of glyph IDs.</returns>
+    /// <remarks />
+    public ushort[] GetGlyphs(ReadOnlySpan<int> codepoints)
     {
-        fixed (char* ptr = text)
+        var glyphs = new ushort[codepoints.Length];
+        GetGlyphs(codepoints, glyphs);
+        return glyphs;
+    }
+
+    /// <summary>Converts text to glyph IDs.</summary>
+    /// <param name="codepoints">The Unicode codepoints to convert.</param>
+    /// <param name="glyphs">The span to receive the glyph IDs.</param>
+    /// <remarks />
+    public void GetGlyphs(ReadOnlySpan<int> codepoints, Span<ushort> glyphs)
+    {
+        if (codepoints.IsEmpty)
+            return;
+
+        if (glyphs.Length != codepoints.Length)
+            throw new ArgumentException("The length of glyphs must be the same as the length of codepoints.",
+                nameof(glyphs));
+
+        fixed (int* up = codepoints)
+        fixed (ushort* gp = glyphs)
         {
-            Rect bounds;
-            var width = SkiaApi.sk_font_measure_text(Handle, ptr,
-                new IntPtr(text.Length * 2), SKTextEncoding.Utf16,
-                &bounds, IntPtr.Zero);
-            return new Size(width /*bounds.Width*/, bounds.Height);
+            SkiaApi.sk_font_unichars_to_glyphs(Handle, up, codepoints.Length, gp);
+            GC.KeepAlive(this);
         }
     }
 
-    public int CountGlyphs(ReadOnlySpan<byte> text, SKTextEncoding encoding)
+    // GetGlyphs
+
+    /// <summary>Converts text to glyph IDs.</summary>
+    /// <param name="text">The text to convert.</param>
+    /// <returns>An array of glyph IDs.</returns>
+    /// <remarks />
+    public ushort[] GetGlyphs(string text) =>
+        GetGlyphs(text.AsSpan());
+
+    /// <summary>Converts text to glyph IDs.</summary>
+    /// <param name="text">The text to convert.</param>
+    /// <returns>An array of glyph IDs.</returns>
+    /// <remarks />
+    public ushort[] GetGlyphs(ReadOnlySpan<char> text)
     {
         fixed (void* t = text)
         {
-            return CountGlyphs(t, text.Length, encoding);
+            return GetGlyphs(t, text.Length * 2, SKTextEncoding.Utf16);
         }
     }
 
-    internal int CountGlyphs(void* text, int length, SKTextEncoding encoding)
+    /// <summary>Converts text to glyph IDs.</summary>
+    /// <param name="text">The text to convert.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <returns>An array of glyph IDs.</returns>
+    /// <remarks />
+    public ushort[] GetGlyphs(ReadOnlySpan<byte> text, SKTextEncoding encoding)
     {
-        if (!ValidateTextArgs(text, length, encoding))
-            return 0;
-
-        return SkiaApi.sk_font_text_to_glyphs(Handle, text, (IntPtr)length, encoding, null, 0);
+        fixed (void* t = text)
+        {
+            return GetGlyphs(t, text.Length, encoding);
+        }
     }
+
+    /// <summary>Converts text to glyph IDs.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <returns>An array of glyph IDs.</returns>
+    /// <remarks />
+    public ushort[] GetGlyphs(IntPtr text, int length, SKTextEncoding encoding) =>
+        GetGlyphs((void*)text, length, encoding);
+
+    /// <summary>Converts text to glyph IDs.</summary>
+    /// <param name="text">The text to convert.</param>
+    /// <param name="glyphs">The span to receive the glyph IDs.</param>
+    /// <remarks />
+    public void GetGlyphs(string text, Span<ushort> glyphs) =>
+        GetGlyphs(text.AsSpan(), glyphs);
+
+    /// <summary>Converts text to glyph IDs.</summary>
+    /// <param name="text">The text to convert.</param>
+    /// <param name="glyphs">The span to receive the glyph IDs.</param>
+    /// <remarks />
+    public void GetGlyphs(ReadOnlySpan<char> text, Span<ushort> glyphs)
+    {
+        fixed (void* t = text)
+        {
+            GetGlyphs(t, text.Length * 2, SKTextEncoding.Utf16, glyphs);
+        }
+    }
+
+    /// <summary>Converts text to glyph IDs.</summary>
+    /// <param name="text">The text to convert.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="glyphs">The span to receive the glyph IDs.</param>
+    /// <remarks />
+    public void GetGlyphs(ReadOnlySpan<byte> text, SKTextEncoding encoding, Span<ushort> glyphs)
+    {
+        fixed (void* t = text)
+        {
+            GetGlyphs(t, text.Length, encoding, glyphs);
+        }
+    }
+
+    /// <summary>Converts text to glyph IDs.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="glyphs">The span to receive the glyph IDs.</param>
+    /// <remarks />
+    public void GetGlyphs(IntPtr text, int length, SKTextEncoding encoding, Span<ushort> glyphs) =>
+        GetGlyphs((void*)text, length, encoding, glyphs);
 
     internal ushort[] GetGlyphs(void* text, int length, SKTextEncoding encoding)
     {
         if (!ValidateTextArgs(text, length, encoding))
-            return [];
+            return new ushort[0];
 
         var n = CountGlyphs(text, length, encoding);
         if (n <= 0)
-            return [];
+            return new ushort[0];
 
         var glyphs = new ushort[n];
         GetGlyphs(text, length, encoding, glyphs);
@@ -166,24 +471,451 @@ public sealed unsafe class SKFont : SKObject, IFont
         fixed (ushort* gp = glyphs)
         {
             SkiaApi.sk_font_text_to_glyphs(Handle, text, (IntPtr)length, encoding, gp, glyphs.Length);
+            GC.KeepAlive(this);
         }
     }
 
-    public ushort[] GetGlyphs(string text)
+    // ContainsGlyph
+
+    /// <summary>Determines whether the font contains a glyph for the specified codepoint.</summary>
+    /// <param name="codepoint">The Unicode codepoint to check.</param>
+    /// <returns><see langword="true" /> if the font contains a glyph for the codepoint; otherwise, <see langword="false" />.</returns>
+    /// <remarks />
+    public bool ContainsGlyph(int codepoint) =>
+        GetGlyph(codepoint) != 0;
+
+    // ContainsGlyphs
+
+    /// <summary>Determines whether the font contains glyphs for all specified codepoints.</summary>
+    /// <param name="codepoints">The Unicode codepoints to check.</param>
+    /// <returns><see langword="true" /> if the font contains glyphs for all codepoints; otherwise, <see langword="false" />.</returns>
+    /// <remarks />
+    public bool ContainsGlyphs(ReadOnlySpan<int> codepoints) =>
+        ContainsGlyphs(GetGlyphs(codepoints));
+
+    /// <summary>Determines whether the font contains glyphs for all characters in the string.</summary>
+    /// <param name="text">The text to check.</param>
+    /// <returns><see langword="true" /> if the font contains glyphs for all characters; otherwise, <see langword="false" />.</returns>
+    /// <remarks />
+    public bool ContainsGlyphs(string text) =>
+        ContainsGlyphs(GetGlyphs(text));
+
+    /// <summary>Determines whether the font contains glyphs for all characters in the text.</summary>
+    /// <param name="text">The text to check.</param>
+    /// <returns><see langword="true" /> if the font contains glyphs for all characters; otherwise, <see langword="false" />.</returns>
+    /// <remarks />
+    public bool ContainsGlyphs(ReadOnlySpan<char> text) =>
+        ContainsGlyphs(GetGlyphs(text));
+
+    /// <summary>Determines whether the font contains glyphs for all characters in the text.</summary>
+    /// <param name="text">The text to check.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <returns><see langword="true" /> if the font contains glyphs for all characters; otherwise, <see langword="false" />.</returns>
+    /// <remarks />
+    public bool ContainsGlyphs(ReadOnlySpan<byte> text, SKTextEncoding encoding) =>
+        ContainsGlyphs(GetGlyphs(text, encoding));
+
+    /// <summary>Determines whether the font contains glyphs for all characters in the text.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <returns><see langword="true" /> if the font contains glyphs for all characters; otherwise, <see langword="false" />.</returns>
+    /// <remarks />
+    public bool ContainsGlyphs(IntPtr text, int length, SKTextEncoding encoding) =>
+        ContainsGlyphs(GetGlyphs(text, length, encoding));
+
+    private bool ContainsGlyphs(ushort[] glyphs) =>
+        Array.IndexOf(glyphs, (ushort)0) == -1;
+
+    // CountGlyphs
+
+    /// <summary>Counts the number of glyphs needed to represent the text.</summary>
+    /// <param name="text">The text to count.</param>
+    /// <returns>The number of glyphs.</returns>
+    /// <remarks />
+    public int CountGlyphs(string text) =>
+        CountGlyphs(text.AsSpan());
+
+    /// <summary>Counts the number of glyphs needed to represent the text.</summary>
+    /// <param name="text">The text to count.</param>
+    /// <returns>The number of glyphs.</returns>
+    /// <remarks />
+    public int CountGlyphs(ReadOnlySpan<char> text)
     {
-        var glyphs = new ushort[text.Length];
-        fixed (ushort* glyphsPtr = glyphs)
-        fixed (char* charPtr = text)
+        fixed (void* t = text)
         {
-            var glyphsCount = SkiaApi.sk_font_text_to_glyphs(Handle, charPtr, new IntPtr(text.Length * 2),
-                SKTextEncoding.Utf16, glyphsPtr, glyphs.Length);
-            if (glyphsCount == glyphs.Length)
-                return glyphs;
-            return glyphs.AsSpan(0, glyphsCount).ToArray();
+            return CountGlyphs(t, text.Length * 2, SKTextEncoding.Utf16);
         }
     }
 
-    public void GetGlyphPositions(ReadOnlySpan<char> text, Span<Point> offsets, Point origin = default)
+    /// <summary>Counts the number of glyphs needed to represent the text.</summary>
+    /// <param name="text">The text to count.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <returns>The number of glyphs.</returns>
+    /// <remarks />
+    public int CountGlyphs(ReadOnlySpan<byte> text, SKTextEncoding encoding)
+    {
+        fixed (void* t = text)
+        {
+            return CountGlyphs(t, text.Length, encoding);
+        }
+    }
+
+    /// <summary>Counts the number of glyphs needed to represent the text.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <returns>The number of glyphs.</returns>
+    /// <remarks />
+    public int CountGlyphs(IntPtr text, int length, SKTextEncoding encoding) =>
+        CountGlyphs((void*)text, length, encoding);
+
+    internal int CountGlyphs(void* text, int length, SKTextEncoding encoding)
+    {
+        if (!ValidateTextArgs(text, length, encoding))
+            return 0;
+
+        var r = SkiaApi.sk_font_text_to_glyphs(Handle, text, (IntPtr)length, encoding, null, 0);
+        GC.KeepAlive(this);
+        return r;
+    }
+
+    // MeasureText (text)
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float MeasureText(string text, SKPaint paint = null) =>
+        MeasureText(text.AsSpan(), paint);
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float MeasureText(ReadOnlySpan<char> text, SKPaint paint = null)
+    {
+        fixed (void* t = text)
+        {
+            return MeasureText(t, text.Length * 2, SKTextEncoding.Utf16, null, paint);
+        }
+    }
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float MeasureText(ReadOnlySpan<byte> text, SKTextEncoding encoding, SKPaint paint = null)
+    {
+        fixed (void* t = text)
+        {
+            return MeasureText(t, text.Length, encoding, null, paint);
+        }
+    }
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float MeasureText(IntPtr text, int length, SKTextEncoding encoding, SKPaint paint = null) =>
+        MeasureText((void*)text, length, encoding, null, paint);
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="bounds">When this method returns, contains the bounding rectangles for each glyph.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float MeasureText(string text, out SKRect bounds, SKPaint paint = null) =>
+        MeasureText(text.AsSpan(), out bounds, paint);
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="bounds">When this method returns, contains the bounding rectangles for each glyph.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float MeasureText(ReadOnlySpan<char> text, out SKRect bounds, SKPaint paint = null)
+    {
+        fixed (void* t = text)
+        fixed (SKRect* b = &bounds)
+        {
+            return MeasureText(t, text.Length * 2, SKTextEncoding.Utf16, b, paint);
+        }
+    }
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="bounds">When this method returns, contains the bounding rectangles for each glyph.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float MeasureText(ReadOnlySpan<byte> text, SKTextEncoding encoding, out SKRect bounds, SKPaint paint = null)
+    {
+        fixed (void* t = text)
+        fixed (SKRect* b = &bounds)
+        {
+            return MeasureText(t, text.Length, encoding, b, paint);
+        }
+    }
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="bounds">When this method returns, contains the bounding rectangles for each glyph.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float MeasureText(IntPtr text, int length, SKTextEncoding encoding, out SKRect bounds, SKPaint paint = null)
+    {
+        fixed (SKRect* b = &bounds)
+        {
+            return MeasureText((void*)text, length, encoding, b, paint);
+        }
+    }
+
+    internal float MeasureText(void* text, int length, SKTextEncoding encoding, SKRect* bounds, SKPaint paint)
+    {
+        if (!ValidateTextArgs(text, length, encoding))
+            return 0;
+
+        float measuredWidth;
+        SkiaApi.sk_font_measure_text_no_return(Handle, text, (IntPtr)length, encoding, bounds,
+            paint?.Handle ?? IntPtr.Zero, &measuredWidth);
+        GC.KeepAlive(paint);
+        GC.KeepAlive(this);
+        return measuredWidth;
+    }
+
+    // MeasureText (glyphs)
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="glyphs">The array of glyph IDs.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float MeasureText(ReadOnlySpan<ushort> glyphs, SKPaint paint = null)
+    {
+        fixed (ushort* gp = glyphs)
+        {
+            return MeasureText(gp, glyphs.Length * 2, SKTextEncoding.GlyphId, null, paint);
+        }
+    }
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="glyphs">The array of glyph IDs.</param>
+    /// <param name="bounds">When this method returns, contains the bounding rectangles for each glyph.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float MeasureText(ReadOnlySpan<ushort> glyphs, out SKRect bounds, SKPaint paint = null)
+    {
+        fixed (ushort* gp = glyphs)
+        fixed (SKRect* b = &bounds)
+        {
+            return MeasureText(gp, glyphs.Length * 2, SKTextEncoding.GlyphId, b, paint);
+        }
+    }
+
+    public Size MeasureString(string text)
+    {
+        fixed (char* ptr = text)
+        {
+            Rect bounds;
+            var width = SkiaApi.sk_font_measure_text(Handle, ptr,
+                new IntPtr(text.Length * 2), SKTextEncoding.Utf16,
+                &bounds, IntPtr.Zero);
+            return new Size(width /*bounds.Width*/, bounds.Height);
+        }
+    }
+
+    // BreakText
+
+    /// <summary>Measures text, stopping when the maximum width is exceeded.</summary>
+    /// <param name="text">The text to measure.</param>
+    /// <param name="maxWidth">The maximum width constraint.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>The number of characters that fit within the maximum width.</returns>
+    /// <remarks />
+    public int BreakText(string text, float maxWidth, SKPaint paint = null) =>
+        BreakText(text.AsSpan(), maxWidth, out _, paint);
+
+    /// <summary>Measures text, stopping when the maximum width is exceeded.</summary>
+    /// <param name="text">The text to measure.</param>
+    /// <param name="maxWidth">The maximum width constraint.</param>
+    /// <param name="measuredWidth">When this method returns, contains the actual measured width of the text.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>The number of characters that fit within the maximum width.</returns>
+    /// <remarks />
+    public int BreakText(string text, float maxWidth, out float measuredWidth, SKPaint paint = null) =>
+        BreakText(text.AsSpan(), maxWidth, out measuredWidth, paint);
+
+    /// <summary>Measures text, stopping when the maximum width is exceeded.</summary>
+    /// <param name="text">The text to measure.</param>
+    /// <param name="maxWidth">The maximum width constraint.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>The number of characters that fit within the maximum width.</returns>
+    /// <remarks />
+    public int BreakText(ReadOnlySpan<char> text, float maxWidth, SKPaint paint = null) =>
+        BreakText(text, maxWidth, out _, paint);
+
+    /// <summary>Measures text, stopping when the maximum width is exceeded.</summary>
+    /// <param name="text">The text to measure.</param>
+    /// <param name="maxWidth">The maximum width constraint.</param>
+    /// <param name="measuredWidth">When this method returns, contains the actual measured width of the text.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>The number of characters that fit within the maximum width.</returns>
+    /// <remarks />
+    public int BreakText(ReadOnlySpan<char> text, float maxWidth, out float measuredWidth, SKPaint paint = null)
+    {
+        fixed (void* t = text)
+        fixed (float* mw = &measuredWidth)
+        {
+            var bytesRead = BreakText(t, text.Length * 2, SKTextEncoding.Utf16, maxWidth, mw, paint);
+            return bytesRead / 2;
+        }
+    }
+
+    /// <summary>Measures text, stopping when the maximum width is exceeded.</summary>
+    /// <param name="text">The text to measure.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="maxWidth">The maximum width constraint.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>The number of characters that fit within the maximum width.</returns>
+    /// <remarks />
+    public int BreakText(ReadOnlySpan<byte> text, SKTextEncoding encoding, float maxWidth, SKPaint paint = null) =>
+        BreakText(text, encoding, maxWidth, out _, paint);
+
+    /// <summary>Measures text, stopping when the maximum width is exceeded.</summary>
+    /// <param name="text">The text to measure.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="maxWidth">The maximum width constraint.</param>
+    /// <param name="measuredWidth">When this method returns, contains the actual measured width of the text.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>The number of characters that fit within the maximum width.</returns>
+    /// <remarks />
+    public int BreakText(ReadOnlySpan<byte> text, SKTextEncoding encoding, float maxWidth, out float measuredWidth,
+        SKPaint paint = null)
+    {
+        fixed (void* t = text)
+        fixed (float* mw = &measuredWidth)
+        {
+            return BreakText(t, text.Length, encoding, maxWidth, mw, paint);
+        }
+    }
+
+    /// <summary>Measures text, stopping when the maximum width is exceeded.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="maxWidth">The maximum width constraint.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>The number of characters that fit within the maximum width.</returns>
+    /// <remarks />
+    public int BreakText(IntPtr text, int length, SKTextEncoding encoding, float maxWidth, SKPaint paint = null) =>
+        BreakText(text, length, encoding, maxWidth, out _, paint);
+
+    /// <summary>Measures text, stopping when the maximum width is exceeded.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="maxWidth">The maximum width constraint.</param>
+    /// <param name="measuredWidth">When this method returns, contains the actual measured width of the text.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>The number of characters that fit within the maximum width.</returns>
+    /// <remarks />
+    public int BreakText(IntPtr text, int length, SKTextEncoding encoding, float maxWidth, out float measuredWidth,
+        SKPaint paint = null)
+    {
+        fixed (float* mw = &measuredWidth)
+        {
+            return BreakText((void*)text, length, encoding, maxWidth, mw, paint);
+        }
+    }
+
+    internal int BreakText(void* text, int length, SKTextEncoding encoding, float maxWidth, float* measuredWidth,
+        SKPaint paint)
+    {
+        throw new NotImplementedException();
+        // if (!ValidateTextArgs (text, length, encoding))
+        // 	return 0;
+        //
+        // var result = (int)SkiaApi.sk_font_break_text (Handle, text, (IntPtr)length, encoding, maxWidth, measuredWidth, paint?.Handle ?? IntPtr.Zero);
+        // GC.KeepAlive (paint);
+        // GC.KeepAlive (this);
+        // return result;
+    }
+
+    // GetGlyphPositions (text)
+
+    /// <summary>Gets the x,y positions for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="origin">The starting position offset.</param>
+    /// <returns>An array of positions for each glyph.</returns>
+    /// <remarks />
+    public SKPoint[] GetGlyphPositions(string text, SKPoint origin = default) =>
+        GetGlyphPositions(text.AsSpan(), origin);
+
+    /// <summary>Gets the x,y positions for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="origin">The starting position offset.</param>
+    /// <returns>An array of positions for each glyph.</returns>
+    /// <remarks />
+    public SKPoint[] GetGlyphPositions(ReadOnlySpan<char> text, SKPoint origin = default)
+    {
+        fixed (void* t = text)
+        {
+            return GetGlyphPositions(t, text.Length * 2, SKTextEncoding.Utf16, origin);
+        }
+    }
+
+    /// <summary>Gets the x,y positions for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="origin">The starting position offset.</param>
+    /// <returns>An array of positions for each glyph.</returns>
+    /// <remarks />
+    public SKPoint[] GetGlyphPositions(ReadOnlySpan<byte> text, SKTextEncoding encoding, SKPoint origin = default)
+    {
+        fixed (void* t = text)
+        {
+            return GetGlyphPositions(t, text.Length, encoding, origin);
+        }
+    }
+
+    /// <summary>Gets the x,y positions for the glyphs.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="origin">The starting position offset.</param>
+    /// <returns>An array of positions for each glyph.</returns>
+    /// <remarks />
+    public SKPoint[] GetGlyphPositions(IntPtr text, int length, SKTextEncoding encoding, SKPoint origin = default) =>
+        GetGlyphPositions((void*)text, length, encoding, origin);
+
+    /// <summary>Gets the x,y positions for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="offsets">The span to receive the glyph positions.</param>
+    /// <param name="origin">The starting position offset.</param>
+    /// <remarks />
+    public void GetGlyphPositions(string text, Span<SKPoint> offsets, SKPoint origin = default) =>
+        GetGlyphPositions(text.AsSpan(), offsets, origin);
+
+    /// <summary>Gets the x,y positions for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="offsets">The span to receive the glyph positions.</param>
+    /// <param name="origin">The starting position offset.</param>
+    /// <remarks />
+    public void GetGlyphPositions(ReadOnlySpan<char> text, Span<SKPoint> offsets, SKPoint origin = default)
     {
         fixed (void* t = text)
         {
@@ -191,7 +923,48 @@ public sealed unsafe class SKFont : SKObject, IFont
         }
     }
 
-    internal void GetGlyphPositions(void* text, int length, SKTextEncoding encoding, Span<Point> offsets, Point origin)
+    /// <summary>Gets the x,y positions for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="offsets">The span to receive the glyph positions.</param>
+    /// <param name="origin">The starting position offset.</param>
+    /// <remarks />
+    public void GetGlyphPositions(ReadOnlySpan<byte> text, SKTextEncoding encoding, Span<SKPoint> offsets,
+        SKPoint origin = default)
+    {
+        fixed (void* t = text)
+        {
+            GetGlyphPositions(t, text.Length, encoding, offsets, origin);
+        }
+    }
+
+    /// <summary>Gets the x,y positions for the glyphs.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="offsets">The span to receive the glyph positions.</param>
+    /// <param name="origin">The starting position offset.</param>
+    /// <remarks />
+    public void GetGlyphPositions(IntPtr text, int length, SKTextEncoding encoding, Span<SKPoint> offsets,
+        SKPoint origin = default) =>
+        GetGlyphPositions((void*)text, length, encoding, offsets, origin);
+
+    internal SKPoint[] GetGlyphPositions(void* text, int length, SKTextEncoding encoding, SKPoint origin)
+    {
+        if (!ValidateTextArgs(text, length, encoding))
+            return new SKPoint[0];
+
+        var n = CountGlyphs(text, length, encoding);
+        if (n <= 0)
+            return new SKPoint[0];
+
+        var positions = new SKPoint[n];
+        GetGlyphPositions(text, length, encoding, positions, origin);
+        return positions;
+    }
+
+    internal void GetGlyphPositions(void* text, int length, SKTextEncoding encoding, Span<SKPoint> offsets,
+        SKPoint origin)
     {
         if (!ValidateTextArgs(text, length, encoding))
             return;
@@ -205,33 +978,205 @@ public sealed unsafe class SKFont : SKObject, IFont
         GetGlyphPositions(glyphs, offsets, origin);
     }
 
-    public void GetGlyphPositions(ReadOnlySpan<ushort> glyphs, Span<Point> positions, Point origin = default)
+    // GetGlyphPositions (glyphs)
+
+    /// <summary>Gets the x,y positions for the glyphs.</summary>
+    /// <param name="glyphs">The array of glyph IDs.</param>
+    /// <param name="origin">The starting position offset.</param>
+    /// <returns>An array of positions for each glyph.</returns>
+    /// <remarks />
+    public SKPoint[] GetGlyphPositions(ReadOnlySpan<ushort> glyphs, SKPoint origin = default)
+    {
+        var positions = new SKPoint[glyphs.Length];
+        GetGlyphPositions(glyphs, positions, origin);
+        return positions;
+    }
+
+    /// <summary>Gets the x,y positions for the glyphs.</summary>
+    /// <param name="glyphs">The array of glyph IDs.</param>
+    /// <param name="positions">The span to receive the glyph positions.</param>
+    /// <param name="origin">The starting position offset.</param>
+    /// <remarks />
+    public void GetGlyphPositions(ReadOnlySpan<ushort> glyphs, Span<SKPoint> positions, SKPoint origin = default)
     {
         if (glyphs.Length != positions.Length)
             throw new ArgumentException("The length of glyphs must be the same as the length of positions.",
                 nameof(positions));
 
         fixed (ushort* gp = glyphs)
-        fixed (Point* pp = positions)
+        fixed (SKPoint* pp = positions)
         {
             SkiaApi.sk_font_get_pos(Handle, gp, glyphs.Length, pp, &origin);
+            GC.KeepAlive(this);
         }
     }
 
-    public void GetGlyphWidths(ReadOnlySpan<ushort> glyphs, Span<float> widths, Span<Rect> bounds,
-        SKPaint? paint = null)
+    // GetGlyphOffsets (text)
+
+    /// <summary>Gets the horizontal offsets for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="origin">The starting horizontal offset.</param>
+    /// <returns>An array of horizontal offsets for each glyph.</returns>
+    /// <remarks />
+    public float[] GetGlyphOffsets(string text, float origin = 0f) =>
+        GetGlyphOffsets(text.AsSpan(), origin);
+
+    /// <summary>Gets the horizontal offsets for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="origin">The starting horizontal offset.</param>
+    /// <returns>An array of horizontal offsets for each glyph.</returns>
+    /// <remarks />
+    public float[] GetGlyphOffsets(ReadOnlySpan<char> text, float origin = 0f)
     {
-        fixed (ushort* gp = glyphs)
-        fixed (float* wp = widths)
-        fixed (Rect* bp = bounds)
+        fixed (void* t = text)
         {
-            var w = widths.Length > 0 ? wp : null;
-            var b = bounds.Length > 0 ? bp : null;
-            SkiaApi.sk_font_get_widths_bounds(Handle, gp, glyphs.Length, w, b, paint?.Handle ?? IntPtr.Zero);
+            return GetGlyphOffsets(t, text.Length * 2, SKTextEncoding.Utf16, origin);
         }
     }
 
-    public float[] GetGlyphWidths(ReadOnlySpan<ushort> glyphs)
+    /// <summary>Gets the horizontal offsets for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="origin">The starting horizontal offset.</param>
+    /// <returns>An array of horizontal offsets for each glyph.</returns>
+    /// <remarks />
+    public float[] GetGlyphOffsets(ReadOnlySpan<byte> text, SKTextEncoding encoding, float origin = 0f)
+    {
+        fixed (void* t = text)
+        {
+            return GetGlyphOffsets(t, text.Length, encoding, origin);
+        }
+    }
+
+    /// <summary>Gets the horizontal offsets for the glyphs.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="origin">The starting horizontal offset.</param>
+    /// <returns>An array of horizontal offsets for each glyph.</returns>
+    /// <remarks />
+    public float[] GetGlyphOffsets(IntPtr text, int length, SKTextEncoding encoding, float origin = 0f) =>
+        GetGlyphOffsets((void*)text, length, encoding, origin);
+
+    /// <summary>Gets the horizontal offsets for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="offsets">The span to receive the horizontal offsets.</param>
+    /// <param name="origin">The starting horizontal offset.</param>
+    /// <remarks />
+    public void GetGlyphOffsets(string text, Span<float> offsets, float origin = 0f) =>
+        GetGlyphOffsets(text.AsSpan(), offsets, origin);
+
+    /// <summary>Gets the horizontal offsets for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="offsets">The span to receive the horizontal offsets.</param>
+    /// <param name="origin">The starting horizontal offset.</param>
+    /// <remarks />
+    public void GetGlyphOffsets(ReadOnlySpan<char> text, Span<float> offsets, float origin = 0f)
+    {
+        fixed (void* t = text)
+        {
+            GetGlyphOffsets(t, text.Length * 2, SKTextEncoding.Utf16, offsets, origin);
+        }
+    }
+
+    /// <summary>Gets the horizontal offsets for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="offsets">The span to receive the horizontal offsets.</param>
+    /// <param name="origin">The starting horizontal offset.</param>
+    /// <remarks />
+    public void GetGlyphOffsets(ReadOnlySpan<byte> text, SKTextEncoding encoding, Span<float> offsets,
+        float origin = 0f)
+    {
+        fixed (void* t = text)
+        {
+            GetGlyphOffsets(t, text.Length, encoding, offsets, origin);
+        }
+    }
+
+    /// <summary>Gets the horizontal offsets for the glyphs.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="offsets">The span to receive the horizontal offsets.</param>
+    /// <param name="origin">The starting horizontal offset.</param>
+    /// <remarks />
+    public void GetGlyphOffsets(IntPtr text, int length, SKTextEncoding encoding, Span<float> offsets,
+        float origin = 0f) =>
+        GetGlyphOffsets((void*)text, length, encoding, offsets, origin);
+
+    internal float[] GetGlyphOffsets(void* text, int length, SKTextEncoding encoding, float origin)
+    {
+        if (!ValidateTextArgs(text, length, encoding))
+            return new float[0];
+
+        var n = CountGlyphs(text, length, encoding);
+        if (n <= 0)
+            return new float[0];
+
+        var offsets = new float[n];
+        GetGlyphOffsets(text, length, encoding, offsets, origin);
+        return offsets;
+    }
+
+    internal void GetGlyphOffsets(void* text, int length, SKTextEncoding encoding, Span<float> offsets, float origin)
+    {
+        if (!ValidateTextArgs(text, length, encoding))
+            return;
+
+        var n = offsets.Length;
+        if (n <= 0)
+            return;
+
+        using var glyphs = Utils.RentArray<ushort>(n);
+        GetGlyphs(text, length, encoding, glyphs);
+        GetGlyphOffsets(glyphs, offsets, origin);
+    }
+
+    // GetGlyphOffsets (glyphs)
+
+    /// <summary>Gets the horizontal offsets for the glyphs.</summary>
+    /// <param name="glyphs">The array of glyph IDs.</param>
+    /// <param name="origin">The starting horizontal offset.</param>
+    /// <returns>An array of horizontal offsets for each glyph.</returns>
+    /// <remarks />
+    public float[] GetGlyphOffsets(ReadOnlySpan<ushort> glyphs, float origin = 0f)
+    {
+        var offsets = new float[glyphs.Length];
+        GetGlyphOffsets(glyphs, offsets, origin);
+        return offsets;
+    }
+
+    /// <summary>Gets the horizontal offsets for the glyphs.</summary>
+    /// <param name="glyphs">The array of glyph IDs.</param>
+    /// <param name="offsets">The span to receive the horizontal offsets.</param>
+    /// <param name="origin">The starting horizontal offset.</param>
+    /// <remarks />
+    public void GetGlyphOffsets(ReadOnlySpan<ushort> glyphs, Span<float> offsets, float origin = 0f)
+    {
+        if (glyphs.Length != offsets.Length)
+            throw new ArgumentException("The length of glyphs must be the same as the length of offsets.",
+                nameof(offsets));
+
+        fixed (ushort* gp = glyphs)
+        fixed (float* pp = offsets)
+        {
+            SkiaApi.sk_font_get_xpos(Handle, gp, glyphs.Length, pp, origin);
+            GC.KeepAlive(this);
+        }
+    }
+
+    // GetGlyphWidths (text)
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float[] GetGlyphWidths(string text, SKPaint paint = null) =>
+        GetGlyphWidths(text.AsSpan(), paint);
+
+    float[] IFont.GetGlyphWidths(ReadOnlySpan<ushort> glyphs)
     {
         var res = new float[glyphs.Length];
         fixed (float* widthsPtr = res)
@@ -243,19 +1188,644 @@ public sealed unsafe class SKFont : SKObject, IFont
         return res;
     }
 
-    public Rect[] GetBounds(ReadOnlySpan<ushort> glyphs)
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float[] GetGlyphWidths(ReadOnlySpan<char> text, SKPaint paint = null)
     {
-        var bounds = new Rect[glyphs.Length];
-        fixed (Rect* boundsPtr = bounds)
-        fixed (ushort* glyphsPtr = glyphs)
+        fixed (void* t = text)
         {
-            SkiaApi.sk_font_get_widths_bounds(Handle, glyphsPtr, glyphs.Length, null, boundsPtr, IntPtr.Zero);
+            return GetGlyphWidths(t, text.Length * 2, SKTextEncoding.Utf16, paint);
         }
-
-        return bounds;
     }
 
-    private static bool ValidateTextArgs(void* text, int length, SKTextEncoding encoding)
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float[] GetGlyphWidths(ReadOnlySpan<byte> text, SKTextEncoding encoding, SKPaint paint = null)
+    {
+        fixed (void* t = text)
+        {
+            return GetGlyphWidths(t, text.Length, encoding, paint);
+        }
+    }
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float[] GetGlyphWidths(IntPtr text, int length, SKTextEncoding encoding, SKPaint paint = null) =>
+        GetGlyphWidths((void*)text, length, encoding, paint);
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="bounds">When this method returns, contains the bounding rectangles for each glyph.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float[] GetGlyphWidths(string text, out SKRect[] bounds, SKPaint paint = null) =>
+        GetGlyphWidths(text.AsSpan(), out bounds, paint);
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="bounds">When this method returns, contains the bounding rectangles for each glyph.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float[] GetGlyphWidths(ReadOnlySpan<char> text, out SKRect[] bounds, SKPaint paint = null)
+    {
+        fixed (void* t = text)
+        {
+            return GetGlyphWidths(t, text.Length * 2, SKTextEncoding.Utf16, out bounds, paint);
+        }
+    }
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="bounds">When this method returns, contains the bounding rectangles for each glyph.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float[] GetGlyphWidths(ReadOnlySpan<byte> text, SKTextEncoding encoding, out SKRect[] bounds,
+        SKPaint paint = null)
+    {
+        fixed (void* t = text)
+        {
+            return GetGlyphWidths(t, text.Length, encoding, out bounds, paint);
+        }
+    }
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="bounds">When this method returns, contains the bounding rectangles for each glyph.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float[] GetGlyphWidths(IntPtr text, int length, SKTextEncoding encoding, out SKRect[] bounds,
+        SKPaint paint = null) =>
+        GetGlyphWidths((void*)text, length, encoding, out bounds, paint);
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="widths">The span to receive the advance widths.</param>
+    /// <param name="bounds">The span to receive the bounding rectangles.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <remarks />
+    public void GetGlyphWidths(string text, Span<float> widths, Span<SKRect> bounds, SKPaint paint = null) =>
+        GetGlyphWidths(text.AsSpan(), widths, bounds, paint);
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="widths">The span to receive the advance widths.</param>
+    /// <param name="bounds">The span to receive the bounding rectangles.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <remarks />
+    public void GetGlyphWidths(ReadOnlySpan<char> text, Span<float> widths, Span<SKRect> bounds, SKPaint paint = null)
+    {
+        fixed (void* t = text)
+        {
+            GetGlyphWidths(t, text.Length * 2, SKTextEncoding.Utf16, widths, bounds, paint);
+        }
+    }
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">The text to process.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="widths">The span to receive the advance widths.</param>
+    /// <param name="bounds">The span to receive the bounding rectangles.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <remarks />
+    public void GetGlyphWidths(ReadOnlySpan<byte> text, SKTextEncoding encoding, Span<float> widths,
+        Span<SKRect> bounds, SKPaint paint = null)
+    {
+        fixed (void* t = text)
+        {
+            GetGlyphWidths(t, text.Length, encoding, widths, bounds, paint);
+        }
+    }
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="widths">The span to receive the advance widths.</param>
+    /// <param name="bounds">The span to receive the bounding rectangles.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <remarks />
+    public void GetGlyphWidths(IntPtr text, int length, SKTextEncoding encoding, Span<float> widths,
+        Span<SKRect> bounds, SKPaint paint = null) =>
+        GetGlyphWidths((void*)text, length, encoding, widths, bounds, paint);
+
+    internal float[] GetGlyphWidths(void* text, int length, SKTextEncoding encoding, SKPaint paint)
+    {
+        if (!ValidateTextArgs(text, length, encoding))
+            return new float[0];
+
+        var n = CountGlyphs(text, length, encoding);
+        if (n <= 0)
+            return new float[0];
+
+        var widths = new float[n];
+        GetGlyphWidths(text, length, encoding, widths, Span<SKRect>.Empty, paint);
+        return widths;
+    }
+
+    internal float[] GetGlyphWidths(void* text, int length, SKTextEncoding encoding, out SKRect[] bounds, SKPaint paint)
+    {
+        if (!ValidateTextArgs(text, length, encoding))
+        {
+            bounds = new SKRect[0];
+            return new float[0];
+        }
+
+        var n = CountGlyphs(text, length, encoding);
+        if (n <= 0)
+        {
+            bounds = new SKRect[0];
+            return new float[0];
+        }
+
+        bounds = new SKRect[n];
+        var widths = new float[n];
+        GetGlyphWidths(text, length, encoding, widths, bounds, paint);
+        return widths;
+    }
+
+    internal void GetGlyphWidths(void* text, int length, SKTextEncoding encoding, Span<float> widths,
+        Span<SKRect> bounds, SKPaint paint)
+    {
+        if (!ValidateTextArgs(text, length, encoding))
+            return;
+
+        var n = Math.Max(widths.Length, bounds.Length);
+        if (n <= 0)
+            return;
+
+        // make sure that the destination spans are either empty/null or the same length
+        if (widths.Length != 0 && widths.Length != n)
+            throw new ArgumentException("The length of widths must be equal to the length of bounds or empty.",
+                nameof(widths));
+        if (bounds.Length != 0 && bounds.Length != n)
+            throw new ArgumentException("The length of bounds must be equal to the length of widths or empty.",
+                nameof(bounds));
+
+        using var glyphs = Utils.RentArray<ushort>(n);
+        GetGlyphs(text, length, encoding, glyphs);
+        GetGlyphWidths(glyphs, widths, bounds, paint);
+    }
+
+    // GetGlyphWidths (glyphs)
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="glyphs">The array of glyph IDs.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float[] GetGlyphWidths(ReadOnlySpan<ushort> glyphs, SKPaint paint = null)
+    {
+        var widths = new float[glyphs.Length];
+        GetGlyphWidths(glyphs, widths, Span<SKRect>.Empty, paint);
+        return widths;
+    }
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="glyphs">The array of glyph IDs.</param>
+    /// <param name="bounds">When this method returns, contains the bounding rectangles for each glyph.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <returns>An array of advance widths for each glyph.</returns>
+    /// <remarks />
+    public float[] GetGlyphWidths(ReadOnlySpan<ushort> glyphs, out SKRect[] bounds, SKPaint paint = null)
+    {
+        var widths = new float[glyphs.Length];
+        bounds = new SKRect[glyphs.Length];
+        GetGlyphWidths(glyphs, widths, bounds, paint);
+        return widths;
+    }
+
+    /// <summary>Gets the advance widths for the glyphs.</summary>
+    /// <param name="glyphs">The array of glyph IDs.</param>
+    /// <param name="widths">The span to receive the advance widths.</param>
+    /// <param name="bounds">The span to receive the bounding rectangles.</param>
+    /// <param name="paint">An optional <see cref="T:SKPaint" /> for additional text effects.</param>
+    /// <remarks />
+    public void GetGlyphWidths(ReadOnlySpan<ushort> glyphs, Span<float> widths, Span<SKRect> bounds,
+        SKPaint paint = null)
+    {
+        fixed (ushort* gp = glyphs)
+        fixed (float* wp = widths)
+        fixed (SKRect* bp = bounds)
+        {
+            var w = widths.Length > 0 ? wp : null;
+            var b = bounds.Length > 0 ? bp : null;
+            SkiaApi.sk_font_get_widths_bounds(Handle, gp, glyphs.Length, w, b, paint?.Handle ?? IntPtr.Zero);
+        }
+
+        GC.KeepAlive(paint);
+        GC.KeepAlive(this);
+    }
+
+    // GetGlyphPath
+
+    /// <summary>Gets the outline path for a glyph.</summary>
+    /// <param name="glyph">The glyph ID.</param>
+    /// <returns>The <see cref="T:SKPath" /> representing the glyph outline, or <see langword="null" /> if the glyph has no outline.</returns>
+    /// <remarks />
+    public SKPath GetGlyphPath(ushort glyph)
+    {
+        var path = new SKPath();
+        if (!SkiaApi.sk_font_get_path(Handle, glyph, path.Handle))
+        {
+            path.Dispose();
+            path = null;
+        }
+
+        GC.KeepAlive(this);
+        return path;
+    }
+
+    // GetTextPath (text)
+
+    /// <summary>Gets the path for the text.</summary>
+    /// <param name="text">The text to convert to a path.</param>
+    /// <param name="origin">The starting position for the text.</param>
+    /// <returns>The <see cref="T:SKPath" /> representing the text outline.</returns>
+    /// <remarks />
+    public SKPath GetTextPath(string text, SKPoint origin = default) =>
+        GetTextPath(text.AsSpan(), origin);
+
+    /// <summary>Gets the path for the text.</summary>
+    /// <param name="text">The text to convert to a path.</param>
+    /// <param name="origin">The starting position for the text.</param>
+    /// <returns>The <see cref="T:SKPath" /> representing the text outline.</returns>
+    /// <remarks />
+    public SKPath GetTextPath(ReadOnlySpan<char> text, SKPoint origin = default)
+    {
+        fixed (void* t = text)
+        {
+            return GetTextPath(t, text.Length * 2, SKTextEncoding.Utf16, origin);
+        }
+    }
+
+    /// <summary>Gets the path for the text.</summary>
+    /// <param name="text">The text to convert to a path.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="origin">The starting position for the text.</param>
+    /// <returns>The <see cref="T:SKPath" /> representing the text outline.</returns>
+    /// <remarks />
+    public SKPath GetTextPath(ReadOnlySpan<byte> text, SKTextEncoding encoding, SKPoint origin = default)
+    {
+        fixed (void* t = text)
+        {
+            return GetTextPath(t, text.Length, encoding, origin);
+        }
+    }
+
+    /// <summary>Gets the path for the text.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="origin">The starting position for the text.</param>
+    /// <returns>The <see cref="T:SKPath" /> representing the text outline.</returns>
+    /// <remarks />
+    public SKPath GetTextPath(IntPtr text, int length, SKTextEncoding encoding, SKPoint origin = default) =>
+        GetTextPath((void*)text, length, encoding, origin);
+
+    internal SKPath GetTextPath(void* text, int length, SKTextEncoding encoding, SKPoint origin)
+    {
+        if (!ValidateTextArgs(text, length, encoding))
+            return new SKPath();
+
+        var path = new SKPath();
+        SkiaApi.sk_text_utils_get_path(text, (IntPtr)length, encoding, origin.X, origin.Y, Handle, path.Handle);
+        GC.KeepAlive(this);
+        return path;
+    }
+
+    // GetTextPath (positioned)
+
+    /// <summary>Gets the path for the text.</summary>
+    /// <param name="text">The text to convert to a path.</param>
+    /// <param name="positions">The positions for each glyph.</param>
+    /// <returns>The <see cref="T:SKPath" /> representing the text outline.</returns>
+    /// <remarks />
+    public SKPath GetTextPath(string text, ReadOnlySpan<SKPoint> positions) =>
+        GetTextPath(text.AsSpan(), positions);
+
+    /// <summary>Gets the path for the text.</summary>
+    /// <param name="text">The text to convert to a path.</param>
+    /// <param name="positions">The positions for each glyph.</param>
+    /// <returns>The <see cref="T:SKPath" /> representing the text outline.</returns>
+    /// <remarks />
+    public SKPath GetTextPath(ReadOnlySpan<char> text, ReadOnlySpan<SKPoint> positions)
+    {
+        fixed (void* t = text)
+        {
+            return GetTextPath(t, text.Length * 2, SKTextEncoding.Utf16, positions);
+        }
+    }
+
+    /// <summary>Gets the path for the text.</summary>
+    /// <param name="text">The text to convert to a path.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="positions">The positions for each glyph.</param>
+    /// <returns>The <see cref="T:SKPath" /> representing the text outline.</returns>
+    /// <remarks />
+    public SKPath GetTextPath(ReadOnlySpan<byte> text, SKTextEncoding encoding, ReadOnlySpan<SKPoint> positions)
+    {
+        fixed (void* t = text)
+        {
+            return GetTextPath(t, text.Length, encoding, positions);
+        }
+    }
+
+    /// <summary>Gets the path for the text.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="positions">The positions for each glyph.</param>
+    /// <returns>The <see cref="T:SKPath" /> representing the text outline.</returns>
+    /// <remarks />
+    public SKPath GetTextPath(IntPtr text, int length, SKTextEncoding encoding, ReadOnlySpan<SKPoint> positions) =>
+        GetTextPath((void*)text, length, encoding, positions);
+
+    internal SKPath GetTextPath(void* text, int length, SKTextEncoding encoding, ReadOnlySpan<SKPoint> positions)
+    {
+        if (!ValidateTextArgs(text, length, encoding))
+            return new SKPath();
+
+        var path = new SKPath();
+        fixed (SKPoint* p = positions)
+        {
+            SkiaApi.sk_text_utils_get_pos_path(text, (IntPtr)length, encoding, p, Handle, path.Handle);
+            GC.KeepAlive(this);
+        }
+
+        return path;
+    }
+
+    // GetGlyphPaths
+
+    /// <summary>Gets the outline paths for multiple glyphs by invoking a delegate for each.</summary>
+    /// <param name="glyphs">The array of glyph IDs.</param>
+    /// <param name="glyphPathDelegate">A delegate called for each glyph path.</param>
+    /// <remarks />
+    public void GetGlyphPaths(ReadOnlySpan<ushort> glyphs, SKGlyphPathDelegate glyphPathDelegate)
+    {
+        DelegateProxies.Create(glyphPathDelegate, out var gch, out var ctx);
+        var proxy = glyphPathDelegate is not null ? DelegateProxies.SKGlyphPathProxy : null;
+        try
+        {
+            fixed (ushort* g = glyphs)
+            {
+                SkiaApi.sk_font_get_paths(Handle, g, glyphs.Length, proxy, (void*)ctx);
+                GC.KeepAlive(this);
+            }
+        }
+        finally
+        {
+            gch.Free();
+        }
+    }
+
+    // GetTextPathOnPath (text)
+
+    /// <summary>Gets the path for text laid out along another path.</summary>
+    /// <param name="text">The text to convert to a path.</param>
+    /// <param name="path">The <see cref="T:SKPath" /> along which to lay out the text.</param>
+    /// <param name="textAlign">The text alignment relative to the path.</param>
+    /// <param name="origin">The starting position for the text.</param>
+    /// <returns>The <see cref="T:SKPath" /> representing the text outline along the path.</returns>
+    /// <remarks />
+    public SKPath GetTextPathOnPath(string text, SKPath path, SKTextAlign textAlign = SKTextAlign.Left,
+        SKPoint origin = default) =>
+        GetTextPathOnPath(text.AsSpan(), path, textAlign, origin);
+
+    /// <summary>Gets the path for text laid out along another path.</summary>
+    /// <param name="text">The text to convert to a path.</param>
+    /// <param name="path">The <see cref="T:SKPath" /> along which to lay out the text.</param>
+    /// <param name="textAlign">The text alignment relative to the path.</param>
+    /// <param name="origin">The starting position for the text.</param>
+    /// <returns>The <see cref="T:SKPath" /> representing the text outline along the path.</returns>
+    /// <remarks />
+    public SKPath GetTextPathOnPath(ReadOnlySpan<char> text, SKPath path, SKTextAlign textAlign = SKTextAlign.Left,
+        SKPoint origin = default)
+    {
+        fixed (void* t = text)
+        {
+            return GetTextPathOnPath(t, text.Length * 2, SKTextEncoding.Utf16, path, textAlign, origin);
+        }
+    }
+
+    /// <summary>Gets the path for text laid out along another path.</summary>
+    /// <param name="text">The text to convert to a path.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="path">The <see cref="T:SKPath" /> along which to lay out the text.</param>
+    /// <param name="textAlign">The text alignment relative to the path.</param>
+    /// <param name="origin">The starting position for the text.</param>
+    /// <returns>The <see cref="T:SKPath" /> representing the text outline along the path.</returns>
+    /// <remarks />
+    public SKPath GetTextPathOnPath(ReadOnlySpan<byte> text, SKTextEncoding encoding, SKPath path,
+        SKTextAlign textAlign = SKTextAlign.Left, SKPoint origin = default)
+    {
+        fixed (void* t = text)
+        {
+            return GetTextPathOnPath(t, text.Length, encoding, path, textAlign, origin);
+        }
+    }
+
+    /// <summary>Gets the path for text laid out along another path.</summary>
+    /// <param name="text">A pointer to the text buffer.</param>
+    /// <param name="length">The number of bytes in the text buffer.</param>
+    /// <param name="encoding">The <see cref="T:SKTextEncoding" /> of the text.</param>
+    /// <param name="path">The <see cref="T:SKPath" /> along which to lay out the text.</param>
+    /// <param name="textAlign">The text alignment relative to the path.</param>
+    /// <param name="origin">The starting position for the text.</param>
+    /// <returns>The <see cref="T:SKPath" /> representing the text outline along the path.</returns>
+    /// <remarks />
+    public SKPath GetTextPathOnPath(IntPtr text, int length, SKTextEncoding encoding, SKPath path,
+        SKTextAlign textAlign = SKTextAlign.Left, SKPoint origin = default) =>
+        GetTextPathOnPath((void*)text, length, encoding, path, textAlign, origin);
+
+    internal SKPath GetTextPathOnPath(void* text, int length, SKTextEncoding encoding, SKPath path,
+        SKTextAlign textAlign = SKTextAlign.Left, SKPoint origin = default)
+    {
+        if (!ValidateTextArgs(text, length, encoding))
+            return new SKPath();
+
+        var n = CountGlyphs(text, length, encoding);
+        if (n <= 0)
+            return new SKPath();
+
+        using var glyphs = Utils.RentArray<ushort>(n);
+        GetGlyphs(text, length, encoding, glyphs);
+
+        return GetTextPathOnPath(glyphs, path, textAlign, origin);
+    }
+
+    // GetTextPathOnPath (glyphs)
+
+    /// <summary>Gets the path for text laid out along another path.</summary>
+    /// <param name="glyphs">The array of glyph IDs.</param>
+    /// <param name="path">The <see cref="T:SKPath" /> along which to lay out the text.</param>
+    /// <param name="textAlign">The text alignment relative to the path.</param>
+    /// <param name="origin">The starting position for the text.</param>
+    /// <returns>The <see cref="T:SKPath" /> representing the text outline along the path.</returns>
+    /// <remarks />
+    public SKPath GetTextPathOnPath(ReadOnlySpan<ushort> glyphs, SKPath path, SKTextAlign textAlign = SKTextAlign.Left,
+        SKPoint origin = default)
+    {
+        if (path == null)
+            throw new ArgumentNullException(nameof(path));
+
+        if (glyphs.Length == 0)
+            return new SKPath();
+
+        using var glyphWidths = Utils.RentArray<float>(glyphs.Length);
+        using var glyphOffsets = Utils.RentArray<SKPoint>(glyphs.Length);
+
+        GetGlyphWidths(glyphs, glyphWidths, Span<SKRect>.Empty);
+        GetGlyphPositions(glyphs, glyphOffsets, origin);
+
+        return GetTextPathOnPath(glyphs, glyphWidths, glyphOffsets, path, textAlign);
+    }
+
+    /// <summary>Gets the path for text laid out along another path.</summary>
+    /// <param name="glyphs">The array of glyph IDs.</param>
+    /// <param name="glyphWidths">The advance widths for each glyph.</param>
+    /// <param name="glyphPositions">The positions for each glyph.</param>
+    /// <param name="path">The <see cref="T:SKPath" /> along which to lay out the text.</param>
+    /// <param name="textAlign">The text alignment relative to the path.</param>
+    /// <returns>The <see cref="T:SKPath" /> representing the text outline along the path.</returns>
+    /// <remarks />
+    public SKPath GetTextPathOnPath(ReadOnlySpan<ushort> glyphs, ReadOnlySpan<float> glyphWidths,
+        ReadOnlySpan<SKPoint> glyphPositions, SKPath path, SKTextAlign textAlign = SKTextAlign.Left)
+    {
+        if (glyphs.Length != glyphWidths.Length)
+            throw new ArgumentException("The number of glyphs and glyph widths must be the same.");
+        if (glyphs.Length != glyphPositions.Length)
+            throw new ArgumentException("The number of glyphs and glyph offsets must be the same.");
+        if (path == null)
+            throw new ArgumentNullException(nameof(path));
+
+        if (glyphs.Length == 0)
+            return new SKPath();
+
+        using var glyphPathCache = new GlyphPathCache(this);
+        using var pathMeasure = new SKPathMeasure(path);
+
+        var contourLength = pathMeasure.Length;
+
+        var textLength = glyphPositions[glyphs.Length - 1].X + glyphWidths[glyphs.Length - 1];
+        var alignment = (int)textAlign * 0.5f;
+        var startOffset = glyphPositions[0].X + (contourLength - textLength) * alignment;
+
+        using var builder = new SKPathBuilder();
+
+        // TODO: deal with multiple contours?
+        for (var index = 0; index < glyphPositions.Length; index++)
+        {
+            var glyphOffset = glyphPositions[index];
+            var gw = glyphWidths[index];
+            var x0 = startOffset + glyphOffset.X;
+            var x1 = x0 + gw;
+
+            if (x1 >= 0 && x0 <= contourLength)
+            {
+                var glyphId = glyphs[index];
+                var glyphPath = glyphPathCache.GetPath(glyphId);
+                if (glyphPath != null)
+                {
+                    var transformation = SKMatrix.CreateTranslation(x0, glyphOffset.Y);
+                    MorphPath(builder, glyphPath, pathMeasure, transformation);
+                }
+            }
+        }
+
+        return builder.Detach();
+
+        static void MorphPath(SKPathBuilder dst, SKPath src, SKPathMeasure meas, in SKMatrix matrix)
+        {
+            // TODO:
+            // Need differentially more subdivisions when the follow-path is curvy. Not sure how to determine
+            // that, but we need it. I guess a cheap answer is let the caller tell us, but that seems like a
+            // cop-out. Another answer is to get Skia's Rob Johnson to figure it out.
+
+            using var it = src.CreateIterator(false);
+
+            SKPathVerb verb;
+
+            Span<SKPoint> srcP = stackalloc SKPoint[4];
+            Span<SKPoint> dstP = stackalloc SKPoint[4];
+
+            while ((verb = it.Next(srcP)) != SKPathVerb.Done)
+            {
+                switch (verb)
+                {
+                    case SKPathVerb.Move:
+                        MorphPoints(dstP, srcP, 1, meas, matrix);
+                        dst.MoveTo(dstP[0]);
+                        break;
+                    case SKPathVerb.Line:
+                        // turn lines into quads to look bendy
+                        srcP[0].X = (srcP[0].X + srcP[1].X) * 0.5f;
+                        srcP[0].Y = (srcP[0].Y + srcP[1].Y) * 0.5f;
+                        MorphPoints(dstP, srcP, 2, meas, matrix);
+                        dst.QuadTo(dstP[0], dstP[1]);
+                        break;
+                    case SKPathVerb.Quad:
+                        MorphPoints(dstP, srcP.Slice(1, 2), 2, meas, matrix);
+                        dst.QuadTo(dstP[0], dstP[1]);
+                        break;
+                    case SKPathVerb.Conic:
+                        MorphPoints(dstP, srcP.Slice(1, 2), 2, meas, matrix);
+                        dst.ConicTo(dstP[0], dstP[1], it.ConicWeight());
+                        break;
+                    case SKPathVerb.Cubic:
+                        MorphPoints(dstP, srcP.Slice(1, 3), 3, meas, matrix);
+                        dst.CubicTo(dstP[0], dstP[1], dstP[2]);
+                        break;
+                    case SKPathVerb.Close:
+                        dst.Close();
+                        break;
+                    default:
+                        Debug.Fail("Unknown verb when iterating points in glyph path.");
+                        break;
+                }
+            }
+        }
+
+        static void MorphPoints(Span<SKPoint> dst, Span<SKPoint> src, int count, SKPathMeasure meas, in SKMatrix matrix)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                SKPoint s = matrix.MapPoint(src[i].X, src[i].Y);
+
+                if (!meas.GetPositionAndTangent(s.X, out var p, out var t))
+                {
+                    // set to 0 if the measure failed, so that we just set dst == pos
+                    t = SKPoint.Empty;
+                }
+
+                // y-offset the point in the direction of the normal vector on the path.
+                dst[i] = new SKPoint(p.X - t.Y * s.Y, p.Y + t.X * s.Y);
+            }
+        }
+    }
+
+    // Utils
+
+    private bool ValidateTextArgs(void* text, int length, SKTextEncoding encoding)
     {
         if (length == 0)
             return false;
@@ -264,5 +1834,43 @@ public sealed unsafe class SKFont : SKObject, IFont
             throw new ArgumentNullException(nameof(text));
 
         return true;
+    }
+
+    //
+
+    internal static SKFont GetObject(IntPtr handle, bool owns = true) =>
+        GetOrAddObject(handle, owns, (h, o) => new SKFont(h, o));
+
+    //
+
+    internal sealed class GlyphPathCache : Dictionary<ushort, SKPath>, IDisposable
+    {
+        public SKFont Font { get; }
+
+        public GlyphPathCache(SKFont font)
+        {
+            Font = font;
+        }
+
+        public SKPath GetPath(ushort glyph)
+        {
+            if (!TryGetValue(glyph, out var path))
+            {
+                path = Font.GetGlyphPath(glyph);
+                this[glyph] = path;
+            }
+
+            return path;
+        }
+
+        public void Dispose()
+        {
+            foreach (var path in Values)
+            {
+                path?.Dispose();
+            }
+
+            Clear();
+        }
     }
 }
