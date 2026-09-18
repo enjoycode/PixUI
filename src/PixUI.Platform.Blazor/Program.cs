@@ -30,14 +30,14 @@ public static class Program
     private static async Task Run(int width, int height, float ratio, string? routePath, bool isMacOS)
     {
         //初始化默认字体
-        await using var fontDataStream =
-            await BlazorApplication.HttpClient.GetStreamAsync("/fonts/MiSans-Regular.woff2");
+        var fontUrl = "/fonts/MiSans-Regular.woff2";
+        // var fontUrl = "/fonts/NotoMono-Regular.ttf";
+        await using var fontDataStream = await BlazorApplication.HttpClient.GetStreamAsync(fontUrl);
         //因fontDataStream不支持同步复制(DotNet10)，所以先复制至MemoryStream
         using var ms = new MemoryStream();
         await fontDataStream.CopyToAsync(ms);
         ms.Position = 0;
-        var typeface = SKTypeface.FromStream(ms);
-        //FontCollection.RegisterTypeface(ms, FontCollection.DefaultFamilyName, false);
+        FontCollection.RegisterTypeface(ms, FontCollection.DefaultFamilyName, false);
 
         var adapter = await WebGPU.RequestAdapter();
         Console.WriteLine(adapter);

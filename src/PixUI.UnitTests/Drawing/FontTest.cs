@@ -21,18 +21,21 @@ public class FontTest
     private static IFont GetFont(string familyName, bool bold, bool italic, int sizeInPoints) =>
         GetTypeface(familyName, bold, italic).MakeFont(sizeInPoints);
 
+
     [Test]
-    public void CreateTypefaceFromDataTest()
+    public void CreateTypefaceTest()
     {
-        var path = "/Users/rick/Projects/AppBox/ext/PixUI/src/PixUI.Platform.Blazor/wwwroot/fonts/MiSans-Regular.woff2";
+        //var path = "/Users/rick/Projects/AppBox/ext/PixUI/src/PixUI.Platform.Blazor/wwwroot/fonts/MiSans-Regular.woff2";
+        var path = "/Users/rick/Projects/AppBox/ext/PixUI/src/PixUI.Platform.Blazor/wwwroot/fonts/NotoMono-Regular.ttf";
         var fs = File.OpenRead(path);
         var ms = new MemoryStream((int)fs.Length);
         fs.CopyTo(ms);
         ms.Seek(0, SeekOrigin.Begin);
-        var data = SKData.Create(ms);
-        
-        //var typeface = SKTypeface.FromStream(fs);
-        var typeface = SKTypeface.FromData(data);
+        // var data = SKData.Create(ms);
+
+        var fontManager = SKFontManager.Default;
+        // var typeface = fontManager.CreateTypeface(data);
+        var typeface = fontManager.CreateTypeface(ms);
         Assert.NotNull(typeface);
     }
 

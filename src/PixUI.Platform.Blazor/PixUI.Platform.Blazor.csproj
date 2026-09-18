@@ -26,6 +26,7 @@
         <WasmEnableSIMD>true</WasmEnableSIMD>
         <WasmAllowUndefinedSymbols>true</WasmAllowUndefinedSymbols>
         <EmccInitialHeapSize>128MB</EmccInitialHeapSize>
+<!--        <EmccExtraCFlags>-pthread</EmccExtraCFlags>-->
         <EmccExtraLDFlags>-s USE_WEBGL2=0 -s USE_WEBGPU=1</EmccExtraLDFlags>
         <LangVersion>default</LangVersion>
     </PropertyGroup>

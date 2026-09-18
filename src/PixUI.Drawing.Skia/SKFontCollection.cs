@@ -3,7 +3,7 @@ namespace PixUI.Drawing.Skia;
 public sealed class SKFontCollection : IFontCollection
 {
     private readonly IntPtr _fontCollectionHandle;
-    private readonly IntPtr _assetFontMgrHandle;
+    private readonly IntPtr _assetFontMgr;
 
     private readonly HashSet<string> _loading = new();
     private readonly Dictionary<string, SKTypeface> _loaded = new();
@@ -14,8 +14,8 @@ public sealed class SKFontCollection : IFontCollection
 
     internal SKFontCollection()
     {
-        _assetFontMgrHandle = SkiaApi.sk_typeface_font_provider_new();
-        _fontCollectionHandle = SkiaApi.sk_font_collection_new(_assetFontMgrHandle, OperatingSystem.IsBrowser());
+        _assetFontMgr = SkiaApi.sk_typeface_font_provider_new();
+        _fontCollectionHandle = SkiaApi.sk_font_collection_new(_assetFontMgr, OperatingSystem.IsBrowser());
     }
 
     public bool HasAny => _loading.Count > 0;
@@ -50,7 +50,7 @@ public sealed class SKFontCollection : IFontCollection
             return;
         }
 
-        SkiaApi.sk_typeface_font_provider_register_typeface(_assetFontMgrHandle, typeface.Handle);
+        SkiaApi.sk_typeface_font_provider_register_typeface(_assetFontMgr, typeface.Handle);
         Console.WriteLine($"FontCollection.RegisterTypeface: {typeface.FamilyName}");
 
         _loaded[fontFamily] = typeface;
