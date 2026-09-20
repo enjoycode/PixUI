@@ -66,34 +66,59 @@ public static class Program
 
         var backendContext = new SKGraphiteDawnBackendContext
         {
-            WgpuInstance = (IntPtr)instanceId,
-            WgpuDevice = (IntPtr)deviceId,
-            WgpuQueue = (IntPtr)queueId,
+            WgpuInstance = instanceId,
+            WgpuDevice = deviceId,
+            WgpuQueue = queueId,
         };
         var context = SKGraphiteContext.CreateDawn(backendContext)
                       ?? throw new InvalidOperationException("SKGraphiteContext.CreateDawn returned null.");
-        var recorder = context.CreateRecorder()
-                       ?? throw new InvalidOperationException("SKGraphiteContext.CreateRecorder returned null.");
+        var onscreenRecorder = context.CreateRecorder() ?? throw new InvalidOperationException(
+            "SKGraphiteContext.CreateRecorder returned null.");
+        var offscreenRecorder = context.CreateRecorder() ?? throw new InvalidOperationException(
+            "SKGraphiteContext.CreateRecorder returned null.");
 
-        //var texture = WebGPU.CreateTexture(offscreenDevice, 400, 300); //offscreen texture
-        var texture = WebGPU.GetCanvasTexture(device); //onscreen texture
-        var textureId = WebGPU.RegisterTexture(texture);
+        //create onscreen surface
+        var onscreenTexture = WebGPU.GetCanvasTexture(device);
+        var onscreenTextureId = WebGPU.RegisterTexture(onscreenTexture);
 
-        using var backendTex = SKGraphiteBackendTexture.CreateDawn((IntPtr)textureId)
-                               ?? throw new InvalidOperationException(
-                                   "SKGraphiteBackendTexture.CreateDawn returned null.");
-        using var surface = SKSurface.Create(recorder, backendTex, ColorType.Rgba8888)
-                            ?? throw new InvalidOperationException("SKSurface.Create returned null on Graphite/Dawn.");
-        Console.WriteLine(backendTex.Dimensions);
+        using var onscreenBackend = SKGraphiteBackendTexture.CreateDawn(onscreenTextureId) ??
+                                    throw new InvalidOperationException(
+                                        "SKGraphiteBackendTexture.CreateDawn returned null.");
+        using var onscreenSurface = SKSurface.Create(onscreenRecorder, onscreenBackend, ColorType.Rgba8888)
+                                    ?? throw new InvalidOperationException(
+                                        "SKSurface.Create returned null on Graphite/Dawn.");
 
-        //Draw to surface.Canvas
+        //create offscreen surface
+        var offscreenTexture =
+            WebGPU.CreateTexture(device, onscreenBackend.Dimensions.Width, onscreenBackend.Dimensions.Height);
+        var offscreenTextureId = WebGPU.RegisterTexture(offscreenTexture);
+        using var offscreenBackend = SKGraphiteBackendTexture.CreateDawn(offscreenTextureId)
+                                     ?? throw new InvalidOperationException(
+                                         "SKGraphiteBackendTexture.CreateDawn returned null.");
+        using var offscreenSurface = SKSurface.Create(offscreenRecorder, offscreenBackend, ColorType.Rgba8888)
+                                     ?? throw new InvalidOperationException(
+                                         "SKSurface.Create returned null on Graphite/Dawn.");
+
+        //Draw something
         using var paint = new SKPaint();
         paint.Color = Colors.Red;
-        surface.Canvas.Clear(Colors.White);
-        //surface.Canvas.DrawLine(10, 10, 100, 100, Paint.Shared(Colors.Red, PaintStyle.Stroke));
-        surface.Canvas.DrawRect(Rect.FromLTWH(10, 10, 100, 100), paint);
+        paint.IsAntialias = true;
+        offscreenSurface.Canvas.Clear(Colors.White);
+        offscreenSurface.Canvas.DrawRect(Rect.FromLTWH(10, 10, 100, 100), paint);
+        paint.Color = Colors.Green;
+        paint.Style = PaintStyle.Stroke;
+        offscreenSurface.Canvas.DrawLine(10, 10, 110, 110, paint);
+        FlushSurface(context, offscreenRecorder);
+        offscreenSurface.Draw(onscreenSurface.Canvas, 0, 0, null);
 
-        using (var recording = recorder.Snap() ?? throw new InvalidOperationException("Recorder.Snap() returned null."))
+        //flush onscreen surface
+        FlushSurface(context, onscreenRecorder);
+    }
+
+    private static void FlushSurface(SKGraphiteContext context, SKGraphiteRecorder recorder)
+    {
+        using (var recording = recorder.Snap() ??
+                               throw new InvalidOperationException("Recorder.Snap() returned null."))
         {
             if (context.InsertRecording(recording) != SKGraphiteInsertStatus.Success)
                 throw new InvalidOperationException("InsertRecording did not report Success.");
