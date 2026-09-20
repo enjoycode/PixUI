@@ -30,6 +30,9 @@ internal partial class WebGPU
 
     [JSImport("globalThis.PixUI.WebGPU.createTexture")]
     internal static partial JSObject CreateTexture(JSObject device, int width, int height);
+    
+    [JSImport("globalThis.PixUI.GetCanvasTexture")]
+    internal static partial JSObject GetCanvasTexture(JSObject device);
 
     [JSImport("globalThis.PixUI.WebGPU.createBuffer")]
     internal static partial JSObject CreateBuffer(JSObject device, int size);

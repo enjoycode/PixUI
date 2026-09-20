@@ -1,0 +1,67 @@
+<Project>
+    <!-- if ShouldIncludeNativeSkia == False then don't include the native libskia -->
+    <PropertyGroup>
+        <ShouldIncludeNativeSkia Condition=" '$(ShouldIncludeNativeSkia)' == '' ">True</ShouldIncludeNativeSkia>
+    </PropertyGroup>
+
+    <!-- If this is a .NET web assembly app -->
+    <PropertyGroup Condition="('$(UsingMicrosoftNETSdkBlazorWebAssembly)' == 'true' or '$(UsingMicrosoftNETSdkWebAssembly)' == 'true') and '$(ShouldIncludeNativeSkia)' == 'True'">
+        <WasmBuildNative Condition="'$(WasmBuildNative)' == ''">true</WasmBuildNative>
+        <!--
+          net8.x (emsdk 3.1.34) uses the built-in `-sUSE_WEBGPU=1`; net9.0+ uses
+          Dawn's emdawnwebgpu port, which ships in this NuGet at
+          buildTransitive/netstandard1.0/emdawnwebgpu_pkg/. Discriminate on
+          $(TargetFramework) directly — $(TargetFrameworkVersion) is populated by a
+          later SDK import so it's still empty here.
+        -->
+        <_SkiaUseEmdawnwebgpu Condition="'$(_SkiaUseEmdawnwebgpu)' == '' and '$(TargetFramework)' != '' and !$(TargetFramework.StartsWith('net8.'))">true</_SkiaUseEmdawnwebgpu>
+        <!-- Normalize to forward slashes: emcc parses `-isystem <abs-path>` as one
+             shell arg and swallows Windows backslashes. -->
+        <_SkiaEmdawnwebgpuPkg>$([System.String]::Copy('$(MSBuildThisFileDirectory)..\..\out\wasm\emdawnwebgpu_pkg').Replace('\','/'))</_SkiaEmdawnwebgpuPkg>
+        <!--
+          Inline the port's inputs rather than emcc's ports mechanism: that
+          compiles into emcc's cache (needs FROZEN_CACHE=0), and the .NET WASM SDK's
+          FROZEN_CACHE=1 + parallel compile races on sysroot_install.stamp. Passing
+          the include paths, JS libraries, and webgpu.cpp directly replicates the
+          port without touching the cache; -sDEFAULT_TO_CXX=1 keeps LINK_AS_CXX on.
+        -->
+        <_SkiaEmdawnwebgpuFlags Condition="'$(_SkiaUseEmdawnwebgpu)' == 'true'">-s DEFAULT_TO_CXX=1 -isystem $(_SkiaEmdawnwebgpuPkg)/webgpu/include -isystem $(_SkiaEmdawnwebgpuPkg)/webgpu_cpp/include --js-library=$(_SkiaEmdawnwebgpuPkg)/webgpu/src/library_webgpu_enum_tables.js --js-library=$(_SkiaEmdawnwebgpuPkg)/webgpu/src/library_webgpu_generated_struct_info.js --js-library=$(_SkiaEmdawnwebgpuPkg)/webgpu/src/library_webgpu_generated_sig_info.js --js-library=$(_SkiaEmdawnwebgpuPkg)/webgpu/src/library_webgpu.js -std=c++20 $(_SkiaEmdawnwebgpuPkg)/webgpu/src/webgpu.cpp</_SkiaEmdawnwebgpuFlags>
+        <EmccExtraLDFlags Condition="'$(_SkiaUseEmdawnwebgpu)' == 'true'">$(EmccExtraLDFlags) -s USE_WEBGL2=0 $(_SkiaEmdawnwebgpuFlags)</EmccExtraLDFlags>
+        <EmccExtraLDFlags Condition="'$(_SkiaUseEmdawnwebgpu)' != 'true'">$(EmccExtraLDFlags) -s USE_WEBGL2=0 -s USE_WEBGPU=1</EmccExtraLDFlags>
+    </PropertyGroup>
+    <ItemGroup Condition="('$(UsingMicrosoftNETSdkBlazorWebAssembly)' == 'true' or '$(UsingMicrosoftNETSdkWebAssembly)' == 'true') and '$(TargetFrameworkVersion)' != '' and '$(ShouldIncludeNativeSkia)' == 'True'">
+        <!-- Skia's interop reads Module.WebGPU.{mgr*,importJs*}, so export the
+             WebGPU runtime method. -->
+        <EmccExportedRuntimeMethod Include="WebGPU"/>
+        <!-- emdawnwebgpu allocates refcounted WGPUTexture handles; the managed
+             interop releases them via the C ABI's wgpuTextureRelease, so export it
+             as Module._wgpuTextureRelease. -->
+        <EmccExportedFunction Include="_wgpuTextureRelease" Condition="'$(_SkiaUseEmdawnwebgpu)' == 'true'"/>
+        <!-- Skia's DawnBackendContext needs a real WGPUInstance* — the emdawnwebgpu
+             port's wgpuCreateInstance returns one. Export it as Module._wgpuCreateInstance
+             so the managed WebGPU shim can call it instead of falling back to a fake
+             handle (a bogus pointer would hang inside wgpu::Instance::AddRef). -->
+        <EmccExportedFunction Include="_wgpuCreateInstance" Condition="'$(_SkiaUseEmdawnwebgpu)' == 'true'"/>
+        <!-- net8.0 -->
+        <NativeFileReference Include="$(MSBuildThisFileDirectory)..\..\out\wasm\*.a" Condition="$([MSBuild]::VersionEquals($(TargetFrameworkVersion), '8.0'))"/>
+        <!-- net9.0+ -->
+        <NativeFileReference Include="$(MSBuildThisFileDirectory)..\..\out\wasm\*.a" Condition="$([MSBuild]::VersionGreaterThanOrEquals($(TargetFrameworkVersion), '9.0'))"/>
+    </ItemGroup>
+
+    <!-- Workaround for https://github.com/dotnet/runtime/issues/109289 -->
+    <Target Name="RuntimeIssue109289_Workaround" AfterTargets="_BrowserWasmWriteRspForLinking">
+        <ItemGroup>
+            <_WasmLinkStepArgs Remove="@(_EmccLinkStepArgs)"/>
+            <_EmccLinkStepArgs Remove="&quot;%(_WasmNativeFileForLinking.Identity)&quot;"/>
+            <_WasmLinkDependencies Remove="@(_WasmNativeFileForLinking)"/>
+
+            <_SkiaToReorder Include="@(_WasmNativeFileForLinking)" Condition="$([System.String]::Copy('%(FullPath)').Contains('skia.a'))"/>
+            <_WasmNativeFileForLinking Remove="@(_SkiaToReorder)"/>
+            <_WasmNativeFileForLinking Include="@(_SkiaToReorder)"/>
+
+            <_EmccLinkStepArgs Include="&quot;%(_WasmNativeFileForLinking.Identity)&quot;"/>
+            <_WasmLinkDependencies Include="@(_WasmNativeFileForLinking)"/>
+            <_WasmLinkStepArgs Include="@(_EmccLinkStepArgs)"/>
+        </ItemGroup>
+    </Target>
+</Project>

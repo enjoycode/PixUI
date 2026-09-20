@@ -1,3 +1,5 @@
+#nullable disable
+
 using System.Runtime.InteropServices;
 
 namespace PixUI.Drawing.Skia;
@@ -7,8 +9,13 @@ namespace PixUI.Drawing.Skia;
 /// <param name="instance">The Vulkan instance handle to resolve the function against, or <see langword="null" /> when resolving a global or device-level function.</param>
 /// <param name="device">The Vulkan device handle to resolve the function against, or <see langword="null" /> when resolving a global or instance-level function.</param>
 /// <returns>A pointer to the resolved Vulkan function, or <see cref="F:System.IntPtr.Zero" /> if the function could not be found.</returns>
-/// <remarks />
 public delegate IntPtr SKGraphiteVkGetProcedureAddressDelegate(string name, IntPtr instance, IntPtr device);
+
+/// <summary>
+/// Represents the method that is called when Skia is finished
+/// using a wrapped Graphite backend texture and the caller may release the underlying resource.
+/// </summary>
+public delegate void SKGraphiteReleaseDelegate();
 
 /// <summary>Represents a callback method that receives the path and transformation matrix for each glyph when enumerating glyph paths.</summary>
 /// <param name="path">The path of the glyph, or <see langword="null" /> if the glyph has no path.</param>
@@ -67,5 +74,18 @@ internal static unsafe partial class DelegateProxies
         var del = Get<SKGraphiteVkGetProcedureAddressDelegate>((IntPtr)userData, out _);
 
         return del.Invoke(Marshal.PtrToStringAnsi((IntPtr)name), instance, device);
+    }
+
+    private static partial void SKGraphiteReleaseProxyImplementation(void* releaseContext)
+    {
+        var del = Get<SKGraphiteReleaseDelegate>((IntPtr)releaseContext, out var gch);
+        try
+        {
+            del.Invoke();
+        }
+        finally
+        {
+            gch.Free();
+        }
     }
 }

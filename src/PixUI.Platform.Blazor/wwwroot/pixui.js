@@ -1,8 +1,8 @@
 export let PixUI = {
     _htmlCanvas: null,
     _htmlInput: null,
+    _canvasCtx: null,
     _asmName: "PixUI",
-    M: null,
     _baseHref: (document.getElementsByTagName('base')[0] || {href: document.location.origin + '/'}).href,
 
     Init: function () {
@@ -42,6 +42,15 @@ export let PixUI = {
         });
 
         this._htmlInput = input;
+    },
+    
+    GetCanvasTexture: function(device) {
+        this._canvasCtx = this._htmlCanvas.getContext("webgpu");
+        this._canvasCtx.configure({
+            device: device,
+            format: navigator.gpu.getPreferredCanvasFormat(),
+        });
+        return this._canvasCtx.getCurrentTexture();
     },
 
     UpdateCanvasSize: function () {
@@ -235,7 +244,6 @@ export let PixUI = {
 
     BeforeRunApp: function () {
         this._asmName = Blazor.runtime.getConfig().mainAssemblyName
-        this.M = Blazor.runtime.Module.WebGPU
 
         let routePath = document.location.hash.length > 0 ? document.location.hash.substring(1) : null
         let isMacOS = navigator.userAgent.includes("Mac")
@@ -250,7 +258,8 @@ export let PixUI = {
 
     WebGPU: {
         requestAdapter: () => navigator.gpu && navigator.gpu.requestAdapter({powerPreference: 'low-power'}),
-        createInstance: () => (typeof this.M._wgpuCreateInstance === 'function') ? this.M._wgpuCreateInstance(0) : 0,
+        createInstance: () => (typeof Blazor.runtime.Module.wasmExports.wgpuCreateInstance === 'function')
+            ? Blazor.runtime.Module.wasmExports.wgpuCreateInstance(0) : 0,
         // Port-agnostic handle registration. emdawnwebgpu ships
         // importJs* on Module.WebGPU; the legacy -sUSE_WEBGPU=1
         // port shipped mgr* HandleAllocator tables with .create.
@@ -259,15 +268,15 @@ export let PixUI = {
         // WaitAny assert(event->mInstanceId == instance) fire on
         // the first async wait. Pass the current instance handle
         // so device/queue events resolve against it.
-        registerDevice: (d, parent) => this.M.WebGPU.importJsDevice
-            ? this.M.WebGPU.importJsDevice(d, parent)
-            : this.M.WebGPU.mgrDevice.create(d),
-        registerQueue: (q, parent) => this.M.WebGPU.importJsQueue
-            ? this.M.WebGPU.importJsQueue(q, parent)
-            : this.M.WebGPU.mgrQueue.create(q),
-        registerTexture: (t) => this.M.WebGPU.importJsTexture
-            ? this.M.WebGPU.importJsTexture(t)
-            : this.M.WebGPU.mgrTexture.create(t),
+        registerDevice: (d, parent) => Blazor.runtime.Module.WebGPU.importJsDevice
+            ? Blazor.runtime.Module.WebGPU.importJsDevice(d, parent)
+            : Blazor.runtime.Module.WebGPU.mgrDevice.create(d),
+        registerQueue: (q, parent) => Blazor.runtime.Module.WebGPU.importJsQueue
+            ? Blazor.runtime.Module.WebGPU.importJsQueue(q, parent)
+            : Blazor.runtime.Module.WebGPU.mgrQueue.create(q),
+        registerTexture: (t) => Blazor.runtime.Module.WebGPU.importJsTexture
+            ? Blazor.runtime.Module.WebGPU.importJsTexture(t)
+            : Blazor.runtime.Module.WebGPU.mgrTexture.create(t),
         // Under emdawnwebgpu, released handles hold real
         // refcounted C-side WGPUTexture objects — call the C ABI
         // via the exported symbol. Under the legacy port they
@@ -275,10 +284,10 @@ export let PixUI = {
         // .release. Try the C ABI first (it's the mandatory
         // path under emdawnwebgpu), fall back to the JS table.
         releaseTexture: (id) => {
-            if (typeof this.M._wgpuTextureRelease === 'function') {
-                this.M._wgpuTextureRelease(id);
-            } else if (this.M.WebGPU.mgrTexture) {
-                this.M.WebGPU.mgrTexture.release(id);
+            if (typeof Blazor.runtime.Module.wasmExports.wgpuTextureRelease === 'function') {
+                Blazor.runtime.Module.wasmExports.wgpuTextureRelease(id);
+            } else if (Blazor.runtime.Module.WebGPU.mgrTexture) {
+                Blazor.runtime.Module.WebGPU.mgrTexture.release(id);
             }
         },
         requestDevice: (adapter) => adapter.requestDevice(),

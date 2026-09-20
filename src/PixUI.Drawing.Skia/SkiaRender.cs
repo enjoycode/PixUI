@@ -82,31 +82,33 @@ public sealed class SkiaRender : IRender
 
     public ISurface? MakeSurface(IGRContext context, bool budgeted, ImageInfo info, int sampleCount,
         SurfaceOrigin origin, ISurfaceProperties? props, bool shouldCreateWithMips) =>
-        SKSurface.Create((GRRecordingContext)context, budgeted, info, sampleCount, origin, props, shouldCreateWithMips);
+        throw new NotSupportedException();//SKSurface.Create((GRRecordingContext)context, budgeted, info, sampleCount, origin, props, shouldCreateWithMips);
 
     public ISurface? MakeSurfaceForWebGL(IGRContext context, int width, int height) =>
-        SKSurface.CreateGLOnScreen((GRContext)context, width, height);
+        throw new NotSupportedException(); //SKSurface.CreateGLOnScreen((GRContext)context, width, height));
 
     public unsafe ISurface? MakeSurfaceForMetalWindow(IGRContext context, IntPtr textureHandle,
         int width, int height, int sampleCount,
         IColorSpace? colorSpace, ISurfaceProperties? surfaceProperties)
     {
-        var fbInfo = new GRMtlTextureInfoNative();
-        fbInfo.fTexture = (void*)textureHandle;
-
-        using var backendRt = GRBackendRenderTarget.CreateMetal(width, height, sampleCount, fbInfo);
-        return SKSurface.Create((GRContext)context, backendRt, SurfaceOrigin.TopLeft,
-            ColorType.Bgra8888, colorSpace as SKColorSpace, surfaceProperties as SKSurfaceProperties);
+        throw new NotSupportedException();
+        // var fbInfo = new GRMtlTextureInfoNative();
+        // fbInfo.fTexture = (void*)textureHandle;
+        //
+        // using var backendRt = GRBackendRenderTarget.CreateMetal(width, height, sampleCount, fbInfo);
+        // return SKSurface.Create((GRContext)context, backendRt, SurfaceOrigin.TopLeft,
+        //     ColorType.Bgra8888, colorSpace as SKColorSpace, surfaceProperties as SKSurfaceProperties);
     }
 
     public ISurface? MakeSurfaceForDirect3DWindow(IGRContext context, IDirect3DSwapChain swapChain, int bufferIndex,
         int width, int height,
         IColorSpace? colorSpace, ISurfaceProperties? surfaceProperties)
     {
-        var backBuffer = SkiaApi.gr_d3d_swapchain_get_buffer(((Direct3DSwapChain)swapChain).Handle, bufferIndex);
-        using var backendRt = GRBackendRenderTarget.CreateDirect3D(width, height, backBuffer);
-        return SKSurface.Create((GRContext)context, backendRt, SurfaceOrigin.TopLeft,
-            ColorType.Rgba8888, colorSpace as SKColorSpace, surfaceProperties as SKSurfaceProperties);
+        throw new NotSupportedException();
+        // var backBuffer = SkiaApi.gr_d3d_swapchain_get_buffer(((Direct3DSwapChain)swapChain).Handle, bufferIndex);
+        // using var backendRt = GRBackendRenderTarget.CreateDirect3D(width, height, backBuffer);
+        // return SKSurface.Create((GRContext)context, backendRt, SurfaceOrigin.TopLeft,
+        //     ColorType.Rgba8888, colorSpace as SKColorSpace, surfaceProperties as SKSurfaceProperties);
     }
 
     public IDirect3DSwapChain MakeDirect3DSwapChain(IntPtr windowHandle, IDirect3DBackendContext direct3DBackendContext,

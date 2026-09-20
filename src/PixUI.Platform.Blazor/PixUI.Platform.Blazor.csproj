@@ -23,11 +23,10 @@
 
 <!--        <EmccExtraCFlags>-s MAIN_MODULE=2 -sAUTOLOAD_DYLIBS=0</EmccExtraCFlags>-->
         
+<!--        <WasmEnableThreads>true</WasmEnableThreads>-->
         <WasmEnableSIMD>true</WasmEnableSIMD>
         <WasmAllowUndefinedSymbols>true</WasmAllowUndefinedSymbols>
         <EmccInitialHeapSize>128MB</EmccInitialHeapSize>
-<!--        <EmccExtraCFlags>-pthread</EmccExtraCFlags>-->
-        <EmccExtraLDFlags>-s USE_WEBGL2=0 -s USE_WEBGPU=1</EmccExtraLDFlags>
         <LangVersion>default</LangVersion>
     </PropertyGroup>
 
@@ -35,10 +34,10 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.0" PrivateAssets="all" />
     </ItemGroup>
+    
+    <Import Project="../PixUI.Drawing.Skia/Wasm.targets" />
 
     <ItemGroup>
-        <EmccExportedRuntimeMethod Include="WebGPU" />
-        <NativeFileReference Include="libs\skia.a" />
 <!--        <NativeFileReference Include="libs\tree-sitter.o" />-->
 <!--        <NativeFileReference Include="libs\tree-sitter-csharp.a" />-->
     </ItemGroup>
