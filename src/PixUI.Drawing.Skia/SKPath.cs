@@ -397,7 +397,6 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
         if (strokeWidth <= 0)
             throw new ArgumentOutOfRangeException(nameof(strokeWidth), "Stroke width must be positive.");
 
-        var strokedPath = new SKPath();
         using var strokePaint = new SKPaint();
         strokePaint.Style = PaintStyle.Stroke;
         strokePaint.StrokeWidth = strokeWidth;
@@ -405,14 +404,15 @@ public unsafe class SKPath : SKObject, ISKSkipObjectRegistration, IPath
         strokePaint.StrokeJoin = StrokeJoin.Miter;
         strokePaint.IsAntialias = true;
 
-        var ok = SkiaApi.sk_paint_get_fill_path(strokePaint.Handle, Handle, strokedPath.Handle, null, 1);
+        var pathBuilder = new SKPathBuilder();
+        var ok = SkiaApi.sk_paint_get_fill_path(Handle, strokePaint.Handle, pathBuilder.Handle);
         if (!ok)
         {
-            strokedPath.Dispose();
+            pathBuilder.Dispose();
             return null;
         }
 
-        return strokedPath;
+        return pathBuilder.Detach();
     }
 
     public bool Op(IPath other, PathOp op)
