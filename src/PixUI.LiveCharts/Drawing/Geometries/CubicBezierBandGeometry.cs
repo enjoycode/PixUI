@@ -34,7 +34,7 @@ namespace PixUI.LiveCharts.Drawing.Geometries;
 /// </summary>
 public class CubicBezierBandGeometry : BaseVectorGeometry, IBandVectorGeometry, IDrawnElement<SkiaSharpDrawingContext>
 {
-    private SKPath? _cachedPath;
+    private IPathBuilder? _cachedPathBuilder;
 
     /// <summary>
     /// Gets the low-curve segments, in the same forward (ascending Id) order as
@@ -48,8 +48,8 @@ public class CubicBezierBandGeometry : BaseVectorGeometry, IBandVectorGeometry, 
     {
         if (Commands.Count == 0 || LowCommands.Count == 0) return;
 
-        var path = _cachedPath ??= Path.Create();
-        path.Reset();
+        var pathBuilder = _cachedPathBuilder ??= PathBuilder.Create();
+        pathBuilder.Reset();
 
         var isValid = true;
         List<Segment>? toRemoveSegments = null;
@@ -61,11 +61,11 @@ public class CubicBezierBandGeometry : BaseVectorGeometry, IBandVectorGeometry, 
             var cubic = (CubicBezierSegment)s;
             if (isFirst)
             {
-                path.MoveTo(s.Xi, s.Yi);
+                pathBuilder.MoveTo(s.Xi, s.Yi);
                 isFirst = false;
             }
 
-            path.CubicTo(s.Xi, s.Yi, cubic.Xm, cubic.Ym, s.Xj, s.Yj);
+            pathBuilder.CubicTo(s.Xi, s.Yi, cubic.Xm, cubic.Ym, s.Xj, s.Yj);
             isValid = isValid && s.IsValid;
             if (s.IsValid && s.RemoveOnCompleted) (toRemoveSegments ??= []).Add(s);
         }
@@ -76,7 +76,7 @@ public class CubicBezierBandGeometry : BaseVectorGeometry, IBandVectorGeometry, 
         // (or the first segment's own Xi/Yi when we reach it), P1 = (Xi, Yi),
         // P2 = (Xm, Ym), P3 = (Xj, Yj).
         var lastLow = LowCommands.Last!.Value;
-        path.LineTo(lastLow.Xj, lastLow.Yj);
+        pathBuilder.LineTo(lastLow.Xj, lastLow.Yj);
 
         var node = LowCommands.Last;
         while (node is not null)
@@ -87,13 +87,13 @@ public class CubicBezierBandGeometry : BaseVectorGeometry, IBandVectorGeometry, 
             var prev = node.Previous;
             var endX = prev?.Value.Xj ?? s.Xi;
             var endY = prev?.Value.Yj ?? s.Yi;
-            path.CubicTo(cubic.Xm, cubic.Ym, s.Xi, s.Yi, endX, endY);
+            pathBuilder.CubicTo(cubic.Xm, cubic.Ym, s.Xi, s.Yi, endX, endY);
             isValid = isValid && s.IsValid;
             if (s.IsValid && s.RemoveOnCompleted) (toRemoveSegments ??= []).Add(s);
             node = prev;
         }
 
-        path.Close();
+        pathBuilder.Close();
 
         if (toRemoveSegments is not null)
         {
@@ -105,6 +105,7 @@ public class CubicBezierBandGeometry : BaseVectorGeometry, IBandVectorGeometry, 
             }
         }
 
+        using var path = pathBuilder.Detach();
         context.Canvas.DrawPath(path, context.ActiveSkiaPaint);
 
         if (!isValid) IsValid = false;
@@ -112,8 +113,8 @@ public class CubicBezierBandGeometry : BaseVectorGeometry, IBandVectorGeometry, 
 
     internal override void OnDisposed()
     {
-        _cachedPath?.Dispose();
-        _cachedPath = null;
+        _cachedPathBuilder?.Dispose();
+        _cachedPathBuilder = null;
         base.OnDisposed();
     }
 }

@@ -1230,8 +1230,6 @@ public class DiagramConnection : DiagramItem, IConnection
             return;
 
         var path = GetPathFromCap(capFigure);
-        if (capFigure.IsClosed)
-            path.Close();
 
         if (StrokeDashArray is { Length: > 0 })
             canvas.DrawPathDashed(ForeColor, StrokeThickness, StrokeDashArray, path);
@@ -1255,7 +1253,7 @@ public class DiagramConnection : DiagramItem, IConnection
         var segment = geometry.Figures[0].Segments[0];
         if (segment is LineSegment lineSegment)
         {
-            var path = Path.Create();
+            using var pathBuilder = PathBuilder.Create();
             var lastFigure = geometry.Figures.Last();
 
             foreach (var figure in geometry.Figures)
@@ -1275,8 +1273,9 @@ public class DiagramConnection : DiagramItem, IConnection
 
                     if (seg is BezierSegment bSeg)
                     {
-                        using var arcPath = Path.Create();
-                        arcPath.AddBezier(startPoint, bSeg.Point1, bSeg.Point2, bSeg.Point3);
+                        using var arcPathBuilder = PathBuilder.Create();
+                        arcPathBuilder.AddBezier(startPoint, bSeg.Point1, bSeg.Point2, bSeg.Point3);
+                        using var arcPath = arcPathBuilder.Detach();
                         arcPath.Points.ForEach(p => points.Add(new Point(p.X, p.Y)));
                     }
                 }
@@ -1293,19 +1292,19 @@ public class DiagramConnection : DiagramItem, IConnection
                     //this.TotalTransform.TransformPoints(arrayPoints);
                 }
 
-                if (arrayPoints.Length > 1) path.AddLines(arrayPoints);
+                if (arrayPoints.Length > 1) pathBuilder.AddLines(arrayPoints);
 
-                if (figure != lastFigure) path.Close();
+                if (figure != lastFigure) pathBuilder.Close();
             }
 
-            return path;
+            return pathBuilder.Detach();
         }
 
         if (segment is PolyLineSegment polyLineSegment)
         {
             var points = polyLineSegment.Points;
 
-            var path = Path.Create();
+            using var pathBuilder = PathBuilder.Create();
 
             Point[] arrayPoints = new Point[points.Count + 1];
             arrayPoints[0] = geometry.Figures[0].StartPoint;
@@ -1320,14 +1319,14 @@ public class DiagramConnection : DiagramItem, IConnection
             }
 
             if (arrayPoints.Length > 1)
-                path.AddLines(arrayPoints);
+                pathBuilder.AddLines(arrayPoints);
 
-            return path;
+            return pathBuilder.Detach();
         }
 
         if (segment is BezierSegment bezierSegment)
         {
-            var path = Path.Create();
+            using var pathBuilder = PathBuilder.Create();
             var arrayPoints = new Point[4];
             arrayPoints[0] = geometry.Figures[0].StartPoint;
             arrayPoints[1] = new Point(bezierSegment.Point1.X, bezierSegment.Point1.Y);
@@ -1341,9 +1340,9 @@ public class DiagramConnection : DiagramItem, IConnection
             }
 
             if (arrayPoints.Length > 1)
-                path.AddBezier(arrayPoints[0], arrayPoints[1], arrayPoints[2], arrayPoints[3]);
+                pathBuilder.AddBezier(arrayPoints[0], arrayPoints[1], arrayPoints[2], arrayPoints[3]);
 
-            return path;
+            return pathBuilder.Detach();
         }
 
         return Path.Create();
@@ -1351,7 +1350,7 @@ public class DiagramConnection : DiagramItem, IConnection
 
     private static IPath GetPathFromCap(PathFigure figure)
     {
-        var path = Path.Create();
+        using var pathBuilder = PathBuilder.Create();
         var start = new Point(figure.StartPoint.X, figure.StartPoint.Y);
         foreach (var segment in figure.Segments)
         {
@@ -1359,7 +1358,7 @@ public class DiagramConnection : DiagramItem, IConnection
             {
                 //var pathFromLine = GetPathFromLineSegment(lineSegment, false, figure, ref start);
                 //path.AddPath(pathFromLine, true);
-                GetPathFromLineSegment(path, lineSegment, false, figure, ref start);
+                GetPathFromLineSegment(pathBuilder, lineSegment, false, figure, ref start);
                 continue;
             }
 
@@ -1367,15 +1366,16 @@ public class DiagramConnection : DiagramItem, IConnection
             {
                 //var pathFromArc = GetPathFromArcSegment(arcSegment, start);
                 //path.AddPath(pathFromArc, true);
-                GetPathFromArcSegment(path, arcSegment, start);
+                GetPathFromArcSegment(pathBuilder, arcSegment, start);
                 break;
             }
         }
 
-        return path;
+        if (figure.IsClosed) pathBuilder.Close();
+        return pathBuilder.Detach();
     }
 
-    private static void GetPathFromLineSegment(IPath path, LineSegment lineSegment, bool transforms,
+    private static void GetPathFromLineSegment(IPathBuilder pathBuilder, LineSegment lineSegment, bool transforms,
         PathFigure figure, ref Point start)
     {
         Point[] points = new Point[2];
@@ -1388,11 +1388,11 @@ public class DiagramConnection : DiagramItem, IConnection
             //this.TotalTransform.TransformPoints(points);
         }
 
-        path.AddLine(points[0], points[1]);
+        pathBuilder.AddLine(points[0], points[1]);
         start = points[1];
     }
 
-    private static void GetPathFromArcSegment(IPath path, ArcSegment arcSegment, Point startPoint)
+    private static void GetPathFromArcSegment(IPathBuilder pathBuilder, ArcSegment arcSegment, Point startPoint)
     {
         var endPoint = arcSegment.Point;
         var dist = (float)Math.Sqrt(Math.Pow(startPoint.X - endPoint.X, 2) +
@@ -1400,7 +1400,7 @@ public class DiagramConnection : DiagramItem, IConnection
         var size = new Size(dist, dist);
         var location = new Point((endPoint.X + startPoint.X - size.Width) / 2f,
             (endPoint.Y + startPoint.Y - size.Height) / 2f);
-        path.AddEllipse(Rect.FromLTWH(location.X, location.Y, dist, dist));
+        pathBuilder.AddEllipse(Rect.FromLTWH(location.X, location.Y, dist, dist));
     }
 
     private void DrawConnectionText(ICanvas canvas)

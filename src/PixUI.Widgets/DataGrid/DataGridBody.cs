@@ -118,9 +118,10 @@ internal sealed class DataGridBody<T> : Widget, IScrollable
         //draw shadow for scroll vertical
         if (_controller.ScrollController.OffsetY > 0)
         {
-            using var shadowPath = Path.Create();
             var headerHeight = _controller.TotalHeaderHeight;
-            shadowPath.AddRect(Rect.FromLTWH(0, -headerHeight, Math.Min(W, totalColumnsWidth), headerHeight));
+            using var shadowPathBuilder = PathBuilder.Create();
+            shadowPathBuilder.AddRect(Rect.FromLTWH(0, -headerHeight, Math.Min(W, totalColumnsWidth), headerHeight));
+            using var shadowPath = shadowPathBuilder.Detach();
             canvas.DrawShadow(shadowPath, Colors.Black, 5.0f, false, Root!.Window.ScaleFactor);
             canvas.Restore();
         }

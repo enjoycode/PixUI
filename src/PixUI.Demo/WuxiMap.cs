@@ -176,19 +176,20 @@ public sealed class WuxiMap : Widget
             {
                 if (landData.Shape is LandAreaGeometry shape)
                 {
-                    using var path = Path.Create();
+                    using var pathBuilder = PathBuilder.Create();
                     var isFirst = true;
                     foreach (var segment in shape.Commands)
                     {
                         if (isFirst)
                         {
-                            path.MoveTo(segment.Xi, segment.Yi);
+                            pathBuilder.MoveTo(segment.Xi, segment.Yi);
                             isFirst = false;
                         }
 
-                        path.LineTo(segment.Xi, segment.Yi);
+                        pathBuilder.LineTo(segment.Xi, segment.Yi);
                     }
 
+                    using var path = pathBuilder.Detach();
                     canvas.DrawPath(path, strokePaint);
                     canvas.DrawPath(path, fillPaint);
                 }

@@ -1607,7 +1607,7 @@ public unsafe class SKFont : SKObject, IFont
     /// <param name="origin">The starting position for the text.</param>
     /// <returns>The <see cref="T:SKPath" /> representing the text outline along the path.</returns>
     /// <remarks />
-    public SKPath GetTextPathOnPath(string text, SKPath path, SKTextAlign textAlign = SKTextAlign.Left,
+    public IPath GetTextPathOnPath(string text, SKPath path, SKTextAlign textAlign = SKTextAlign.Left,
         SKPoint origin = default) =>
         GetTextPathOnPath(text.AsSpan(), path, textAlign, origin);
 
@@ -1618,7 +1618,7 @@ public unsafe class SKFont : SKObject, IFont
     /// <param name="origin">The starting position for the text.</param>
     /// <returns>The <see cref="T:SKPath" /> representing the text outline along the path.</returns>
     /// <remarks />
-    public SKPath GetTextPathOnPath(ReadOnlySpan<char> text, SKPath path, SKTextAlign textAlign = SKTextAlign.Left,
+    public IPath GetTextPathOnPath(ReadOnlySpan<char> text, SKPath path, SKTextAlign textAlign = SKTextAlign.Left,
         SKPoint origin = default)
     {
         fixed (void* t = text)
@@ -1635,7 +1635,7 @@ public unsafe class SKFont : SKObject, IFont
     /// <param name="origin">The starting position for the text.</param>
     /// <returns>The <see cref="T:SKPath" /> representing the text outline along the path.</returns>
     /// <remarks />
-    public SKPath GetTextPathOnPath(ReadOnlySpan<byte> text, SKTextEncoding encoding, SKPath path,
+    public IPath GetTextPathOnPath(ReadOnlySpan<byte> text, SKTextEncoding encoding, SKPath path,
         SKTextAlign textAlign = SKTextAlign.Left, SKPoint origin = default)
     {
         fixed (void* t = text)
@@ -1653,11 +1653,11 @@ public unsafe class SKFont : SKObject, IFont
     /// <param name="origin">The starting position for the text.</param>
     /// <returns>The <see cref="T:SKPath" /> representing the text outline along the path.</returns>
     /// <remarks />
-    public SKPath GetTextPathOnPath(IntPtr text, int length, SKTextEncoding encoding, SKPath path,
+    public IPath GetTextPathOnPath(IntPtr text, int length, SKTextEncoding encoding, SKPath path,
         SKTextAlign textAlign = SKTextAlign.Left, SKPoint origin = default) =>
         GetTextPathOnPath((void*)text, length, encoding, path, textAlign, origin);
 
-    internal SKPath GetTextPathOnPath(void* text, int length, SKTextEncoding encoding, SKPath path,
+    internal IPath GetTextPathOnPath(void* text, int length, SKTextEncoding encoding, SKPath path,
         SKTextAlign textAlign = SKTextAlign.Left, SKPoint origin = default)
     {
         if (!ValidateTextArgs(text, length, encoding))
@@ -1682,7 +1682,7 @@ public unsafe class SKFont : SKObject, IFont
     /// <param name="origin">The starting position for the text.</param>
     /// <returns>The <see cref="T:SKPath" /> representing the text outline along the path.</returns>
     /// <remarks />
-    public SKPath GetTextPathOnPath(ReadOnlySpan<ushort> glyphs, SKPath path, SKTextAlign textAlign = SKTextAlign.Left,
+    public IPath GetTextPathOnPath(ReadOnlySpan<ushort> glyphs, SKPath path, SKTextAlign textAlign = SKTextAlign.Left,
         SKPoint origin = default)
     {
         if (path == null)
@@ -1708,7 +1708,7 @@ public unsafe class SKFont : SKObject, IFont
     /// <param name="textAlign">The text alignment relative to the path.</param>
     /// <returns>The <see cref="T:SKPath" /> representing the text outline along the path.</returns>
     /// <remarks />
-    public SKPath GetTextPathOnPath(ReadOnlySpan<ushort> glyphs, ReadOnlySpan<float> glyphWidths,
+    public IPath GetTextPathOnPath(ReadOnlySpan<ushort> glyphs, ReadOnlySpan<float> glyphWidths,
         ReadOnlySpan<SKPoint> glyphPositions, SKPath path, SKTextAlign textAlign = SKTextAlign.Left)
     {
         if (glyphs.Length != glyphWidths.Length)

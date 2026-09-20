@@ -288,3 +288,9 @@ public enum PathFillType
     InverseWinding = 2,
     InverseEvenOdd = 3,
 }
+
+public enum PathArcSize
+{
+    Small = 0,
+    Large = 1,
+}

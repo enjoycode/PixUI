@@ -42,12 +42,12 @@ public class NeedleGeometry : BaseNeedleGeometry, IDrawnElement<SkiaSharpDrawing
 
         var w = Width / 2f;
 
-        using var path = Path.Create();
-
-        path.MoveTo(X, Y + Radius);
-        path.LineTo(X - w, Y);
-        path.LineTo(X + w, Y);
-        path.Close();
+        using var pathBuilder = PathBuilder.Create();
+        pathBuilder.MoveTo(X, Y + Radius);
+        pathBuilder.LineTo(X - w, Y);
+        pathBuilder.LineTo(X + w, Y);
+        pathBuilder.Close();
+        using var path = pathBuilder.Detach();
 
         context.Canvas.DrawPath(path, paint);
         context.Canvas.DrawCircle(X, Y, w, paint);

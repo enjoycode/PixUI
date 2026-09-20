@@ -12,6 +12,7 @@ global using SKTextAlign = PixUI.TextAlign;
 global using SKPathDirection = PixUI.PathDirection;
 global using SKPathAddMode = PixUI.PathAddMode;
 global using SKPathFillType = PixUI.PathFillType;
+global using SKPathArcSize = PixUI.PathArcSize;
 global using gr_backendrendertarget_t = System.IntPtr;
 global using gr_backendtexture_t = System.IntPtr;
 global using gr_direct_context_t = System.IntPtr;

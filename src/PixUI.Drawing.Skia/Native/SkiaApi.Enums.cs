@@ -478,16 +478,6 @@ public enum SKMaskFormat
     Sdf = 5,
 }
 
-// sk_path_arc_size_t
-public enum SKPathArcSize
-{
-    // SMALL_SK_PATH_ARC_SIZE = 0
-    Small = 0,
-
-    // LARGE_SK_PATH_ARC_SIZE = 1
-    Large = 1,
-}
-
 // sk_path_effect_trim_mode_t
 public enum SKTrimPathEffectMode
 {

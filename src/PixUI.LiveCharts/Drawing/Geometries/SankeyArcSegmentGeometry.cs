@@ -33,7 +33,7 @@ namespace PixUI.LiveCharts.Drawing.Geometries;
 /// </summary>
 public class SankeyArcSegmentGeometry : BaseSankeyArcSegmentGeometry, IDrawnElement<SkiaSharpDrawingContext>
 {
-    private SKPath? _cachedPath;
+    private IPathBuilder? _cachedPathBuilder;
 
     /// <inheritdoc cref="IDrawnElement{TDrawingContext}.Draw(TDrawingContext)" />
     public void Draw(SkiaSharpDrawingContext context)
@@ -48,26 +48,26 @@ public class SankeyArcSegmentGeometry : BaseSankeyArcSegmentGeometry, IDrawnElem
         var start = StartAngle;
         const float toRadians = (float)(Math.PI / 180);
 
-        var path = _cachedPath ??= Path.Create();
-        path.Reset();
+        var pathBuilder = _cachedPathBuilder ??= PathBuilder.Create();
+        pathBuilder.Reset();
 
         // 4-corner annular sector: walk inner-start → outer-start (radial),
         // outer arc forward, outer-end → inner-end (radial), inner arc reverse.
         var outerRect = new SKRect(cx - outer, cy - outer, cx + outer, cy + outer);
         var innerRect = new SKRect(cx - inner, cy - inner, cx + inner, cy + inner);
 
-        path.MoveTo(
+        pathBuilder.MoveTo(
             (float)(cx + Math.Cos(start * toRadians) * inner),
             (float)(cy + Math.Sin(start * toRadians) * inner));
-        path.LineTo(
+        pathBuilder.LineTo(
             (float)(cx + Math.Cos(start * toRadians) * outer),
             (float)(cy + Math.Sin(start * toRadians) * outer));
-        path.ArcTo(outerRect, start, sweep, false);
-        path.LineTo(
+        pathBuilder.ArcTo(outerRect, start, sweep, false);
+        pathBuilder.LineTo(
             (float)(cx + Math.Cos((start + sweep) * toRadians) * inner),
             (float)(cy + Math.Sin((start + sweep) * toRadians) * inner));
-        path.ArcTo(innerRect, start + sweep, -sweep, false);
-        path.Close();
+        pathBuilder.ArcTo(innerRect, start + sweep, -sweep, false);
+        pathBuilder.Close();
 
         // Save/restore paint color around the per-instance override so a
         // non-Empty Color doesn't bleed into the next geometry sharing the
@@ -92,6 +92,7 @@ public class SankeyArcSegmentGeometry : BaseSankeyArcSegmentGeometry, IDrawnElem
             activePaint.PathEffect = cornerEffect;
         }
 
+        using var path = pathBuilder.Detach();
         context.Canvas.DrawPath(path, activePaint);
 
         if (cornerEffect is not null)
@@ -106,8 +107,8 @@ public class SankeyArcSegmentGeometry : BaseSankeyArcSegmentGeometry, IDrawnElem
     /// <inheritdoc cref="DrawnGeometry.OnDisposed()" />
     internal override void OnDisposed()
     {
-        _cachedPath?.Dispose();
-        _cachedPath = null;
+        _cachedPathBuilder?.Dispose();
+        _cachedPathBuilder = null;
         base.OnDisposed();
     }
 

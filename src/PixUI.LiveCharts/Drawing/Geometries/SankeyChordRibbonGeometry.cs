@@ -36,7 +36,7 @@ namespace PixUI.LiveCharts.Drawing.Geometries;
 /// </summary>
 public class SankeyChordRibbonGeometry : BaseSankeyChordRibbonGeometry, IDrawnElement<SkiaSharpDrawingContext>
 {
-    private SKPath? _cachedPath;
+    private IPathBuilder? _cachedPathBuilder;
 
     /// <inheritdoc cref="IDrawnElement{TDrawingContext}.Draw(TDrawingContext)" />
     public void Draw(SkiaSharpDrawingContext context)
@@ -65,20 +65,20 @@ public class SankeyChordRibbonGeometry : BaseSankeyChordRibbonGeometry, IDrawnEl
         var targetSweep = _NormalizeSweep(tp1Angle - tp0Angle);
         var sourceCloseSweep = _NormalizeSweep(sp0Angle - sp1Angle);
 
-        var path = _cachedPath ??= Path.Create();
-        path.Reset();
+        var pathBuilder = _cachedPathBuilder ??= PathBuilder.Create();
+        pathBuilder.Reset();
 
         // Untwisted band: source-top → target-top via cubic; trace the inner
         // arc along the target chord (rounded end); target-bottom →
         // source-bottom via cubic; trace the inner arc back along the source
         // chord (rounded end). Control points coincident at chart center
         // collapse the cubic to a curve through (cx, cy) — d3-chord convention.
-        path.MoveTo(SourceP0X, SourceP0Y);
-        path.CubicTo(cx, cy, cx, cy, TargetP0X, TargetP0Y);
-        path.ArcTo(arcRect, tp0Angle, targetSweep, forceMoveTo: false);
-        path.CubicTo(cx, cy, cx, cy, SourceP1X, SourceP1Y);
-        path.ArcTo(arcRect, sp1Angle, sourceCloseSweep, forceMoveTo: false);
-        path.Close();
+        pathBuilder.MoveTo(SourceP0X, SourceP0Y);
+        pathBuilder.CubicTo(cx, cy, cx, cy, TargetP0X, TargetP0Y);
+        pathBuilder.ArcTo(arcRect, tp0Angle, targetSweep, forceMoveTo: false);
+        pathBuilder.CubicTo(cx, cy, cx, cy, SourceP1X, SourceP1Y);
+        pathBuilder.ArcTo(arcRect, sp1Angle, sourceCloseSweep, forceMoveTo: false);
+        pathBuilder.Close();
 
         // Save/restore paint color around the per-instance override so a
         // non-Empty Color doesn't bleed into the next geometry sharing the
@@ -90,6 +90,7 @@ public class SankeyChordRibbonGeometry : BaseSankeyChordRibbonGeometry, IDrawnEl
         if (hasOverride)
             activePaint.Color = new SKColor(c.R, c.G, c.B, c.A);
 
+        using var path = pathBuilder.Detach();
         context.Canvas.DrawPath(path, activePaint);
 
         if (hasOverride) activePaint.Color = previousColor;
@@ -98,8 +99,8 @@ public class SankeyChordRibbonGeometry : BaseSankeyChordRibbonGeometry, IDrawnEl
     /// <inheritdoc cref="DrawnGeometry.OnDisposed()" />
     internal override void OnDisposed()
     {
-        _cachedPath?.Dispose();
-        _cachedPath = null;
+        _cachedPathBuilder?.Dispose();
+        _cachedPathBuilder = null;
         base.OnDisposed();
     }
 

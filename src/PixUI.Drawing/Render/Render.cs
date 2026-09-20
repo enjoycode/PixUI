@@ -54,6 +54,8 @@ public interface IRender
     IColorFilter? MakeColorFilterBlendMode(Color color, BlendMode blendMode);
 
     IPath MakePath();
+    
+    IPathBuilder MakePathBuilder();
 
     IPath MakePathFromSvgData(string svgPath);
 

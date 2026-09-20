@@ -32,7 +32,7 @@ public class StepLineAreaGeometry : VectorGeometry
     private bool _isFirst = true;
 
     /// <inheritdoc cref="VectorGeometry.OnDrawSegment(SkiaSharpDrawingContext, SKPath, Segment)"/>
-    protected override void OnDrawSegment(SkiaSharpDrawingContext context, SKPath path, Segment segment)
+    protected override void OnDrawSegment(SkiaSharpDrawingContext context, IPathBuilder pathBuilder, Segment segment)
     {
         if (_isFirst)
         {
@@ -40,29 +40,29 @@ public class StepLineAreaGeometry : VectorGeometry
             return;
         }
 
-        path.LineTo(segment.Xj, segment.Yi);
-        path.LineTo(segment.Xj, segment.Yj);
+        pathBuilder.LineTo(segment.Xj, segment.Yi);
+        pathBuilder.LineTo(segment.Xj, segment.Yj);
     }
 
     /// <inheritdoc cref="VectorGeometry.OnOpen(SkiaSharpDrawingContext, SKPath, Segment)"/>
-    protected override void OnOpen(SkiaSharpDrawingContext context, SKPath path, Segment segment)
+    protected override void OnOpen(SkiaSharpDrawingContext context, IPathBuilder pathBuilder, Segment segment)
     {
         if (ClosingMethod == LiveChartsCore.Drawing.VectorClosingMethod.NotClosed)
         {
-            path.MoveTo(segment.Xj, segment.Yj);
+            pathBuilder.MoveTo(segment.Xj, segment.Yj);
             return;
         }
 
         if (ClosingMethod == LiveChartsCore.Drawing.VectorClosingMethod.CloseToPivot)
         {
-            path.MoveTo(segment.Xj, Pivot);
-            path.LineTo(segment.Xj, segment.Yj);
+            pathBuilder.MoveTo(segment.Xj, Pivot);
+            pathBuilder.LineTo(segment.Xj, segment.Yj);
             return;
         }
     }
 
     /// <inheritdoc cref="VectorGeometry.OnClose(SkiaSharpDrawingContext, SKPath, Segment)"/>
-    protected override void OnClose(SkiaSharpDrawingContext context, SKPath path, Segment segment)
+    protected override void OnClose(SkiaSharpDrawingContext context, IPathBuilder pathBuilder, Segment segment)
     {
         _isFirst = true;
 
@@ -70,8 +70,8 @@ public class StepLineAreaGeometry : VectorGeometry
 
         if (ClosingMethod == LiveChartsCore.Drawing.VectorClosingMethod.CloseToPivot)
         {
-            path.LineTo(segment.Xj, Pivot);
-            path.Close();
+            pathBuilder.LineTo(segment.Xj, Pivot);
+            pathBuilder.Close();
             return;
         }
     }

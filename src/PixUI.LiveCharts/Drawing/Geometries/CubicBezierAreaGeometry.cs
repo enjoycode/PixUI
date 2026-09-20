@@ -30,39 +30,39 @@ namespace PixUI.LiveCharts.Drawing.Geometries;
 public class CubicBezierAreaGeometry : VectorGeometry
 {
     /// <inheritdoc cref="VectorGeometry.OnDrawSegment(SkiaSharpDrawingContext, SKPath, Segment)"/>
-    protected override void OnDrawSegment(SkiaSharpDrawingContext context, SKPath path, Segment segment)
+    protected override void OnDrawSegment(SkiaSharpDrawingContext context, IPathBuilder pathBuilder, Segment segment)
     {
         var cubic = (CubicBezierSegment)segment;
-        path.CubicTo(segment.Xi, segment.Yi, cubic.Xm, cubic.Ym, segment.Xj, segment.Yj);
+        pathBuilder.CubicTo(segment.Xi, segment.Yi, cubic.Xm, cubic.Ym, segment.Xj, segment.Yj);
     }
 
     /// <inheritdoc cref="VectorGeometry.OnOpen(SkiaSharpDrawingContext, SKPath, Segment)"/>
-    protected override void OnOpen(SkiaSharpDrawingContext context, SKPath path, Segment segment)
+    protected override void OnOpen(SkiaSharpDrawingContext context, IPathBuilder pathBuilder, Segment segment)
     {
         if (ClosingMethod == LiveChartsCore.Drawing.VectorClosingMethod.NotClosed)
         {
-            path.MoveTo(segment.Xi, segment.Yi);
+            pathBuilder.MoveTo(segment.Xi, segment.Yi);
             return;
         }
 
         if (ClosingMethod == LiveChartsCore.Drawing.VectorClosingMethod.CloseToPivot)
         {
-            path.MoveTo(segment.Xi, Pivot);
-            path.LineTo(segment.Xi, segment.Yi);
+            pathBuilder.MoveTo(segment.Xi, Pivot);
+            pathBuilder.LineTo(segment.Xi, segment.Yi);
             return;
         }
     }
 
     /// <inheritdoc cref="VectorGeometry.OnClose(SkiaSharpDrawingContext, SKPath, Segment)"/>
-    protected override void OnClose(SkiaSharpDrawingContext context, SKPath path, Segment segment)
+    protected override void OnClose(SkiaSharpDrawingContext context, IPathBuilder pathBuilder, Segment segment)
     {
         if (ClosingMethod == LiveChartsCore.Drawing.VectorClosingMethod.NotClosed)
             return;
 
         if (ClosingMethod == LiveChartsCore.Drawing.VectorClosingMethod.CloseToPivot)
         {
-            path.LineTo(segment.Xj, Pivot);
-            path.Close();
+            pathBuilder.LineTo(segment.Xj, Pivot);
+            pathBuilder.Close();
             return;
         }
     }

@@ -69,8 +69,9 @@ public class MapFactory : IMapFactory
                 _globeCircle = new LandAreaGeometry();
             }
 
-            var circlePath = _globeCircle.GetOrResetBasePath();
-            circlePath.AddCircle(ortho.ScreenCenterX, ortho.ScreenCenterY, ortho.Radius);
+            using var pathBuilder = PathBuilder.Create();
+            pathBuilder.AddCircle(ortho.ScreenCenterX, ortho.ScreenCenterY, ortho.Radius);
+            _globeCircle.SetBasePath(pathBuilder.Detach());
             _globeCircle.ViewportTransform = _viewportTransform;
 
             if (context.View.Fill is not null)
@@ -107,6 +108,7 @@ public class MapFactory : IMapFactory
                 _ = _usedPaints.Add(fill);
                 _ = toRemovePaints.Remove(fill);
             }
+
             if (stroke is not null)
             {
                 context.View.CoreCanvas.AddDrawableTask(stroke, zone: CanvasZone.DrawMargin);
@@ -144,8 +146,9 @@ public class MapFactory : IMapFactory
                         // Reuse the geometry's cached SKPath in place; avoids
                         // the per-frame native alloc+dispose pair that used to
                         // dominate paint time during orthographic rotation.
-                        var skPath = shape.GetOrResetBasePath();
-                        var hasGeometry = BuildOrthographicPath(ortho, landData.Coordinates, skPath);
+                        using var pathBuilder = PathBuilder.Create();
+                        var hasGeometry = BuildOrthographicPath(ortho, landData.Coordinates, pathBuilder);
+                        shape.SetBasePath(pathBuilder.Detach());
                         if (!hasGeometry)
                         {
                             // Entire polygon is on the far side — hide it.
@@ -300,8 +303,7 @@ public class MapFactory : IMapFactory
     /// geometry was added; false when the entire polygon is on the far side
     /// (caller hides the geometry).
     /// </summary>
-    private static bool BuildOrthographicPath(
-        OrthographicProjector ortho, LvcPointD[] coordinates, SKPath path)
+    private static bool BuildOrthographicPath(OrthographicProjector ortho, LvcPointD[] coordinates, IPathBuilder path)
     {
         if (coordinates.Length == 0) return false;
 
@@ -341,7 +343,8 @@ public class MapFactory : IMapFactory
                 if (!started)
                 {
                     path.MoveTo(px, py);
-                    firstX = px; firstY = py;
+                    firstX = px;
+                    firstY = py;
                     started = true;
                 }
                 else
@@ -355,7 +358,8 @@ public class MapFactory : IMapFactory
                     var hp = FindHorizonPoint(ortho, cur.X, cur.Y, next.X, next.Y);
                     ortho.ToMap(hp[0], hp[1], out var hx, out var hy);
                     path.LineTo(hx, hy);
-                    lastExitX = hx; lastExitY = hy;
+                    lastExitX = hx;
+                    lastExitY = hy;
                     hasPendingExit = true;
                 }
             }
@@ -376,7 +380,8 @@ public class MapFactory : IMapFactory
                 if (!started)
                 {
                     path.MoveTo(hx, hy);
-                    firstX = hx; firstY = hy;
+                    firstX = hx;
+                    firstY = hy;
                     started = true;
                 }
                 else
@@ -404,8 +409,7 @@ public class MapFactory : IMapFactory
     /// to <c>(toX, toY)</c>, taking the shorter arc. Both endpoints are
     /// assumed to already lie on the disc boundary.
     /// </summary>
-    private static void EmitHorizonArc(
-        OrthographicProjector ortho, SKPath path,
+    private static void EmitHorizonArc(OrthographicProjector ortho, IPathBuilder path,
         float fromX, float fromY, float toX, float toY)
     {
         var cx = ortho.ScreenCenterX;
@@ -473,8 +477,8 @@ public class MapFactory : IMapFactory
         if (_mapView is not null)
         {
             var layersQuery = _mapView.ActiveMap.Layers.Values
-               .Where(x => x.IsVisible)
-               .OrderByDescending(x => x.ProcessIndex);
+                .Where(x => x.IsVisible)
+                .OrderByDescending(x => x.ProcessIndex);
 
             foreach (var layer in layersQuery)
             {
@@ -494,6 +498,7 @@ public class MapFactory : IMapFactory
                         landData.Shape = null;
                     }
                 }
+
                 foreach (var paint in _usedPaints)
                 {
                     _mapView.CoreCanvas.RemovePaintTask(paint);

@@ -89,8 +89,10 @@ internal sealed class PopupMenu : Widget
     {
         //画背景及阴影
         var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, W, H), 4f, 4f);
-        using var path = Path.Create();
-        path.AddRRect(rrect);
+        using var pathBuilder = PathBuilder.Create();
+        pathBuilder.AddRoundRect(rrect);
+        using var path = pathBuilder.Detach();
+
         canvas.DrawShadow(path, Colors.Black, 5, false, Root!.Window.ScaleFactor);
         var paint = PixUI.Paint.Shared(_controller.BackgroundColor);
         canvas.DrawRRect(rrect, paint);

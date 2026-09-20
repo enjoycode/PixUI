@@ -34,39 +34,39 @@ public abstract class VectorGeometry : BaseVectorGeometry, IDrawnElement<SkiaSha
     // Cached path reused across Draw calls — SkPath::reset() is cheap on the native side,
     // and skipping the per-call SKPath managed alloc + Dispose adds up in perf-sensitive
     // chart paths where a vector is redrawn every invalidation.
-    private SKPath? _cachedPath;
+    private IPathBuilder? _cachedPathBuilder;
 
     /// <summary>
     /// Called when the area begins the draw.
     /// </summary>
     /// <param name="context">The context.</param>
-    /// <param name="path">The path.</param>
+    /// <param name="pathBuilder">The path.</param>
     /// <param name="segment">The segment.</param>
-    protected abstract void OnOpen(SkiaSharpDrawingContext context, SKPath path, Segment segment);
+    protected abstract void OnOpen(SkiaSharpDrawingContext context, IPathBuilder pathBuilder, Segment segment);
 
     /// <summary>
     /// Called to close the area.
     /// </summary>
     /// <param name="context">The context.</param>
-    /// <param name="path">The path.</param>
+    /// <param name="pathBuilder"></param>
     /// <param name="segment">The segment.</param>
-    protected abstract void OnClose(SkiaSharpDrawingContext context, SKPath path, Segment segment);
+    protected abstract void OnClose(SkiaSharpDrawingContext context, IPathBuilder pathBuilder, Segment segment);
 
     /// <summary>
     /// Called to draw the segment.
     /// </summary>
     /// <param name="context">The context.</param>
-    /// <param name="path">The path.</param>
+    /// <param name="pathBuilder"></param>
     /// <param name="segment">The segment.</param>
-    protected abstract void OnDrawSegment(SkiaSharpDrawingContext context, SKPath path, Segment segment);
+    protected abstract void OnDrawSegment(SkiaSharpDrawingContext context, IPathBuilder pathBuilder, Segment segment);
 
     /// <inheritdoc cref="IDrawnElement{TDrawingContext}.Draw(TDrawingContext)" />
     public void Draw(SkiaSharpDrawingContext context)
     {
         if (Commands.Count == 0) return;
 
-        var path = _cachedPath ??= Path.Create();
-        path.Reset();
+        var pathBuilder = _cachedPathBuilder ??= PathBuilder.Create();
+        pathBuilder.Reset();
 
         var isValid = true;
         List<Segment>? toRemoveSegments = null;
@@ -81,10 +81,10 @@ public abstract class VectorGeometry : BaseVectorGeometry, IDrawnElement<SkiaSha
             if (isFirst)
             {
                 isFirst = false;
-                OnOpen(context, path, segment);
+                OnOpen(context, pathBuilder, segment);
             }
 
-            OnDrawSegment(context, path, segment);
+            OnDrawSegment(context, pathBuilder, segment);
             isValid = isValid && segment.IsValid;
 
             if (segment.IsValid && segment.RemoveOnCompleted)
@@ -101,8 +101,9 @@ public abstract class VectorGeometry : BaseVectorGeometry, IDrawnElement<SkiaSha
             }
         }
 
-        if (last is not null) OnClose(context, path, last);
+        if (last is not null) OnClose(context, pathBuilder, last);
 
+        using var path = pathBuilder.Detach();
         context.Canvas.DrawPath(path, context.ActiveSkiaPaint);
 
         if (!isValid) IsValid = false;
@@ -113,8 +114,8 @@ public abstract class VectorGeometry : BaseVectorGeometry, IDrawnElement<SkiaSha
         // Release the cached native SKPath deterministically when the geometry is removed
         // from its paint task. GC finalization is the safety net if a geometry is dropped
         // without going through the normal removal path.
-        _cachedPath?.Dispose();
-        _cachedPath = null;
+        _cachedPathBuilder?.Dispose();
+        _cachedPathBuilder = null;
 
         base.OnDisposed();
     }

@@ -14,17 +14,17 @@ public sealed class RoundedRectangleBorder : OutlinedBorder
     {
         var rrect = BorderRadius.ToRRect(rect);
         rrect.Deflate(Side.Width, Side.Width);
-        var path = Path.Create();
-        path.AddRRect(rrect);
-        return path;
+        using var pathBuilder = PathBuilder.Create();
+        pathBuilder.AddRoundRect(rrect);
+        return pathBuilder.Detach();
     }
 
     public override IPath GetInnerPath(in Rect rect)
     {
         var rrect = BorderRadius.ToRRect(rect);
-        var path = Path.Create();
-        path.AddRRect(rrect);
-        return path;
+        using var pathBuilder = PathBuilder.Create();
+        pathBuilder.AddRoundRect(rrect);
+        return pathBuilder.Detach();
     }
 
     public override void LerpTo(ShapeBorder? to, ShapeBorder tween, double t)

@@ -54,8 +54,7 @@ public class PopUpGeometry : BoundedDrawnGeometry, IDrawnElement<SkiaSharpDrawin
     /// <inheritdoc cref="IDrawnElement{TDrawingContext}.Draw(TDrawingContext)" />
     public virtual void Draw(SkiaSharpDrawingContext context)
     {
-        using var path = Path.Create();
-
+        using var pathBuilder = PathBuilder.Create();
         var wedge = (float)Wedge;
         var br = (float)BorderRadius;
         var wf = (float)WedgeThickness;
@@ -64,50 +63,51 @@ public class PopUpGeometry : BoundedDrawnGeometry, IDrawnElement<SkiaSharpDrawin
         var w = Width - (Placement is PopUpPlacement.Right or PopUpPlacement.Left ? 1 : 0) * wedge;
         var h = Height - (Placement is PopUpPlacement.Bottom or PopUpPlacement.Top ? 1 : 0) * wedge;
 
-        path.MoveTo(x + br, y);
+        pathBuilder.MoveTo(x + br, y);
 
         if (Placement == PopUpPlacement.Bottom)
         {
-            path.LineTo(x + (w * 0.5f - wedge * wf * 0.5f), y);
-            path.LineTo(x + w * 0.5f, y - wedge);
-            path.LineTo(x + (w * 0.5f + wedge * wf * 0.5f), y);
+            pathBuilder.LineTo(x + (w * 0.5f - wedge * wf * 0.5f), y);
+            pathBuilder.LineTo(x + w * 0.5f, y - wedge);
+            pathBuilder.LineTo(x + (w * 0.5f + wedge * wf * 0.5f), y);
         }
 
-        path.LineTo(x + w - br, y);
-        path.ArcTo(new SKRect(x + w - br, y, x + w, y + br), 270, 90, false);
+        pathBuilder.LineTo(x + w - br, y);
+        pathBuilder.ArcTo(new SKRect(x + w - br, y, x + w, y + br), 270, 90, false);
 
         if (Placement == PopUpPlacement.Left)
         {
-            path.LineTo(x + w, y + (h * 0.5f - wedge * wf * 0.5f));
-            path.LineTo(x + w + wedge, y + h * 0.5f);
-            path.LineTo(x + w, y + (h * 0.5f + wedge * wf * 0.5f));
+            pathBuilder.LineTo(x + w, y + (h * 0.5f - wedge * wf * 0.5f));
+            pathBuilder.LineTo(x + w + wedge, y + h * 0.5f);
+            pathBuilder.LineTo(x + w, y + (h * 0.5f + wedge * wf * 0.5f));
         }
 
-        path.LineTo(x + w, y + h - br);
-        path.ArcTo(new SKRect(x + w - br, y + h - br, x + w, y + h), 0, 90, false);
+        pathBuilder.LineTo(x + w, y + h - br);
+        pathBuilder.ArcTo(new SKRect(x + w - br, y + h - br, x + w, y + h), 0, 90, false);
 
         if (Placement == PopUpPlacement.Top)
         {
-            path.LineTo(x + (w * 0.5f + wedge * wf * 0.5f), y + h);
-            path.LineTo(x + w * 0.5f, y + h + wedge);
-            path.LineTo(x + (w * 0.5f - wedge * wf * 0.5f), y + h);
+            pathBuilder.LineTo(x + (w * 0.5f + wedge * wf * 0.5f), y + h);
+            pathBuilder.LineTo(x + w * 0.5f, y + h + wedge);
+            pathBuilder.LineTo(x + (w * 0.5f - wedge * wf * 0.5f), y + h);
         }
 
-        path.LineTo(x + br, y + h);
-        path.ArcTo(new SKRect(x, y + h - br, x + br, y + h), 90, 90, false);
+        pathBuilder.LineTo(x + br, y + h);
+        pathBuilder.ArcTo(new SKRect(x, y + h - br, x + br, y + h), 90, 90, false);
 
         if (Placement == PopUpPlacement.Right)
         {
-            path.LineTo(x, y + (h * 0.5f + wedge * wf * 0.5f));
-            path.LineTo(x - wedge, y + h * 0.5f);
-            path.LineTo(x, y + (h * 0.5f - wedge * wf * 0.5f));
+            pathBuilder.LineTo(x, y + (h * 0.5f + wedge * wf * 0.5f));
+            pathBuilder.LineTo(x - wedge, y + h * 0.5f);
+            pathBuilder.LineTo(x, y + (h * 0.5f - wedge * wf * 0.5f));
         }
 
-        path.LineTo(x, y + br);
-        path.ArcTo(new SKRect(x, y, x + br, y + br), 180, 90, false);
+        pathBuilder.LineTo(x, y + br);
+        pathBuilder.ArcTo(new SKRect(x, y, x + br, y + br), 180, 90, false);
 
-        path.Close();
+        pathBuilder.Close();
 
+        using var path = pathBuilder.Detach();
         context.Canvas.DrawPath(path, context.ActiveSkiaPaint);
     }
 }

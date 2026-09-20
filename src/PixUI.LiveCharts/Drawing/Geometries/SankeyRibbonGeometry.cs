@@ -33,7 +33,7 @@ namespace PixUI.LiveCharts.Drawing.Geometries;
 /// </summary>
 public class SankeyRibbonGeometry : BaseSankeyRibbonGeometry, IDrawnElement<SkiaSharpDrawingContext>
 {
-    private SKPath? _cachedPath;
+    private IPathBuilder? _cachedPathBuilder;
 
     /// <inheritdoc cref="IDrawnElement{TDrawingContext}.Draw(TDrawingContext)" />
     public void Draw(SkiaSharpDrawingContext context)
@@ -49,14 +49,14 @@ public class SankeyRibbonGeometry : BaseSankeyRibbonGeometry, IDrawnElement<Skia
         // S-curve shape that doesn't overshoot either node's interior.
         var mx = (sx + tx) * 0.5f;
 
-        var path = _cachedPath ??= Path.Create();
-        path.Reset();
+        var pathBuilder = _cachedPathBuilder ??= PathBuilder.Create();
+        pathBuilder.Reset();
 
-        path.MoveTo(sx, sy0);
-        path.CubicTo(mx, sy0, mx, ty0, tx, ty0); // top edge
-        path.LineTo(tx, ty1);
-        path.CubicTo(mx, ty1, mx, sy1, sx, sy1); // bottom edge (reversed)
-        path.Close();
+        pathBuilder.MoveTo(sx, sy0);
+        pathBuilder.CubicTo(mx, sy0, mx, ty0, tx, ty0); // top edge
+        pathBuilder.LineTo(tx, ty1);
+        pathBuilder.CubicTo(mx, ty1, mx, sy1, sx, sy1); // bottom edge (reversed)
+        pathBuilder.Close();
 
         // Per-instance Color override (mirrors ColoredRectangleGeometry).
         // IsEmpty is the canonical "no override" sentinel — when set, the
@@ -70,6 +70,7 @@ public class SankeyRibbonGeometry : BaseSankeyRibbonGeometry, IDrawnElement<Skia
         if (hasOverride)
             activePaint.Color = new SKColor(c.R, c.G, c.B, c.A);
 
+        using var path = pathBuilder.Detach();
         context.Canvas.DrawPath(path, activePaint);
 
         if (hasOverride) activePaint.Color = previousColor;
@@ -87,8 +88,8 @@ public class SankeyRibbonGeometry : BaseSankeyRibbonGeometry, IDrawnElement<Skia
     /// <inheritdoc cref="DrawnGeometry.OnDisposed()" />
     internal override void OnDisposed()
     {
-        _cachedPath?.Dispose();
-        _cachedPath = null;
+        _cachedPathBuilder?.Dispose();
+        _cachedPathBuilder = null;
         base.OnDisposed();
     }
 }

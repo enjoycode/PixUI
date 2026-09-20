@@ -33,8 +33,9 @@ public sealed class ButtonGroup : MultiChildWidget<Button>
         //clip to round rectangle
         var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, W, H),
             Button.StandardRadius, Button.StandardRadius);
-        using var path = Path.Create();
-        path.AddRRect(rrect);
+        using var pathBuilder = PathBuilder.Create();
+        pathBuilder.AddRoundRect(rrect);
+        using var path = pathBuilder.Detach();
         canvas.Save();
         canvas.ClipPath(path, ClipOp.Intersect, true);
 
@@ -51,7 +52,7 @@ public sealed class ButtonGroup : MultiChildWidget<Button>
         }
 
         //画分隔条
-        var paint = PixUI.Paint.Shared(Colors.White, PaintStyle.Stroke);
+        var paint = Paint.Shared(Colors.White, PaintStyle.Stroke);
         for (var i = 1; i < _children.Count; i++)
         {
             var x = _children[i].X - 0.5f;

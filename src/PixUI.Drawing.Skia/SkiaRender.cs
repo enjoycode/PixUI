@@ -51,6 +51,8 @@ public sealed class SkiaRender : IRender
 
     public IPath MakePath() => new SKPath();
 
+    public IPathBuilder MakePathBuilder() => new SKPathBuilder();
+
     public IPath MakePathFromSvgData(string svgPath) => SKPath.ParseSvgPathData(svgPath);
 
     public IPathEffect? MakePathEffectDash(float[] intervals, float phase) =>

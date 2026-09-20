@@ -31,8 +31,6 @@ public class ArcGeometry : BaseArcGeometry, IDrawnElement<SkiaSharpDrawingContex
     /// <inheritdoc cref="IDrawnElement{TDrawingContext}.Draw(TDrawingContext)" />
     public virtual void Draw(SkiaSharpDrawingContext context)
     {
-        using var path = Path.Create();
-
         var cx = CenterX;
         var cy = CenterY;
         var r = Width * 0.5f;
@@ -40,11 +38,13 @@ public class ArcGeometry : BaseArcGeometry, IDrawnElement<SkiaSharpDrawingContex
         var sweepAngle = SweepAngle;
         const float toRadians = (float)(Math.PI / 180);
 
-        path.MoveTo(
+        using var pathBuilder = PathBuilder.Create();
+        pathBuilder.MoveTo(
             (float)(cx + Math.Cos(startAngle * toRadians) * r),
             (float)(cy + Math.Sin(startAngle * toRadians) * r));
-        path.ArcTo(Rect.FromLTWH(X, Y, Width, Height), startAngle, sweepAngle, false);
+        pathBuilder.ArcTo(Rect.FromLTWH(X, Y, Width, Height), startAngle, sweepAngle, false);
 
+        using var path = pathBuilder.Detach();
         context.Canvas.DrawPath(path, context.ActiveSkiaPaint);
     }
 }

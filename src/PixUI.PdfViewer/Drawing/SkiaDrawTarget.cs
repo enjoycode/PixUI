@@ -4,12 +4,12 @@ using Melville.Pdf.Model.Renderers.GraphicsStates;
 
 namespace PixUI.PdfViewer.Drawing;
 
-internal class SkiaDrawTarget : IDrawTarget, IDisposable
+internal class SkiaDrawTarget : IDrawTarget
 {
     private readonly ICanvas _target;
     private readonly GraphicsStateStack<SkiaGraphicsState> _state;
-    private readonly IPath _compositePath = Path.Create();
-    private IPath? _path;
+    private IPath _compositePath = Path.Create();
+    private IPathBuilder? _pathBuilder;
 
     public SkiaDrawTarget(ICanvas target, GraphicsStateStack<SkiaGraphicsState> state)
     {
@@ -17,14 +17,16 @@ internal class SkiaDrawTarget : IDrawTarget, IDisposable
         _state = state;
     }
 
-    public void Dispose() => _path?.Dispose();
+    public void Dispose() => _pathBuilder?.Dispose();
 
     private void TryAddCurrent()
     {
-        if (_path == null || _path.IsEmpty()) return;
+        if (_pathBuilder == null /*|| _pathBuilder.IsEmpty()*/) return;
         //var matrix = currentMatrix.Transform();
-        _compositePath.AddPath(_path); //, ref matrix);
-        _path = Path.Create();
+        using var compositePathBuilder = PathBuilder.Create();
+        compositePathBuilder.AddPath(_pathBuilder.Detach() /*, ref matrix*/);
+        _compositePath = compositePathBuilder.Detach();
+        _pathBuilder = PathBuilder.Create();
     }
 
     public void MoveTo(Vector2 startPoint) => GetOrCreatePath()
@@ -32,21 +34,21 @@ internal class SkiaDrawTarget : IDrawTarget, IDisposable
 
     //The Adobe Pdf interpreter ignores drawing operations before the first MoveTo operation.
     //If path == null then we have not yet gotten a moveto command and we just ignore all the drawing operations
-    private IPath GetOrCreatePath() => _path ??= Path.Create();
+    private IPathBuilder GetOrCreatePath() => _pathBuilder ??= PathBuilder.Create();
 
-    public void LineTo(Vector2 endPoint) => _path?.LineTo(
+    public void LineTo(Vector2 endPoint) => _pathBuilder?.LineTo(
         endPoint.X, endPoint.Y);
 
     public void ClosePath()
     {
-        _path?.Close();
+        _pathBuilder?.Close();
     }
 
     public void CurveTo(Vector2 control, Vector2 endPoint) =>
-        _path?.QuadTo(control.X, control.Y, endPoint.X, endPoint.Y);
+        _pathBuilder?.QuadTo(control.X, control.Y, endPoint.X, endPoint.Y);
 
     public void CurveTo(Vector2 control1, Vector2 control2, Vector2 endPoint) =>
-        _path?.CubicTo(control1.X, control1.Y, control2.X, control2.Y, endPoint.X, endPoint.Y);
+        _pathBuilder?.CubicTo(control1.X, control1.Y, control2.X, control2.Y, endPoint.X, endPoint.Y);
 
     public void EndGlyph() { }
 

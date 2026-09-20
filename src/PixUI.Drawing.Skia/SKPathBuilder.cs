@@ -1,3 +1,5 @@
+#nullable disable
+
 namespace PixUI.Drawing.Skia;
 
 /// <summary>A mutable builder for constructing <see cref="T:SkiaSharp.SKPath" /> objects incrementally.</summary>
@@ -23,7 +25,7 @@ namespace PixUI.Drawing.Skia;
 /// using var path = builder.Detach();
 /// ```
 /// ]]></remarks>
-public unsafe class SKPathBuilder : SKObject, ISKSkipObjectRegistration
+public unsafe class SKPathBuilder : SKObject, ISKSkipObjectRegistration, IPathBuilder
 {
     internal SKPathBuilder(IntPtr handle, bool owns)
         : base(handle, owns) { }
@@ -85,7 +87,7 @@ public unsafe class SKPathBuilder : SKObject, ISKSkipObjectRegistration
     /// <summary>Returns the built path and resets this builder to an empty state.</summary>
     /// <returns>The <see cref="T:SkiaSharp.SKPath" /> built so far. The builder is reset to an empty state after the call.</returns>
     /// <remarks></remarks>
-    public SKPath Detach()
+    public IPath Detach()
     {
         var r = SKPath.GetObject(SkiaApi.sk_pathbuilder_detach_path(Handle));
         GC.KeepAlive(this);
@@ -605,12 +607,12 @@ public unsafe class SKPathBuilder : SKObject, ISKSkipObjectRegistration
     /// <param name="other">The path whose contours are appended.</param>
     /// <param name="mode">Controls how the contours of <paramref name="other" /> are joined to the existing contours.</param>
     /// <remarks></remarks>
-    public void AddPath(SKPath other, SKPathAddMode mode = SKPathAddMode.Append)
+    public void AddPath(IPath other, SKPathAddMode mode = SKPathAddMode.Append)
     {
         if (other == null)
             throw new ArgumentNullException(nameof(other));
 
-        SkiaApi.sk_pathbuilder_add_path(Handle, other.Handle, mode);
+        SkiaApi.sk_pathbuilder_add_path(Handle, ((SKPath)other).Handle, mode);
         GC.KeepAlive(other);
         GC.KeepAlive(this);
     }

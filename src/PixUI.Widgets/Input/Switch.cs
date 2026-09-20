@@ -70,8 +70,9 @@ public sealed class Switch : Toggleable
         var thumbBounds = new Rect(thumbLeft, thumbCenterY - KThumbRadius, thumbRight,
             thumbCenterY + KThumbRadius);
 
-        using var clipPath = Path.Create();
-        clipPath.AddRRect(trackRRect);
+        using var clipPathBuilder = PathBuilder.Create();
+        clipPathBuilder.AddRoundRect(trackRRect);
+        using var clipPath = clipPathBuilder.Detach();
         canvas.ClipPath(clipPath, ClipOp.Intersect, true);
 
         PaintThumb(canvas, thumbBounds);

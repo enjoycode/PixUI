@@ -16,10 +16,12 @@ public class PathTest
     {
         var bigger = Rect.FromLTWH(10, 10, 200, 200);
         var smaller = Rect.FromLTWH(20, 20, 50, 50);
-        var pathBigger = Path.Create();
-        pathBigger.AddRect(bigger);
-        var pathSmaller = Path.Create();
-        pathSmaller.AddRect(smaller);
+        using var pathBiggerBuilder = PathBuilder.Create();
+        pathBiggerBuilder.AddRect(bigger);
+        using var pathBigger = pathBiggerBuilder.Detach();
+        using var pathSmallerBuilder = PathBuilder.Create();
+        pathSmallerBuilder.AddRect(smaller);
+        using var pathSmaller = pathSmallerBuilder.Detach();
 
         var res = pathBigger.Op(pathSmaller, PathOp.Intersect);
         Assert.True(res);
@@ -33,10 +35,12 @@ public class PathTest
     {
         var rect1 = Rect.FromLTWH(0, 0, 10, 10);
         var rect2 = Rect.FromLTWH(30, 30, 10, 10);
-        var path1 = Path.Create();
-        path1.AddRect(rect1);
-        var path2 = Path.Create();
-        path2.AddRect(rect2);
+        using var path1Builder = PathBuilder.Create();
+        path1Builder.AddRect(rect1);
+        using var path1 = path1Builder.Detach();
+        using var path2Builder = PathBuilder.Create();
+        path2Builder.AddRect(rect2);
+        var path2 = path2Builder.Detach();
 
         var res = path1.Op(path2, PathOp.Intersect);
         Assert.True(res);
@@ -46,22 +50,25 @@ public class PathTest
     [Test]
     public void IsClosedTest()
     {
-        var path1 = Path.Create();
-        path1.MoveTo(1, 1);
-        path1.LineTo(2, 2);
+        using var path1Builder = PathBuilder.Create();
+        path1Builder.MoveTo(1, 1);
+        path1Builder.LineTo(2, 2);
+        using var path1 = path1Builder.Detach();
         Assert.False(path1.IsClosed());
 
-        var path2 = Path.Create();
-        path2.AddRect(Rect.FromLTWH(0, 0, 10, 10));
+        using var path2Builder = PathBuilder.Create();
+        path2Builder.AddRect(Rect.FromLTWH(0, 0, 10, 10));
+        using var path2 = path2Builder.Detach();
         Assert.True(path2.IsClosed());
     }
 
     [Test]
     public void OutlineContainsTest()
     {
-        var path1 = Path.Create();
-        path1.MoveTo(10, 10);
-        path1.LineTo(20, 10);
+        using var path1Builder = PathBuilder.Create();
+        path1Builder.MoveTo(10, 10);
+        path1Builder.LineTo(20, 10);
+        var path1 = path1Builder.Detach();
 
         var path2 = path1.GetOutlinePath(4);
         Assert.IsTrue(path2 != null);

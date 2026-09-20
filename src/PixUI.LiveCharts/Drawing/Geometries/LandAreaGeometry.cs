@@ -32,7 +32,7 @@ namespace PixUI.LiveCharts.Drawing.Geometries;
 /// </summary>
 public class LandAreaGeometry : VectorGeometry, IDrawnElement<SkiaSharpDrawingContext>
 {
-    private SKPath? _basePath;
+    private IPath? _basePath;
     private bool _pathDirty = true;
 
     /// <summary>
@@ -62,20 +62,6 @@ public class LandAreaGeometry : VectorGeometry, IDrawnElement<SkiaSharpDrawingCo
     }
 
     /// <summary>
-    /// Returns the cached base path, reset and ready for in-place rebuild.
-    /// Caller populates with MoveTo/LineTo. Hot path for animated projections
-    /// (orthographic rotation) — avoids the native alloc + dispose of a fresh
-    /// <see cref="SKPath"/> per land per frame.
-    /// </summary>
-    public SKPath GetOrResetBasePath()
-    {
-        _basePath ??= Path.Create();
-        _basePath.Reset();
-        _pathDirty = false;
-        return _basePath;
-    }
-
-    /// <summary>
     /// Draws the land area using a cached base path with GPU canvas matrix transform.
     /// Zero allocations during zoom/pan — just Save/Concat/DrawPath/Restore.
     /// </summary>
@@ -87,20 +73,21 @@ public class LandAreaGeometry : VectorGeometry, IDrawnElement<SkiaSharpDrawingCo
         if (_pathDirty || _basePath is null)
         {
             _basePath?.Dispose();
-            _basePath = Path.Create();
+            using var basePathBuilder = PathBuilder.Create();
 
             var isFirst = true;
             foreach (var segment in Commands)
             {
                 if (isFirst)
                 {
-                    _basePath.MoveTo(segment.Xi, segment.Yi);
+                    basePathBuilder.MoveTo(segment.Xi, segment.Yi);
                     isFirst = false;
                 }
 
-                _basePath.LineTo(segment.Xi, segment.Yi);
+                basePathBuilder.LineTo(segment.Xi, segment.Yi);
             }
 
+            _basePath = basePathBuilder.Detach();
             _pathDirty = false;
         }
 
@@ -121,15 +108,15 @@ public class LandAreaGeometry : VectorGeometry, IDrawnElement<SkiaSharpDrawingCo
     }
 
     /// <inheritdoc cref="VectorGeometry.OnDrawSegment(SkiaSharpDrawingContext, SKPath, Segment)"/>
-    protected override void OnDrawSegment(SkiaSharpDrawingContext context, SKPath path, Segment segment) =>
-        path.LineTo(segment.Xi, segment.Yi);
+    protected override void OnDrawSegment(SkiaSharpDrawingContext context, IPathBuilder pathBuilder, Segment segment) =>
+        pathBuilder.LineTo(segment.Xi, segment.Yi);
 
     /// <inheritdoc cref="VectorGeometry.OnOpen(SkiaSharpDrawingContext, SKPath, Segment)"/>
-    protected override void OnOpen(SkiaSharpDrawingContext context, SKPath path, Segment segment) =>
-        path.MoveTo(segment.Xi, segment.Yi);
+    protected override void OnOpen(SkiaSharpDrawingContext context, IPathBuilder pathBuilder, Segment segment) =>
+        pathBuilder.MoveTo(segment.Xi, segment.Yi);
 
     /// <inheritdoc cref="VectorGeometry.OnClose(SkiaSharpDrawingContext, SKPath, Segment)"/>
-    protected override void OnClose(SkiaSharpDrawingContext context, SKPath path, Segment segment) { }
+    protected override void OnClose(SkiaSharpDrawingContext context, IPathBuilder pathBuilder, Segment segment) { }
 
     /// <summary>
     /// Determines whether the specified point is inside this land polygon.
@@ -145,21 +132,22 @@ public class LandAreaGeometry : VectorGeometry, IDrawnElement<SkiaSharpDrawingCo
 
         if (Commands.Count == 0) return false;
 
-        using var path = Path.Create();
+        using var pathBuilder = PathBuilder.Create();
         var isFirst = true;
 
         foreach (var segment in Commands)
         {
             if (isFirst)
             {
-                path.MoveTo(segment.Xi, segment.Yi);
+                pathBuilder.MoveTo(segment.Xi, segment.Yi);
                 isFirst = false;
             }
 
-            path.LineTo(segment.Xi, segment.Yi);
+            pathBuilder.LineTo(segment.Xi, segment.Yi);
         }
 
-        path.Close();
+        pathBuilder.Close();
+        using var path = pathBuilder.Detach();
         return path.Contains(x, y);
     }
 }
