@@ -1,7 +1,9 @@
+using System.Runtime.Versioning;
 using Microsoft.JSInterop;
 
 namespace PixUI.Platform.Blazor;
 
+[SupportedOSPlatform("browser")]
 public sealed class BlazorApplication : UIApplication
 {
     private BlazorApplication(bool isMacOS)
@@ -26,10 +28,10 @@ public sealed class BlazorApplication : UIApplication
     public override bool IsMacOS() => _isMacOS;
 
     protected override void PushWebHistory(string fullPath, int index)
-        => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("PixUI.PushWebHistory", fullPath, index);
+        => WebBrowser.PushWebHistory(fullPath, index);
 
     protected override void ReplaceWebHistory(string fullPath, int index)
-        => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("PixUI.ReplaceWebHistory", fullPath, index);
+        => WebBrowser.ReplaceWebHistory(fullPath, index);
 
     public static async void Run(Func<Widget> rootBuilder, int width, int height, float ratio,
         string? routePath, bool isMacOS)
@@ -48,8 +50,7 @@ public sealed class BlazorApplication : UIApplication
         Window.FirstShow();
     }
 
-    public override void PostInvalidateEvent()
-        => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("PixUI.PostInvalidateEvent");
+    public override void PostInvalidateEvent() => WebBrowser.PostInvalidateEvent();
 
     internal void RunInvalidateRequest() => OnInvalidateRequest();
 

@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using Microsoft.JSInterop;
 
 namespace PixUI.Platform.Blazor;
@@ -12,6 +13,7 @@ public sealed class BlazorCursor : Cursor
     internal readonly string Name;
 }
 
+[SupportedOSPlatform("browser")]
 public sealed class BlazorCursors : IPlatformCursors
 {
     private static readonly BlazorCursor WArrow = new("auto");
@@ -26,6 +28,5 @@ public sealed class BlazorCursors : IPlatformCursors
     public Cursor ResizeLR => WResizeLR;
     public Cursor ResizeUD => WResizeUD;
 
-    public void SetCursor(Cursor cursor) =>
-        ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("PixUI.SetCursor", ((BlazorCursor)cursor).Name);
+    public void SetCursor(Cursor cursor) => WebBrowser.SetCursor(((BlazorCursor)cursor).Name);
 }

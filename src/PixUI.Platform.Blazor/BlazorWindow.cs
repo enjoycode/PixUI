@@ -1,8 +1,9 @@
 using System.Runtime.InteropServices.JavaScript;
-using Microsoft.JSInterop;
+using System.Runtime.Versioning;
 
 namespace PixUI.Platform.Blazor;
 
+[SupportedOSPlatform("browser")]
 public sealed class BlazorWindow : UIWindow
 {
     public BlazorWindow(Widget child, JSObject adapter, JSObject device, int width, int height, float ratio,
@@ -100,7 +101,6 @@ public sealed class BlazorWindow : UIWindow
 
         var overlayCanvas = GetOnscreenCanvas();
         _offScreenSurface?.Draw(overlayCanvas, 0, 0, null);
-
         Present();
     }
 
@@ -110,22 +110,19 @@ public sealed class BlazorWindow : UIWindow
     internal void OnResize(int width, int height, float ratio)
     {
         //TODO: reuse surface if can
-        _offScreenSurface?.Dispose();
-        _onScreenSurface?.Dispose();
-
-        CreateSurface(width, height, ratio);
-        RootWidget.Relayout();
+        // _offScreenSurface?.Dispose();
+        // _onScreenSurface?.Dispose();
+        //
+        // CreateSurface(width, height, ratio);
+        // RootWidget.Relayout();
     }
 
-    public override void StartTextInput() =>
-        ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("PixUI.StartTextInput");
+    public override void StartTextInput() => WebBrowser.StartTextInput();
 
-    public override void StopTextInput() =>
-        ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("PixUI.StopTextInput");
+    public override void StopTextInput() => WebBrowser.StopTextInput();
 
     public override void SetTextInputRect(Rect rect) =>
-        ((IJSInProcessRuntime)BlazorApplication.JSRuntime).InvokeVoid("PixUI.SetInputRect",
-            rect.X, rect.Y, rect.Width, rect.Height);
+        WebBrowser.SetInputRect(rect.X, rect.Y, rect.Width, rect.Height);
 
     internal void RouteGoto(int historyId) => RouteHistoryManager.Goto(historyId);
 

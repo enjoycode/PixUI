@@ -1,11 +1,12 @@
+using System.Runtime.Versioning;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.JSInterop;
 using PixUI.Demo;
-using PixUI.Demo.Mac;
 using PixUI.Drawing.Skia;
 
 namespace PixUI.Platform.Blazor;
 
+[SupportedOSPlatform("browser")]
 public static class Program
 {
     public static async Task Main(string[] args)
@@ -20,7 +21,7 @@ public static class Program
 
         //调用js获取启动参数
         var jsRuntime = ((IJSInProcessRuntime)BlazorApplication.JSRuntime);
-        var runInfo = jsRuntime.Invoke<RunInfo>("PixUI.BeforeRunApp");
+        var runInfo = await jsRuntime.InvokeAsync<RunInfo>("PixUI.BeforeRunApp");
         await Run(runInfo.Width, runInfo.Height, runInfo.PixelRatio, runInfo.RoutePath,
             runInfo.IsMacOS);
         jsRuntime.InvokeVoid("PixUI.BindEvents");

@@ -1,16 +1,11 @@
-using Microsoft.JSInterop;
+using System.Runtime.Versioning;
 
 namespace PixUI.Platform.Blazor;
 
+[SupportedOSPlatform("browser")]
 public sealed class BlazorClipboard : IPlatformClipboard
 {
-    public ValueTask WriteText(string text)
-    {
-        return BlazorApplication.JSRuntime.InvokeVoidAsync("PixUI.ClipboardWriteText", text);
-    }
+    public ValueTask WriteText(string text) => new(WebBrowser.ClipboardWriteText(text));
 
-    public ValueTask<string?> ReadText()
-    {
-        return BlazorApplication.JSRuntime.InvokeAsync<string?>("PixUI.ClipboardReadText");
-    }
+    public ValueTask<string?> ReadText() => new(WebBrowser.ClipboardReadText());
 }

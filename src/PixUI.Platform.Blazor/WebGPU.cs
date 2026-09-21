@@ -1,8 +1,10 @@
 using System.Runtime.InteropServices.JavaScript;
+using System.Runtime.Versioning;
 
 namespace PixUI.Platform.Blazor;
 
-internal partial class WebGPU
+[SupportedOSPlatform("browser")]
+internal static partial class WebGPU
 {
     [JSImport("globalThis.PixUI.WebGPU.requestAdapter")]
     internal static partial Task<JSObject> RequestAdapter();

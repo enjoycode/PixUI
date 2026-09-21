@@ -4,6 +4,7 @@ export let PixUI = {
     _canvasCtx: null,
     _asmName: "PixUI",
     _baseHref: (document.getElementsByTagName('base')[0] || {href: document.location.origin + '/'}).href,
+    _api: null,
 
     Init: function () {
         this.CreateCanvas()
@@ -43,14 +44,17 @@ export let PixUI = {
 
         this._htmlInput = input;
     },
-    
-    GetCanvasTexture: function(device) {
-        this._canvasCtx = this._htmlCanvas.getContext("webgpu");
-        this._canvasCtx.configure({
-            device: device,
-            format: navigator.gpu.getPreferredCanvasFormat(),
-            alphaMode: "premultiplied",
-        });
+
+    GetCanvasTexture: function (device) {
+        if (!this._canvasCtx) {
+            this._canvasCtx = this._htmlCanvas.getContext("webgpu");
+            this._canvasCtx.configure({
+                device: device,
+                format: navigator.gpu.getPreferredCanvasFormat(),
+                alphaMode: "premultiplied",
+            });
+        }
+        
         return this._canvasCtx.getCurrentTexture();
     },
 
@@ -69,26 +73,26 @@ export let PixUI = {
     BindEvents: function () {
         window.onresize = ev => {
             this.UpdateCanvasSize()
-            DotNet.invokeMethod(this._asmName, "OnResize", window.innerWidth, window.innerHeight, window.devicePixelRatio)
+            this._api.OnResize(window.innerWidth, window.innerHeight, window.devicePixelRatio)
         }
 
         window.onmousemove = ev => {
             ev.preventDefault();
             ev.stopPropagation();
-            DotNet.invokeMethod(this._asmName, "OnMouseMove", ev.buttons, ev.x, ev.y, ev.movementX, ev.movementY)
+            this._api.OnMouseMove(ev.buttons, ev.x, ev.y, ev.movementX, ev.movementY)
         }
         window.onmouseout = ev => {
-            DotNet.invokeMethod(this._asmName, "OnMouseMoveOutWindow")
+            this._api.OnMouseMoveOutWindow()
         }
         window.onmousedown = ev => {
             ev.preventDefault();
             ev.stopPropagation();
-            DotNet.invokeMethod(this._asmName, "OnMouseDown", ev.button, ev.x, ev.y, ev.movementX, ev.movementY)
+            this._api.OnMouseDown(ev.button, ev.x, ev.y, ev.movementX, ev.movementY)
         }
         window.onmouseup = ev => {
             ev.preventDefault();
             ev.stopPropagation();
-            DotNet.invokeMethod(this._asmName, "OnMouseUp", ev.button, ev.x, ev.y, ev.movementX, ev.movementY)
+            this._api.OnMouseUp(ev.button, ev.x, ev.y, ev.movementX, ev.movementY)
         }
         window.oncontextmenu = ev => {
             ev.preventDefault();
@@ -105,13 +109,13 @@ export let PixUI = {
             }
         }
         window.onkeydown = ev => {
-            DotNet.invokeMethod(this._asmName, "OnKeyDown", ev.key, ev.code, ev.altKey, ev.ctrlKey, ev.shiftKey, ev.metaKey)
+            this._api.OnKeyDown(ev.key, ev.code, ev.altKey, ev.ctrlKey, ev.shiftKey, ev.metaKey)
             if (ev.code === 'Tab') {
                 ev.preventDefault();
             }
         }
         window.onkeyup = ev => {
-            DotNet.invokeMethod(this._asmName, "OnKeyUp", ev.key, ev.code, ev.altKey, ev.ctrlKey, ev.shiftKey, ev.metaKey)
+            this._api.OnKeyUp(ev.key, ev.code, ev.altKey, ev.ctrlKey, ev.shiftKey, ev.metaKey)
             if (ev.code === 'Tab') {
                 ev.preventDefault();
             }
@@ -141,12 +145,12 @@ export let PixUI = {
         this._htmlCanvas.onwheel = ev => {
             ev.preventDefault();
             ev.stopPropagation();
-            DotNet.invokeMethod(this._asmName, "OnScroll", ev.x, ev.y, ev.deltaX, ev.deltaY)
+            this._api.OnScroll(ev.x, ev.y, ev.deltaX, ev.deltaY)
         }
     },
 
     OnTextInput: function (s) {
-        DotNet.invokeMethod(this._asmName, "OnTextInput", s)
+        this._api.OnTextInput(s)
     },
 
     SetCursor: function (name) {
@@ -184,7 +188,7 @@ export let PixUI = {
 
     PostInvalidateEvent: function () {
         requestAnimationFrame(() => {
-            DotNet.invokeMethod(this._asmName, "OnInvalidate")
+            this._api.OnInvalidate()
         });
     },
 
@@ -243,8 +247,13 @@ export let PixUI = {
         setTimeout(() => URL.revokeObjectURL(link.href), 10000)
     },
 
-    BeforeRunApp: function () {
-        this._asmName = Blazor.runtime.getConfig().mainAssemblyName
+    BeforeRunApp: async function () {
+        let runtime = globalThis.Blazor.runtime
+        this._asmName = runtime.getConfig().mainAssemblyName
+        let exports = await runtime.getAssemblyExports(this._asmName)
+        this._api = this._asmName.split('.')
+            .reduce((obj,key) => obj[key], exports)
+            .WebBrowser
 
         let routePath = document.location.hash.length > 0 ? document.location.hash.substring(1) : null
         let isMacOS = navigator.userAgent.includes("Mac")
