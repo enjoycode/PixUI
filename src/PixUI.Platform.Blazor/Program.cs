@@ -41,11 +41,11 @@ public static class Program
         FontCollection.RegisterTypeface(ms, FontCollection.DefaultFamilyName, false);
 
         //开始执行Blazor应用
-        //BlazorApplication.Run(() => new DemoRoute(), width, height, ratio, routePath, isMacOS);
-        BlazorApplication.Run(() => new Center()
-                .WithChild(new Card()
-                    .WithChild(new Container() { Width = 200, Height = 200 })),
-            width, height, ratio, routePath, isMacOS);
+        BlazorApplication.Run(() => new DemoRoute(), width, height, ratio, routePath, isMacOS);
+        // BlazorApplication.Run(() => new Center()
+        //         .WithChild(new Card()
+        //             .WithChild(new Container() { Width = 200, Height = 200 })),
+        //     width, height, ratio, routePath, isMacOS);
     }
 
     // private static async Task TestCanvas()

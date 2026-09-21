@@ -13,8 +13,8 @@ public sealed class SKTextStyle : SKObject, ITextStyle
 
     public Color Color
     {
-        get => SkiaApi.sk_text_style_get_color(Handle);
-        set => SkiaApi.sk_text_style_set_color(Handle, value);
+        get => new Color(SkiaApi.sk_text_style_get_color(Handle));
+        set => SkiaApi.sk_text_style_set_color(Handle, (uint)value);
     }
 
     public float FontSize

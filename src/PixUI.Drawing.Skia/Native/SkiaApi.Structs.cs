@@ -257,8 +257,7 @@ public struct GRVkAlloc : IEquatable<GRVkAlloc>
 
 // gr_vk_backendcontext_t
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct
-    GRVkBackendContextNative : IEquatable<GRVkBackendContextNative>
+internal unsafe struct GRVkBackendContextNative : IEquatable<GRVkBackendContextNative>
 {
     // public vk_instance_t* fInstance
     public IntPtr fInstance;
@@ -1054,8 +1053,7 @@ public partial struct SKColorSpaceXyz : IEquatable<SKColorSpaceXyz>
 
 // sk_document_pdf_metadata_t
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct
-    SKDocumentPdfMetadataInternal : IEquatable<SKDocumentPdfMetadataInternal>
+internal unsafe struct SKDocumentPdfMetadataInternal : IEquatable<SKDocumentPdfMetadataInternal>
 {
     // public sk_string_t* fTitle
     public IntPtr fTitle;

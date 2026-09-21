@@ -139,7 +139,7 @@ public abstract class SKObject : SKNativeObject
 
         return HandleDictionary.GetOrAddObject(handle, owns, unrefExisting, objectFactory);
     }
-    
+
     // Variant that promotes the returned wrapper to dispose-protected
     // (IgnorePublicDispose = true) inside HandleDictionary's critical section.
     // Used by the singleton accessors (CreateSrgb, Default, etc.). "Dispose-protected"
@@ -147,13 +147,14 @@ public abstract class SKObject : SKNativeObject
     // from GC's perspective; finalization and DisposeInternal still tear it down.
     // The actual long-lived persistence comes from each accessor's static-field
     // cache acting as a GC root.
-    internal static TSkiaObject GetOrAddDisposeProtectedObject<TSkiaObject> (IntPtr handle, bool owns, bool unrefExisting, Func<IntPtr, bool, TSkiaObject> objectFactory)
+    internal static TSkiaObject GetOrAddDisposeProtectedObject<TSkiaObject>(IntPtr handle, bool owns,
+        bool unrefExisting, Func<IntPtr, bool, TSkiaObject> objectFactory)
         where TSkiaObject : SKObject
     {
         if (handle == IntPtr.Zero)
             return null;
 
-        return HandleDictionary.GetOrAddObject (handle, owns, unrefExisting, disposeProtected: true, objectFactory);
+        return HandleDictionary.GetOrAddObject(handle, owns, unrefExisting, disposeProtected: true, objectFactory);
     }
 
     internal static void RegisterHandle(IntPtr handle, SKObject? instance)
@@ -353,13 +354,9 @@ internal static class SKObjectExtensions
             return SkiaApi.sk_nvrefcnt_unique(handle);
     }
 
-    public static int GetReferenceCount(this IntPtr handle, bool isVirtual)
-    {
-        if (isVirtual)
-            return SkiaApi.sk_refcnt_get_ref_count(handle);
-        else
-            return SkiaApi.sk_nvrefcnt_get_ref_count(handle);
-    }
+    public static int GetReferenceCount(this IntPtr handle, bool isVirtual) => isVirtual
+        ? SkiaApi.sk_refcnt_get_ref_count(handle)
+        : SkiaApi.sk_nvrefcnt_get_ref_count(handle);
 
     public static void SafeRef(this ISKReferenceCounted obj)
     {
@@ -377,13 +374,9 @@ internal static class SKObjectExtensions
             SkiaApi.sk_refcnt_safe_unref(obj.Handle);
     }
 
-    public static int GetReferenceCount(this ISKReferenceCounted obj)
-    {
-        if (obj is ISKNonVirtualReferenceCounted)
-            return SkiaApi.sk_nvrefcnt_get_ref_count(obj.Handle);
-        else
-            return SkiaApi.sk_refcnt_get_ref_count(obj.Handle);
-    }
+    public static int GetReferenceCount(this ISKReferenceCounted obj) => obj is ISKNonVirtualReferenceCounted
+        ? SkiaApi.sk_nvrefcnt_get_ref_count(obj.Handle)
+        : SkiaApi.sk_refcnt_get_ref_count(obj.Handle);
 }
 
 internal interface ISKReferenceCounted
