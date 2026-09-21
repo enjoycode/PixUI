@@ -103,11 +103,11 @@ public sealed class DemoPage : View
                         new Card
                         {
                             Elevation = 2, Width = 200, Height = 266,
-                            Child = new ImageBox()
-                            {
-                                // ImageSource = ImageSource.FromNetwork("https://picsum.photos/200/266?random=2")
-                                ImageSource = _imgSrc
-                            }
+                            // Child = new ImageBox()
+                            // {
+                            //     // ImageSource = ImageSource.FromNetwork("https://picsum.photos/200/266?random=2")
+                            //     ImageSource = _imgSrc
+                            // }
                         }
                     }
                 },
