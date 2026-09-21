@@ -1,5 +1,17 @@
 namespace PixUI;
 
+public interface IGpuContext : IDisposable
+{
+    IGpuRecorder CreateRecorder();
+}
+
+public interface IGpuRecorder : IDisposable { }
+
+public interface IGpuBackendTexture : IDisposable
+{
+    SizeI Dimensions { get; }
+}
+
 public interface IGRContext : IDisposable
 {
     void AbandonContext(bool releaseResources = false);

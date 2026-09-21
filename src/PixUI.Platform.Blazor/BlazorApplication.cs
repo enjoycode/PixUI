@@ -31,15 +31,18 @@ public sealed class BlazorApplication : UIApplication
     protected override void ReplaceWebHistory(string fullPath, int index)
         => ((IJSInProcessRuntime)JSRuntime).InvokeVoid("PixUI.ReplaceWebHistory", fullPath, index);
 
-    public static void Run(Func<Widget> rootBuilder, int glHandle,
-        int width, int height, float ratio,
+    public static async void Run(Func<Widget> rootBuilder, int width, int height, float ratio,
         string? routePath, bool isMacOS)
     {
         var app = new BlazorApplication(isMacOS);
         Current = app;
 
         //创建WebWindow
-        Window = new BlazorWindow(rootBuilder(), glHandle, width, height, ratio, routePath);
+        var adapter = await WebGPU.RequestAdapter() ?? throw new InvalidOperationException(
+            "navigator.gpu.requestAdapter returned null — WebGPU is unavailable in this browser.");
+        var device = await WebGPU.RequestDevice(adapter) ?? throw new InvalidOperationException(
+            "adapter.requestDevice returned null.");
+        Window = new BlazorWindow(rootBuilder(), adapter, device, width, height, ratio, routePath);
         app.MainWindow = Window;
         //开始构建WidgetTree并首秀
         Window.FirstShow();

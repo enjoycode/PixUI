@@ -26,6 +26,9 @@ public static class Surface
     public static ISurface Create(ImageInfo info, IntPtr pixels, int rowBytes) =>
         Render.Backend.MakeSurface(info, pixels, rowBytes);
 
+    public static ISurface Create(IGpuRecorder recorder, IGpuBackendTexture backendTexture, ColorType colorType) =>
+        Render.Backend.MakeSurface(recorder, backendTexture, colorType);
+
     /// <summary>
     /// Create a new gpu surface (like a Texture)
     /// </summary>

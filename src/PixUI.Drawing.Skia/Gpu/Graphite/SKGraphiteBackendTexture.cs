@@ -10,7 +10,7 @@ namespace PixUI.Drawing.Skia;
 ///
 /// This type wraps a native Skia resource and implements `IDisposable`. Dispose it when it is no longer needed.
 /// ]]></format></remarks>
-public unsafe class SKGraphiteBackendTexture : SKObject
+public unsafe class SKGraphiteBackendTexture : SKObject, IGpuBackendTexture
 {
     internal SKGraphiteBackendTexture(IntPtr handle, bool owns)
         : base(handle, owns) { }

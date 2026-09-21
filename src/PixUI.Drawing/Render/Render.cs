@@ -67,6 +67,8 @@ public interface IRender
 
     ISurface MakeSurface(ImageInfo imageInfo);
     ISurface MakeSurface(ImageInfo imageInfo, IntPtr pixels, int rowBytes);
+    
+    ISurface MakeSurface(IGpuRecorder recorder, IGpuBackendTexture backendTexture, ColorType colorType);
 
     ISurface? MakeSurface(IGRContext context, bool budgeted, ImageInfo info,
         int sampleCount, SurfaceOrigin origin, ISurfaceProperties? props, bool shouldCreateWithMips);
@@ -83,7 +85,11 @@ public interface IRender
 
     #endregion
 
-    #region ====GRContext Factory====
+    #region ====Gpu====
+    IGpuContext MakeWebGpuContext(IntPtr instanceId, IntPtr deviceId, IntPtr queueId);
+    
+    IGpuBackendTexture MakeWebGpuBackendTexture(IntPtr textureId);
+    void FlushSurface(IGpuContext gpuContext, IGpuRecorder recorder);
 
     IGRContext? MakeGRContextWebGL(int webglHandle);
     IGRContext? MakeGRContextMetal(IntPtr device, IntPtr queue);

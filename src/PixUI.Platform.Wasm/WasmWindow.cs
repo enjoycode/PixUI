@@ -52,6 +52,11 @@ internal sealed class WasmWindow : UIWindow
 
     protected override ICanvas GetOffscreenCanvas() => _offScreenSurface!.Canvas;
 
+    protected override void FlushOffScreen()
+    {
+        throw new NotImplementedException();
+    }
+
     protected override void Present() => _grContext?.Flush(true);
 
     internal void FirstShow()
@@ -63,7 +68,7 @@ internal sealed class WasmWindow : UIWindow
         RootWidget.OnPaint(widgetsCanvas);
 
         var overlayCanvas = GetOnscreenCanvas();
-        widgetsCanvas?.Flush(); // _offScreenSurface?.Flush();
+        FlushOffScreen();
         _offScreenSurface?.Draw(overlayCanvas, 0, 0, null);
 
         // test draw onscreen bounds

@@ -16,7 +16,7 @@ namespace PixUI.Drawing.Skia;
 ///
 /// A recorder is not thread-safe; use one recorder per thread. This type wraps a native Skia resource and implements `IDisposable`.
 /// ]]></format></remarks>
-public unsafe class SKGraphiteRecorder : SKObject
+public unsafe class SKGraphiteRecorder : SKObject, IGpuRecorder
 {
 	// Pin keeping the user's image-upload callback alive while Skia's FfiImageProvider
 	// can dispatch into it. Freed in DisposeNative AFTER the native recorder is destroyed.

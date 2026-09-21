@@ -303,8 +303,6 @@ public sealed unsafe class SKCanvas : SKObject, ICanvas
 
     #region ====Clear & Flush====
 
-    public void Flush() => SkiaApi.sk_canvas_flush(Handle);
-
     public void Clear() => Clear(Color.Empty);
 
     public void Clear(Color color) => SkiaApi.sk_canvas_clear(Handle, (uint)color);

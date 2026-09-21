@@ -60,6 +60,44 @@ public sealed class SkiaRender : IRender
 
     public IPathEffect? MakePathEffectCorner(float radius) => SKPathEffect.CreateCorner(radius);
 
+    public IGpuContext MakeWebGpuContext(IntPtr instanceId, IntPtr deviceId, IntPtr queueId)
+    {
+        var backendContext = new SKGraphiteDawnBackendContext
+        {
+            WgpuInstance = instanceId,
+            WgpuDevice = deviceId,
+            WgpuQueue = queueId,
+        };
+        return SKGraphiteContext.CreateDawn(backendContext)
+               ?? throw new InvalidOperationException("SKGraphiteContext.CreateDawn returned null.");
+    }
+
+    public IGpuBackendTexture MakeWebGpuBackendTexture(IntPtr textureId)
+    {
+        return SKGraphiteBackendTexture.CreateDawn(textureId) ??
+               throw new InvalidOperationException("SKGraphiteBackendTexture.CreateDawn returned null.");
+    }
+
+    public void FlushSurface(IGpuContext gpuContext, IGpuRecorder gpuRecorder)
+    {
+        var context = (SKGraphiteContext)gpuContext;
+        var recorder = (SKGraphiteRecorder)gpuRecorder;
+        using (var recording = recorder.Snap() ??
+                               throw new InvalidOperationException("Recorder.Snap() returned null."))
+        {
+            if (context.InsertRecording(recording) != SKGraphiteInsertStatus.Success)
+                throw new InvalidOperationException("InsertRecording did not report Success.");
+        }
+
+        context.Submit(new SKGraphiteSubmitInfo { Sync = false });
+    }
+
+    public ISurface MakeSurface(IGpuRecorder recorder, IGpuBackendTexture backendTexture, ColorType colorType)
+    {
+        return SKSurface.Create((SKGraphiteRecorder)recorder, (SKGraphiteBackendTexture)backendTexture, colorType)
+               ?? throw new InvalidOperationException("SKSurface.Create returned null on Graphite.");
+    }
+
     public IGRContext? MakeGRContextWebGL(int webglHandle)
     {
         var glInterface = GRGlInterface.Create();
@@ -84,7 +122,7 @@ public sealed class SkiaRender : IRender
 
     public ISurface? MakeSurface(IGRContext context, bool budgeted, ImageInfo info, int sampleCount,
         SurfaceOrigin origin, ISurfaceProperties? props, bool shouldCreateWithMips) =>
-        throw new NotSupportedException();//SKSurface.Create((GRRecordingContext)context, budgeted, info, sampleCount, origin, props, shouldCreateWithMips);
+        throw new NotSupportedException(); //SKSurface.Create((GRRecordingContext)context, budgeted, info, sampleCount, origin, props, shouldCreateWithMips);
 
     public ISurface? MakeSurfaceForWebGL(IGRContext context, int width, int height) =>
         throw new NotSupportedException(); //SKSurface.CreateGLOnScreen((GRContext)context, width, height));

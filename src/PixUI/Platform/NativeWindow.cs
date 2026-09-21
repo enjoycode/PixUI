@@ -35,6 +35,11 @@ public abstract class NativeWindow : UIWindow
 
     protected internal sealed override void Present() => WindowContext?.SwapBuffers();
 
+    protected internal override void FlushOffScreen()
+    {
+        throw new NotImplementedException();
+    }
+
     protected abstract void Show();
 
     public void OnResize(int width, int height)

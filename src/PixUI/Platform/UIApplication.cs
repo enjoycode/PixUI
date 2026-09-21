@@ -1,6 +1,4 @@
-using System;
 using System.Diagnostics;
-using System.Threading;
 using PixUI.Platform;
 
 namespace PixUI;
@@ -65,8 +63,7 @@ public abstract class UIApplication
         {
             ctx.Canvas = widgetsCanvas;
             hasRelayout = window.WidgetsInvalidQueue.RenderFrame(ctx);
-            if (OperatingSystem.IsBrowser())
-                widgetsCanvas.Flush(); //widgetsCanvas.Surface!.Flush();
+            window.FlushOffScreen();
         }
 
         //重新布局OverlayCanvas

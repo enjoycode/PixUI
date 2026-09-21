@@ -67,7 +67,6 @@ public interface ICanvas : IDisposable
 
     #region ====Clear & Flush====
 
-    void Flush();
     void Clear();
     void Clear(Color color);
 

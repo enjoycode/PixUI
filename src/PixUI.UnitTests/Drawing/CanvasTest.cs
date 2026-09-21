@@ -18,7 +18,6 @@ public class CanvasTest
         using var surface = Surface.Create(imgInfo);
         var canvas = surface.Canvas;
         canvas.Clear(new Color(255, 0, 0));
-        canvas.Flush();
 
         // using var img = surface.Snapshot();
         // using var imgData = img.Encode(EncodedImageFormat.Png, 100);

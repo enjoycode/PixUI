@@ -125,6 +125,11 @@ public abstract class UIWindow
     }
 
     /// <summary>
+    /// 完成离屏绘制
+    /// </summary>
+    protected internal abstract void FlushOffScreen();
+
+    /// <summary>
     /// 呈现已渲染好的当前帧
     /// </summary>
     protected internal abstract void Present();
