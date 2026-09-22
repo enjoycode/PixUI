@@ -89,7 +89,10 @@ public sealed class SkiaRender : IRender
                 throw new InvalidOperationException("InsertRecording did not report Success.");
         }
 
-        context.Submit(new SKGraphiteSubmitInfo { Sync = false });
+        var done = context.Submit(new SKGraphiteSubmitInfo { Sync = false });
+#if DEBUG
+        if (!done) throw new Exception("Failed to submit.");
+#endif
     }
 
     public ISurface MakeSurface(IGpuRecorder recorder, IGpuBackendTexture backendTexture, ColorType colorType)

@@ -63,7 +63,7 @@ public abstract class UIApplication
         {
             ctx.Canvas = widgetsCanvas;
             hasRelayout = window.WidgetsInvalidQueue.RenderFrame(ctx);
-            window.FlushOffScreen();
+            //window.FlushOffScreen();
         }
 
         //重新布局OverlayCanvas

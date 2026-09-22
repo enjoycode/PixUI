@@ -6,18 +6,18 @@ namespace PixUI.Platform.Blazor;
 [SupportedOSPlatform("browser")]
 public sealed class BlazorWindow : UIWindow
 {
-    public BlazorWindow(Widget child, JSObject adapter, JSObject device, int width, int height, float ratio,
+    public BlazorWindow(Widget child, JSObject device, int width, int height, float ratio,
         string? initRoutePath = null) : base(child, initRoutePath)
     {
         _device = device;
-        CreateContext(adapter, device);
-        CreateSurface(width, height, ratio);
+        CreateContext(device);
+        CreateOffScreenSurface(width, height, ratio);
     }
 
     private readonly JSObject _device;
     private IGpuContext? _webGpuContext;
+    private IGpuRecorder? _gpuRecorder;
 
-    private IGpuRecorder? _onScreenRecorder;
     private int _onScreenTextureId;
     private IGpuBackendTexture? _onScreenBackendTexture;
     private ISurface? _onScreenSurface;
@@ -26,7 +26,6 @@ public sealed class BlazorWindow : UIWindow
     private ISurface? _offScreenSurface;
     private int _offScreenTextureId;
     private IGpuBackendTexture? _offScreenBackendTexture;
-    private IGpuRecorder? _offScreenRecorder;
     private ICanvas? _offScreenCanvas;
     private int _width;
     private int _height;
@@ -36,7 +35,7 @@ public sealed class BlazorWindow : UIWindow
     public override float Width => _width;
     public override float Height => _height;
 
-    private void CreateContext(JSObject adapter, JSObject device)
+    private void CreateContext(JSObject device)
     {
         var instanceId = WebGPU.CreateInstance();
         if (instanceId == 0)
@@ -49,10 +48,19 @@ public sealed class BlazorWindow : UIWindow
 
         _webGpuContext = Render.Backend.MakeWebGpuContext(instanceId, deviceId, queueId);
         if (_webGpuContext == null) throw new Exception("Can't create WebGpuContext");
+
+        _gpuRecorder = _webGpuContext.CreateRecorder();
     }
 
-    private void CreateSurface(int width, int height, float ratio)
+    private void CreateOffScreenSurface(int width, int height, float ratio)
     {
+        if (_offScreenSurface != null)
+        {
+            _offScreenSurface.Dispose();
+            _offScreenBackendTexture?.Dispose();
+            WebGPU.ReleaseTexture(_offScreenTextureId);
+        }
+
         _width = width;
         _height = height;
         _ratio = ratio;
@@ -60,35 +68,39 @@ public sealed class BlazorWindow : UIWindow
         var pixWidth = (int)(width * ratio);
         var pixHeigh = (int)(height * ratio);
 
-        _onScreenRecorder = _webGpuContext!.CreateRecorder();
-        _offScreenRecorder = _webGpuContext.CreateRecorder();
-
-        //create onscreen surface
-        var onscreenTexture = WebGPU.GetCanvasTexture(_device);
-        _onScreenTextureId = WebGPU.RegisterTexture(onscreenTexture);
-        _onScreenBackendTexture = Render.Backend.MakeWebGpuBackendTexture(_onScreenTextureId);
-        _onScreenSurface = Surface.Create(_onScreenRecorder, _onScreenBackendTexture, ColorType.Rgba8888);
-        _onScreenCanvas = _onScreenSurface.Canvas;
-
         //create offscreen surface
-        var onScreenSize = _onScreenBackendTexture.Dimensions;
-        var offscreenTexture = WebGPU.CreateTexture(_device, onScreenSize.Width, onScreenSize.Height);
+        var offscreenTexture = WebGPU.CreateTexture(_device, pixWidth, pixHeigh);
         _offScreenTextureId = WebGPU.RegisterTexture(offscreenTexture);
         _offScreenBackendTexture = Render.Backend.MakeWebGpuBackendTexture(_offScreenTextureId);
-        _offScreenSurface = Surface.Create(_offScreenRecorder, _offScreenBackendTexture, ColorType.Rgba8888);
+        _offScreenSurface = Surface.Create(_gpuRecorder!, _offScreenBackendTexture, ColorType.Rgba8888);
         _offScreenCanvas = _offScreenSurface.Canvas;
         _offScreenCanvas.Scale(ratio, ratio);
     }
 
-    protected override ICanvas GetOnscreenCanvas() => _onScreenCanvas!;
+    protected override ICanvas GetOnscreenCanvas()
+    {
+        if (_onScreenSurface != null)
+        {
+            _onScreenSurface.Dispose();
+            _onScreenBackendTexture?.Dispose();
+            //Check should WebGPU.ReleaseTexture(_onScreenTextureId)
+        }
+
+        var onscreenTexture = WebGPU.GetCanvasTexture(_device);
+        _onScreenTextureId = WebGPU.RegisterTexture(onscreenTexture);
+        _onScreenBackendTexture = Render.Backend.MakeWebGpuBackendTexture(_onScreenTextureId);
+        _onScreenSurface = Surface.Create(_gpuRecorder!, _onScreenBackendTexture, ColorType.Rgba8888);
+        _onScreenCanvas = _onScreenSurface.Canvas;
+        return _onScreenCanvas;
+    }
 
     protected override ICanvas GetOffscreenCanvas() => _offScreenCanvas!;
 
     protected override void FlushOffScreen() =>
-        Render.Backend.FlushSurface(_webGpuContext!, _offScreenRecorder!);
+        Render.Backend.FlushSurface(_webGpuContext!, _gpuRecorder!);
 
     protected override void Present() =>
-        Render.Backend.FlushSurface(_webGpuContext!, _onScreenRecorder!);
+        Render.Backend.FlushSurface(_webGpuContext!, _gpuRecorder!);
 
     internal void FirstShow()
     {
@@ -97,7 +109,7 @@ public sealed class BlazorWindow : UIWindow
 
         var widgetsCanvas = GetOffscreenCanvas();
         RootWidget.OnPaint(widgetsCanvas);
-        FlushOffScreen();
+        // FlushOffScreen();
 
         var overlayCanvas = GetOnscreenCanvas();
         _offScreenSurface?.Draw(overlayCanvas, 0, 0, null);

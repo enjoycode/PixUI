@@ -44,7 +44,7 @@ public sealed class BlazorApplication : UIApplication
             "navigator.gpu.requestAdapter returned null — WebGPU is unavailable in this browser.");
         var device = await WebGPU.RequestDevice(adapter) ?? throw new InvalidOperationException(
             "adapter.requestDevice returned null.");
-        Window = new BlazorWindow(rootBuilder(), adapter, device, width, height, ratio, routePath);
+        Window = new BlazorWindow(rootBuilder(), device, width, height, ratio, routePath);
         app.MainWindow = Window;
         //开始构建WidgetTree并首秀
         Window.FirstShow();

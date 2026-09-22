@@ -6,7 +6,12 @@ namespace PixUI.Drawing.Skia;
 /// <remarks><format type="text/markdown"><![CDATA[
 /// ## Remarks
 ///
-/// Create an instance from a platform texture handle using one of the backend-specific factory methods (<xref:SkiaSharp.SKGraphiteBackendTexture.CreateVulkan(System.Int32,System.Int32,SkiaSharp.SKGraphiteVkTextureInfo,System.Int32,System.UInt32,System.IntPtr)>, <xref:SkiaSharp.SKGraphiteBackendTexture.CreateMetal(System.Int32,System.Int32,System.IntPtr)>, or <xref:SkiaSharp.SKGraphiteBackendTexture.CreateDawn(System.IntPtr)>). The caller retains ownership of the underlying platform texture; disposing this wrapper does not destroy it.
+/// Create an instance from a platform texture handle using one of the backend-specific factory methods
+/// (<xref:SkiaSharp.SKGraphiteBackendTexture.CreateVulkan(System.Int32,System.Int32,SkiaSharp.SKGraphiteVkTextureInfo,System.Int32,System.UInt32,System.IntPtr)>,
+/// <xref:SkiaSharp.SKGraphiteBackendTexture.CreateMetal(System.Int32,System.Int32,System.IntPtr)>,
+/// or <xref:SkiaSharp.SKGraphiteBackendTexture.CreateDawn(System.IntPtr)>).
+///
+/// The caller retains ownership of the underlying platform texture; disposing this wrapper does not destroy it.
 ///
 /// This type wraps a native Skia resource and implements `IDisposable`. Dispose it when it is no longer needed.
 /// ]]></format></remarks>
@@ -24,12 +29,8 @@ public unsafe class SKGraphiteBackendTexture : SKObject, IGpuBackendTexture
     /// <param name="vkImage">A handle to the Vulkan image to wrap.</param>
     /// <returns>A new <see cref="T:SkiaSharp.SKGraphiteBackendTexture" />, or <see langword="null" /> if it could not be created.</returns>
     /// <remarks />
-    public static SKGraphiteBackendTexture CreateVulkan(
-        int width, int height,
-        SKGraphiteVkTextureInfo info,
-        int imageLayout,
-        uint queueFamilyIndex,
-        IntPtr vkImage)
+    public static SKGraphiteBackendTexture CreateVulkan(int width, int height, SKGraphiteVkTextureInfo info,
+        int imageLayout, uint queueFamilyIndex, IntPtr vkImage)
     {
         if (vkImage == IntPtr.Zero)
             throw new ArgumentNullException(nameof(vkImage));
@@ -48,9 +49,7 @@ public unsafe class SKGraphiteBackendTexture : SKObject, IGpuBackendTexture
     /// <param name="mtlTexture">A handle to the Metal texture to wrap.</param>
     /// <returns>A new <see cref="T:SkiaSharp.SKGraphiteBackendTexture" />, or <see langword="null" /> if it could not be created.</returns>
     /// <remarks />
-    public static SKGraphiteBackendTexture CreateMetal(
-        int width, int height,
-        IntPtr mtlTexture)
+    public static SKGraphiteBackendTexture CreateMetal(int width, int height, IntPtr mtlTexture)
     {
         if (mtlTexture == IntPtr.Zero)
             throw new ArgumentNullException(nameof(mtlTexture));

@@ -57,14 +57,12 @@ public unsafe class SKGraphiteRecorder : SKObject, IGpuRecorder
 	/// <summary>Gets the graphics backend that this recorder uses.</summary>
 	/// <value>One of the enumeration values that indicates the backend.</value>
 	/// <remarks />
-	public SKGraphiteBackend Backend =>
-		SkiaApi.sk_graphite_recorder_get_backend (Handle);
+	public SKGraphiteBackend Backend => SkiaApi.sk_graphite_recorder_get_backend (Handle);
 
 	/// <summary>Gets the maximum texture dimension supported by the recorder's backend, in pixels.</summary>
 	/// <value>The maximum texture size, in pixels.</value>
 	/// <remarks />
-	public int MaxTextureSize =>
-		SkiaApi.sk_graphite_recorder_get_max_texture_size (Handle);
+	public int MaxTextureSize => SkiaApi.sk_graphite_recorder_get_max_texture_size (Handle);
 
 	/// <summary>Captures the commands recorded so far into a new recording and resets the recorder for further recording.</summary>
 	/// <returns>A new <see cref="T:SkiaSharp.SKGraphiteRecording" />, or <see langword="null" /> if there was nothing to record.</returns>

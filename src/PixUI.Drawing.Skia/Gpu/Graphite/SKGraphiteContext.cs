@@ -11,7 +11,11 @@ namespace PixUI.Drawing.Skia;
 /// <remarks><format type="text/markdown"><![CDATA[
 /// ## Remarks
 ///
-/// Create a context from a backend-specific backend context, for example <xref:SkiaSharp.SKGraphiteContext.CreateVulkan(SkiaSharp.SKGraphiteVkBackendContext)>, <xref:SkiaSharp.SKGraphiteContext.CreateMetal(SkiaSharp.SKGraphiteMtlBackendContext)>, or <xref:SkiaSharp.SKGraphiteContext.CreateDawn(SkiaSharp.SKGraphiteDawnBackendContext)>. Create one or more recorders with <xref:SkiaSharp.SKGraphiteContext.CreateRecorder(System.Int64)>, draw into Graphite-backed surfaces, snap the work into recordings, insert them into the context, and submit.
+/// Create a context from a backend-specific backend context, for example <xref:SkiaSharp.SKGraphiteContext.CreateVulkan(SkiaSharp.SKGraphiteVkBackendContext)>,
+/// <xref:SkiaSharp.SKGraphiteContext.CreateMetal(SkiaSharp.SKGraphiteMtlBackendContext)>,
+/// or <xref:SkiaSharp.SKGraphiteContext.CreateDawn(SkiaSharp.SKGraphiteDawnBackendContext)>.
+/// Create one or more recorders with <xref:SkiaSharp.SKGraphiteContext.CreateRecorder(System.Int64)>,
+/// draw into Graphite-backed surfaces, snap the work into recordings, insert them into the context, and submit.
 ///
 /// This type wraps a native Skia resource and implements `IDisposable`. Dispose it after all its recorders and surfaces have been disposed.
 ///
@@ -195,32 +199,27 @@ public unsafe class SKGraphiteContext : SKObject, IGpuContext
     /// <summary>Gets the graphics backend that this context uses.</summary>
     /// <value>One of the enumeration values that indicates the backend.</value>
     /// <remarks />
-    public SKGraphiteBackend Backend =>
-        SkiaApi.sk_graphite_context_get_backend(Handle);
+    public SKGraphiteBackend Backend => SkiaApi.sk_graphite_context_get_backend(Handle);
 
     /// <summary>Gets a value indicating whether the underlying GPU device has been lost.</summary>
     /// <value><see langword="true" /> if the device has been lost; otherwise, <see langword="false" />.</value>
     /// <remarks />
-    public bool IsDeviceLost =>
-        SkiaApi.sk_graphite_context_is_device_lost(Handle);
+    public bool IsDeviceLost => SkiaApi.sk_graphite_context_is_device_lost(Handle);
 
     /// <summary>Gets the maximum texture dimension supported by the context's backend, in pixels.</summary>
     /// <value>The maximum texture size, in pixels.</value>
     /// <remarks />
-    public int MaxTextureSize =>
-        SkiaApi.sk_graphite_context_get_max_texture_size(Handle);
+    public int MaxTextureSize => SkiaApi.sk_graphite_context_get_max_texture_size(Handle);
 
     /// <summary>Gets a value indicating whether the context supports protected content.</summary>
     /// <value><see langword="true" /> if protected content is supported; otherwise, <see langword="false" />.</value>
     /// <remarks />
-    public bool SupportsProtectedContent =>
-        SkiaApi.sk_graphite_context_supports_protected_content(Handle);
+    public bool SupportsProtectedContent => SkiaApi.sk_graphite_context_supports_protected_content(Handle);
 
     /// <summary>Gets the number of bytes of GPU memory currently used by budgeted resources.</summary>
     /// <value>The current budgeted GPU memory usage, in bytes.</value>
     /// <remarks />
-    public long CurrentBudgetedBytes =>
-        SkiaApi.sk_graphite_context_get_current_budgeted_bytes(Handle);
+    public long CurrentBudgetedBytes => SkiaApi.sk_graphite_context_get_current_budgeted_bytes(Handle);
 
     /// <summary>Gets or sets the maximum number of bytes of GPU memory the resource cache may use.</summary>
     /// <value>The maximum budgeted GPU memory, in bytes.</value>
@@ -252,11 +251,9 @@ public unsafe class SKGraphiteContext : SKObject, IGpuContext
     /// <param name="recorderBudgetBytes">The GPU memory budget for the recorder, in bytes, or -1 to use the Skia default.</param>
     /// <param name="findOrCreate">The callback that finds or uploads a Graphite-backed image for a source image, or <see langword="null" /> for none.</param>
     /// <param name="findOrCreateDispose">An optional cleanup action invoked before the recorder is destroyed, or <see langword="null" /> for none.</param>
-    /// <returns>A new <see cref="T:SkiaSharp.SKGraphiteRecorder" />, which the caller must dispose before disposing this context, or <see langword="null" /> if it could not be created.</returns>
+    /// <returns>The caller must dispose before disposing this context, or <see langword="null" /> if it could not be created.</returns>
     /// <remarks />
-    public SKGraphiteRecorder CreateRecorder(
-        long recorderBudgetBytes,
-        SKGraphiteFindOrCreateImageDelegate findOrCreate,
+    public SKGraphiteRecorder CreateRecorder(long recorderBudgetBytes, SKGraphiteFindOrCreateImageDelegate findOrCreate,
         Action findOrCreateDispose = null)
     {
         IntPtr providerHandle = IntPtr.Zero;
@@ -303,8 +300,7 @@ public unsafe class SKGraphiteContext : SKObject, IGpuContext
         return rec;
     }
 
-    private static IntPtr InvokeFindOrCreate(
-        SKGraphiteFindOrCreateImageDelegate callback,
+    private static IntPtr InvokeFindOrCreate(SKGraphiteFindOrCreateImageDelegate callback,
         IntPtr recorderHandle, IntPtr imageHandle, bool mipmapped)
     {
         if (recorderHandle == IntPtr.Zero || imageHandle == IntPtr.Zero)
@@ -312,10 +308,9 @@ public unsafe class SKGraphiteContext : SKObject, IGpuContext
         // Wrap the handles in non-owning managed views. unrefExisting:false because
         // these are borrowed handles owned by Skia for the duration of this call —
         // decrementing on dispose would crash later.
-        var recorder =
-            SKObject.GetOrAddObject<SKGraphiteRecorder>(recorderHandle, false, false,
-                (h, o) => new SKGraphiteRecorder(h, o));
-        var image = SKObject.GetOrAddObject<SKImage>(imageHandle, false, false, (h, o) => new SKImage(h, o));
+        var recorder = GetOrAddObject(recorderHandle, false, false,
+            (h, o) => new SKGraphiteRecorder(h, o));
+        var image = GetOrAddObject(imageHandle, false, false, (h, o) => new SKImage(h, o));
         var result = callback(recorder, image, mipmapped);
         if (result == null) return IntPtr.Zero;
         // Skia consumes the +1 ref on `result`. Detach the managed wrapper so Dispose
@@ -351,8 +346,7 @@ public unsafe class SKGraphiteContext : SKObject, IGpuContext
     /// <summary>Submits all inserted recordings to the GPU without waiting for completion.</summary>
     /// <returns><see langword="true" /> if the work was submitted successfully; otherwise, <see langword="false" />.</returns>
     /// <remarks />
-    public bool Submit() =>
-        SkiaApi.sk_graphite_context_submit(Handle, null);
+    public bool Submit() => SkiaApi.sk_graphite_context_submit(Handle, null);
 
     /// <summary>Submits all inserted recordings to the GPU using the specified submission options.</summary>
     /// <param name="submitInfo">The options that control how the work is submitted.</param>
@@ -371,8 +365,7 @@ public unsafe class SKGraphiteContext : SKObject, IGpuContext
 
     /// <summary>Frees GPU resources held by the context's resource cache.</summary>
     /// <remarks />
-    public void FreeGpuResources() =>
-        SkiaApi.sk_graphite_context_free_gpu_resources(Handle);
+    public void FreeGpuResources() => SkiaApi.sk_graphite_context_free_gpu_resources(Handle);
 
     /// <summary>Purges GPU resources that have not been used for at least the specified duration.</summary>
     /// <param name="duration">The minimum time a resource must have been unused before it is purged.</param>
@@ -407,13 +400,8 @@ public unsafe class SKGraphiteContext : SKObject, IGpuContext
     /// <param name="rescaleMode">One of the enumeration values that specifies the sampling algorithm used for rescaling.</param>
     /// <param name="callback">The callback invoked with the read result, or <see langword="null" /> if the read fails; the result is valid only for the duration of the call.</param>
     /// <remarks />
-    public void RequestReadPixels(
-        SKSurface surface,
-        ImageInfo dstInfo,
-        RectI srcRect,
-        SKImageRescaleGamma rescaleGamma,
-        SKImageRescaleMode rescaleMode,
-        Action<SKImageReadPixelsResult> callback)
+    public void RequestReadPixels(SKSurface surface, ImageInfo dstInfo, RectI srcRect,
+        SKImageRescaleGamma rescaleGamma, SKImageRescaleMode rescaleMode, Action<SKImageReadPixelsResult> callback)
     {
         if (surface is null) throw new ArgumentNullException(nameof(surface));
         if (callback is null) throw new ArgumentNullException(nameof(callback));
@@ -445,11 +433,7 @@ public unsafe class SKGraphiteContext : SKObject, IGpuContext
     /// <param name="srcRect">The rectangle of the surface to read, in pixels.</param>
     /// <param name="callback">The callback invoked with the read result, which is valid only for the duration of the call.</param>
     /// <remarks />
-    public void RequestReadPixels(
-        SKSurface surface,
-        ImageInfo dstInfo,
-        RectI srcRect,
+    public void RequestReadPixels(SKSurface surface, ImageInfo dstInfo, RectI srcRect,
         Action<SKImageReadPixelsResult> callback) =>
-        RequestReadPixels(surface, dstInfo, srcRect,
-            SKImageRescaleGamma.Src, SKImageRescaleMode.Nearest, callback);
+        RequestReadPixels(surface, dstInfo, srcRect, SKImageRescaleGamma.Src, SKImageRescaleMode.Nearest, callback);
 }

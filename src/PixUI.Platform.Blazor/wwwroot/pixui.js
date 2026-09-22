@@ -51,11 +51,13 @@ export let PixUI = {
             this._canvasCtx.configure({
                 device: device,
                 format: navigator.gpu.getPreferredCanvasFormat(),
-                alphaMode: "premultiplied",
+                // alphaMode: "premultiplied",
+                usage: 0x04 | 0x10
             });
         }
         
-        return this._canvasCtx.getCurrentTexture();
+        let res = this._canvasCtx.getCurrentTexture()
+        return res
     },
 
     UpdateCanvasSize: function () {
@@ -305,7 +307,7 @@ export let PixUI = {
         createTexture: (d, w, h) => d.createTexture({
             size: {width: w, height: h, depthOrArrayLayers: 1},
             format: navigator.gpu.getPreferredCanvasFormat(),
-            usage: 0x01 | 0x04 /*need*/ | 0x10,
+            usage: 0x01  | 0x04 | 0x10,
         }),
         createBuffer: (d, sz) => d.createBuffer({size: sz, usage: 0x09}),
         createCommandEncoder: (d) => d.createCommandEncoder(),
