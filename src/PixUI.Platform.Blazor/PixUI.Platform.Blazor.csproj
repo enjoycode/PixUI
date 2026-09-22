@@ -12,7 +12,6 @@
 <!--        <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>-->
         
 <!--        <BlazorWebAssemblyJiterpreter>false</BlazorWebAssemblyJiterpreter>-->
-<!--        <WasmEnableThreads>false</WasmEnableThreads>-->
 <!--        <WasmEnableExceptionHandling>false</WasmEnableExceptionHandling>-->
         
 <!--        <RunAOTCompilation>true</RunAOTCompilation>-->

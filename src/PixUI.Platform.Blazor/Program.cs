@@ -1,4 +1,5 @@
 using System.Runtime.Versioning;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.JSInterop;
 using PixUI.Demo;
@@ -30,102 +31,45 @@ public static class Program
 
     private static async Task Run(RunInfo runInfo)
     {
-        //初始化默认字体
-        var fontUrl = "/fonts/MiSans-Regular.woff2";
-        // var fontUrl = "/fonts/NotoMono-Regular.ttf";
-        await using var fontDataStream = await BlazorApplication.HttpClient.GetStreamAsync(fontUrl);
-        //因fontDataStream不支持同步复制(DotNet10)，所以先复制至MemoryStream
-        using var ms = new MemoryStream();
-        await fontDataStream.CopyToAsync(ms);
-        ms.Position = 0;
-        FontCollection.RegisterTypeface(ms, FontCollection.DefaultFamilyName, false);
+        // //初始化默认字体
+        // var fontUrl = "/fonts/MiSans-Regular.woff2";
+        // // var fontUrl = "/fonts/NotoMono-Regular.ttf";
+        // await using var fontDataStream = await BlazorApplication.HttpClient.GetStreamAsync(fontUrl);
+        // //因fontDataStream不支持同步复制(DotNet10)，所以先复制至MemoryStream
+        // using var ms = new MemoryStream();
+        // await fontDataStream.CopyToAsync(ms);
+        // ms.Position = 0;
+        // FontCollection.RegisterTypeface(ms, FontCollection.DefaultFamilyName, false);
 
         //开始执行Blazor应用
-        BlazorApplication.Run(() => new DemoRoute(), runInfo);
-        // BlazorApplication.Run(() => new Center()
-        //         .WithChild(new Card()
-        //             .WithChild(new Container() { Width = 200, Height = 200 })),
-        //     runInfo);
+        BlazorApplication.Run(() => new TestWidget() { Width = 100, Height = 100 }, runInfo);
     }
 
-    // private static async Task TestCanvas()
-    // {
-    //     var adapter = await WebGPU.RequestAdapter()
-    //                   ?? throw new InvalidOperationException(
-    //                       "navigator.gpu.requestAdapter returned null — WebGPU is unavailable in this browser.");
-    //     var device = await WebGPU.RequestDevice(adapter)
-    //                  ?? throw new InvalidOperationException(
-    //                      "adapter.requestDevice returned null.");
-    //
-    //     var instanceId = WebGPU.CreateInstance();
-    //     if (instanceId == 0)
-    //         throw new InvalidOperationException(
-    //             "Module._wgpuCreateInstance not exported — cannot obtain a real WGPUInstance.");
-    //
-    //     var queue = WebGPU.GetDeviceQueue(device);
-    //     var queueId = WebGPU.RegisterQueue(queue, instanceId);
-    //     var deviceId = WebGPU.RegisterDevice(device, instanceId);
-    //
-    //     var backendContext = new SKGraphiteDawnBackendContext
-    //     {
-    //         WgpuInstance = instanceId,
-    //         WgpuDevice = deviceId,
-    //         WgpuQueue = queueId,
-    //     };
-    //     var context = SKGraphiteContext.CreateDawn(backendContext)
-    //                   ?? throw new InvalidOperationException("SKGraphiteContext.CreateDawn returned null.");
-    //     var onscreenRecorder = context.CreateRecorder() ?? throw new InvalidOperationException(
-    //         "SKGraphiteContext.CreateRecorder returned null.");
-    //     var offscreenRecorder = context.CreateRecorder() ?? throw new InvalidOperationException(
-    //         "SKGraphiteContext.CreateRecorder returned null.");
-    //
-    //     //create onscreen surface
-    //     var onscreenTexture = WebGPU.GetCanvasTexture(device);
-    //     var onscreenTextureId = WebGPU.RegisterTexture(onscreenTexture);
-    //
-    //     using var onscreenBackend = SKGraphiteBackendTexture.CreateDawn(onscreenTextureId) ??
-    //                                 throw new InvalidOperationException(
-    //                                     "SKGraphiteBackendTexture.CreateDawn returned null.");
-    //     using var onscreenSurface = SKSurface.Create(onscreenRecorder, onscreenBackend, ColorType.Rgba8888)
-    //                                 ?? throw new InvalidOperationException(
-    //                                     "SKSurface.Create returned null on Graphite/Dawn.");
-    //
-    //     //create offscreen surface
-    //     var offscreenTexture =
-    //         WebGPU.CreateTexture(device, onscreenBackend.Dimensions.Width, onscreenBackend.Dimensions.Height);
-    //     var offscreenTextureId = WebGPU.RegisterTexture(offscreenTexture);
-    //     using var offscreenBackend = SKGraphiteBackendTexture.CreateDawn(offscreenTextureId)
-    //                                  ?? throw new InvalidOperationException(
-    //                                      "SKGraphiteBackendTexture.CreateDawn returned null.");
-    //     using var offscreenSurface = SKSurface.Create(offscreenRecorder, offscreenBackend, ColorType.Rgba8888)
-    //                                  ?? throw new InvalidOperationException(
-    //                                      "SKSurface.Create returned null on Graphite/Dawn.");
-    //
-    //     //Draw something
-    //     using var paint = new SKPaint();
-    //     paint.Color = Colors.Red;
-    //     paint.IsAntialias = true;
-    //     offscreenSurface.Canvas.Clear(Colors.White);
-    //     offscreenSurface.Canvas.DrawRect(Rect.FromLTWH(10, 10, 100, 100), paint);
-    //     paint.Color = Colors.Green;
-    //     paint.Style = PaintStyle.Stroke;
-    //     offscreenSurface.Canvas.DrawLine(10, 10, 110, 110, paint);
-    //     FlushSurface(context, offscreenRecorder);
-    //     offscreenSurface.Draw(onscreenSurface.Canvas, 0, 0, null);
-    //
-    //     //flush onscreen surface
-    //     FlushSurface(context, onscreenRecorder);
-    // }
+    private class TestWidget : Widget, IMouseRegion
+    {
+        public TestWidget()
+        {
+            MouseRegion.HoverChanged += OnHoverChanged;
+        }
 
-    // private static void FlushSurface(SKGraphiteContext context, SKGraphiteRecorder recorder)
-    // {
-    //     using (var recording = recorder.Snap() ??
-    //                            throw new InvalidOperationException("Recorder.Snap() returned null."))
-    //     {
-    //         if (context.InsertRecording(recording) != SKGraphiteInsertStatus.Success)
-    //             throw new InvalidOperationException("InsertRecording did not report Success.");
-    //     }
-    //
-    //     context.Submit(new SKGraphiteSubmitInfo { Sync = false });
-    // }
+        private bool _isHovered;
+
+        public MouseRegion MouseRegion { get; } = new MouseRegion();
+
+        private void OnHoverChanged(bool isHovered)
+        {
+            _isHovered = isHovered;
+            Repaint();
+        }
+
+        public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
+        {
+            var color = _isHovered ? Colors.Red : Colors.Green;
+            var paint = Paint.Shared(color, PaintStyle.Stroke);
+            for (int i = 0; i < 100; i++)
+            {
+                canvas.DrawLine(i, i, 100, i, paint);
+            }
+        }
+    }
 }

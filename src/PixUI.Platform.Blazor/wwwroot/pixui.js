@@ -338,6 +338,7 @@ export let PixUI = {
         createTexture: (d, w, h) => d.createTexture({
             size: {width: w, height: h, depthOrArrayLayers: 1},
             format: navigator.gpu.getPreferredCanvasFormat(),
+            alphaMode: "premultiplied",
             usage: 0x01 | 0x04 | 0x10,
         }),
         createBuffer: (d, sz) => d.createBuffer({size: sz, usage: 0x09}),
