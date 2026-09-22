@@ -3,6 +3,29 @@ using Microsoft.JSInterop;
 
 namespace PixUI.Platform.Blazor;
 
+public struct RunInfo
+{
+    public int GpuInstanceId { get; set; }
+    public int GpuDeviceId { get; set; }
+    public int GpuQueueId { get; set; }
+    public int GpuOnScreenTextureId { get; set; }
+    public int GpuOffScreenTextureId { get; set; }
+
+    public int Width { get; set; }
+    public int Height { get; set; }
+    public float PixelRatio { get; set; }
+
+    /// <summary>
+    /// 启动时的路由
+    /// </summary>
+    public string? RoutePath { get; set; }
+
+    /// <summary>
+    /// 是否MacOS,主要用于设置一些快捷键
+    /// </summary>
+    public bool IsMacOS { get; set; }
+}
+
 [SupportedOSPlatform("browser")]
 public sealed class BlazorApplication : UIApplication
 {
@@ -33,18 +56,13 @@ public sealed class BlazorApplication : UIApplication
     protected override void ReplaceWebHistory(string fullPath, int index)
         => WebBrowser.ReplaceWebHistory(fullPath, index);
 
-    public static async void Run(Func<Widget> rootBuilder, int width, int height, float ratio,
-        string? routePath, bool isMacOS)
+    public static async void Run(Func<Widget> rootBuilder, RunInfo runInfo)
     {
-        var app = new BlazorApplication(isMacOS);
+        var app = new BlazorApplication(runInfo.IsMacOS);
         Current = app;
 
         //创建WebWindow
-        var adapter = await WebGPU.RequestAdapter() ?? throw new InvalidOperationException(
-            "navigator.gpu.requestAdapter returned null — WebGPU is unavailable in this browser.");
-        var device = await WebGPU.RequestDevice(adapter) ?? throw new InvalidOperationException(
-            "adapter.requestDevice returned null.");
-        Window = new BlazorWindow(rootBuilder(), device, width, height, ratio, routePath);
+        Window = new BlazorWindow(rootBuilder(), runInfo);
         app.MainWindow = Window;
         //开始构建WidgetTree并首秀
         Window.FirstShow();
@@ -52,7 +70,12 @@ public sealed class BlazorApplication : UIApplication
 
     public override void PostInvalidateEvent() => WebBrowser.PostInvalidateEvent();
 
-    internal void RunInvalidateRequest() => OnInvalidateRequest();
+    internal void RunInvalidateRequest(int onScreenTextureId)
+    {
+        //重新创建OnScreenSurface
+        Window.CreateOnScreenSurface(onScreenTextureId);
+        OnInvalidateRequest();
+    }
 
     public override void BeginInvoke(Action action)
     {

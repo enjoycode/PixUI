@@ -45,7 +45,8 @@ internal static partial class WebBrowser
     #region ====Exports====
 
     [JSExport]
-    private static void OnInvalidate() => ((BlazorApplication)UIApplication.Current).RunInvalidateRequest();
+    private static void OnInvalidate(int onScreenTextureId) => 
+        ((BlazorApplication)UIApplication.Current).RunInvalidateRequest(onScreenTextureId);
 
     [JSExport]
     private static void OnMouseMove(int buttons, int x, int y, int dx, int dy)

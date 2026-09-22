@@ -22,14 +22,13 @@ public static class Program
         //调用js获取启动参数
         var jsRuntime = ((IJSInProcessRuntime)BlazorApplication.JSRuntime);
         var runInfo = await jsRuntime.InvokeAsync<RunInfo>("PixUI.BeforeRunApp");
-        await Run(runInfo.Width, runInfo.Height, runInfo.PixelRatio, runInfo.RoutePath,
-            runInfo.IsMacOS);
+        await Run(runInfo);
         jsRuntime.InvokeVoid("PixUI.BindEvents");
 
         await host.RunAsync();
     }
 
-    private static async Task Run(int width, int height, float ratio, string? routePath, bool isMacOS)
+    private static async Task Run(RunInfo runInfo)
     {
         //初始化默认字体
         var fontUrl = "/fonts/MiSans-Regular.woff2";
@@ -42,11 +41,11 @@ public static class Program
         FontCollection.RegisterTypeface(ms, FontCollection.DefaultFamilyName, false);
 
         //开始执行Blazor应用
-        BlazorApplication.Run(() => new DemoRoute(), width, height, ratio, routePath, isMacOS);
+        BlazorApplication.Run(() => new DemoRoute(), runInfo);
         // BlazorApplication.Run(() => new Center()
         //         .WithChild(new Card()
         //             .WithChild(new Container() { Width = 200, Height = 200 })),
-        //     width, height, ratio, routePath, isMacOS);
+        //     runInfo);
     }
 
     // private static async Task TestCanvas()
@@ -129,13 +128,4 @@ public static class Program
     //
     //     context.Submit(new SKGraphiteSubmitInfo { Sync = false });
     // }
-
-    public struct RunInfo
-    {
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public float PixelRatio { get; set; }
-        public string? RoutePath { get; set; }
-        public bool IsMacOS { get; set; }
-    }
 }

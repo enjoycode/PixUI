@@ -1,17 +1,16 @@
 export let PixUI = {
     _htmlCanvas: null,
     _htmlInput: null,
-    _canvasCtx: null,
     _asmName: "PixUI",
     _baseHref: (document.getElementsByTagName('base')[0] || {href: document.location.origin + '/'}).href,
     _api: null,
 
-    Init: function () {
+    Init() {
         this.CreateCanvas()
         this.CreateInput()
     },
 
-    CreateCanvas: function () {
+    CreateCanvas() {
         this._htmlCanvas = document.createElement("canvas")
         this._htmlCanvas.style.position = "absolute"
         this._htmlCanvas.style.zIndex = "1"
@@ -19,7 +18,7 @@ export let PixUI = {
         document.body.append(this._htmlCanvas)
     },
 
-    CreateInput: function () {
+    CreateInput() {
         let input = document.createElement('input')
         input.id = '_i'
         input.style.position = 'absolute'
@@ -45,22 +44,7 @@ export let PixUI = {
         this._htmlInput = input;
     },
 
-    GetCanvasTexture: function (device) {
-        if (!this._canvasCtx) {
-            this._canvasCtx = this._htmlCanvas.getContext("webgpu");
-            this._canvasCtx.configure({
-                device: device,
-                format: navigator.gpu.getPreferredCanvasFormat(),
-                // alphaMode: "premultiplied",
-                usage: 0x04 | 0x10
-            });
-        }
-        
-        let res = this._canvasCtx.getCurrentTexture()
-        return res
-    },
-
-    UpdateCanvasSize: function () {
+    UpdateCanvasSize() {
         const width = window.innerWidth;
         const height = window.innerHeight;
         const ratio = window.devicePixelRatio;
@@ -72,10 +56,10 @@ export let PixUI = {
         this._htmlCanvas.style.height = height + "px";
     },
 
-    BindEvents: function () {
+    BindEvents() {
         window.onresize = ev => {
             this.UpdateCanvasSize()
-            this._api.OnResize(window.innerWidth, window.innerHeight, window.devicePixelRatio)
+            //this._api.OnResize(window.innerWidth, window.innerHeight, window.devicePixelRatio)
         }
 
         window.onmousemove = ev => {
@@ -151,58 +135,52 @@ export let PixUI = {
         }
     },
 
-    OnTextInput: function (s) {
+    OnTextInput(s) {
         this._api.OnTextInput(s)
     },
 
-    SetCursor: function (name) {
+    SetCursor(name) {
         window.document.body.style.cursor = name
     },
 
-    StartTextInput: function () {
+    StartTextInput() {
         setTimeout(() => {
             this._htmlInput.focus({preventScroll: true});
         }, 0);
     },
 
-    SetInputRect: function (x, y, w, h) {
+    SetInputRect(x, y, w, h) {
         this._htmlInput.style.left = x.toString() + 'px'
         this._htmlInput.style.top = (y + h).toString() + 'px'
         this._htmlInput.style.width = w.toString() + 'px'
     },
 
-    StopTextInput: function () {
+    StopTextInput() {
         this._htmlInput.blur();
         this._htmlInput.value = '';
     },
 
-    PushWebHistory: function (path, index) {
+    PushWebHistory(path, index) {
         let url = this._baseHref + '#' + path;
         history.pushState(index, '', url);
     },
 
-    ReplaceWebHistory: function (path, index) {
+    ReplaceWebHistory(path, index) {
         let url = this._baseHref;
         if (path !== '/')
             url += '#' + path;
         history.replaceState(index, '', url);
     },
 
-    PostInvalidateEvent: function () {
-        requestAnimationFrame(() => {
-            this._api.OnInvalidate()
-        });
-    },
-
-    ClipboardWriteText: async function (text) {
+    async ClipboardWriteText(text) {
         await navigator.clipboard.writeText(text)
     },
 
-    ClipboardReadText: async function () {
+    async ClipboardReadText() {
         return await navigator.clipboard.readText()
     },
 
-    OpenFile: async function (multiple, accept) {
+    async OpenFile(multiple, accept) {
         const input = document.createElement('input')
         input.type = 'file'
         input.multiple = multiple
@@ -236,7 +214,7 @@ export let PixUI = {
         return results
     },
 
-    SaveFile: async function (fileName, streamRef) {
+    async SaveFile(fileName, streamRef) {
         //https://github.com/jimmywarting/native-file-system-adapter/blob/master/src/adapters/downloader.js
         //https://stackoverflow.com/questions/77427123/javascript-open-save-as-dialog-box-and-store-content
         const data = await streamRef.arrayBuffer()
@@ -249,17 +227,31 @@ export let PixUI = {
         setTimeout(() => URL.revokeObjectURL(link.href), 10000)
     },
 
-    BeforeRunApp: async function () {
+    PostInvalidateEvent() {
+        requestAnimationFrame(() => {
+            this._api.OnInvalidate(this.WebGPU.getOnScreenTextureId())
+        });
+    },
+
+    async BeforeRunApp() {
         let runtime = globalThis.Blazor.runtime
         this._asmName = runtime.getConfig().mainAssemblyName
         let exports = await runtime.getAssemblyExports(this._asmName)
         this._api = this._asmName.split('.')
-            .reduce((obj,key) => obj[key], exports)
+            .reduce((obj, key) => obj[key], exports)
             .WebBrowser
 
         let routePath = document.location.hash.length > 0 ? document.location.hash.substring(1) : null
         let isMacOS = navigator.userAgent.includes("Mac")
+
+        await this.WebGPU.init(this._htmlCanvas)
+
         return {
+            GpuInstanceId: this.WebGPU.instanceId,
+            GpuDeviceId: this.WebGPU.deviceId,
+            GpuQueueId: this.WebGPU.queueId,
+            GpuOnScreenTextureId: this.WebGPU.onScreenTextureId,
+            GpuOffScreenTextureId: this.WebGPU.offScreenTextureId,
             Width: window.innerWidth,
             Height: window.innerHeight,
             PixelRatio: window.devicePixelRatio,
@@ -269,6 +261,45 @@ export let PixUI = {
     },
 
     WebGPU: {
+        canvasCtx: null,
+        instanceId: 0,
+        device: null,
+        deviceId: 0,
+        queueId: 0,
+        onScreenTexture: null,
+        onScreenTextureId: 0,
+        offScreenTexture: null,
+        offScreenTextureId: 0,
+
+        async init(htmlCanvas) {
+            let adapter = await this.requestAdapter()
+            this.device = await adapter.requestDevice()
+            this.canvasCtx = htmlCanvas.getContext("webgpu")
+            this.canvasCtx.configure({
+                device: this.device,
+                format: navigator.gpu.getPreferredCanvasFormat(),
+                alphaMode: "premultiplied",
+                usage: 0x04 | 0x10
+            });
+
+            this.instanceId = this.createInstance()
+            if (this.instanceId === 0) throw 'Cannot obtain a real WGPUInstance'
+
+            this.queueId = this.registerQueue(this.device.queue, this.instanceId)
+            this.deviceId = this.registerDevice(this.device, this.instanceId)
+
+            this.onScreenTexture = this.canvasCtx.getCurrentTexture()
+            this.onScreenTextureId = this.registerTexture(this.onScreenTexture)
+            this.offScreenTexture = this.createTexture(this.device, this.onScreenTexture.width, this.onScreenTexture.height)
+            this.offScreenTextureId = this.registerTexture(this.offScreenTexture)
+        },
+
+        getOnScreenTextureId() {
+            this.onScreenTexture = this.canvasCtx.getCurrentTexture()
+            this.onScreenTextureId = this.registerTexture(this.onScreenTexture)
+            return this.onScreenTextureId
+        },
+
         requestAdapter: () => navigator.gpu && navigator.gpu.requestAdapter({powerPreference: 'low-power'}),
         createInstance: () => (typeof Blazor.runtime.Module.wasmExports.wgpuCreateInstance === 'function')
             ? Blazor.runtime.Module.wasmExports.wgpuCreateInstance(0) : 0,
@@ -307,7 +338,7 @@ export let PixUI = {
         createTexture: (d, w, h) => d.createTexture({
             size: {width: w, height: h, depthOrArrayLayers: 1},
             format: navigator.gpu.getPreferredCanvasFormat(),
-            usage: 0x01  | 0x04 | 0x10,
+            usage: 0x01 | 0x04 | 0x10,
         }),
         createBuffer: (d, sz) => d.createBuffer({size: sz, usage: 0x09}),
         createCommandEncoder: (d) => d.createCommandEncoder(),
