@@ -56,7 +56,7 @@ public sealed class BlazorApplication : UIApplication
     protected override void ReplaceWebHistory(string fullPath, int index)
         => WebBrowser.ReplaceWebHistory(fullPath, index);
 
-    public static async void Run(Func<Widget> rootBuilder, RunInfo runInfo)
+    public static void Run(Func<Widget> rootBuilder, RunInfo runInfo)
     {
         var app = new BlazorApplication(runInfo.IsMacOS);
         Current = app;
@@ -72,8 +72,7 @@ public sealed class BlazorApplication : UIApplication
 
     internal void RunInvalidateRequest(int onScreenTextureId)
     {
-        //重新创建OnScreenSurface
-        Window.CreateOnScreenSurface(onScreenTextureId);
+        Window.CreateOnScreenSurface(onScreenTextureId); //重新创建OnScreenSurface
         OnInvalidateRequest();
     }
 

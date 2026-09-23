@@ -36,7 +36,7 @@ partial class Widget
         }
     }
 
-    private readonly struct MountChildrenVisitor : IChildrenVisitor
+    internal readonly struct MountChildrenVisitor : IChildrenVisitor
     {
         public bool Visit(Widget child)
         {

@@ -21,6 +21,8 @@
 <!--        <WasmBuildNative>true</WasmBuildNative>-->
 
 <!--        <EmccExtraCFlags>-s MAIN_MODULE=2 -sAUTOLOAD_DYLIBS=0</EmccExtraCFlags>-->
+<!--        <EmccExtraCFlags>-s SHARED_MEMORY=1</EmccExtraCFlags>-->
+<!--        <EmccExtraLDFlags>-s SHARED_MEMORY=1</EmccExtraLDFlags>-->
         
 <!--        <WasmEnableThreads>true</WasmEnableThreads>-->
         <WasmEnableSIMD>true</WasmEnableSIMD>

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.JSInterop;
 using PixUI.Demo;
+using PixUI.Demo.Mac;
 using PixUI.Drawing.Skia;
 
 namespace PixUI.Platform.Blazor;
@@ -31,18 +32,19 @@ public static class Program
 
     private static async Task Run(RunInfo runInfo)
     {
-        // //初始化默认字体
-        // var fontUrl = "/fonts/MiSans-Regular.woff2";
-        // // var fontUrl = "/fonts/NotoMono-Regular.ttf";
-        // await using var fontDataStream = await BlazorApplication.HttpClient.GetStreamAsync(fontUrl);
-        // //因fontDataStream不支持同步复制(DotNet10)，所以先复制至MemoryStream
-        // using var ms = new MemoryStream();
-        // await fontDataStream.CopyToAsync(ms);
-        // ms.Position = 0;
-        // FontCollection.RegisterTypeface(ms, FontCollection.DefaultFamilyName, false);
+        //初始化默认字体
+        var fontUrl = "/fonts/MiSans-Regular.woff2";
+        // var fontUrl = "/fonts/NotoMono-Regular.ttf";
+        await using var fontDataStream = await BlazorApplication.HttpClient.GetStreamAsync(fontUrl);
+        //因fontDataStream不支持同步复制(DotNet10)，所以先复制至MemoryStream
+        using var ms = new MemoryStream();
+        await fontDataStream.CopyToAsync(ms);
+        ms.Position = 0;
+        FontCollection.RegisterTypeface(ms, FontCollection.DefaultFamilyName, false);
 
         //开始执行Blazor应用
-        BlazorApplication.Run(() => new TestWidget() { Width = 100, Height = 100 }, runInfo);
+        BlazorApplication.Run(() => new DemoDataGrid(), runInfo);
+        //BlazorApplication.Run(() => new TestWidget() { Width = 100, Height = 100 }, runInfo);
     }
 
     private class TestWidget : Widget, IMouseRegion

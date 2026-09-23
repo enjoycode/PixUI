@@ -85,14 +85,8 @@ public sealed class BlazorWindow : UIWindow
         RootWidget.PerformLayout(new(Width, Height));
         Overlay.PerformLayout(new(Width, Height));
 
+        RootWidget.Mount();
         RootWidget.Repaint();
-        // var widgetsCanvas = GetOffscreenCanvas();
-        // RootWidget.OnPaint(widgetsCanvas);
-        // // FlushOffScreen();
-        //
-        // var overlayCanvas = GetOnscreenCanvas();
-        // _offScreenSurface?.Draw(overlayCanvas, 0, 0, null);
-        // Present();
     }
 
     /// <summary>
