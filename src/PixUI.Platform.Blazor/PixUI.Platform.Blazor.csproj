@@ -25,8 +25,9 @@
 <!--        <EmccExtraLDFlags>-s SHARED_MEMORY=1</EmccExtraLDFlags>-->
         
 <!--        <WasmEnableThreads>true</WasmEnableThreads>-->
-        <WasmEnableSIMD>true</WasmEnableSIMD>
-        <WasmAllowUndefinedSymbols>true</WasmAllowUndefinedSymbols>
+        <SkiaUseGraphite>True</SkiaUseGraphite>
+        <WasmEnableSIMD>True</WasmEnableSIMD>
+        <WasmAllowUndefinedSymbols>True</WasmAllowUndefinedSymbols>
         <EmccInitialHeapSize>128MB</EmccInitialHeapSize>
         <LangVersion>default</LangVersion>
     </PropertyGroup>
@@ -36,7 +37,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.0" PrivateAssets="all" />
     </ItemGroup>
     
-    <Import Project="../PixUI.Drawing.Skia/Wasm.targets" />
+    <Import Project="../PixUI.Drawing.Skia/Native/Wasm.targets" />
 
     <ItemGroup>
 <!--        <NativeFileReference Include="libs\tree-sitter.o" />-->
