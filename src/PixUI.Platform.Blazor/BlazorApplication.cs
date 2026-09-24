@@ -62,7 +62,11 @@ public sealed class BlazorApplication : UIApplication
         Current = app;
 
         //创建WebWindow
-        Window = new BlazorWindow(rootBuilder(), runInfo);
+#if SK_GRAPHITE
+        Window = new WebGpuWindow(rootBuilder(), runInfo);
+#else
+        Window = new WebGlWindow(rootBuilder(), runInfo);
+#endif
         app.MainWindow = Window;
         //开始构建WidgetTree并首秀
         Window.FirstShow();
@@ -70,11 +74,15 @@ public sealed class BlazorApplication : UIApplication
 
     public override void PostInvalidateEvent() => WebBrowser.PostInvalidateEvent();
 
+#if SK_GRAPHITE
     internal void RunInvalidateRequest(int onScreenTextureId)
     {
         Window.CreateOnScreenSurface(onScreenTextureId); //重新创建OnScreenSurface
         OnInvalidateRequest();
     }
+#else
+    internal void RunInvalidateRequest() => OnInvalidateRequest();
+#endif
 
     public override void BeginInvoke(Action action)
     {

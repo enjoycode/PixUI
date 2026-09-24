@@ -28,6 +28,7 @@ public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegi
             null, null, IntPtr.Zero))!;
     }
 
+#if SK_GRAPHITE
     // Graphite-backed render target
 
     /// <summary>Creates a Graphite-backed surface for the specified recorder.</summary>
@@ -140,7 +141,7 @@ public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegi
             (void*)ctx));
     }
 
-#if SK_GANESH
+#else
     // ----GPU BACKEND RENDER TARGET surface----
 
     public static SKSurface? Create(GRRecordingContext context, GRBackendRenderTarget renderTarget,
@@ -155,7 +156,7 @@ public unsafe class SKSurface : SKObject, ISKReferenceCounted, ISKSkipObjectRegi
         return GetObject(SkiaApi.sk_surface_new_backend_render_target(context.Handle, renderTarget.Handle,
             origin, colorType.ToNative(), colorspace?.Handle ?? IntPtr.Zero, props?.Handle ?? IntPtr.Zero));
     }
-    
+
     public static SKSurface? CreateGLOnScreen(GRContext grContext, int width, int height)
     {
         var surfacePtr = SkiaApi.gr_direct_context_make_gl_onscreen_surface(grContext.Handle, width, height);

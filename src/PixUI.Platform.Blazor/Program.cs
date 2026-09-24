@@ -23,7 +23,12 @@ public static class Program
 
         //调用js获取启动参数
         var jsRuntime = ((IJSInProcessRuntime)BlazorApplication.JSRuntime);
-        var runInfo = await jsRuntime.InvokeAsync<RunInfo>("PixUI.BeforeRunApp");
+#if SK_GRAPHITE
+        const bool useGraphite = true;
+#else
+        const bool useGraphite = false;
+#endif
+        var runInfo = await jsRuntime.InvokeAsync<RunInfo>("PixUI.BeforeRunApp", useGraphite);
         await Run(runInfo);
         jsRuntime.InvokeVoid("PixUI.BindEvents");
 

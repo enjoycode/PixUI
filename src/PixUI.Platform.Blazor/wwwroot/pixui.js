@@ -2,6 +2,7 @@ export let PixUI = {
     _htmlCanvas: null,
     _htmlInput: null,
     _asmName: "PixUI",
+    _useGraphite: false,
     _baseHref: (document.getElementsByTagName('base')[0] || {href: document.location.origin + '/'}).href,
     _api: null,
 
@@ -229,11 +230,16 @@ export let PixUI = {
 
     PostInvalidateEvent() {
         requestAnimationFrame(() => {
-            this._api.OnInvalidate(this.WebGPU.getOnScreenTextureId())
+            if (!this._useGraphite) {
+                this._api.OnInvalidate()
+            } else {
+                this._api.OnInvalidate(this.WebGPU.getOnScreenTextureId())
+            }
         });
     },
 
-    async BeforeRunApp() {
+    async BeforeRunApp(useGraphite) {
+        this._useGraphite = useGraphite
         let runtime = globalThis.Blazor.runtime
         this._asmName = runtime.getConfig().mainAssemblyName
         let exports = await runtime.getAssemblyExports(this._asmName)
@@ -241,10 +247,11 @@ export let PixUI = {
             .reduce((obj, key) => obj[key], exports)
             .WebBrowser
 
-        let routePath = document.location.hash.length > 0 ? document.location.hash.substring(1) : null
-        let isMacOS = navigator.userAgent.includes("Mac")
-
-        await this.WebGPU.init(this._htmlCanvas)
+        if (useGraphite) {
+            await this.WebGPU.init(this._htmlCanvas, useGraphite)
+        } else {
+            this.WebGL.init(this._htmlCanvas)
+        }
 
         return {
             GpuInstanceId: this.WebGPU.instanceId,
@@ -255,8 +262,40 @@ export let PixUI = {
             Width: window.innerWidth,
             Height: window.innerHeight,
             PixelRatio: window.devicePixelRatio,
-            RoutePath: routePath,
-            IsMacOS: isMacOS
+            RoutePath: document.location.hash.length > 0 ? document.location.hash.substring(1) : null,
+            IsMacOS: navigator.userAgent.includes("Mac")
+        }
+    },
+
+    WebGL: {
+        glHandle: null,
+        
+        init(htmlCanvas) {
+            let contextAttributes = {
+                'alpha': 1,
+                'depth': 1,
+                'stencil': 8,
+                'antialias': 0,
+                'premultipliedAlpha': 1,
+                'preserveDrawingBuffer': 0,
+                'preferLowPowerToHighPerformance': 0,
+                'failIfMajorPerformanceCaveat': 0,
+                'enableExtensionsByDefault': 1,
+                'explicitSwapControl': 0,
+                'renderViaOffscreenBackBuffer': 0,
+            }
+            contextAttributes['majorVersion'] = (typeof WebGL2RenderingContext !== 'undefined') ? 2 : 1
+            let gl = globalThis.Blazor.runtime.Module.GL;
+            this.glHandle = gl.createContext(htmlCanvas, contextAttributes)
+            if (this.glHandle) {
+                gl.makeContextCurrent(this.glHandle)
+                gl.currentContext.GLctx.getExtension('WEBGL_debug_renderer_info')
+                //https://github.com/dotnet/runtime/issues/76077
+                globalThis.GL = gl
+                globalThis.GLctx = gl.currentContext.GLctx
+            } else {
+                alert("Can't use webgl")
+            }
         }
     },
 
@@ -271,7 +310,7 @@ export let PixUI = {
         offScreenTexture: null,
         offScreenTextureId: 0,
 
-        async init(htmlCanvas) {
+        async init(htmlCanvas, useGraphite) {
             let adapter = await this.requestAdapter()
             this.device = await adapter.requestDevice()
             this.canvasCtx = htmlCanvas.getContext("webgpu")
@@ -282,11 +321,13 @@ export let PixUI = {
                 usage: 0x04 | 0x10
             });
 
-            this.instanceId = this.createInstance()
-            if (this.instanceId === 0) throw 'Cannot obtain a real WGPUInstance'
+            if (useGraphite) {
+                this.instanceId = this.createInstance()
+                if (this.instanceId === 0) throw 'Cannot obtain a real WGPUInstance'
 
-            this.queueId = this.registerQueue(this.device.queue, this.instanceId)
-            this.deviceId = this.registerDevice(this.device, this.instanceId)
+                this.queueId = this.registerQueue(this.device.queue, this.instanceId)
+                this.deviceId = this.registerDevice(this.device, this.instanceId)
+            }
 
             this.onScreenTexture = this.canvasCtx.getCurrentTexture()
             this.onScreenTextureId = this.registerTexture(this.onScreenTexture)
@@ -295,6 +336,10 @@ export let PixUI = {
         },
 
         getOnScreenTextureId() {
+            if (this.onScreenTextureId !== 0) {
+                this.releaseTexture(this.onScreenTextureId) //TODO:check
+            }
+
             this.onScreenTexture = this.canvasCtx.getCurrentTexture()
             this.onScreenTextureId = this.registerTexture(this.onScreenTexture)
             return this.onScreenTextureId
@@ -303,14 +348,10 @@ export let PixUI = {
         requestAdapter: () => navigator.gpu && navigator.gpu.requestAdapter({powerPreference: 'low-power'}),
         createInstance: () => (typeof Blazor.runtime.Module.wasmExports.wgpuCreateInstance === 'function')
             ? Blazor.runtime.Module.wasmExports.wgpuCreateInstance(0) : 0,
-        // Port-agnostic handle registration. emdawnwebgpu ships
-        // importJs* on Module.WebGPU; the legacy -sUSE_WEBGPU=1
-        // port shipped mgr* HandleAllocator tables with .create.
-        // emdawnwebgpu tags each imported object's events with the
-        // parent EventSource's InstanceID; leaving parent=0 makes
-        // WaitAny assert(event->mInstanceId == instance) fire on
-        // the first async wait. Pass the current instance handle
-        // so device/queue events resolve against it.
+        // Port-agnostic handle registration. emdawnwebgpu ships importJs* on Module.WebGPU; the legacy -sUSE_WEBGPU=1
+        // port shipped mgr* HandleAllocator tables with .create. emdawnwebgpu tags each imported object's events with
+        // the parent EventSource's InstanceID; leaving parent=0 makes WaitAny assert(event->mInstanceId == instance)
+        // fire on the first async wait. Pass the current instance handle so device/queue events resolve against it.
         registerDevice: (d, parent) => Blazor.runtime.Module.WebGPU.importJsDevice
             ? Blazor.runtime.Module.WebGPU.importJsDevice(d, parent)
             : Blazor.runtime.Module.WebGPU.mgrDevice.create(d),
@@ -320,12 +361,9 @@ export let PixUI = {
         registerTexture: (t) => Blazor.runtime.Module.WebGPU.importJsTexture
             ? Blazor.runtime.Module.WebGPU.importJsTexture(t)
             : Blazor.runtime.Module.WebGPU.mgrTexture.create(t),
-        // Under emdawnwebgpu, released handles hold real
-        // refcounted C-side WGPUTexture objects — call the C ABI
-        // via the exported symbol. Under the legacy port they
-        // were HandleAllocator table entries with a JS-side
-        // .release. Try the C ABI first (it's the mandatory
-        // path under emdawnwebgpu), fall back to the JS table.
+        // Under emdawnwebgpu, released handles hold real refcounted C-side WGPUTexture objects — call the C ABI
+        // via the exported symbol. Under the legacy port they were HandleAllocator table entries with a JS-side
+        // .release. Try the C ABI first (it's the mandatory path under emdawnwebgpu), fall back to the JS table.
         releaseTexture: (id) => {
             if (typeof Blazor.runtime.Module.wasmExports.wgpuTextureRelease === 'function') {
                 Blazor.runtime.Module.wasmExports.wgpuTextureRelease(id);
@@ -334,7 +372,6 @@ export let PixUI = {
             }
         },
         requestDevice: (adapter) => adapter.requestDevice(),
-        deviceQueue: (d) => d.queue,
         createTexture: (d, w, h) => d.createTexture({
             size: {width: w, height: h, depthOrArrayLayers: 1},
             format: navigator.gpu.getPreferredCanvasFormat(),
@@ -363,6 +400,5 @@ export let PixUI = {
                 s += String.fromCharCode.apply(null, packed.subarray(i, i + CHUNK));
             return btoa(s);
         },
-    }
-
+    },
 }

@@ -22,7 +22,7 @@ internal sealed class WasmWindow : UIWindow
     private void CreateContext(int glHandle)
     {
         //创建Surface TODO:根据类型创建，目前仅支持WebGL
-        _grContext = Render.Backend.MakeGRContextWebGL(glHandle);
+        _grContext = Render.Backend.MakeGRContextWebGL();
         if (_grContext == null) throw new Exception("Can't create WebGL GRContext");
     }
 

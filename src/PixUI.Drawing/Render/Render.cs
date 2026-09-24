@@ -91,7 +91,7 @@ public interface IRender
     IGpuBackendTexture MakeWebGpuBackendTexture(IntPtr textureId);
     void FlushSurface(IGpuContext gpuContext, IGpuRecorder recorder);
 
-    IGRContext? MakeGRContextWebGL(int webglHandle);
+    IGRContext? MakeGRContextWebGL();
     IGRContext? MakeGRContextMetal(IntPtr device, IntPtr queue);
     IGRContext? MakeGRContextDirect3D(out IDirect3DBackendContext direct3DBackendContext);
 

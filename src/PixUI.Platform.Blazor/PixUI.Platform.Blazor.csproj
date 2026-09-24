@@ -25,7 +25,7 @@
 <!--        <EmccExtraLDFlags>-s SHARED_MEMORY=1</EmccExtraLDFlags>-->
         
 <!--        <WasmEnableThreads>true</WasmEnableThreads>-->
-        <SkiaUseGraphite>True</SkiaUseGraphite>
+        <SkiaUseGraphite>False</SkiaUseGraphite>
         <WasmEnableSIMD>True</WasmEnableSIMD>
         <WasmAllowUndefinedSymbols>True</WasmAllowUndefinedSymbols>
         <EmccInitialHeapSize>128MB</EmccInitialHeapSize>
@@ -38,11 +38,6 @@
     </ItemGroup>
     
     <Import Project="../PixUI.Drawing.Skia/Native/Wasm.targets" />
-
-    <ItemGroup>
-<!--        <NativeFileReference Include="libs\tree-sitter.o" />-->
-<!--        <NativeFileReference Include="libs\tree-sitter-csharp.a" />-->
-    </ItemGroup>
     
     <ItemGroup>
         <ProjectReference Include="..\PixUI.Demo\PixUI.Demo.csproj" />

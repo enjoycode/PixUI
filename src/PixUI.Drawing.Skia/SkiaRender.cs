@@ -97,11 +97,15 @@ public sealed class SkiaRender : IRender
 
     public ISurface MakeSurface(IGpuRecorder recorder, IGpuBackendTexture backendTexture, ColorType colorType)
     {
+#if SK_GRAPHITE
         return SKSurface.Create((SKGraphiteRecorder)recorder, (SKGraphiteBackendTexture)backendTexture, colorType)
                ?? throw new InvalidOperationException("SKSurface.Create returned null on Graphite.");
+#else
+        throw new NotSupportedException();
+#endif
     }
 
-    public IGRContext? MakeGRContextWebGL(int webglHandle)
+    public IGRContext? MakeGRContextWebGL()
     {
         var glInterface = GRGlInterface.Create();
         if (glInterface == null) throw new Exception("Can't create WebGL Interface");
@@ -125,10 +129,10 @@ public sealed class SkiaRender : IRender
 
     public ISurface? MakeSurface(IGRContext context, bool budgeted, ImageInfo info, int sampleCount,
         SurfaceOrigin origin, ISurfaceProperties? props, bool shouldCreateWithMips) =>
-        throw new NotSupportedException(); //SKSurface.Create((GRRecordingContext)context, budgeted, info, sampleCount, origin, props, shouldCreateWithMips);
+        SKSurface.Create((GRRecordingContext)context, budgeted, info, sampleCount, origin, props, shouldCreateWithMips);
 
     public ISurface? MakeSurfaceForWebGL(IGRContext context, int width, int height) =>
-        throw new NotSupportedException(); //SKSurface.CreateGLOnScreen((GRContext)context, width, height));
+        SKSurface.CreateGLOnScreen((GRContext)context, width, height);
 
     public unsafe ISurface? MakeSurfaceForMetalWindow(IGRContext context, IntPtr textureHandle,
         int width, int height, int sampleCount,
