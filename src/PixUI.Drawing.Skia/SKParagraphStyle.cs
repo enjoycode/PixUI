@@ -1,6 +1,6 @@
 namespace PixUI.Drawing.Skia;
 
-public sealed class SKParagraphStyle : SKObject, IParagraphStyle
+public sealed class SKParagraphStyle : SKNativeObject, IParagraphStyle
 {
     private SKParagraphStyle(IntPtr handle, bool owns) : base(handle, owns) { }
 

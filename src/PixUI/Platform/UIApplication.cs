@@ -73,7 +73,7 @@ public abstract class UIApplication
             window.OverlayInvalidQueue.RelayoutAll();
         }
 
-        widgetsCanvas.Surface!.Draw(overlayCanvas, 0, 0, null);
+        widgetsCanvas.Surface!.Draw(overlayCanvas, 0, 0, null); //TODO: use DrawOffScreenToOnScreen
         if (!window.ScaleFactor.NearlyEqual(1))
             overlayCanvas.Scale(window.ScaleFactor, window.ScaleFactor);
         window.Overlay.OnPaint(overlayCanvas); //always repaint

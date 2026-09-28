@@ -76,6 +76,9 @@ public static class Program
             for (int i = 0; i < 100; i++)
             {
                 canvas.DrawLine(i, i, 100, i, paint);
+
+                using var ph = TextPainter.BuildParagraph("中国", 100, 12, Colors.Blue);
+                canvas.DrawParagraph(ph, 10, 10);
             }
         }
     }

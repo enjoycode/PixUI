@@ -28,8 +28,7 @@
         -->
         <_SkiaEmdawnwebgpuFlags Condition="'$(_SkiaUseEmdawnwebgpu)' == 'true'">-s DEFAULT_TO_CXX=1 -isystem $(_SkiaEmdawnwebgpuPkg)/webgpu/include -isystem $(_SkiaEmdawnwebgpuPkg)/webgpu_cpp/include --js-library=$(_SkiaEmdawnwebgpuPkg)/webgpu/src/library_webgpu_enum_tables.js --js-library=$(_SkiaEmdawnwebgpuPkg)/webgpu/src/library_webgpu_generated_struct_info.js --js-library=$(_SkiaEmdawnwebgpuPkg)/webgpu/src/library_webgpu_generated_sig_info.js --js-library=$(_SkiaEmdawnwebgpuPkg)/webgpu/src/library_webgpu.js -std=c++20 $(_SkiaEmdawnwebgpuPkg)/webgpu/src/webgpu.cpp</_SkiaEmdawnwebgpuFlags>
         <EmccExtraLDFlags Condition="'$(_SkiaUseEmdawnwebgpu)' == 'true'">$(EmccExtraLDFlags) -s USE_WEBGL2=0 $(_SkiaEmdawnwebgpuFlags)</EmccExtraLDFlags>
-        <EmccExtraCFlags Condition="'$(SkiaUseGraphite)' != 'True'">$(EmccExtraCFlags) -s USE_WEBGL2=1 -s MAX_WEBGL_VERSION=2</EmccExtraCFlags>
-        <EmccExtraLDFlags Condition="'$(SkiaUseGraphite)' != 'True'">$(EmccExtraLDFlags) -lGL</EmccExtraLDFlags>
+        <EmccExtraLDFlags Condition="'$(SkiaUseGraphite)' != 'True'">$(EmccExtraLDFlags) -lGL -s USE_WEBGL2=1 -s MIN_WEBGL_VERSION=2 -s MAX_WEBGL_VERSION=2</EmccExtraLDFlags>
         <_SkiaNativeBinaryType Condition="'$(SkiaUseGraphite)' == 'True'">graphite</_SkiaNativeBinaryType>
         <_SkiaNativeBinaryType Condition="'$(SkiaUseGraphite)' != 'True'">ganesh</_SkiaNativeBinaryType>
         <DefineConstants Condition="'$(SkiaUseGraphite)' == 'True'">$(DefineConstants);SK_GRAPHITE</DefineConstants>

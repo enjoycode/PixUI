@@ -1,6 +1,6 @@
 namespace PixUI.Drawing.Skia;
 
-public sealed class SKParagraph : SKObject, IParagraph
+public sealed class SKParagraph : SKNativeObject, IParagraph
 {
     internal SKParagraph(IntPtr handle, bool owns) : base(handle, owns) { }
 

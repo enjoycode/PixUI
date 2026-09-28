@@ -1,3 +1,5 @@
+#nullable disable
+
 #if THROW_OBJECT_EXCEPTIONS
 using System.Collections.Concurrent;
 #endif
@@ -23,12 +25,12 @@ internal static class HandleDictionary
     }
 
 #if THROW_OBJECT_EXCEPTIONS
-		internal static readonly ConcurrentBag<Exception> exceptions = new ConcurrentBag<Exception> ();
+    internal static readonly ConcurrentBag<Exception> exceptions = new ConcurrentBag<Exception> ();
 #endif
     internal static readonly Dictionary<IntPtr, WeakReference> instances = new Dictionary<IntPtr, WeakReference>();
 
 #if DEBUG
-    internal static readonly Dictionary<IntPtr, string> stackTraces = new Dictionary<IntPtr, string>();
+    // internal static readonly Dictionary<IntPtr, string> stackTraces = new Dictionary<IntPtr, string>();
 #endif
 
     internal static readonly IPlatformLock instancesLock = PlatformLock.Create();
@@ -192,7 +194,7 @@ internal static class HandleDictionary
 
             instances[handle] = new WeakReference(instance);
 #if DEBUG
-            stackTraces[handle] = Environment.StackTrace;
+            // stackTraces[handle] = Environment.StackTrace;
 #endif
         }
         finally
@@ -221,7 +223,7 @@ internal static class HandleDictionary
             {
                 instances.Remove(handle);
 #if DEBUG
-                stackTraces.Remove(handle);
+                // stackTraces.Remove(handle);
 #endif
             }
             else
