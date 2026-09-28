@@ -1,3 +1,5 @@
+#if !SK_GRAPHITE
+
 using System.Runtime.Versioning;
 
 namespace PixUI.Platform.Blazor;
@@ -66,4 +68,16 @@ public sealed class WebGlWindow : BlazorWindow
     {
         //TODO: _offScreenSurface.Flush();
     }
+
+    internal override void OnResize(int width, int height, float ratio)
+    {
+        //TODO: reuse surface if can
+        _offScreenSurface?.Dispose();
+        _onScreenSurface?.Dispose();
+
+        CreateSurface(width, height, ratio);
+        RootWidget.Relayout();
+    }
 }
+
+#endif

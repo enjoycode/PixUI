@@ -1,3 +1,4 @@
+#if SK_GRAPHITE
 using System.Runtime.Versioning;
 
 namespace PixUI.Platform.Blazor;
@@ -93,3 +94,5 @@ public sealed class WebGpuWindow : BlazorWindow
         // RootWidget.Relayout();
     }
 }
+
+#endif

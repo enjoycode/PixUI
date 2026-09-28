@@ -18,10 +18,10 @@ public abstract class BlazorWindow : UIWindow
         RootWidget.Repaint();
     }
 
-    internal void OnResize(int width, int height, float ratio)
-    {
-        //TODO:
-    }
+#if SK_GRAPHITE
+#else
+    internal abstract void OnResize(int width, int height, float ratio);
+#endif
 
     public override void StartTextInput() => WebBrowser.StartTextInput();
 

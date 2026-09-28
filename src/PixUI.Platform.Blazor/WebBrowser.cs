@@ -105,9 +105,12 @@ internal static partial class WebBrowser
     [JSExport]
     private static void OnTextInput(string text) => BlazorApplication.Window.OnTextInput(text);
 
+#if SK_GRAPHITE
+#else
     [JSExport]
     public static void OnResize(int width, int height, float ratio) =>
         BlazorApplication.Window.OnResize(width, height, ratio);
+#endif
 
     [JSInvokable]
     public static void RouteGoto(int historyId) => BlazorApplication.Window.RouteGoto(historyId);

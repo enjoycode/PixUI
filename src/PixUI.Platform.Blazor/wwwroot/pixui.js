@@ -60,7 +60,11 @@ export let PixUI = {
     BindEvents() {
         window.onresize = ev => {
             this.UpdateCanvasSize()
-            //this._api.OnResize(window.innerWidth, window.innerHeight, window.devicePixelRatio)
+            if (!this._useGraphite) {
+                this._api.OnResize(window.innerWidth, window.innerHeight, window.devicePixelRatio)
+            } else {
+                //TODO:
+            }
         }
 
         window.onmousemove = ev => {
