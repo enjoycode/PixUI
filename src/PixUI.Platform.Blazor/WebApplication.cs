@@ -63,7 +63,7 @@ public sealed class WebApplication : UIApplication
 
         //创建WebWindow
 #if SK_GRAPHITE
-        Window = new WebGpuWindow(rootBuilder(), runInfo);
+        Window = new WebGPUWindow(rootBuilder(), runInfo);
 #else
         Window = new WebGLWindow(rootBuilder(), runInfo);
 #endif

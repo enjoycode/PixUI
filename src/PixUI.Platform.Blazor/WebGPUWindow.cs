@@ -4,9 +4,9 @@ using System.Runtime.Versioning;
 namespace PixUI.Platform.Blazor;
 
 [SupportedOSPlatform("browser")]
-public sealed class WebGpuWindow : BlazorWindow
+public sealed class WebGPUWindow : WebWindow
 {
-    public WebGpuWindow(Widget child, RunInfo runInfo) : base(child, runInfo.RoutePath)
+    public WebGPUWindow(Widget child, RunInfo runInfo) : base(child, runInfo.RoutePath)
     {
         _webGpuContext = Render.Backend.MakeWebGpuContext(
             runInfo.GpuInstanceId, runInfo.GpuDeviceId, runInfo.GpuQueueId);
@@ -84,14 +84,13 @@ public sealed class WebGpuWindow : BlazorWindow
     /// <summary>
     /// 窗体改变大小后重新创建画布并重新布局
     /// </summary>
-    internal void OnResize(int width, int height, float ratio)
+    internal override void OnResize(int width, int height, float ratio, int onScreenTextureId, int offScreenTextureId)
     {
-        //TODO: reuse surface if can
-        // _offScreenSurface?.Dispose();
-        // _onScreenSurface?.Dispose();
-        //
-        // CreateSurface(width, height, ratio);
-        // RootWidget.Relayout();
+        CreateOnScreenSurface(onScreenTextureId);
+        if (offScreenTextureId != 0)
+            CreateOffScreenSurface(offScreenTextureId, width, height, ratio);
+
+        RootWidget.Relayout();
     }
 }
 

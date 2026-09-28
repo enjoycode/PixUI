@@ -19,6 +19,7 @@ public abstract class WebWindow : UIWindow
     }
 
 #if SK_GRAPHITE
+    internal abstract void OnResize(int width, int height, float ratio, int onScreenTextureId, int offScreenTextureId);
 #else
     internal abstract void OnResize(int width, int height, float ratio);
 #endif

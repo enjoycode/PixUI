@@ -25,7 +25,7 @@
 <!--        <EmccExtraLDFlags>-s SHARED_MEMORY=1</EmccExtraLDFlags>-->
         
 <!--        <WasmEnableThreads>true</WasmEnableThreads>-->
-        <SkiaUseGraphite>False</SkiaUseGraphite>
+        <SkiaUseGraphite>True</SkiaUseGraphite>
         <WasmEnableSIMD>True</WasmEnableSIMD>
         <WasmAllowUndefinedSymbols>True</WasmAllowUndefinedSymbols>
         <EmccInitialHeapSize>128MB</EmccInitialHeapSize>

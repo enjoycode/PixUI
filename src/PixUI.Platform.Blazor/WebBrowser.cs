@@ -47,7 +47,7 @@ internal static partial class WebBrowser
 #if SK_GRAPHITE
     [JSExport]
     private static void OnInvalidate(int onScreenTextureId) =>
-        ((BlazorApplication)UIApplication.Current).RunInvalidateRequest(onScreenTextureId);
+        ((WebApplication)UIApplication.Current).RunInvalidateRequest(onScreenTextureId);
 #else
     [JSExport]
     private static void OnInvalidate() =>
@@ -106,9 +106,12 @@ internal static partial class WebBrowser
     private static void OnTextInput(string text) => WebApplication.Window.OnTextInput(text);
 
 #if SK_GRAPHITE
+    [JSExport]
+    private static void OnResize(int width, int height, float ratio, int onScreenTextureId, int offScreenTextureId)
+        => WebApplication.Window.OnResize(width, height, ratio, onScreenTextureId, offScreenTextureId);
 #else
     [JSExport]
-    public static void OnResize(int width, int height, float ratio) =>
+    private static void OnResize(int width, int height, float ratio) =>
         WebApplication.Window.OnResize(width, height, ratio);
 #endif
 

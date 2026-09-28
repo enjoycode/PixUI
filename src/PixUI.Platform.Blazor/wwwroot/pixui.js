@@ -63,7 +63,11 @@ export let PixUI = {
             if (!this._useGraphite) {
                 this._api.OnResize(window.innerWidth, window.innerHeight, window.devicePixelRatio)
             } else {
-                //TODO:
+                //TODO: reuse offScreenTexture if possible
+                let onScreenTextureId = this.WebGPU.getOnScreenTextureId()
+                this.WebGPU.createOffScreenTexture(this.WebGPU.onScreenTexture.width, this.WebGPU.onScreenTexture.height)
+                this._api.OnResize(window.innerWidth, window.innerHeight, window.devicePixelRatio,
+                    onScreenTextureId, this.WebGPU.offScreenTextureId);
             }
         }
 
@@ -273,7 +277,7 @@ export let PixUI = {
 
     WebGL: {
         glHandle: null,
-        
+
         init(htmlCanvas) {
             let contextAttributes = {
                 'alpha': 1,
@@ -333,10 +337,8 @@ export let PixUI = {
                 this.deviceId = this.registerDevice(this.device, this.instanceId)
             }
 
-            this.onScreenTexture = this.canvasCtx.getCurrentTexture()
-            this.onScreenTextureId = this.registerTexture(this.onScreenTexture)
-            this.offScreenTexture = this.createTexture(this.device, this.onScreenTexture.width, this.onScreenTexture.height)
-            this.offScreenTextureId = this.registerTexture(this.offScreenTexture)
+            this.createOffScreenTexture(window.innerWidth * window.devicePixelRatio,
+                window.innerHeight * window.devicePixelRatio)
         },
 
         getOnScreenTextureId() {
@@ -347,6 +349,14 @@ export let PixUI = {
             this.onScreenTexture = this.canvasCtx.getCurrentTexture()
             this.onScreenTextureId = this.registerTexture(this.onScreenTexture)
             return this.onScreenTextureId
+        },
+
+        createOffScreenTexture(w, h) {
+            if (this.offScreenTextureId !== 0) {
+                this.releaseTexture(this.offScreenTextureId)
+            }
+            this.offScreenTexture = this.createTexture(this.device, w, h)
+            this.offScreenTextureId = this.registerTexture(this.offScreenTexture)
         },
 
         requestAdapter: () => navigator.gpu && navigator.gpu.requestAdapter({powerPreference: 'low-power'}),

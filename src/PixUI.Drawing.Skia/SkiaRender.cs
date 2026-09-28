@@ -101,7 +101,7 @@ public sealed class SkiaRender : IRender
         return SKSurface.Create((SKGraphiteRecorder)recorder, (SKGraphiteBackendTexture)backendTexture, colorType)
                ?? throw new InvalidOperationException("SKSurface.Create returned null on Graphite.");
 #else
-        throw new NotSupportedException();
+        throw new NotSupportedException("MakeSurface for Graphite is not supported.");
 #endif
     }
 
@@ -129,39 +129,57 @@ public sealed class SkiaRender : IRender
 
     public ISurface? MakeSurface(IGRContext context, bool budgeted, ImageInfo info, int sampleCount,
         SurfaceOrigin origin, ISurfaceProperties? props, bool shouldCreateWithMips) =>
+#if !SK_GRAPHITE
         SKSurface.Create((GRRecordingContext)context, budgeted, info, sampleCount, origin, props, shouldCreateWithMips);
+#else
+        throw new NotSupportedException("MakeSurface for Graphite is not supported.");
+#endif
 
     public ISurface? MakeSurfaceForWebGL(IGRContext context, int width, int height) =>
+#if !SK_GRAPHITE
         SKSurface.CreateGLOnScreen((GRContext)context, width, height);
+#else
+        throw new NotSupportedException("MakeSurface for Graphite is not supported.");
+#endif
 
     public unsafe ISurface? MakeSurfaceForMetalWindow(IGRContext context, IntPtr textureHandle,
         int width, int height, int sampleCount,
         IColorSpace? colorSpace, ISurfaceProperties? surfaceProperties)
     {
-        throw new NotSupportedException();
-        // var fbInfo = new GRMtlTextureInfoNative();
-        // fbInfo.fTexture = (void*)textureHandle;
-        //
-        // using var backendRt = GRBackendRenderTarget.CreateMetal(width, height, sampleCount, fbInfo);
-        // return SKSurface.Create((GRContext)context, backendRt, SurfaceOrigin.TopLeft,
-        //     ColorType.Bgra8888, colorSpace as SKColorSpace, surfaceProperties as SKSurfaceProperties);
+#if !SK_GRAPHITE
+        var fbInfo = new GRMtlTextureInfoNative();
+        fbInfo.fTexture = (void*)textureHandle;
+        
+        using var backendRt = GRBackendRenderTarget.CreateMetal(width, height, sampleCount, fbInfo);
+        return SKSurface.Create((GRContext)context, backendRt, SurfaceOrigin.TopLeft,
+            ColorType.Bgra8888, colorSpace as SKColorSpace, surfaceProperties as SKSurfaceProperties);
+#else
+        throw new NotSupportedException("MakeSurface for Graphite is not supported.");
+#endif
     }
 
     public ISurface? MakeSurfaceForDirect3DWindow(IGRContext context, IDirect3DSwapChain swapChain, int bufferIndex,
         int width, int height,
         IColorSpace? colorSpace, ISurfaceProperties? surfaceProperties)
     {
-        throw new NotSupportedException();
+#if !SK_GRAPHITE
         // var backBuffer = SkiaApi.gr_d3d_swapchain_get_buffer(((Direct3DSwapChain)swapChain).Handle, bufferIndex);
         // using var backendRt = GRBackendRenderTarget.CreateDirect3D(width, height, backBuffer);
         // return SKSurface.Create((GRContext)context, backendRt, SurfaceOrigin.TopLeft,
         //     ColorType.Rgba8888, colorSpace as SKColorSpace, surfaceProperties as SKSurfaceProperties);
+#else
+        throw new NotSupportedException("MakeSurface for Graphite is not supported.");
+#endif
     }
 
     public IDirect3DSwapChain MakeDirect3DSwapChain(IntPtr windowHandle, IDirect3DBackendContext direct3DBackendContext,
-        uint width, uint height)
-        => new Direct3DSwapChain(SkiaApi.gr_d3d_new_swapchain(windowHandle,
+        uint width, uint height) =>
+#if !SK_GRAPHITE
+        new Direct3DSwapChain(SkiaApi.gr_d3d_new_swapchain(windowHandle,
             ((Direct3DBackendContext)direct3DBackendContext).Handle, width, height));
+#else
+        throw new NotSupportedException("MakeSurface for Graphite is not supported.");
+#endif
 
     public IDocument MakeDocumentPdf(Stream stream, float dpi) => SKDocument.CreatePdf(stream, dpi);
 }
