@@ -244,8 +244,9 @@ public unsafe class SKGraphiteContext : SKObject, IGpuContext
     public SKGraphiteRecorder CreateRecorder(long recorderBudgetBytes = -1) =>
         CreateRecorder(recorderBudgetBytes, findOrCreate: null, findOrCreateDispose: null);
 
-    IGpuRecorder IGpuContext.CreateRecorder() => CreateRecorder(-1) ?? throw new InvalidOperationException(
-        "GpuContext.CreateRecorder returned null.");
+    IGpuRecorder IGpuContext.CreateRecorder() =>
+        CreateRecorder(-1, SKGraphiteImageCache.Default.FindOrCreate, SKGraphiteImageCache.Default.Dispose) ??
+        throw new InvalidOperationException("GpuContext.CreateRecorder returned null.");
 
     /// <summary>Creates a new recorder associated with this context, using the specified callback to provide Graphite-backed images.</summary>
     /// <param name="recorderBudgetBytes">The GPU memory budget for the recorder, in bytes, or -1 to use the Skia default.</param>

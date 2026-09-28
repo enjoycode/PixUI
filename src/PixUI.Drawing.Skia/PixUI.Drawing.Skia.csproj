@@ -14,8 +14,4 @@
         <ProjectReference Include="..\PixUI.Drawing\PixUI.Drawing.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Gpu\Graphite\"/>
-    </ItemGroup>
-
 </Project>
