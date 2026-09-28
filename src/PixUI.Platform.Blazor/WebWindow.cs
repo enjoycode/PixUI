@@ -3,9 +3,9 @@ using System.Runtime.Versioning;
 namespace PixUI.Platform.Blazor;
 
 [SupportedOSPlatform("browser")]
-public abstract class BlazorWindow : UIWindow
+public abstract class WebWindow : UIWindow
 {
-    protected BlazorWindow(Widget child, string? initRoutePath = null) : base(child, initRoutePath) { }
+    protected WebWindow(Widget child, string? initRoutePath = null) : base(child, initRoutePath) { }
 
     protected internal abstract void CreateOnScreenSurface(int onScreenTextureId);
 

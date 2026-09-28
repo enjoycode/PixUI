@@ -3,12 +3,12 @@ using Microsoft.JSInterop.Implementation;
 
 namespace PixUI.Platform.Blazor;
 
-internal sealed class BlazorFileDialog : IPlatformFileDialog
+internal sealed class WebFileDialog : IPlatformFileDialog
 {
     public async Task<OpenFileResult[]> OpenFileAsync(OpenFileOptions options)
     {
         //注意:JSRuntime.InvokeAsync<必须为JSStreamReference, 不可以为IJSStreamReference>
-        var jsOpenFileResults = await BlazorApplication.JSRuntime.InvokeAsync<JSOpenFileResult[]>(
+        var jsOpenFileResults = await WebApplication.JSRuntime.InvokeAsync<JSOpenFileResult[]>(
             "PixUI.OpenFile", options.AllowMultiple, Array.Empty<string>() /*TODO: accept*/);
         if (jsOpenFileResults.Length == 0)
             return [];
@@ -41,7 +41,7 @@ internal sealed class BlazorFileDialog : IPlatformFileDialog
     public async Task SaveFileAsync(SaveFileOptions options)
     {
         var streamRef = new DotNetStreamReference(options.FileStream, true);
-        await BlazorApplication.JSRuntime.InvokeVoidAsync("PixUI.SaveFile", options.FileName, streamRef);
+        await WebApplication.JSRuntime.InvokeVoidAsync("PixUI.SaveFile", options.FileName, streamRef);
     }
 }
 

@@ -27,22 +27,22 @@ public struct RunInfo
 }
 
 [SupportedOSPlatform("browser")]
-public sealed class BlazorApplication : UIApplication
+public sealed class WebApplication : UIApplication
 {
-    private BlazorApplication(bool isMacOS)
+    private WebApplication(bool isMacOS)
     {
         _isMacOS = isMacOS;
     }
 
     internal static IJSRuntime JSRuntime = null!;
     internal static HttpClient HttpClient = null!;
-    internal static BlazorWindow Window { get; private set; } = null!;
+    internal static WebWindow Window { get; private set; } = null!;
 
     #region ====Platform Providers====
 
-    public override IPlatformCursors CursorsProvider { get; } = new BlazorCursors();
-    public override IPlatformClipboard ClipboardProvider { get; } = new BlazorClipboard();
-    public override IPlatformFileDialog FileDialogProvider { get; } = new BlazorFileDialog();
+    public override IPlatformCursors CursorsProvider { get; } = new WebCursors();
+    public override IPlatformClipboard ClipboardProvider { get; } = new WebClipboard();
+    public override IPlatformFileDialog FileDialogProvider { get; } = new WebFileDialog();
 
     #endregion
 
@@ -58,14 +58,14 @@ public sealed class BlazorApplication : UIApplication
 
     public static void Run(Func<Widget> rootBuilder, RunInfo runInfo)
     {
-        var app = new BlazorApplication(runInfo.IsMacOS);
+        var app = new WebApplication(runInfo.IsMacOS);
         Current = app;
 
         //创建WebWindow
 #if SK_GRAPHITE
         Window = new WebGpuWindow(rootBuilder(), runInfo);
 #else
-        Window = new WebGlWindow(rootBuilder(), runInfo);
+        Window = new WebGLWindow(rootBuilder(), runInfo);
 #endif
         app.MainWindow = Window;
         //开始构建WidgetTree并首秀

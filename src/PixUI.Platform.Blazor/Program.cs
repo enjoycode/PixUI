@@ -18,11 +18,11 @@ public static class Program
         builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
         var host = builder.Build();
-        BlazorApplication.JSRuntime = host.Services.GetRequiredService<IJSRuntime>();
-        BlazorApplication.HttpClient = host.Services.GetService<HttpClient>()!;
+        WebApplication.JSRuntime = host.Services.GetRequiredService<IJSRuntime>();
+        WebApplication.HttpClient = host.Services.GetService<HttpClient>()!;
 
         //调用js获取启动参数
-        var jsRuntime = ((IJSInProcessRuntime)BlazorApplication.JSRuntime);
+        var jsRuntime = ((IJSInProcessRuntime)WebApplication.JSRuntime);
 #if SK_GRAPHITE
         const bool useGraphite = true;
 #else
@@ -40,7 +40,7 @@ public static class Program
         //初始化默认字体
         var fontUrl = "/fonts/MiSans-Regular.woff2";
         // var fontUrl = "/fonts/NotoMono-Regular.ttf";
-        await using var fontDataStream = await BlazorApplication.HttpClient.GetStreamAsync(fontUrl);
+        await using var fontDataStream = await WebApplication.HttpClient.GetStreamAsync(fontUrl);
         //因fontDataStream不支持同步复制(DotNet10)，所以先复制至MemoryStream
         using var ms = new MemoryStream();
         await fontDataStream.CopyToAsync(ms);
@@ -48,7 +48,7 @@ public static class Program
         FontCollection.RegisterTypeface(ms, FontCollection.DefaultFamilyName, false);
 
         //开始执行Blazor应用
-        BlazorApplication.Run(() => new DemoDataGrid(), runInfo);
+        WebApplication.Run(() => new DemoDataGrid(), runInfo);
         //BlazorApplication.Run(() => new TestWidget() { Width = 100, Height = 100 }, runInfo);
     }
 

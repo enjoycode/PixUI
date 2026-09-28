@@ -5,9 +5,9 @@ using System.Runtime.Versioning;
 namespace PixUI.Platform.Blazor;
 
 [SupportedOSPlatform("browser")]
-public sealed class WebGlWindow : BlazorWindow
+public sealed class WebGLWindow : WebWindow
 {
-    public WebGlWindow(Widget child, RunInfo runInfo) : base(child, runInfo.RoutePath)
+    public WebGLWindow(Widget child, RunInfo runInfo) : base(child, runInfo.RoutePath)
     {
         CreateContext();
         CreateSurface(runInfo.Width, runInfo.Height, runInfo.PixelRatio);

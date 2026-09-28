@@ -14,7 +14,7 @@ public sealed class BlazorCursor : Cursor
 }
 
 [SupportedOSPlatform("browser")]
-public sealed class BlazorCursors : IPlatformCursors
+public sealed class WebCursors : IPlatformCursors
 {
     private static readonly BlazorCursor WArrow = new("auto");
     private static readonly BlazorCursor WHand = new("pointer");

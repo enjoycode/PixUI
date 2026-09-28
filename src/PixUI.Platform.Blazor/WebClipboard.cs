@@ -3,7 +3,7 @@ using System.Runtime.Versioning;
 namespace PixUI.Platform.Blazor;
 
 [SupportedOSPlatform("browser")]
-public sealed class BlazorClipboard : IPlatformClipboard
+public sealed class WebClipboard : IPlatformClipboard
 {
     public ValueTask WriteText(string text) => new(WebBrowser.ClipboardWriteText(text));
 

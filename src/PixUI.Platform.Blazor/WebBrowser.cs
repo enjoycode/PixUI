@@ -51,75 +51,75 @@ internal static partial class WebBrowser
 #else
     [JSExport]
     private static void OnInvalidate() =>
-        ((BlazorApplication)UIApplication.Current).RunInvalidateRequest();
+        ((WebApplication)UIApplication.Current).RunInvalidateRequest();
 #endif
 
     [JSExport]
     private static void OnMouseMove(int buttons, int x, int y, int dx, int dy)
     {
         var args = PointerEvent.UseDefault(ConvertButtons(buttons), x, y, dx, dy);
-        BlazorApplication.Window.OnPointerMove(args);
+        WebApplication.Window.OnPointerMove(args);
     }
 
     [JSExport]
     private static void OnMouseMoveOutWindow()
     {
-        BlazorApplication.Window.OnPointerMoveOutWindow();
+        WebApplication.Window.OnPointerMoveOutWindow();
     }
 
     [JSExport]
     private static void OnMouseDown(int button, int x, int y, int dx, int dy)
     {
         var args = PointerEvent.UseDefault(ConvertButton(button), x, y, dx, dy);
-        BlazorApplication.Window.OnPointerDown(args);
+        WebApplication.Window.OnPointerDown(args);
     }
 
     [JSExport]
     private static void OnMouseUp(int button, int x, int y, int dx, int dy)
     {
         var args = PointerEvent.UseDefault(ConvertButton(button), x, y, dx, dy);
-        BlazorApplication.Window.OnPointerUp(args);
+        WebApplication.Window.OnPointerUp(args);
     }
 
     [JSExport]
     public static void OnScroll(int x, int y, int dx, int dy)
     {
         var args = ScrollEvent.Make(x, y, dx, dy);
-        BlazorApplication.Window.OnScroll(args);
+        WebApplication.Window.OnScroll(args);
     }
 
     [JSExport]
     private static void OnKeyDown(string key, string code, bool alt, bool control, bool shift, bool meta)
     {
         var args = KeyEvent.UseDefault(ConvertKeys(key, code, alt, control, shift, meta));
-        BlazorApplication.Window.OnKeyDown(args);
+        WebApplication.Window.OnKeyDown(args);
     }
 
     [JSExport]
     private static void OnKeyUp(string key, string code, bool alt, bool control, bool shift, bool meta)
     {
         var args = KeyEvent.UseDefault(ConvertKeys(key, code, alt, control, shift, meta));
-        BlazorApplication.Window.OnKeyUp(args);
+        WebApplication.Window.OnKeyUp(args);
     }
 
     [JSExport]
-    private static void OnTextInput(string text) => BlazorApplication.Window.OnTextInput(text);
+    private static void OnTextInput(string text) => WebApplication.Window.OnTextInput(text);
 
 #if SK_GRAPHITE
 #else
     [JSExport]
     public static void OnResize(int width, int height, float ratio) =>
-        BlazorApplication.Window.OnResize(width, height, ratio);
+        WebApplication.Window.OnResize(width, height, ratio);
 #endif
 
     [JSInvokable]
-    public static void RouteGoto(int historyId) => BlazorApplication.Window.RouteGoto(historyId);
+    public static void RouteGoto(int historyId) => WebApplication.Window.RouteGoto(historyId);
 
     [JSInvokable]
-    public static void RoutePush(string path) => BlazorApplication.Window.RoutePush(path);
+    public static void RoutePush(string path) => WebApplication.Window.RoutePush(path);
 
     [JSInvokable]
-    public static int NewRouteId() => BlazorApplication.Window.NewRouteId();
+    public static int NewRouteId() => WebApplication.Window.NewRouteId();
 
     [JSInvokable]
     public static async Task OnDropFile(int x, int y, string name, int size, string type,
@@ -129,7 +129,7 @@ internal static partial class WebBrowser
         {
             await using var stream =
                 await jsStreamReference.OpenReadStreamAsync(maxAllowedSize: 1024 * 1024 /*TODO: 全局配置*/);
-            BlazorApplication.Window.OnDropFile(x, y, name, size, type, stream);
+            WebApplication.Window.OnDropFile(x, y, name, size, type, stream);
         }
         finally
         {
