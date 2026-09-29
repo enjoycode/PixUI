@@ -6,7 +6,7 @@ using static PixUI.Platform.Blazor.InputUtils;
 namespace PixUI.Platform.Blazor;
 
 [SupportedOSPlatform("browser")]
-internal static partial class WebBrowser
+public static partial class WebBrowser
 {
     #region ====Imports====
 
