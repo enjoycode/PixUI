@@ -33,10 +33,14 @@ public interface IPath : IDisposable
 
 public interface IPathBuilder : IDisposable
 {
+    PathFillType FillType { get; set; }
+
+    bool TryGetLastPoint(out Point point);
+
     IPath Detach();
 
     void Reset();
-    
+
     void MoveTo(float x, float y);
 
     void LineTo(float x, float y);
@@ -62,7 +66,7 @@ public interface IPathBuilder : IDisposable
     void AddArc(Rect oval, float startAngle, float sweepAngle);
 
     void AddPath(IPath other, PathAddMode mode = PathAddMode.Append);
-    
+
     void Close();
 }
 

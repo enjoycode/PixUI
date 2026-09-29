@@ -9,14 +9,7 @@ public abstract class WebWindow : UIWindow
 
     protected internal abstract void CreateOnScreenSurface(int onScreenTextureId);
 
-    internal void FirstShow()
-    {
-        RootWidget.PerformLayout(new(Width, Height));
-        Overlay.PerformLayout(new(Width, Height));
-
-        RootWidget.Mount();
-        RootWidget.Repaint();
-    }
+    internal void FirstShow() => OnFirstShow();
 
 #if SK_GRAPHITE
     internal abstract void OnResize(int width, int height, float ratio, int onScreenTextureId, int offScreenTextureId);

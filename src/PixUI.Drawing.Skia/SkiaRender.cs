@@ -149,7 +149,7 @@ public sealed class SkiaRender : IRender
 #if !SK_GRAPHITE
         var fbInfo = new GRMtlTextureInfoNative();
         fbInfo.fTexture = (void*)textureHandle;
-        
+
         using var backendRt = GRBackendRenderTarget.CreateMetal(width, height, sampleCount, fbInfo);
         return SKSurface.Create((GRContext)context, backendRt, SurfaceOrigin.TopLeft,
             ColorType.Bgra8888, colorSpace as SKColorSpace, surfaceProperties as SKSurfaceProperties);
@@ -163,10 +163,10 @@ public sealed class SkiaRender : IRender
         IColorSpace? colorSpace, ISurfaceProperties? surfaceProperties)
     {
 #if !SK_GRAPHITE
-        // var backBuffer = SkiaApi.gr_d3d_swapchain_get_buffer(((Direct3DSwapChain)swapChain).Handle, bufferIndex);
-        // using var backendRt = GRBackendRenderTarget.CreateDirect3D(width, height, backBuffer);
-        // return SKSurface.Create((GRContext)context, backendRt, SurfaceOrigin.TopLeft,
-        //     ColorType.Rgba8888, colorSpace as SKColorSpace, surfaceProperties as SKSurfaceProperties);
+        var backBuffer = SkiaApi.gr_d3d_swapchain_get_buffer(((Direct3DSwapChain)swapChain).Handle, bufferIndex);
+        using var backendRt = GRBackendRenderTarget.CreateDirect3D(width, height, backBuffer);
+        return SKSurface.Create((GRContext)context, backendRt, SurfaceOrigin.TopLeft,
+            ColorType.Rgba8888, colorSpace as SKColorSpace, surfaceProperties as SKSurfaceProperties);
 #else
         throw new NotSupportedException("MakeSurface for Graphite is not supported.");
 #endif

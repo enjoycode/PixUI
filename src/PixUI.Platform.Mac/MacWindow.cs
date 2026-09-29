@@ -43,8 +43,7 @@ public sealed class MacWindow : NativeWindow
         InitWindow();
 
         //TODO: 根据backendType创建相应的Context
-        WindowContext =
-            new MacMetalWindowContext(NSWindow!.ContentView!, this, new DisplayParams());
+        WindowContext = new MacMetalWindowContext(NSWindow!.ContentView!, this, new DisplayParams());
 
         OnBackendCreated();
         return true;

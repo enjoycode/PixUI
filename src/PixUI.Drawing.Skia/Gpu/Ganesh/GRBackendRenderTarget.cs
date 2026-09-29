@@ -6,16 +6,17 @@ public unsafe class GRBackendRenderTarget : SKObject, ISKSkipObjectRegistration
 
     public static GRBackendRenderTarget CreateVulkan(int width, int height, int sampleCount, GRVkImageInfo vkImageInfo)
     {
-        var handle = SkiaApi.gr_backendrendertarget_new_vulkan(width, height, sampleCount, &vkImageInfo);
+        var handle = SkiaApi.gr_backendrendertarget_new_vulkan(width, height, &vkImageInfo);
         if (handle == IntPtr.Zero)
             throw new InvalidOperationException("Unable to create a new GRBackendRenderTarget instance.");
 
         return new GRBackendRenderTarget(handle, true);
     }
 
-    public static GRBackendRenderTarget CreateMetal(int width, int height, int sampleCount, GRMtlTextureInfoNative mtlInfo)
+    public static GRBackendRenderTarget CreateMetal(int width, int height, int sampleCount,
+        GRMtlTextureInfoNative mtlInfo)
     {
-        var handle = SkiaApi.gr_backendrendertarget_new_metal(width, height, sampleCount, &mtlInfo);
+        var handle = SkiaApi.gr_backendrendertarget_new_metal(width, height, &mtlInfo);
         if (handle == IntPtr.Zero)
             throw new InvalidOperationException("Unable to create a new GRBackendRenderTarget instance.");
         return new GRBackendRenderTarget(handle, true);

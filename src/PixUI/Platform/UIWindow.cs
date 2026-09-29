@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.IO;
 
 namespace PixUI;
 
@@ -113,21 +112,14 @@ public abstract class UIWindow
         RootWidget.PerformLayout(new(Width, Height));
         Overlay.PerformLayout(new(Width, Height));
 
-        var widgetsCanvas = GetOffscreenCanvas();
-        RootWidget.OnPaint(widgetsCanvas);
-
-        var overlayCanvas = GetOnscreenCanvas();
-        widgetsCanvas.Surface?.Draw(overlayCanvas, 0, 0, null);
-
-        //TODO: maybe paint Overlay
-
-        Present();
+        RootWidget.Mount();
+        RootWidget.Repaint();
     }
 
     /// <summary>
     /// 完成离屏绘制
     /// </summary>
-    protected internal abstract void FlushOffScreen();
+    protected internal abstract void FlushOffScreen(); //TODO: check need it
 
     /// <summary>
     /// 呈现已渲染好的当前帧

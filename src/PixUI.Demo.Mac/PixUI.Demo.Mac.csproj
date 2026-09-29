@@ -4,7 +4,7 @@
         <OutputType>Exe</OutputType>
         <Nullable>enable</Nullable>
         <ImplicitUsings>true</ImplicitUsings>
-        <SupportedOSPlatformVersion>12.0</SupportedOSPlatformVersion>
+        <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <IsArm64 Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">true</IsArm64>
@@ -14,22 +14,21 @@
     <PropertyGroup Condition="'$(IsArm64)'=='true'">
         <DefineConstants>$(DefineConstants);ARM64</DefineConstants>
     </PropertyGroup>
-
+    
+    <Import Project="../PixUI.Drawing.Skia/Native/Macos.targets" />
+    
     <ItemGroup>
         <ProjectReference Include="..\PixUI.CodeEditor\PixUI.CodeEditor.csproj"/>
         <ProjectReference Include="..\PixUI.Demo\PixUI.Demo.csproj"/>
         <ProjectReference Include="..\PixUI.Drawing.Skia\PixUI.Drawing.Skia.csproj" />
         <ProjectReference Include="..\PixUI.Platform.Mac\PixUI.Platform.Mac.csproj"/>
     </ItemGroup>
+    
     <ItemGroup>
         <None Remove="Resources\Cat.webp"/>
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsArm64)'!='true'">
-        <NativeReference Include="..\PixUI.Platform.Mac\libs\osx-x64\libskia.dylib">
-            <Kind>Dynamic</Kind>
-            <SmartLink>False</SmartLink>
-        </NativeReference>
         <NativeReference Include="..\PixUI.CodeEditor.TreeSitter\libs\osx-x64\libtree-sitter.dylib">
             <Kind>Dynamic</Kind>
             <SmartLink>False</SmartLink>
@@ -41,10 +40,6 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsArm64)'=='true'">
-        <NativeReference Include="..\PixUI.Platform.Mac\libs\osx-arm64\libskia.dylib">
-            <Kind>Dynamic</Kind>
-            <SmartLink>False</SmartLink>
-        </NativeReference>
         <NativeReference Include="..\PixUI.CodeEditor.TreeSitter\libs\osx-arm64\libtree-sitter.dylib">
             <Kind>Dynamic</Kind>
             <SmartLink>False</SmartLink>

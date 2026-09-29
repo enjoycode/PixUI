@@ -1,0 +1,16 @@
+<Project>
+    <PropertyGroup>
+        <IsArm64 Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">true</IsArm64>
+        <_BuildOutDir Condition="'$(_BuildOutDir)' == ''">$(MSBuildThisFileDirectory)..\..\..\out\macos</_BuildOutDir>
+        <_SkiaNativeBinaryType Condition="'$(SkiaUseGraphite)' == 'True'">graphite</_SkiaNativeBinaryType>
+        <_SkiaNativeBinaryType Condition="'$(SkiaUseGraphite)' != 'True'">ganesh</_SkiaNativeBinaryType>
+        <_ArchType Condition="'$(IsArm64)'=='true'">arm64</_ArchType>
+        <_ArchType Condition="'$(IsArm64)'!='true'">x86_64</_ArchType>
+    </PropertyGroup>
+    <ItemGroup>
+        <NativeReference Include="$(_BuildOutDir)\$(_SkiaNativeBinaryType)-$(_ArchType)\libskia.dylib">
+            <Kind>Dynamic</Kind>
+            <SmartLink>False</SmartLink>
+        </NativeReference>
+    </ItemGroup>
+</Project>

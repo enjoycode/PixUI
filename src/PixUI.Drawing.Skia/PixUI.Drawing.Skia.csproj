@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <DefineConstants>$(DefineConstants);USE_LIBRARY_IMPORT</DefineConstants>
-        <SkiaUseGraphite>True</SkiaUseGraphite>
+        <SkiaUseGraphite>False</SkiaUseGraphite>
         <DefineConstants Condition="'$(SkiaUseGraphite)' == 'True'">$(DefineConstants);SK_GRAPHITE</DefineConstants>
     </PropertyGroup>
 

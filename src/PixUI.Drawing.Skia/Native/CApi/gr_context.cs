@@ -45,12 +45,12 @@ unsafe partial class SkiaApi
     // gr_backendrendertarget_t* gr_backendrendertarget_new_metal(int width, int height, int samples, const gr_mtl_textureinfo_t* mtlInfo)
     [LibraryImport(SKIA)]
     internal static partial gr_backendrendertarget_t gr_backendrendertarget_new_metal(Int32 width, Int32 height,
-        Int32 samples, GRMtlTextureInfoNative* mtlInfo);
+        GRMtlTextureInfoNative* mtlInfo);
 
     // gr_backendrendertarget_t* gr_backendrendertarget_new_vulkan(int width, int height, int samples, const gr_vk_imageinfo_t* vkImageInfo)
     [LibraryImport(SKIA)]
     internal static partial gr_backendrendertarget_t gr_backendrendertarget_new_vulkan(Int32 width, Int32 height,
-        Int32 samples, GRVkImageInfo* vkImageInfo);
+        GRVkImageInfo* vkImageInfo);
 
     [LibraryImport(SKIA)]
     internal static partial gr_backendrendertarget_t gr_backendrendertarget_new_direct3d(Int32 width, Int32 height,
@@ -268,9 +268,11 @@ unsafe partial class SkiaApi
     [LibraryImport(SKIA)]
     internal static partial void gr_vk_extensions_init(gr_vk_extensions_t extensions, GRVkGetProcProxyDelegate getProc,
         void* userData, vk_instance_t instance, vk_physical_device_t physDev, UInt32 instanceExtensionCount,
-        [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] String[] instanceExtensions,
+        [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)]
+        String[] instanceExtensions,
         UInt32 deviceExtensionCount,
-        [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] String[] deviceExtensions);
+        [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)]
+        String[] deviceExtensions);
 
     // gr_vk_extensions_t* gr_vk_extensions_new()
     [LibraryImport(SKIA)]
