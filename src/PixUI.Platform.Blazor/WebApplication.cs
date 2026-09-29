@@ -24,6 +24,11 @@ public struct RunInfo
     /// 是否MacOS,主要用于设置一些快捷键
     /// </summary>
     public bool IsMacOS { get; set; }
+
+    /// <summary>
+    /// WebSocket Url
+    /// </summary>
+    public string WsUrl { get; set; }
 }
 
 [SupportedOSPlatform("browser")]
