@@ -4,7 +4,9 @@ namespace PixUI.Drawing.Skia;
 
 unsafe partial class SkiaApi
 {
-    #region sk_pathbuilder.h
+    [LibraryImport(SKIA)]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static partial bool sk_pathbuilder_get_last_point(sk_pathbuilder_t builder, SKPoint* point);
 
     // void sk_pathbuilder_add_arc(sk_pathbuilder_t* builder, const sk_rect_t* rect, float startAngle, float sweepAngle)
 #if !USE_DELEGATES
@@ -744,6 +746,4 @@ unsafe partial class SkiaApi
 			(sk_pathbuilder_snapshot_path_delegate ??=
  GetSymbol<Delegates.sk_pathbuilder_snapshot_path> ("sk_pathbuilder_snapshot_path")).Invoke (builder);
 #endif
-
-    #endregion
 }

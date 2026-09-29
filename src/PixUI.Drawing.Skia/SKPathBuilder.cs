@@ -2,7 +2,7 @@
 
 namespace PixUI.Drawing.Skia;
 
-/// <summary>A mutable builder for constructing <see cref="T:SkiaSharp.SKPath" /> objects incrementally.</summary>
+/// <summary>A mutable builder for constructing <see cref="T:SKPath" /> objects incrementally.</summary>
 /// <remarks><![CDATA[
 /// ## Remarks
 ///
@@ -30,7 +30,7 @@ public unsafe class SKPathBuilder : SKObject, ISKSkipObjectRegistration, IPathBu
     internal SKPathBuilder(IntPtr handle, bool owns)
         : base(handle, owns) { }
 
-    /// <summary>Initializes a new, empty instance of the <see cref="T:SkiaSharp.SKPathBuilder" /> class.</summary>
+    /// <summary>Initializes a new, empty instance of the <see cref="T:SKPathBuilder" /> class.</summary>
     /// <remarks></remarks>
     public SKPathBuilder()
         : this(SkiaApi.sk_pathbuilder_new(), true)
@@ -41,7 +41,7 @@ public unsafe class SKPathBuilder : SKObject, ISKSkipObjectRegistration, IPathBu
         }
     }
 
-    /// <summary>Initializes a new instance of the <see cref="T:SkiaSharp.SKPathBuilder" /> class with the contours of the specified path.</summary>
+    /// <summary>Initializes a new instance of the <see cref="T:SKPathBuilder" /> class with the contours of the specified path.</summary>
     /// <param name="path">The path whose contours are copied into this builder.</param>
     /// <remarks></remarks>
     public SKPathBuilder(SKPath path)
@@ -55,19 +55,19 @@ public unsafe class SKPathBuilder : SKObject, ISKSkipObjectRegistration, IPathBu
         }
     }
 
-    /// <summary>Releases the resources used by this <see cref="T:SkiaSharp.SKPathBuilder" />.</summary>
+    /// <summary>Releases the resources used by this <see cref="T:SKPathBuilder" />.</summary>
     /// <param name="disposing"><see langword="true" /> to release both managed and native resources; <see langword="false" /> to release only native resources.</param>
     /// <remarks></remarks>
     protected override void Dispose(bool disposing) =>
         base.Dispose(disposing);
 
-    /// <summary>Releases the native resources held by this <see cref="T:SkiaSharp.SKPathBuilder" />.</summary>
+    /// <summary>Releases the native resources held by this <see cref="T:SKPathBuilder" />.</summary>
     /// <remarks></remarks>
     protected override void DisposeNative() =>
         SkiaApi.sk_pathbuilder_delete(Handle);
 
-    /// <summary>Gets or sets the fill type rule used when the path is converted to an <see cref="T:SkiaSharp.SKPath" />.</summary>
-    /// <value>The <see cref="T:SkiaSharp.SKPathFillType" /> that determines how overlapping contours are filled.</value>
+    /// <summary>Gets or sets the fill type rule used when the path is converted to an <see cref="T:SKPath" />.</summary>
+    /// <value>The <see cref="T:SKPathFillType" /> that determines how overlapping contours are filled.</value>
     /// <remarks></remarks>
     public SKPathFillType FillType
     {
@@ -85,7 +85,7 @@ public unsafe class SKPathBuilder : SKObject, ISKSkipObjectRegistration, IPathBu
     }
 
     /// <summary>Returns the built path and resets this builder to an empty state.</summary>
-    /// <returns>The <see cref="T:SkiaSharp.SKPath" /> built so far. The builder is reset to an empty state after the call.</returns>
+    /// <returns>The <see cref="T:SKPath" /> built so far. The builder is reset to an empty state after the call.</returns>
     /// <remarks></remarks>
     public IPath Detach()
     {
@@ -95,7 +95,7 @@ public unsafe class SKPathBuilder : SKObject, ISKSkipObjectRegistration, IPathBu
     }
 
     /// <summary>Returns a snapshot of the current path without modifying this builder.</summary>
-    /// <returns>A new <see cref="T:SkiaSharp.SKPath" /> containing a snapshot of the current contours. The builder is not modified.</returns>
+    /// <returns>A new <see cref="T:SKPath" /> containing a snapshot of the current contours. The builder is not modified.</returns>
     /// <remarks></remarks>
     public SKPath Snapshot()
     {
@@ -110,6 +110,14 @@ public unsafe class SKPathBuilder : SKObject, ISKSkipObjectRegistration, IPathBu
     {
         SkiaApi.sk_pathbuilder_reset(Handle);
         GC.KeepAlive(this);
+    }
+
+    public bool TryGetLastPoint(out SKPoint point)
+    {
+        var pt = Point.Empty;
+        var ok = SkiaApi.sk_pathbuilder_get_last_point(Handle, &pt);
+        point = pt;
+        return ok;
     }
 
     // Move
