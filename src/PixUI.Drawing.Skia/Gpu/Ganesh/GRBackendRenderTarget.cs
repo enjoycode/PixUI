@@ -24,7 +24,7 @@ public unsafe class GRBackendRenderTarget : SKObject, ISKSkipObjectRegistration
 
     public static GRBackendRenderTarget CreateDirect3D(int width, int height, IntPtr buffer)
     {
-        var handle = SkiaApi.gr_backendrendertarget_new_direct3d(width, height, buffer);
+        var handle = SkiaApi.gr_backendrendertarget_new_direct3d_buffer(width, height, buffer);
         if (handle == IntPtr.Zero)
             throw new InvalidOperationException("Unable to create a new GRBackendRenderTarget instance.");
 

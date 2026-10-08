@@ -56,15 +56,15 @@
   &lt;Assembly Path="/Users/rick/.nuget/packages/melville.pdf.model/0.6.4/lib/net9.0/Melville.Pdf.Model.dll" /&gt;
 &lt;/AssemblyExplorer&gt;</s:String>
 	
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a58cc5d0_002D5832_002D407a_002Db44b_002D89255f8aa24a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="FindTypefaceTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;TestAncestor&gt;
-    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.PathTest.OutlineContainsTest&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.PathTest.IsClosedTest&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.MatrixTest.TestScale&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.FontTest.ParagraphTest&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.Dynamic.SerializationTest.LoadTest&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.FontTest.CreateTypefaceFromDataTest&lt;/TestId&gt;
-  &lt;/TestAncestor&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a58cc5d0_002D5832_002D407a_002Db44b_002D89255f8aa24a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="FindTypefaceTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.PathTest.OutlineContainsTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.PathTest.IsClosedTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.MatrixTest.TestScale&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.FontTest.ParagraphTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.Dynamic.SerializationTest.LoadTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.FontTest.CreateTypefaceFromDataTest&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=PixUI_002EDocs_002FLocalizationRes/@EntryIndexedValue">True</s:Boolean>

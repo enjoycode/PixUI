@@ -53,7 +53,7 @@ unsafe partial class SkiaApi
         GRVkImageInfo* vkImageInfo);
 
     [LibraryImport(SKIA)]
-    internal static partial gr_backendrendertarget_t gr_backendrendertarget_new_direct3d(Int32 width, Int32 height,
+    internal static partial gr_backendrendertarget_t gr_backendrendertarget_new_direct3d_buffer(Int32 width, Int32 height,
         IntPtr buffer);
 
     // void gr_backendtexture_delete(gr_backendtexture_t* texture)

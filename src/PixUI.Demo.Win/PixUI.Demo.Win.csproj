@@ -29,7 +29,7 @@
 	<Choose>
 		<When Condition="'$(IsArm64)'=='true'">
 			<ItemGroup>
-				<Content Include="..\PixUI.Platform.Win\libs\arm64\skia.dll">
+				<Content Include="..\..\out\mswin\ganesh-arm64\skia.dll">
 					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 				</Content>
 				<Content Include="..\PixUI.Platform.Win\libs\arm64\icudtl.dat">
@@ -45,7 +45,7 @@
 		</When>
 		<Otherwise>
 			<ItemGroup>
-				<Content Include="..\PixUI.Platform.Win\libs\x64\skia.dll">
+				<Content Include="..\..\out\mswin\ganesh-x64\skia.dll">
 					<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 				</Content>
 				<Content Include="..\PixUI.Platform.Win\libs\x64\icudtl.dat">
