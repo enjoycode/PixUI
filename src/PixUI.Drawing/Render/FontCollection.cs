@@ -28,7 +28,7 @@ public static class FontCollection
         else if (OperatingSystem.IsMacOS())
             DefaultFamilyName = "Helvetica Neue";
         else if (OperatingSystem.IsWindows())
-            DefaultFamilyName = "Microsoft YaHei UI Light";
+            DefaultFamilyName = "Microsoft YaHei UI";
         else
             DefaultFamilyName = "sans-serif";
     }
