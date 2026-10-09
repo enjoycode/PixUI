@@ -139,7 +139,9 @@ public sealed class WinWindow : NativeWindow
             {
                 var xPos = (lParam.ToInt32() & 0xFFFF) / win.ScaleFactor;
                 var yPos = (lParam.ToInt32() >> 16) / win.ScaleFactor;
-                win.OnPointerUp(PointerEvent.UseDefault(GetButtonsFromWParam(wParam.ToInt64()), xPos, yPos, 0, 0));
+                var buttons = msg == Msg.WM_LBUTTONUP ? PointerButtons.Left : PointerButtons.Right;
+                win.OnPointerUp(PointerEvent.UseDefault(buttons, xPos, yPos, 0, 0));
+                //win.OnPointerUp(PointerEvent.UseDefault(GetButtonsFromWParam(wParam.ToInt64()), xPos, yPos, 0, 0));
                 return eventHandled;
             }
             case Msg.WM_SETCURSOR:
