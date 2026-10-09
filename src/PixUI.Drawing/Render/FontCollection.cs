@@ -23,12 +23,12 @@ public static class FontCollection
 
     static FontCollection()
     {
-        if (OperatingSystem.IsBrowser() /*RuntimeInformation.ProcessArchitecture == Architecture.Wasm*/)
+        if (OperatingSystem.IsBrowser())
             DefaultFamilyName = "MiSans";
-        else if (OperatingSystem.IsMacOS() /*RuntimeInformation.IsOSPlatform(OSPlatform.OSX)*/)
+        else if (OperatingSystem.IsMacOS())
             DefaultFamilyName = "Helvetica Neue";
-        else if (OperatingSystem.IsWindows() /*RuntimeInformation.IsOSPlatform(OSPlatform.Windows)*/)
-            DefaultFamilyName = "Microsoft YaHei SC";
+        else if (OperatingSystem.IsWindows())
+            DefaultFamilyName = "Microsoft YaHei UI Light";
         else
             DefaultFamilyName = "sans-serif";
     }

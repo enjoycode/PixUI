@@ -66,7 +66,7 @@ public sealed class SKFontCollection : IFontCollection
                 new IntPtr(namePtr), familyName.Length * 2, bold, italic);
             return typefaceHandler == IntPtr.Zero
                 ? null
-                : new SKTypeface(typefaceHandler, false); //Typeface.PreventPublicDisposal()
+                : SKTypeface.GetDisposeProtectedObject(typefaceHandler);
         }
     }
 
