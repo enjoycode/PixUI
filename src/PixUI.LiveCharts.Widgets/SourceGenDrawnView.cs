@@ -19,7 +19,11 @@ public abstract partial class SourceGenDrawnView : Widget
     public virtual bool DesignerMode => false;
     public virtual bool IsDarkMode => false;
 
-    public void InvokeOnUIThread(Action action) => UIApplication.Current.BeginInvoke(action);
+    public void InvokeOnUIThread(Action action)
+    {
+        if (!IsMounted) return;
+        UIApplication.Current.BeginInvoke(action);
+    }
 
     #region ====Widget Overrides====
 
@@ -41,7 +45,7 @@ public abstract partial class SourceGenDrawnView : Widget
     {
         var oldSize = LayoutSize;
         SetLayoutSize(maxSize.Width, maxSize.Height);
-        if (oldSize != Size.Empty && oldSize != LayoutSize)
+        if (/*oldSize != Size.Empty &&*/ oldSize != LayoutSize)
             OnDrawnViewSizeChanged();
     }
 
