@@ -5,7 +5,9 @@ public interface IGpuContext : IDisposable
     IGpuRecorder CreateRecorder();
 }
 
-public interface IGpuRecorder : IDisposable { }
+public interface IGpuRecorder : IDisposable
+{
+}
 
 public interface IGpuBackendTexture : IDisposable
 {
@@ -19,14 +21,18 @@ public interface IGRContext : IDisposable
     void PurgeResources();
 }
 
-public interface IDirect3DBackendContext : IDisposable { }
+public interface IDirect3DBackendContext : IDisposable
+{
+}
 
 public interface IDirect3DSwapChain : IDisposable
 {
     int CurrentBufferIndex { get; }
-    void ReleaseBuffers(int count);
+    void ReleaseBuffer(int index);
     void ResizeBuffers(uint width, uint height);
-    void SwapBuffer(IGRContext context, IDirect3DBackendContext backend, ISurface surface);
+
+    void SwapBuffer(IGRContext context, IDirect3DBackendContext backend, ISurface surface, 
+        IntPtr fence, ulong fenceValue);
 }
 
 public enum SurfaceOrigin

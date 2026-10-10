@@ -54,7 +54,7 @@ public interface IRender
     IColorFilter? MakeColorFilterBlendMode(Color color, BlendMode blendMode);
 
     IPath MakePath();
-    
+
     IPathBuilder MakePathBuilder();
 
     IPath MakePathFromSvgData(string svgPath);
@@ -67,7 +67,7 @@ public interface IRender
 
     ISurface MakeSurface(ImageInfo imageInfo);
     ISurface MakeSurface(ImageInfo imageInfo, IntPtr pixels, int rowBytes);
-    
+
     ISurface MakeSurface(IGpuRecorder recorder, IGpuBackendTexture backendTexture, ColorType colorType);
 
     ISurface? MakeSurface(IGRContext context, bool budgeted, ImageInfo info,
@@ -86,21 +86,29 @@ public interface IRender
     #endregion
 
     #region ====Gpu====
+
     IGpuContext MakeWebGpuContext(IntPtr instanceId, IntPtr deviceId, IntPtr queueId);
-    
+
     IGpuBackendTexture MakeWebGpuBackendTexture(IntPtr textureId);
     void FlushSurface(IGpuContext gpuContext, IGpuRecorder recorder);
 
     IGRContext? MakeGRContextWebGL();
     IGRContext? MakeGRContextMetal(IntPtr device, IntPtr queue);
+
+    #region ----Direct3D----
+
     IGRContext? MakeGRContextDirect3D(out IDirect3DBackendContext direct3DBackendContext);
-
-    #endregion
-
-    #region ====Direct3D SwapChain====
 
     IDirect3DSwapChain MakeDirect3DSwapChain(IntPtr windowHandle, IDirect3DBackendContext direct3DBackendContext,
         uint width, uint height);
+
+    IntPtr MakeDirect3DFence(IDirect3DBackendContext direct3DBackendContext, ulong fenceValue);
+    
+    IntPtr MakeDirect3DFenceEvent();
+    
+    void WaitDirect3DFenceEvent(IntPtr fence, IntPtr fenceEvent, ulong fenceValue);
+
+    #endregion
 
     #endregion
 

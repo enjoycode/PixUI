@@ -53,7 +53,8 @@ unsafe partial class SkiaApi
         GRVkImageInfo* vkImageInfo);
 
     [LibraryImport(SKIA)]
-    internal static partial gr_backendrendertarget_t gr_backendrendertarget_new_direct3d_buffer(Int32 width, Int32 height,
+    internal static partial gr_backendrendertarget_t gr_backendrendertarget_new_direct3d_buffer(Int32 width,
+        Int32 height,
         IntPtr buffer);
 
     // void gr_backendtexture_delete(gr_backendtexture_t* texture)
@@ -285,17 +286,27 @@ unsafe partial class SkiaApi
     public static partial IntPtr gr_d3d_new_swapchain(IntPtr hwnd, IntPtr d3dbackendCtx, uint width, uint height);
 
     [LibraryImport(SKIA)]
+    public static partial IntPtr gr_d3d_new_fence(IntPtr d3dBackendContext, ulong fenceValue);
+
+    [LibraryImport(SKIA)]
+    public static partial IntPtr gr_d3d_new_fence_event();
+
+    [LibraryImport(SKIA)]
+    public static partial void gr_d3d_swapchain_release_buffer(IntPtr swapchain, int index);
+
+    [LibraryImport(SKIA)]
+    public static partial void gr_d3d_wait_fence_event(IntPtr fence, IntPtr fenceEvent, ulong fenceValue);
+
+    [LibraryImport(SKIA)]
     public static partial int gr_d3d_swapchain_get_current_buffer_index(IntPtr swapchain);
 
     [LibraryImport(SKIA)]
     public static partial IntPtr gr_d3d_swapchain_get_buffer(IntPtr swapchain, int index);
 
     [LibraryImport(SKIA)]
-    public static partial void gr_d3d_swapchain_release_buffers(IntPtr swapchain, int count);
-
-    [LibraryImport(SKIA)]
     public static partial void gr_d3d_swapchain_resize_buffers(IntPtr swapchain, uint width, uint height);
 
     [LibraryImport(SKIA)]
-    public static partial void gr_d3d_swapbuffer(IntPtr d3dbackendCtx, IntPtr grCtx, IntPtr surface, IntPtr swapchain);
+    public static partial void gr_d3d_swapbuffer(IntPtr d3dbackendCtx, IntPtr grCtx, IntPtr surface, IntPtr swapchain,
+        IntPtr fence, ulong fenceValue);
 }

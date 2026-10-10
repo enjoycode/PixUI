@@ -181,5 +181,32 @@ public sealed class SkiaRender : IRender
         throw new NotSupportedException("MakeSurface for Graphite is not supported.");
 #endif
 
+    public IntPtr MakeDirect3DFence(IDirect3DBackendContext direct3DBackendContext, ulong fenceValue)
+    {
+#if !SK_GRAPHITE
+        return SkiaApi.gr_d3d_new_fence(((Direct3DBackendContext)direct3DBackendContext).Handle, fenceValue);
+#else
+        throw new NotSupportedException("MakeDirect3DFence for Graphite is not supported.");
+#endif
+    }
+
+    public IntPtr MakeDirect3DFenceEvent()
+    {
+#if !SK_GRAPHITE
+        return SkiaApi.gr_d3d_new_fence_event();
+#else
+        throw new NotSupportedException("MakeDirect3DFenceEvent for Graphite is not supported.");
+#endif
+    }
+
+    public void WaitDirect3DFenceEvent(IntPtr fence, IntPtr fenceEvent, ulong fenceValue)
+    {
+#if !SK_GRAPHITE
+        SkiaApi.gr_d3d_wait_fence_event(fence, fenceEvent, fenceValue);
+#else
+        throw new NotSupportedException("WaitDirect3DFenceEvent for Graphite is not supported.");
+#endif
+    }
+
     public IDocument MakeDocumentPdf(Stream stream, float dpi) => SKDocument.CreatePdf(stream, dpi);
 }
