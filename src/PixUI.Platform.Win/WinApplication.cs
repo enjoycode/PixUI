@@ -8,7 +8,7 @@ public sealed class WinApplication : UIApplication
 
     public override IPlatformCursors CursorsProvider { get; } = new WinCursors();
     public override IPlatformClipboard ClipboardProvider { get; } = new WinClipboard();
-    public override IPlatformFileDialog FileDialogProvider => throw new NotImplementedException("FileDialogProvider");
+    public override IPlatformFileDialog FileDialogProvider { get; } = new WinFileDialog();
 
     #endregion
 

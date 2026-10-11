@@ -142,7 +142,7 @@ public sealed class DemoPage : View
         var files = await FileDialog.OpenFileAsync(new OpenFileOptions() { Title = "打开文件" });
         foreach (var file in files)
         {
-            Console.WriteLine($"打开文件: {file.FileName}");
+            Console.WriteLine($"打开文件: {file.FileName} {file.FileStream.Length}");
             await file.FileStream.DisposeAsync();
         }
     }

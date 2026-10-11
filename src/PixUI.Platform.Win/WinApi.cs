@@ -1,9 +1,227 @@
 ﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+
+// ReSharper disable InconsistentNaming
 
 namespace PixUI.Platform.Win;
 
+#region ====COM====
+
+internal static class ComIds
+{
+    public const string CID_FileOpenDialog = "DC1C5A9C-E88A-4DDE-A5A1-60F82A20AEF7";
+    public const string CID_FileSaveDialog = "C0B4E2F3-BA21-4773-8DBA-335EC946EB8B";
+
+    public const string IID_IModalWindow = "B4DB1657-70D7-485E-8E3E-6FCB5A5C1802";
+    public const string IID_IFileDialog = "42F85136-DB7E-439C-85F1-E4075D135FC8";
+    public const string IID_IFileOpenDialog = "D57C7288-D4AD-4768-BE02-9D969532D960";
+    public const string IID_IFileSaveDialog = "84BCCD23-5FDE-4CDB-AEA4-AF64B83D78AB";
+    public const string IID_IShellItem = "43826D1E-E718-42EE-BC55-A1E261C37BFE";
+    public const string IID_IShellItemArray = "B63EA76D-1F85-456F-A19C-48159EFA858B";
+}
+
+[GeneratedComInterface]
+[Guid(ComIds.IID_IModalWindow)]
+internal partial interface IModalWindow
+{
+    [PreserveSig]
+    int Show(IntPtr parent);
+}
+
+[GeneratedComInterface]
+[Guid(ComIds.IID_IShellItem)]
+internal partial interface IShellItem
+{
+    [PreserveSig]
+    int BindToHandler(IntPtr bindContext, in Guid handler, in Guid interfaceId, out IntPtr result);
+
+    [PreserveSig]
+    int GetParent(out IShellItem parent);
+
+    [PreserveSig]
+    int GetDisplayName(SIGDN displayName, out IntPtr name);
+
+    [PreserveSig]
+    int GetAttributes(uint mask, out uint attributes);
+
+    [PreserveSig]
+    int Compare(IShellItem item, uint hint, out int order);
+}
+
+[GeneratedComInterface]
+[Guid(ComIds.IID_IShellItemArray)]
+internal partial interface IShellItemArray
+{
+    [PreserveSig]
+    int BindToHandler(IntPtr bindContext, in Guid handler, in Guid interfaceId, out IntPtr result);
+
+    [PreserveSig]
+    int GetPropertyStore(uint flags, in Guid interfaceId, out IntPtr propertyStore);
+
+    [PreserveSig]
+    int GetPropertyDescriptionList(IntPtr keyType, in Guid interfaceId, out IntPtr descriptionList);
+
+    [PreserveSig]
+    int GetAttributes(uint flags, uint mask, out uint attributes);
+
+    [PreserveSig]
+    int GetCount(out uint count);
+
+    [PreserveSig]
+    int GetItemAt(uint index, out IShellItem item);
+}
+
+[GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
+[Guid(ComIds.IID_IFileDialog)]
+internal partial interface IFileDialog : IModalWindow
+{
+    [PreserveSig]
+    int SetFileTypes(uint count, in COMDLG_FILTERSPEC filters);
+
+    [PreserveSig]
+    int SetFileTypeIndex(uint index);
+
+    [PreserveSig]
+    int GetFileTypeIndex(out uint index);
+
+    [PreserveSig]
+    int Advise(IntPtr events, out uint cookie);
+
+    [PreserveSig]
+    int Unadvise(uint cookie);
+
+    [PreserveSig]
+    int SetOptions(FOS options);
+
+    [PreserveSig]
+    int GetOptions(out FOS options);
+
+    [PreserveSig]
+    int SetDefaultFolder(IShellItem folder);
+
+    [PreserveSig]
+    int SetFolder(IShellItem folder);
+
+    [PreserveSig]
+    int GetFolder(out IShellItem folder);
+
+    [PreserveSig]
+    int GetCurrentSelection(out IShellItem item);
+
+    [PreserveSig]
+    int SetFileName(string name);
+
+    [PreserveSig]
+    int GetFileName(out IntPtr name);
+
+    [PreserveSig]
+    int SetTitle(string title);
+
+    [PreserveSig]
+    int SetOkButtonLabel(string text);
+
+    [PreserveSig]
+    int SetFileNameLabel(string label);
+
+    [PreserveSig]
+    int GetResult(out IShellItem item);
+
+    [PreserveSig]
+    int AddPlace(IShellItem item, int location);
+
+    [PreserveSig]
+    int SetDefaultExtension(string extension);
+
+    [PreserveSig]
+    int Close(int result);
+
+    [PreserveSig]
+    int SetClientGuid(in Guid guid);
+
+    [PreserveSig]
+    int ClearClientData();
+
+    [PreserveSig]
+    int SetFilter(IntPtr filter);
+}
+
+[GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
+[Guid(ComIds.IID_IFileOpenDialog)]
+internal partial interface IFileOpenDialog : IFileDialog
+{
+    [PreserveSig]
+    int GetResults(out IShellItemArray results);
+
+    [PreserveSig]
+    int GetSelectedItems(out IntPtr items);
+}
+
+[GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
+[Guid(ComIds.IID_IFileSaveDialog)]
+internal partial interface IFileSaveDialog : IFileDialog
+{
+    [PreserveSig]
+    int SetSaveAsItem(IShellItem item);
+
+    [PreserveSig]
+    int SetProperties(IntPtr propertyStore);
+
+    [PreserveSig]
+    int SetCollectedProperties(IntPtr propertyDescriptionList, int appendDefault);
+
+    [PreserveSig]
+    int GetProperties(out IntPtr propertyStore);
+
+    [PreserveSig]
+    int ApplyProperties(
+        IShellItem item,
+        IntPtr propertyStore,
+        IntPtr owner,
+        IntPtr progressSink);
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct COMDLG_FILTERSPEC
+{
+    internal IntPtr pszName;
+    internal IntPtr pszSpec;
+}
+
+internal enum SIGDN : uint
+{
+    SIGDN_FILESYSPATH = 0x80058000
+}
+
+[Flags]
+internal enum FOS : uint
+{
+    FOS_OVERWRITEPROMPT = 0x2,
+    FOS_STRICTFILETYPES = 0x4,
+    FOS_NOCHANGEDIR = 0x8,
+    FOS_PICKFOLDERS = 0x20,
+    FOS_FORCEFILESYSTEM = 0x40,
+    FOS_ALLNONSTORAGEITEMS = 0x80,
+    FOS_NOVALIDATE = 0x100,
+    FOS_ALLOWMULTISELECT = 0x200,
+    FOS_PATHMUSTEXIST = 0x800,
+    FOS_FILEMUSTEXIST = 0x1000,
+    FOS_CREATEPROMPT = 0x2000,
+    FOS_SHAREAWARE = 0x4000,
+    FOS_NOREADONLYRETURN = 0x8000,
+    FOS_NOTESTFILECREATE = 0x10000,
+    FOS_HIDEMRUPLACES = 0x20000,
+    FOS_HIDEPINNEDPLACES = 0x40000,
+    FOS_NODEREFERENCELINKS = 0x100000,
+    FOS_DONTADDTORECENT = 0x2000000,
+    FOS_FORCESHOWHIDDEN = 0x10000000,
+    FOS_DEFAULTNOMINIMODE = 0x20000000
+}
+
+#endregion
+
 #region ====Structs====
+
 internal enum WindowExStyles : int
 {
     // Extended Styles
@@ -100,6 +318,7 @@ internal enum Msg : uint
     WM_ACTIVATE = 0x0006,
     WM_SETFOCUS = 0x0007,
     WM_KILLFOCUS = 0x0008,
+
     //              public const uint WM_SETVISIBLE           = 0x0009;
     WM_ENABLE = 0x000A,
     WM_SETREDRAW = 0x000B,
@@ -114,6 +333,7 @@ internal enum Msg : uint
     WM_ERASEBKGND = 0x0014,
     WM_SYSCOLORCHANGE = 0x0015,
     WM_ENDSESSION = 0x0016,
+
     //              public const uint WM_SYSTEMERROR          = 0x0017;
     WM_SHOWWINDOW = 0x0018,
     WM_CTLCOLOR = 0x0019,
@@ -132,6 +352,7 @@ internal enum Msg : uint
     WM_PAINTICON = 0x0026,
     WM_ICONERASEBKGND = 0x0027,
     WM_NEXTDLGCTL = 0x0028,
+
     //              public const uint WM_ALTTABACTIVE         = 0x0029;
     WM_SPOOLERSTATUS = 0x002A,
     WM_DRAWITEM = 0x002B,
@@ -143,14 +364,17 @@ internal enum Msg : uint
     WM_GETFONT = 0x0031,
     WM_SETHOTKEY = 0x0032,
     WM_GETHOTKEY = 0x0033,
+
     //              public const uint WM_FILESYSCHANGE        = 0x0034;
     //              public const uint WM_ISACTIVEICON         = 0x0035;
     //              public const uint WM_QUERYPARKICON        = 0x0036;
     WM_QUERYDRAGICON = 0x0037,
     WM_COMPAREITEM = 0x0039,
+
     //              public const uint WM_TESTING              = 0x003a;
     //              public const uint WM_OTHERWINDOWCREATED = 0x003c;
     WM_GETOBJECT = 0x003D,
+
     //                      public const uint WM_ACTIVATESHELLWINDOW        = 0x003e;
     WM_COMPACTING = 0x0041,
     WM_COMMNOTIFY = 0x0044,
@@ -182,6 +406,7 @@ internal enum Msg : uint
     WM_NCACTIVATE = 0x0086,
     WM_GETDLGCODE = 0x0087,
     WM_SYNCPAINT = 0x0088,
+
     //              public const uint WM_SYNCTASK       = 0x0089;
     WM_NCMOUSEMOVE = 0x00A0,
     WM_NCLBUTTONDOWN = 0x00A1,
@@ -193,6 +418,7 @@ internal enum Msg : uint
     WM_NCMBUTTONDOWN = 0x00A7,
     WM_NCMBUTTONUP = 0x00A8,
     WM_NCMBUTTONDBLCLK = 0x00A9,
+
     //              public const uint WM_NCXBUTTONDOWN    = 0x00ab;
     //              public const uint WM_NCXBUTTONUP      = 0x00ac;
     //              public const uint WM_NCXBUTTONDBLCLK  = 0x00ad;
@@ -218,6 +444,7 @@ internal enum Msg : uint
     WM_VSCROLL = 0x0115,
     WM_INITMENU = 0x0116,
     WM_INITMENUPOPUP = 0x0117,
+
     //              public const uint WM_SYSTIMER       = 0x0118;
     WM_MENUSELECT = 0x011F,
     WM_MENUCHAR = 0x0120,
@@ -254,6 +481,7 @@ internal enum Msg : uint
     WM_MOUSEWHEEL = 0x020A,
     WM_MOUSEHWHEEL = 0x020E,
     WM_MOUSELAST = 0x020D,
+
     //              public const uint WM_XBUTTONDOWN      = 0x020B;
     //              public const uint WM_XBUTTONUP        = 0x020C;
     //              public const uint WM_XBUTTONDBLCLK    = 0x020D;
@@ -264,6 +492,7 @@ internal enum Msg : uint
     WM_SIZING = 0x0214,
     WM_CAPTURECHANGED = 0x0215,
     WM_MOVING = 0x0216,
+
     //              public const uint WM_POWERBROADCAST   = 0x0218;
     WM_DEVICECHANGE = 0x0219,
     WM_MDICREATE = 0x0220,
@@ -276,6 +505,7 @@ internal enum Msg : uint
     WM_MDICASCADE = 0x0227,
     WM_MDIICONARRANGE = 0x0228,
     WM_MDIGETACTIVE = 0x0229,
+
     /* D&D messages */
     //              public const uint WM_DROPOBJECT     = 0x022A;
     //              public const uint WM_QUERYDROPOBJECT  = 0x022B;
@@ -390,7 +620,7 @@ internal enum GetSysColorIndex
     COLOR_3DHIGHLIGHT = 20,
     COLOR_3DHILIGHT = 20,
     COLOR_BTNHILIGHT = 20,
-    COLOR_MAXVALUE = 24,/* Maximum value */
+    COLOR_MAXVALUE = 24, /* Maximum value */
 }
 
 internal enum LoadCursorType
@@ -645,10 +875,8 @@ internal struct WNDCLASS
     internal IntPtr hIcon;
     internal IntPtr hCursor;
     internal IntPtr hbrBackground;
-    [MarshalAs(UnmanagedType.LPWStr)]
-    internal string lpszMenuName;
-    [MarshalAs(UnmanagedType.LPWStr)]
-    internal string lpszClassName;
+    [MarshalAs(UnmanagedType.LPWStr)] internal string lpszMenuName;
+    [MarshalAs(UnmanagedType.LPWStr)] internal string lpszClassName;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -693,113 +921,121 @@ internal struct PAINTSTRUCT
     internal int Reserved7;
     internal int Reserved8;
 }
+
 #endregion
 
-internal static class WinApi
+internal static partial class WinApi
 {
     [DllImport("user32.dll", EntryPoint = "SetProcessDPIAware", CallingConvention = CallingConvention.StdCall)]
     internal static extern int Win32SetProcessDPIAware();
 
-    [DllImport("user32.dll", EntryPoint = "CreateWindowExW", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32CreateWindow(WindowExStyles dwExStyle, string lpClassName, string lpWindowName, WindowStyles dwStyle,
+    [DllImport("user32.dll", EntryPoint = "CreateWindowExW", CharSet = CharSet.Unicode,
+        CallingConvention = CallingConvention.StdCall)]
+    internal static extern IntPtr Win32CreateWindow(WindowExStyles dwExStyle, string lpClassName, string lpWindowName,
+        WindowStyles dwStyle,
         int x, int y, int nWidth, int nHeight, IntPtr hWndParent, IntPtr hMenu, IntPtr hInstance, IntPtr lParam);
 
     [DllImport("user32.dll", EntryPoint = "DestroyWindow", CallingConvention = CallingConvention.StdCall)]
-    internal extern static bool Win32DestroyWindow(IntPtr hWnd);
+    internal static extern bool Win32DestroyWindow(IntPtr hWnd);
 
     [DllImport("user32.dll", EntryPoint = "ShowWindow", CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32ShowWindow(IntPtr hwnd, WindowPlacementFlags nCmdShow);
+    internal static extern IntPtr Win32ShowWindow(IntPtr hwnd, WindowPlacementFlags nCmdShow);
 
     [DllImport("user32.dll", EntryPoint = "GetDpiForSystem", CallingConvention = CallingConvention.StdCall)]
-    internal extern static uint Win32GetDpiForSystem();
+    internal static extern uint Win32GetDpiForSystem();
 
     [DllImport("user32.dll", EntryPoint = "GetClientRect", CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32GetClientRect(IntPtr hWnd, out RECT rect);
+    internal static extern IntPtr Win32GetClientRect(IntPtr hWnd, out RECT rect);
 
     [DllImport("user32.dll", EntryPoint = "GetMessage", CallingConvention = CallingConvention.StdCall)]
-    internal extern static int Win32GetMessage(ref MSG msg, IntPtr hWnd, uint wFilterMin, uint wFilterMax);
+    internal static extern int Win32GetMessage(ref MSG msg, IntPtr hWnd, uint wFilterMin, uint wFilterMax);
 
     [DllImport("user32.dll", EntryPoint = "TranslateMessage", CallingConvention = CallingConvention.StdCall)]
-    internal extern static bool Win32TranslateMessage(ref MSG msg);
+    internal static extern bool Win32TranslateMessage(ref MSG msg);
 
     [DllImport("user32.dll", EntryPoint = "DispatchMessage", CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32DispatchMessage(ref MSG msg);
+    internal static extern IntPtr Win32DispatchMessage(ref MSG msg);
 
-    [DllImport("user32.dll", EntryPoint = "PostMessageW", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-    internal extern static bool Win32PostMessage(IntPtr hwnd, Msg msg, IntPtr wParam, IntPtr lParam);
+    [DllImport("user32.dll", EntryPoint = "PostMessageW", CharSet = CharSet.Unicode,
+        CallingConvention = CallingConvention.StdCall)]
+    internal static extern bool Win32PostMessage(IntPtr hwnd, Msg msg, IntPtr wParam, IntPtr lParam);
 
     [DllImport("user32.dll", EntryPoint = "PostQuitMessage", CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32PostQuitMessage(int nExitCode);
+    internal static extern IntPtr Win32PostQuitMessage(int nExitCode);
 
-    [DllImport("user32.dll", EntryPoint = "RegisterClassW", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-    internal extern static bool Win32RegisterClass(ref WNDCLASS wndClass);
+    [DllImport("user32.dll", EntryPoint = "RegisterClassW", CharSet = CharSet.Unicode,
+        CallingConvention = CallingConvention.StdCall)]
+    internal static extern bool Win32RegisterClass(ref WNDCLASS wndClass);
 
-    [DllImport("user32.dll", EntryPoint = "DefWindowProcW", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32DefWindowProc(IntPtr hWnd, Msg Msg, IntPtr wParam, IntPtr lParam);
+    [DllImport("user32.dll", EntryPoint = "DefWindowProcW", CharSet = CharSet.Unicode,
+        CallingConvention = CallingConvention.StdCall)]
+    internal static extern IntPtr Win32DefWindowProc(IntPtr hWnd, Msg Msg, IntPtr wParam, IntPtr lParam);
 
     [DllImport("user32.dll", EntryPoint = "GetDC", CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32GetDC(IntPtr hWnd);
+    internal static extern IntPtr Win32GetDC(IntPtr hWnd);
 
     [DllImport("user32.dll", EntryPoint = "GetWindowDC", CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32GetWindowDC(IntPtr hWnd);
+    internal static extern IntPtr Win32GetWindowDC(IntPtr hWnd);
 
     [DllImport("user32.dll", EntryPoint = "ReleaseDC", CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32ReleaseDC(IntPtr hWnd, IntPtr hDC);
+    internal static extern IntPtr Win32ReleaseDC(IntPtr hWnd, IntPtr hDC);
 
     [DllImport("user32.dll", EntryPoint = "UpdateWindow", CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32UpdateWindow(IntPtr hWnd);
+    internal static extern IntPtr Win32UpdateWindow(IntPtr hWnd);
 
     [DllImport("user32.dll", EntryPoint = "InvalidateRect", CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32InvalidateRect(IntPtr hWnd, IntPtr rect, bool bErase);
+    internal static extern IntPtr Win32InvalidateRect(IntPtr hWnd, IntPtr rect, bool bErase);
 
     [DllImport("user32.dll", EntryPoint = "BeginPaint", CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32BeginPaint(IntPtr hWnd, ref PAINTSTRUCT ps);
+    internal static extern IntPtr Win32BeginPaint(IntPtr hWnd, ref PAINTSTRUCT ps);
 
     [DllImport("user32.dll", EntryPoint = "EndPaint", CallingConvention = CallingConvention.StdCall)]
-    internal extern static bool Win32EndPaint(IntPtr hWnd, ref PAINTSTRUCT ps);
+    internal static extern bool Win32EndPaint(IntPtr hWnd, ref PAINTSTRUCT ps);
 
     [DllImport("gdi32.dll", EntryPoint = "BitBlt", CallingConvention = CallingConvention.StdCall)]
     internal static extern bool Win32BitBlt(IntPtr hObject, int nXDest, int nYDest, int nWidth,
         int nHeight, IntPtr hObjSource, int nXSrc, int nYSrc, uint dwRop);
 
     [DllImport("gdi32.dll", EntryPoint = "StretchDIBits", CallingConvention = CallingConvention.StdCall)]
-    internal static unsafe extern int Win32StretchDIBits(IntPtr hdc, int xDest, int yDest, int destWidth, int destHeight,
+    internal static unsafe extern int Win32StretchDIBits(IntPtr hdc, int xDest, int yDest, int destWidth,
+        int destHeight,
         int xSrc, int ySrc, int srcWidth, int srcHeight, void* lpBits, void* lpbmi, uint iUsage, uint rop);
 
-    [DllImport("user32.dll", EntryPoint = "LoadCursorW", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32LoadCursor(IntPtr hInstance, LoadCursorType type);
+    [DllImport("user32.dll", EntryPoint = "LoadCursorW", CharSet = CharSet.Unicode,
+        CallingConvention = CallingConvention.StdCall)]
+    internal static extern IntPtr Win32LoadCursor(IntPtr hInstance, LoadCursorType type);
 
     [DllImport("user32.dll", EntryPoint = "SetCursor", CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32SetCursor(IntPtr hCursor);
+    internal static extern IntPtr Win32SetCursor(IntPtr hCursor);
 
     [DllImport("user32.dll", EntryPoint = "GetKeyState", CallingConvention = CallingConvention.StdCall)]
-    internal extern static short Win32GetKeyState(VirtualKeys nVirtKey);
+    internal static extern short Win32GetKeyState(VirtualKeys nVirtKey);
 
     [DllImport("user32.dll", EntryPoint = "OpenClipboard", CallingConvention = CallingConvention.StdCall)]
-    internal extern static bool Win32OpenClipboard(IntPtr hwnd);
+    internal static extern bool Win32OpenClipboard(IntPtr hwnd);
 
     [DllImport("user32.dll", EntryPoint = "CloseClipboard", CallingConvention = CallingConvention.StdCall)]
-    internal extern static bool Win32CloseClipboard();
+    internal static extern bool Win32CloseClipboard();
 
     [DllImport("user32.dll", EntryPoint = "EmptyClipboard", CallingConvention = CallingConvention.StdCall)]
-    internal extern static bool Win32EmptyClipboard();
+    internal static extern bool Win32EmptyClipboard();
 
     [DllImport("user32.dll", EntryPoint = "GetClipboardData", CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32GetClipboardData(uint format);
+    internal static extern IntPtr Win32GetClipboardData(uint format);
 
     [DllImport("user32.dll", EntryPoint = "SetClipboardData", CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32SetClipboardData(uint format, IntPtr handle);
+    internal static extern IntPtr Win32SetClipboardData(uint format, IntPtr handle);
 
     [DllImport("kernel32.dll", EntryPoint = "GlobalAlloc", CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32GlobalAlloc(GAllocFlags Flags, int dwBytes);
+    internal static extern IntPtr Win32GlobalAlloc(GAllocFlags flags, int dwBytes);
 
     [DllImport("kernel32.dll", EntryPoint = "GlobalLock", CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32GlobalLock(IntPtr hMem);
+    internal static extern IntPtr Win32GlobalLock(IntPtr hMem);
 
     [DllImport("kernel32.dll", EntryPoint = "GlobalUnlock", CallingConvention = CallingConvention.StdCall)]
-    internal extern static IntPtr Win32GlobalUnlock(IntPtr hMem);
+    internal static extern IntPtr Win32GlobalUnlock(IntPtr hMem);
 
-    internal unsafe static IntPtr CopyToMoveableMemory(Span<byte> data, bool forString)
+    internal static unsafe IntPtr CopyToMoveableMemory(Span<byte> data, bool forString)
     {
         if (data == null || data.Length == 0)
             throw new ArgumentException("Can't create a zero length memory block.");
@@ -819,8 +1055,31 @@ internal static class WinApi
             dest[data.Length] = 0;
             dest[data.Length + 1] = 0;
         }
+
         Win32GlobalUnlock(hmem);
         return hmem;
     }
 
+    [LibraryImport("ole32.dll")]
+    private static partial int CoCreateInstance(in Guid classId, IntPtr outer, uint context, in Guid interfaceId,
+        out IntPtr instance);
+
+    [LibraryImport("ole32.dll")]
+    internal static partial void CoTaskMemFree(IntPtr memory);
+
+    internal static unsafe T CreateComInstance<T>(Guid classId, Guid interfaceId)
+    {
+        const uint ClsctxInprocServer = 0x1;
+        var res = CoCreateInstance(in classId, IntPtr.Zero, ClsctxInprocServer, in interfaceId, out var comPt);
+        Marshal.ThrowExceptionForHR(res);
+        try
+        {
+            return ComInterfaceMarshaller<T>.ConvertToManaged((void*)comPt)
+                   ?? throw new InvalidOperationException("COM returned a null.");
+        }
+        finally
+        {
+            ComInterfaceMarshaller<IFileSaveDialog>.Free((void*)comPt);
+        }
+    }
 }
