@@ -22,6 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\PixUI.CodeEditor.Roslyn\PixUI.CodeEditor.Roslyn.csproj" />
       <ProjectReference Include="..\PixUI.CodeEditor.Text\PixUI.CodeEditor.Text.csproj" />
       <ProjectReference Include="..\PixUI.CodeEditor.TreeSitter\PixUI.CodeEditor.TreeSitter.csproj" />
       <ProjectReference Include="..\PixUI.CodeEditor\PixUI.CodeEditor.csproj" />
@@ -128,7 +129,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsMacOS)'=='true' And '$(IsArm64)'=='true'">
-        <None Include="..\PixUI.Platform.Mac\libs\osx-arm64\libskia.dylib">
+        <None Include="..\..\out\macos\ganesh-arm64\libskia.dylib">
             <Link>libskia.dylib</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>

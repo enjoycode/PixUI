@@ -7,7 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="5.9.0" />
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.9.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\PixUI.CodeEditor.Text\PixUI.CodeEditor.Text.csproj" />
+      <ProjectReference Include="..\PixUI.CodeEditor\PixUI.CodeEditor.csproj" />
+      <ProjectReference Include="..\PixUI.Widgets\PixUI.Widgets.csproj" />
     </ItemGroup>
 
 </Project>
