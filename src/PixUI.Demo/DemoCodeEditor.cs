@@ -1,7 +1,8 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using PixUI.CodeEditor;
+using PixUI.CodeEditor.Roslyn;
 
 namespace PixUI.Demo.Mac;
 
@@ -27,13 +28,34 @@ public sealed class Person
 } //中国 */
 ";
 
+    private readonly RoslynWorkspace _workspace;
+    private readonly ProjectId _projectId;
+    private readonly DocumentId _documentId;
+    private readonly RoslynSourceText _sourceText;
+
     public DemoCodeEditor()
     {
-        _controller = new CodeEditorController("Demo.cs", 
-            new ImmutableTextBuffer(), 
-            new TreeSitterSyntaxParser(),
-            new MockCompletionProvider());
-        _controller.Document.Open(SrcCode);
+        _workspace = new RoslynWorkspace();
+        _projectId = ProjectId.CreateNewId();
+        _documentId = DocumentId.CreateNewId(_projectId);
+
+        var prjInfo = ProjectInfo.Create(_projectId, VersionStamp.Create(),
+            "TestProject", "TestProject", LanguageNames.CSharp, null, null,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                .WithNullableContextOptions(NullableContextOptions.Enable),
+            new CSharpParseOptions().WithLanguageVersion(LanguageVersion.CSharp14));
+
+        var solution = _workspace.CurrentSolution.AddProject(prjInfo)
+            .AddMetadataReference(_projectId, MetadataReference.CreateFromFile(typeof(object).Assembly.Location))
+            .AddMetadataReference(_projectId, MetadataReference.CreateFromFile(typeof(Console).Assembly.Location))
+            .AddDocument(_documentId, "Demo.cs", string.Empty);
+        _workspace.TryApplyChanges(solution);
+        _sourceText = new RoslynSourceText(_workspace, _documentId);
+        _controller = new CodeEditorController("Demo.cs",
+            _sourceText,
+            new RoslynSyntaxParser(_sourceText),
+            new RoslynCompletionProvider(_workspace),
+            _documentId);
 
         Child = new Column
         {
@@ -61,42 +83,19 @@ public sealed class Person
             }
         };
     }
-}
 
-internal sealed class MockCompletionProvider : ICompletionProvider
-{
-    public IEnumerable<char> TriggerCharacters => ['.'];
-
-    public Task<IList<ICompletionItem>?> ProvideCompletionItems(global::PixUI.CodeEditor.Document document,
-        int offset, string? completionWord)
+    protected override async void OnMounted()
     {
-        var list = new List<ICompletionItem>
-        {
-            new CompletionItem(CompletionItemKind.Class, "Person"),
-            new CompletionItem(CompletionItemKind.Method, "SayHello"),
-            new CompletionItem(CompletionItemKind.Method, "SayHi"),
-            new CompletionItem(CompletionItemKind.Keyword, "where"),
-            new CompletionItem(CompletionItemKind.Interface, "IEquatable")
-        };
-        if (completionWord != null)
-            list = list.Where(t => t.Label.StartsWith(completionWord!)).ToList();
-        return Task.FromResult<IList<ICompletionItem>?>(list);
-    }
+        base.OnMounted();
 
-    private sealed class CompletionItem : ICompletionItem
-    {
-        public CompletionItemKind Kind { get; }
-        public string Label { get; }
-        public string? InsertText { get; }
-        public string? Detail { get; }
-
-        public CompletionItem(CompletionItemKind kind, string label, string? insertText = null,
-            string? detail = null)
+        try
         {
-            Kind = kind;
-            Label = label;
-            InsertText = insertText;
-            Detail = detail;
+            await _sourceText.Open();
+            _controller.Document.Open(SrcCode);
+        }
+        catch (Exception)
+        {
+            Notification.Error("Can't open RoslynSourceText");
         }
     }
 }

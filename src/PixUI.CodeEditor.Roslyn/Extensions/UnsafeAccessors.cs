@@ -20,4 +20,7 @@ internal static class UnsafeAccessors
     
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_EndPosition")]
     internal static extern int SyntaxNodeOrTokenGetEndPosition(ref readonly SyntaxNodeOrToken nodeOrToken);
+    
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_ProviderName")]
+    internal static extern string? CompletionItemGetProviderName(Microsoft.CodeAnalysis.Completion.CompletionItem completionItem);
 }

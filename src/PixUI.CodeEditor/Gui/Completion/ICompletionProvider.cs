@@ -8,6 +8,11 @@ public interface ICompletionItem
     CompletionItemKind Kind { get; }
     string Label { get; }
     string? InsertText { get; }
+    
+    /// <summary>
+    /// A human-readable string with additional information
+    /// about this item, like type or symbol information
+    /// </summary>
     string? Detail { get; }
 }
 
