@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Completion;
 using Microsoft.CodeAnalysis.CSharp.Formatting;
 using Microsoft.CodeAnalysis.Host;
 using Microsoft.CodeAnalysis.Host.Mef;
@@ -20,6 +20,11 @@ public class RoslynWorkspace : Workspace
         : base(aggregator.CreateHostServices(), "Custom")
     {
         // BufferManager = new BufferManager(this);
+        if (OperatingSystem.IsBrowser())
+        {
+            //this.Services.HostServices
+            Console.WriteLine("");
+        }
     }
 
     public override bool CanOpenDocuments => true;
@@ -87,12 +92,18 @@ public sealed class HostServicesAggregator
     {
         var builder = ImmutableHashSet.CreateBuilder<Assembly>();
 
+        // var type = typeof(Microsoft.CodeAnalysis.CodeGeneration.CodeGenerationTypeSymbol);
+        var assembly = Assembly.Load("Microsoft.CodeAnalysis");
+        
         // We always include the default Roslyn assemblies:
-        builder.Add(typeof(Workspace).Assembly); //Microsoft.CodeAnalysis.Workspaces
-        builder.Add(typeof(CompletionItem).Assembly); //Microsoft.CodeAnalysis.Features
+        if (OperatingSystem.IsBrowser())
+        {
+            builder.Add(typeof(WebPersistentStorageService).Assembly);
+        }
+        builder.Add(typeof(Microsoft.CodeAnalysis.Workspace).Assembly); //Microsoft.CodeAnalysis.Workspaces
+        builder.Add(typeof(Microsoft.CodeAnalysis.Completion.CompletionItem).Assembly); //Microsoft.CodeAnalysis.Features
         builder.Add(typeof(CSharpFormattingOptions).Assembly); //Microsoft.CodeAnalysis.CSharp.Workspaces
         builder.Add(Assembly.Load("Microsoft.CodeAnalysis.CSharp.Features")); //Microsoft.CodeAnalysis.CSharp.Features
-
         _assemblies = builder.ToImmutableArray();
     }
 

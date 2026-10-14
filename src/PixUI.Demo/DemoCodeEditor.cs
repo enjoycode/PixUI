@@ -1,4 +1,6 @@
 using System;
+using System.Reflection;
+using System.Reflection.Metadata;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using PixUI.CodeEditor;
@@ -46,8 +48,8 @@ public sealed class Person
             new CSharpParseOptions().WithLanguageVersion(LanguageVersion.CSharp14));
 
         var solution = _workspace.CurrentSolution.AddProject(prjInfo)
-            .AddMetadataReference(_projectId, MetadataReference.CreateFromFile(typeof(object).Assembly.Location))
-            .AddMetadataReference(_projectId, MetadataReference.CreateFromFile(typeof(Console).Assembly.Location))
+            .AddMetadataReference(_projectId, CreateMetadataReference(typeof(object).Assembly))
+            .AddMetadataReference(_projectId, CreateMetadataReference(typeof(Console).Assembly))
             .AddDocument(_documentId, "Demo.cs", string.Empty);
         _workspace.TryApplyChanges(solution);
         _sourceText = new RoslynSourceText(_workspace, _documentId);
@@ -82,6 +84,19 @@ public sealed class Person
                 }
             }
         };
+    }
+
+    private static MetadataReference CreateMetadataReference(Assembly assembly)
+    {
+        unsafe
+        {
+            if (assembly.TryGetRawMetadata(out var blob, out var len))
+            {
+                var metadata = ModuleMetadata.CreateFromMetadata((IntPtr)blob, len);
+                return AssemblyMetadata.Create(metadata).GetReference();
+            }
+        }
+        throw new NotSupportedException($"Assembly '{assembly}' doesn't have a MetadataReference.");
     }
 
     protected override async void OnMounted()

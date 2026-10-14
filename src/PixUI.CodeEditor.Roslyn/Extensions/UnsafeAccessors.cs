@@ -6,7 +6,7 @@ namespace PixUI.CodeEditor.Roslyn;
 internal static class UnsafeAccessors
 {
     private const string GreenNodeType = "Microsoft.CodeAnalysis.GreenNode, Microsoft.CodeAnalysis";
-    
+
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_UnderlyingNode")]
     [return: UnsafeAccessorType(GreenNodeType)]
     internal static extern object SyntaxTriviaGetUnderlyingNode(ref readonly SyntaxTrivia syntaxTrivia);
@@ -17,10 +17,11 @@ internal static class UnsafeAccessors
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_Position")]
     internal static extern int SyntaxNodeOrTokenGetPosition(ref readonly SyntaxNodeOrToken nodeOrToken);
-    
+
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_EndPosition")]
     internal static extern int SyntaxNodeOrTokenGetEndPosition(ref readonly SyntaxNodeOrToken nodeOrToken);
-    
+
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_ProviderName")]
-    internal static extern string? CompletionItemGetProviderName(Microsoft.CodeAnalysis.Completion.CompletionItem completionItem);
+    internal static extern string? CompletionItemGetProviderName(
+        Microsoft.CodeAnalysis.Completion.CompletionItem completionItem);
 }
