@@ -84,7 +84,27 @@ public class FontTest
         ph.Layout(500);
         Console.WriteLine($"{ph.LongestLine} {ph.MaxIntrinsicWidth} {ph.Height}");
 
-        var textBlobPtr = SkiaApi.sk_paragraph_get_line_first_textblob(((SKParagraph)ph).Handle, 0);
-        Console.WriteLine(textBlobPtr);
+        // var textBlobPtr = SkiaApi.sk_paragraph_get_line_first_textblob(((SKParagraph)ph).Handle, 0);
+        // Console.WriteLine(textBlobPtr);
+    }
+
+    [Test]
+    public void ParagraphRelayoutTest()
+    {
+        using var ts = TextStyle.Create(Colors.Red, 1);
+        ts.FontSize = 12;
+        //ts.SetFontFamilies(new[] { FontCollection.DefaultFamilyName });
+        using var ps = ParagraphStyle.Create();
+        using var pb = ParagraphBuilder.Create(ps);
+        pb.PushStyle(ts);
+        pb.AddText("This is long long long long long long line text");
+        pb.Pop();
+        using var ph = pb.Build();
+        ph.Layout(500);
+        Console.WriteLine($"longLine: {ph.LongestLine} maxWidth: {ph.MaxIntrinsicWidth} height: {ph.Height} lines: {ph.Lines}");
+        
+        //重新限制宽度布局
+        ph.Layout(100);
+        Console.WriteLine($"longLine: {ph.LongestLine} maxWidth: {ph.MaxIntrinsicWidth} height: {ph.Height} lines: {ph.Lines}");
     }
 }

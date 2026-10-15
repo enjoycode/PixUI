@@ -107,6 +107,7 @@
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.CodeEditor.UnsafeAccessorTest.NodeOrTokenTest&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.Markdown.MarkdownAstTest.FirstAstTest&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.Markdown.MarkdownAstTest.ModifyAstTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.FontTest.ParagraphRelayoutTest&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	
