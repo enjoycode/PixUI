@@ -2,6 +2,7 @@ using System;
 using Facebook.Yoga;
 using NUnit.Framework;
 using PixUI.Drawing.Skia;
+using PixUI.Markdown;
 
 namespace PixUI.UnitTests.Markdown;
 
@@ -48,17 +49,17 @@ public class YogaTest
         root.Style.AlignItems = Align.FlexStart; //所有子对象交叉轴收缩
 
         var text1 = new Node();
-        YGNodeAPI.YGNodeInsertChild(root, text1, 0);
+        root.AppendChild(text1);
         // text1.Style.AlignSelf = Align.FlexStart; //交叉轴收缩宽
         text1.SetContext("Text1");
         text1.SetMeasureFunc(MeasureString);
 
         var text2 = new Node();
-        YGNodeAPI.YGNodeInsertChild(root, text2, 1);
+        root.AppendChild(text2);
         text2.SetContext("Text2: long long long long long long long line text2");
 
         var text3 = new Node();
-        YGNodeAPI.YGNodeInsertChild(root, text3, 2);
+        root.AppendChild(text3);
         text2.SetMeasureFunc(MeasureString);
         text3.SetContext("Text3");
         text3.SetMeasureFunc(MeasureString);
@@ -66,18 +67,50 @@ public class YogaTest
         LayoutAlgorithm.CalculateLayout(root, 200, float.NaN, Direction.LTR);
         DumpLayout(root);
 
-        // //修改宽度约束检查重新布局
-        // LayoutAlgorithm.CalculateLayout(root, 400, float.NaN, Direction.LTR);
-        // DumpLayout(root);
-
-        //修改节点检查增量布局
-        text2.SetContext("Text2: modified");
-        text2.MarkDirtyAndPropagate();
+        //修改宽度约束检查重新布局
         LayoutAlgorithm.CalculateLayout(root, 400, float.NaN, Direction.LTR);
         DumpLayout(root);
-        
-        // LayoutAlgorithm.CalculateLayout(root, 400, float.NaN, Direction.LTR);
-        // DumpLayout(root);
+    }
+
+    [Test(Description = "测试增量布局")]
+    public void YogaIncrementalTest()
+    {
+        var root = new Node();
+        root.SetContext("Root");
+
+        var child1 = new Node();
+        child1.SetContext("Child1");
+        child1.SetStyleSize(100, 100);
+        root.AppendChild(child1);
+
+        var child1_1 = new Node();
+        child1_1.SetContext("Child1_1");
+        child1_1.SetStyleSize(50, 50);
+        child1.AppendChild(child1_1);
+
+        var child2 = new Node();
+        child2.SetContext("Child2");
+        child2.SetStyleSize(200, 200);
+        root.AppendChild(child2);
+
+        //第一次布局
+        LayoutAlgorithm.CalculateLayout(root, float.NaN, float.NaN, Direction.LTR);
+        ApplyLayout(root);
+        DumpLayout(root);
+
+        //修改第二子节点的大小检查增量布局
+        child2.SetStyleSize(150, 150);
+        LayoutAlgorithm.CalculateLayout(root, float.NaN, float.NaN, Direction.LTR);
+        DumpLayout(root);
+    }
+
+    private static void ApplyLayout(Node node)
+    {
+        if (!node.HasNewLayout) return;
+
+        node.HasNewLayout = false;
+        foreach (var child in node.GetChildren())
+            ApplyLayout(child);
     }
 
     private static void DumpLayout(Node node, int level = 0)
@@ -93,7 +126,7 @@ public class YogaTest
         var layout = node.GetLayout();
         Console.Write($"X={layout.Position(PhysicalEdge.Left)} Y={layout.Position(PhysicalEdge.Top)} ");
         Console.Write($"W={layout.Dimension(Dimension.Width)} H={layout.Dimension(Dimension.Height)} ");
-        Console.Write($"NL={node.HasNewLayout}");
+        Console.Write($"New={node.HasNewLayout}");
         Console.WriteLine();
 
         if (node.GetChildCount() <= 0) return;
