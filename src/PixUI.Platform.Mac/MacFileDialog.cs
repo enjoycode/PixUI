@@ -47,7 +47,7 @@ internal sealed class MacFileDialog : IPlatformFileDialog
             if (result == 1)
             {
                 var filePath = dialog.Url.Path!;
-                using var fileStream = File.OpenWrite(filePath);
+                using var fileStream = new FileStream(filePath, FileMode.Truncate, FileAccess.Write, FileShare.ReadWrite);
                 options.FileStream.CopyTo(fileStream);
 
                 taskCompletionSource.SetResult();
