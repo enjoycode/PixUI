@@ -4,9 +4,11 @@ namespace PixUI.Demo;
 
 internal sealed class DemoNode
 {
+    public required DemoNode? Parent { get; init; }
+
     public required string Name { get; init; }
 
-    public required List<DemoNode> Children { get; init; }
+    public List<DemoNode> Children { get; } = [];
 
     public bool IsLeaf => Children.Count == 0;
 }

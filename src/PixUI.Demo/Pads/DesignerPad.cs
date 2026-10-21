@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using PixUI.CodeEditor;
 using PixUI.CodeEditor.Roslyn;
@@ -17,9 +19,12 @@ internal sealed class DesignerPad : View
             new RoslynSyntaxParser(_textBuffer),
             new RoslynCompletionProvider(_context.Workspace),
             _context.DocumentId);
+
+        //事件处理
         //_codeEditorController.ContextMenuBuilder = e => ContextMenuService.BuildContextMenu(designContext, e);
         _codeEditorController.Document.DocumentChanged += OnDocumentChanged;
         _delayDocChangedTask = new DelayTask(300, RunDelayTask);
+        _context.TreeController.SelectionChanged += OnDemoChanged;
 
         Child = new Splitter()
         {
@@ -70,5 +75,19 @@ internal sealed class DesignerPad : View
         {
             Notification.Error($"GetProblems error: {e.Message}");
         }
+    }
+
+    private void OnDemoChanged()
+    {
+        var selectedNode = _context.TreeController.FirstSelectedNode;
+        if (selectedNode == null || !selectedNode.Data.IsLeaf) return;
+
+        var demoNode = selectedNode.Data;
+        _context.WidgetTypeName = $"Demo{demoNode.Name}";
+        var resource = $"{PlaygroundContext.ResourcePrefix}{demoNode.Parent!.Name}.Demo{demoNode.Name}.cs";
+        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource)!;
+        using var textReader = new StreamReader(stream);
+        var sourceCode = textReader.ReadToEnd();
+        _codeEditorController.Replace(sourceCode);
     }
 }

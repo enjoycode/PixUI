@@ -326,6 +326,13 @@ public sealed class CodeEditorController : WidgetController<CodeEditorWidget>, I
         SetCaret(caretPos.Line, caretPos.Column);
     }
 
+    public void Replace(string newText)
+    {
+        ClearSelection();
+        Document.Replace(0, Document.TextLength, newText);
+        SetCaret(0, 0);
+    }
+
     #endregion
 
     #region ====Static Helpers====

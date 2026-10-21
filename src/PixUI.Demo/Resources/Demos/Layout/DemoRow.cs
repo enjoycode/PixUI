@@ -1,12 +1,10 @@
-namespace PixUI.Demo;
-
 public class DemoRow : View
 {
     public DemoRow()
     {
         Child = new Center()
         {
-            Child = new Text("Hello World!")
+            Child = new Text("Hello Row!")
         };
     }
 }

@@ -47,6 +47,8 @@ internal sealed class PlaygroundContext
         Workspace.TryApplyChanges(solution);
     }
 
+    public const string ResourcePrefix = "PixUI.Demo.Resources.Demos.";
+    
     private readonly ProjectId _projectId;
     internal readonly DocumentId DocumentId;
     internal readonly RoslynWorkspace Workspace;

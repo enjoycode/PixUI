@@ -41,7 +41,7 @@ internal sealed class TreePad : View
 
     private void BuildTree()
     {
-        var prefix = "PixUI.Demo.Resources.Demos.";
+        var prefix = PlaygroundContext.ResourcePrefix;
         var folders = new List<DemoNode>();
         var spans = new Range[3];
         var resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
@@ -61,11 +61,11 @@ internal sealed class TreePad : View
             var folderNode = folders.FirstOrDefault(f => f.Name == folder);
             if (folderNode == null)
             {
-                folderNode = new DemoNode() { Name = folder, Children = [] };
+                folderNode = new DemoNode() { Parent = null, Name = folder };
                 folders.Add(folderNode);
             }
 
-            var demoNode = new DemoNode() { Name = name, Children = [] };
+            var demoNode = new DemoNode() { Parent = folderNode, Name = name };
             folderNode.Children.Add(demoNode);
         }
 
