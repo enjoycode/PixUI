@@ -54,6 +54,8 @@
         <EmbeddedResource Include="Resources\Cat.webp"/>
         <EmbeddedResource Include="Resources\China.json"/>
         <EmbeddedResource Include="Resources\Demo.pdf"/>
+        <Compile Remove="Resources\Demos\Layout\DemoRow.cs" />
+        <EmbeddedResource Include="Resources\Demos\Layout\DemoRow.cs" />
     </ItemGroup>
 
 </Project>

@@ -18,12 +18,12 @@ public sealed class MacApplication : UIApplication
     public override void BeginInvoke(Action action)
         => NSRunLoop.Main.BeginInvokeOnMainThread(action);
 
-    public static void Run(Widget child)
+    public static void Run(Func<Widget> child)
     {
         // create and run application
         var app = new MacApplication();
         Current = app;
-        app.RunInternal(child);
+        app.RunInternal(child());
     }
 
     private void RunInternal(Widget child)

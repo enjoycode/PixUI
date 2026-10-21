@@ -8,6 +8,6 @@ internal static class MainClass
     private static void Main(string[] args)
     {
         Render.Init(new SkiaRender());
-        MacApplication.Run(new DemoRoute());
+        MacApplication.Run(() => new Playground());
     }
 }
