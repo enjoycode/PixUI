@@ -15,7 +15,7 @@ public sealed class RoslynCompletionProvider : ICompletionProvider
     }
 
     private readonly RoslynWorkspace _workspace;
-    public IEnumerable<char> TriggerCharacters { get; } = ['.'];
+    public IEnumerable<char> TriggerCharacters { get; } = ['.', '<'];
 
     public async Task<IList<ICompletionItem>?> ProvideCompletionItems(Document document, int offset,
         string? completionWord)
@@ -90,7 +90,7 @@ public sealed class RoslynCompletionProvider : ICompletionProvider
         return completionsList;
     }
 
-    private static ImmutableArray<Microsoft.CodeAnalysis.Completion.CompletionItem> FilterCompletionList(
+    private static ImmutableArray<CompletionItem> FilterCompletionList(
         CompletionList completionList, string filterText)
     {
         var cultureInfo = CultureInfo.CurrentCulture;

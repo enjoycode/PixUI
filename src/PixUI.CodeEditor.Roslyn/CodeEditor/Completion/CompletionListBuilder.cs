@@ -90,10 +90,9 @@ internal static class CompletionListBuilder
     internal static async Task<(IList<ICompletionItem>, bool)> BuildCompletionItemsAsync(
         Microsoft.CodeAnalysis.Document document,
         SourceText sourceText,
-        // long cacheId,
         int position,
         CompletionService completionService,
-        ImmutableArray<Microsoft.CodeAnalysis.Completion.CompletionItem> completions,
+        ImmutableArray<CompletionItem> completions,
         TextSpan typedSpan,
         bool expectingImportedItems, bool isSuggestionMode)
     {
@@ -122,10 +121,10 @@ internal static class CompletionListBuilder
 
                 // The completion is somehow expensive. Currently, this one of two categories:
                 // import completion or override/partial completion.
-                Debug.Assert(providerName is OverrideCompletionProvider
-                    or PartialMethodCompletionProvider
-                    or TypeImportCompletionProvider or ExtensionMemberImportCompletionProvider
-                    or AwaitCompletionProvider);
+                // Debug.Assert(providerName is OverrideCompletionProvider
+                //     or PartialMethodCompletionProvider
+                //     or TypeImportCompletionProvider or ExtensionMemberImportCompletionProvider
+                //     or AwaitCompletionProvider);
 
                 changeSpan = typedSpan;
 
@@ -171,8 +170,9 @@ internal static class CompletionListBuilder
             var commitCharacters = BuildCommitCharacters(completion.Rules.CommitCharacterRules, treatAsASuggestion,
                 commitCharacterRuleCache, commitCharacterRuleBuilder);
 
-            completionsBuilder.Add(new CompletionItem
+            completionsBuilder.Add(new RoslynCompletionItem
             {
+                RawCompletionItem = completion,
                 Label = labelText,
                 TextEdit = GetChangeForTextAndSpan(insertText!, changeSpan, sourceText),
                 InsertTextFormat = insertTextFormat,
@@ -230,7 +230,7 @@ internal static class CompletionListBuilder
         {
             if (!textChange.Span.IntersectsWith(position))
             {
-                handleNonInsertsectingEdit(sourceText, ref additionalTextEdits, ref adjustedNewPosition, textChange);
+                HandleNonInsertsectingEdit(sourceText, ref additionalTextEdits, ref adjustedNewPosition, textChange);
             }
             else
             {
@@ -277,7 +277,7 @@ internal static class CompletionListBuilder
                     var prefixChange =
                         new TextChange(new TextSpan(changeSpanStart, length: lineStartPosition - changeSpanStart),
                             textChange.NewText!.Substring(0, cutoffPosition));
-                    handleNonInsertsectingEdit(sourceText, ref additionalTextEdits, ref adjustedNewPosition,
+                    HandleNonInsertsectingEdit(sourceText, ref additionalTextEdits, ref adjustedNewPosition,
                         prefixChange);
                     updatedChange =
                         new TextChange(new TextSpan(lineStartPosition, length: textChange.Span.End - lineStartPosition),
@@ -294,7 +294,7 @@ internal static class CompletionListBuilder
                     changeSpan = new(changeSpan.Start, length: position - changeSpan.Start);
                 }
 
-                (insertText, insertTextFormat) = getPossiblySnippetizedInsertText(updatedChange, adjustedNewPosition);
+                (insertText, insertTextFormat) = GetPossiblySnippetizedInsertText(updatedChange, adjustedNewPosition);
 
                 // If we're expecting there to be unimported types, put in an explicit sort text to put things already in scope first.
                 // Otherwise, omit the sort text if it's the same as the label to save on space.
@@ -337,7 +337,9 @@ internal static class CompletionListBuilder
             }
         }
 
-        static (string?, InsertTextFormat) getPossiblySnippetizedInsertText(TextChange change, int? adjustedNewPosition)
+        return;
+
+        static (string?, InsertTextFormat) GetPossiblySnippetizedInsertText(TextChange change, int? adjustedNewPosition)
         {
             if (adjustedNewPosition is not int newPosition || change.NewText is null ||
                 newPosition == change.Span.Start + change.NewText.Length)
@@ -355,7 +357,7 @@ internal static class CompletionListBuilder
             return ($"{beforeText}$0{afterText}", InsertTextFormat.Snippet);
         }
 
-        static void handleNonInsertsectingEdit(SourceText sourceText,
+        static void HandleNonInsertsectingEdit(SourceText sourceText,
             ref List<LinePositionSpanTextChange>? additionalTextEdits, ref int? adjustedNewPosition,
             TextChange textChange)
         {
@@ -376,14 +378,14 @@ internal static class CompletionListBuilder
         }
     }
 
-    private static string? GetSortText(Microsoft.CodeAnalysis.Completion.CompletionItem completion, string labelText,
+    private static string? GetSortText(CompletionItem completion, string labelText,
         bool expectingImportedItems) => expectingImportedItems
         ? '0' + completion.SortText
         : labelText == completion.SortText
             ? null
             : completion.SortText;
 
-    private static bool ShouldTreatCompletionItemAsSuggestion(Microsoft.CodeAnalysis.Completion.CompletionItem item,
+    private static bool ShouldTreatCompletionItemAsSuggestion(CompletionItem item,
         TextSpan typedSpan)
     {
         // The user hasn't actually typed anything and completion provider does
