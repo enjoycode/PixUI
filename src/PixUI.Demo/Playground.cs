@@ -10,7 +10,7 @@ public sealed class Playground : View
         {
             Children =
             [
-                new HeaderPad(),
+                new MenuPad(context),
                 new Expanded
                 {
                     Child = new Row

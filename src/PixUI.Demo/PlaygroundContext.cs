@@ -27,6 +27,7 @@ internal sealed class PlaygroundContext
             CreateMetadataReference(Assembly.Load("System.Runtime")),
             CreateMetadataReference(Assembly.Load("System.Linq")),
             CreateMetadataReference(typeof(Console).Assembly),
+            CreateMetadataReference(typeof(Color).Assembly),
             CreateMetadataReference(typeof(Widget).Assembly),
             CreateMetadataReference(typeof(DataGrid<>).Assembly),
             CreateMetadataReference(typeof(PieChart).Assembly),
@@ -48,11 +49,12 @@ internal sealed class PlaygroundContext
     }
 
     public const string ResourcePrefix = "PixUI.Demo.Resources.Demos.";
-    
+
     private readonly ProjectId _projectId;
     internal readonly DocumentId DocumentId;
     internal readonly RoslynWorkspace Workspace;
     internal readonly MetadataReference[] References;
+    public Microsoft.CodeAnalysis.Document RoslynDocument => Workspace.CurrentSolution.GetDocument(DocumentId)!;
 
     internal readonly CSharpParseOptions ParseOptions =
         new CSharpParseOptions().WithLanguageVersion(LanguageVersion.Latest);
