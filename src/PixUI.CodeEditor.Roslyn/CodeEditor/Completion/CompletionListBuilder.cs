@@ -82,6 +82,9 @@ internal static class CompletionListBuilder
     internal const string XmlDocCommentCompletionProvider =
         "Microsoft.CodeAnalysis.CSharp.Completion.Providers.XmlDocCommentCompletionProvider";
 
+    internal const string UnnamedSymbolCompletionProvider =
+        "Microsoft.CodeAnalysis.CSharp.Completion.Providers.UnnamedSymbolCompletionProvider";
+
     #endregion
 
     internal static async Task<(IList<ICompletionItem>, bool)> BuildCompletionItemsAsync(
@@ -90,19 +93,18 @@ internal static class CompletionListBuilder
         // long cacheId,
         int position,
         CompletionService completionService,
-        CompletionList completions,
+        ImmutableArray<Microsoft.CodeAnalysis.Completion.CompletionItem> completions,
         TextSpan typedSpan,
         bool expectingImportedItems, bool isSuggestionMode)
     {
-        var completionsBuilder = new List<ICompletionItem>(completions.ItemsList.Count);
+        var completionsBuilder = new List<ICompletionItem>(completions.Length);
         var seenUnimportedCompletions = false;
         var commitCharacterRuleCache =
             new Dictionary<ImmutableArray<CharacterSetModificationRule>, IReadOnlyList<char>>();
         var commitCharacterRuleBuilder = new HashSet<char>();
 
-        for (int i = 0; i < completions.ItemsList.Count; i++)
+        foreach (var completion in completions)
         {
-            var completion = completions.ItemsList[i];
             string labelText = completion.DisplayTextPrefix + completion.DisplayText + completion.DisplayTextSuffix;
             string? insertText;
             string? filterText = null;
@@ -113,20 +115,21 @@ internal static class CompletionListBuilder
             bool hasAfterInsertStep = false;
             if (completion.IsComplexTextEdit)
             {
-                // TODO: Add support for snippet items
-                if (completion.GetProviderName() == SnippetCompletionProvider)
+                var providerName = completion.GetProviderName();
+                // TODO: Add support for snippet items and UnnamedSymbolCompletionProvider
+                if (providerName == SnippetCompletionProvider || providerName == UnnamedSymbolCompletionProvider)
                     continue;
 
                 // The completion is somehow expensive. Currently, this one of two categories:
                 // import completion or override/partial completion.
-                Debug.Assert(completion.GetProviderName() is OverrideCompletionProvider
+                Debug.Assert(providerName is OverrideCompletionProvider
                     or PartialMethodCompletionProvider
                     or TypeImportCompletionProvider or ExtensionMemberImportCompletionProvider
                     or AwaitCompletionProvider);
 
                 changeSpan = typedSpan;
 
-                switch (completion.GetProviderName())
+                switch (providerName)
                 {
                     case OverrideCompletionProvider or PartialMethodCompletionProvider or AwaitCompletionProvider:
                         // For override and partial completion, we don't want to use the DisplayText as the insert text

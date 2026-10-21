@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.ComponentModel;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Formatting;
@@ -92,18 +91,17 @@ public sealed class HostServicesAggregator
     {
         var builder = ImmutableHashSet.CreateBuilder<Assembly>();
 
-        // var type = typeof(Microsoft.CodeAnalysis.CodeGeneration.CodeGenerationTypeSymbol);
-        var assembly = Assembly.Load("Microsoft.CodeAnalysis");
-        
         // We always include the default Roslyn assemblies:
         if (OperatingSystem.IsBrowser())
         {
             builder.Add(typeof(WebPersistentStorageService).Assembly);
         }
-        builder.Add(typeof(Microsoft.CodeAnalysis.Workspace).Assembly); //Microsoft.CodeAnalysis.Workspaces
-        builder.Add(typeof(Microsoft.CodeAnalysis.Completion.CompletionItem).Assembly); //Microsoft.CodeAnalysis.Features
-        builder.Add(typeof(CSharpFormattingOptions).Assembly); //Microsoft.CodeAnalysis.CSharp.Workspaces
-        builder.Add(Assembly.Load("Microsoft.CodeAnalysis.CSharp.Features")); //Microsoft.CodeAnalysis.CSharp.Features
+
+        foreach (var assembly in MefHostServices.DefaultAssemblies)
+        {
+            builder.Add(assembly);
+        }
+
         _assemblies = builder.ToImmutableArray();
     }
 

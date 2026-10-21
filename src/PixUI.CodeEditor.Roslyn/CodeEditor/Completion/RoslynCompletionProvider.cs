@@ -1,8 +1,9 @@
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Globalization;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Completion;
-using Microsoft.CodeAnalysis.Text;
+using Microsoft.CodeAnalysis.PooledObjects;
 
 namespace PixUI.CodeEditor.Roslyn;
 
@@ -44,7 +45,7 @@ public sealed class RoslynCompletionProvider : ICompletionProvider
                 return Array.Empty<ICompletionItem>();
         }
 
-        var completions = await completionService.GetCompletionsAsync(doc, offset);
+        var completions = await completionService.GetCompletionsAsync(doc, offset, trigger);
         if (completions.ItemsList.Count == 0)
             return Array.Empty<ICompletionItem>();
 
@@ -61,7 +62,11 @@ public sealed class RoslynCompletionProvider : ICompletionProvider
         // }
 
         var typedSpan = completionService.GetDefaultCompletionListSpan(sourceText, offset);
-        // string typedText = sourceText.GetSubText(typedSpan).ToString();
+        string typedText = sourceText.GetSubText(typedSpan).ToString();
+
+        //暂简单过滤排序
+        var filteredAndOrdered = completions.ItemsList.ToImmutableArray();
+        if (!string.IsNullOrEmpty(typedText)) filteredAndOrdered = FilterCompletionList(completions, typedText);
 
         // If we don't encounter any unimported types, and the completion context thinks that some would be available, then
         // that completion provider is still creating the cache. We'll mark this completion list as not completed, and the
@@ -76,7 +81,7 @@ public sealed class RoslynCompletionProvider : ICompletionProvider
             // cacheId,
             offset,
             completionService,
-            completions,
+            filteredAndOrdered,
             typedSpan,
             expectingImportedItems,
             isSuggestionMode);
@@ -84,39 +89,21 @@ public sealed class RoslynCompletionProvider : ICompletionProvider
         //var isIncomplete = !seenUnimportedCompletions && expectingImportedItems;
         return completionsList;
     }
-    
-    // private static CompletionList FilterCompletionList(CompletionList completionList, TextSpan filterSpan, 
-    //     CompletionTrigger completionTrigger, CompletionFilterReason filterReason, SourceText sourceText)
-    // {
-    //     var filterText = sourceText.GetSubText(filterSpan).ToString();
-    //     Microsoft.CodeAnalysis.PooledObjects.ArrayBuilder;
-    //
-    //     // Use pattern matching to determine which items are most relevant out of the calculated items.
-    //     using var _ = ArrayBuilder<MatchResult>.GetInstance(out var matchResultsBuilder);
-    //     var index = 0;
-    //     using var helper = new PatternMatchHelper(filterText);
-    //     foreach (var item in completionList.ItemsList)
-    //     {
-    //         if (helper.TryCreateMatchResult(
-    //                 item,
-    //                 completionTrigger.Kind,
-    //                 filterReason,
-    //                 recentItemIndex: -1,
-    //                 includeMatchSpans: true,
-    //                 index,
-    //                 out var matchResult))
-    //         {
-    //             matchResultsBuilder.Add(matchResult);
-    //             index++;
-    //         }
-    //     }
-    //
-    //     // Next, we sort the list based on the pattern matching result.
-    //     matchResultsBuilder.Sort(MatchResult.SortingComparer);
-    //
-    //     var filteredList = matchResultsBuilder.SelectAsArray(matchResult =>
-    //         new SharpIdeCompletionItem(matchResult.CompletionItem, matchResult.PatternMatch?.MatchedSpans));
-    //
-    //     return filteredList;
-    // }
+
+    private static ImmutableArray<Microsoft.CodeAnalysis.Completion.CompletionItem> FilterCompletionList(
+        CompletionList completionList, string filterText)
+    {
+        var cultureInfo = CultureInfo.CurrentCulture;
+        using var helper = new PatternMatchHelper(filterText);
+        using var _ = ArrayBuilder<MatchResult>.GetInstance(out var matchResultsBuilder);
+        foreach (var item in completionList.ItemsList)
+        {
+            var result = helper.GetMatchResult(item, false, cultureInfo);
+            if (result.ShouldBeConsideredMatchingFilterText)
+                matchResultsBuilder.Add(result);
+        }
+
+        matchResultsBuilder.Sort(MatchResult.SortingComparer);
+        return matchResultsBuilder.SelectAsArray(matchResult => matchResult.CompletionItem);
+    }
 }

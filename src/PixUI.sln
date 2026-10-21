@@ -89,6 +89,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.CodeEditor.Roslyn", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.Markdown", "PixUI.Markdown\PixUI.Markdown.csproj", "{54417000-3319-4D2C-BFE0-B1E463938986}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoslynPublicizer", "RoslynPublicizer\RoslynPublicizer.csproj", "{A20001D4-B766-481C-A178-EE3CB3EB7F80}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -231,6 +233,10 @@ Global
 		{54417000-3319-4D2C-BFE0-B1E463938986}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54417000-3319-4D2C-BFE0-B1E463938986}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54417000-3319-4D2C-BFE0-B1E463938986}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A20001D4-B766-481C-A178-EE3CB3EB7F80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A20001D4-B766-481C-A178-EE3CB3EB7F80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A20001D4-B766-481C-A178-EE3CB3EB7F80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A20001D4-B766-481C-A178-EE3CB3EB7F80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -265,6 +271,7 @@ Global
 		{A9A69AAD-F366-4BC8-B69C-C0A42F6E4B6B} = {DACBAF54-20B3-43D5-8669-8B9962E5B138}
 		{1498891B-6104-4FFC-9BA2-5507B1B9949F} = {37CC8374-65A4-4189-8C60-01746BF9713B}
 		{54417000-3319-4D2C-BFE0-B1E463938986} = {DACBAF54-20B3-43D5-8669-8B9962E5B138}
+		{A20001D4-B766-481C-A178-EE3CB3EB7F80} = {37CC8374-65A4-4189-8C60-01746BF9713B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CC639009-5F80-440A-A7F1-4A3C36AA556D}

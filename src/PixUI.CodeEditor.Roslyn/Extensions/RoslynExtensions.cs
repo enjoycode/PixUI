@@ -5,18 +5,6 @@ namespace PixUI.CodeEditor.Roslyn;
 
 internal static class RoslynExtensions
 {
-    internal static object GetUnderlyingNode(this ref readonly SyntaxTrivia syntaxTrivia)
-        => UnsafeAccessors.SyntaxTriviaGetUnderlyingNode(in syntaxTrivia);
-
-    internal static object GetUnderlyingNode(this ref readonly SyntaxNodeOrToken nodeOrToken)
-        => UnsafeAccessors.SyntaxNodeOrTokenGetUnderlyingNode(in nodeOrToken);
-
-    internal static int GetPosition(this SyntaxNodeOrToken nodeOrToken)
-        => UnsafeAccessors.SyntaxNodeOrTokenGetPosition(in nodeOrToken);
-
-    internal static int GetEndPosition(this ref readonly SyntaxNodeOrToken nodeOrToken)
-        => UnsafeAccessors.SyntaxNodeOrTokenGetEndPosition(in nodeOrToken);
-
     internal static string? GetProviderName(this Microsoft.CodeAnalysis.Completion.CompletionItem completionItem)
         => UnsafeAccessors.CompletionItemGetProviderName(completionItem);
 

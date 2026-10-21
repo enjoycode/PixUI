@@ -24,7 +24,7 @@ public sealed class DemoRoute : View
             new("stack", s => new DemoStack()),
             new("designer", s => new DemoDesigner()),
             new("splitter", s => new DemoSplitter()),
-            new("pdf", s => new DemoPdfViewer()),
+            // new("pdf", s => new DemoPdfViewer()),
             new("diagram", s => new DemoDiagram()),
             new("colors", s => new DemoColorPicker()),
         };
@@ -64,26 +64,23 @@ public sealed class DemoRoute : View
     {
         return new MenuItem[]
         {
-            MenuItem.SubMenu("Route", MaterialIcons.Map, new MenuItem[]
-            {
+            MenuItem.SubMenu("Route", MaterialIcons.Map, [
                 MenuItem.Item("Back", MaterialIcons.ArrowBack, action: _navigator.Pop),
-                MenuItem.Item("Forward", MaterialIcons.ArrowForward, null),
-            }),
-            MenuItem.SubMenu("Debug", MaterialIcons.BugReport, new MenuItem[]
-            {
+                MenuItem.Item("Forward", MaterialIcons.ArrowForward, null)
+            ]),
+            MenuItem.SubMenu("Debug", MaterialIcons.BugReport, [
                 MenuItem.Item("Outline", null, PaintDebugger.Switch),
-                MenuItem.SubMenu("Help", MaterialIcons.HelpOutline, new MenuItem[]
-                {
+                MenuItem.SubMenu("Help", MaterialIcons.HelpOutline, [
                     MenuItem.Item("About"),
                     MenuItem.Item("Window")
-                }),
+                ]),
                 MenuItem.Item("Stack", null, () => _navigator.Push("stack")),
                 MenuItem.Item("Designer", null, () => _navigator.Push("designer")),
                 MenuItem.Item("Splitter", null, () => _navigator.Push("splitter")),
-                MenuItem.Item("PdfViewer", null, () => _navigator.Push("pdf")),
+                // MenuItem.Item("PdfViewer", null, () => _navigator.Push("pdf")),
                 MenuItem.Item("Diagram", null, () => _navigator.Push("diagram")),
-                MenuItem.Item("ColorPicker", null, () => _navigator.Push("colors")),
-            }),
+                MenuItem.Item("ColorPicker", null, () => _navigator.Push("colors"))
+            ]),
             // MenuItem.Item("Form", null, () => _navigator.Push("form")),
             MenuItem.Item("Charts", null, () => _navigator.Push("charts")),
             MenuItem.Item("Animation", null, () => _navigator.Push("animation")),

@@ -38,9 +38,16 @@ internal sealed class CompletionItemWidget : Widget
     {
         switch (kind)
         {
+            case CompletionItemKind.Keyword: return MaterialIcons.Key;
+            case CompletionItemKind.Class: return MaterialIcons.AccountTree;
             case CompletionItemKind.Function:
             case CompletionItemKind.Method: return MaterialIcons.Functions;
+            case CompletionItemKind.Property:
+            case CompletionItemKind.Field: return MaterialIcons.LocalOffer;
+            case CompletionItemKind.Interface: return MaterialIcons.Hub;
+            case CompletionItemKind.Enum: return MaterialIcons.Storage;
             case CompletionItemKind.Event: return MaterialIcons.Bolt;
+            case CompletionItemKind.Module: return MaterialIcons.DataObject;
             default: return MaterialIcons.Title;
         }
     }

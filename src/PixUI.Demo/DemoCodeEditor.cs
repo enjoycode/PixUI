@@ -96,16 +96,22 @@ public sealed class Person
                 return AssemblyMetadata.Create(metadata).GetReference();
             }
         }
+
         throw new NotSupportedException($"Assembly '{assembly}' doesn't have a MetadataReference.");
     }
 
-    protected override async void OnMounted()
+    protected override void OnMounted()
     {
         base.OnMounted();
 
+        OnLoad();
+    }
+
+    private async void OnLoad()
+    {
         try
         {
-            await _sourceText.Open();
+            await _sourceText.Open().ConfigureAwait(false);
             _controller.Document.Open(SrcCode);
         }
         catch (Exception)

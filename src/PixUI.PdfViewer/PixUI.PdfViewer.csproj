@@ -9,7 +9,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Melville.Pdf.Model" Version="0.6.4" />
+      <!--强制Roslyn版本一致-->
+      <PackageReference Include="Microsoft.CodeAnalysis" Version="5.9.0" />
+      <PackageReference Include="Melville.Pdf.Model" Version="0.6.8" />
     </ItemGroup>
 
     <ItemGroup>
