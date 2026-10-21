@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using PixUI.CodeEditor.Roslyn;
@@ -17,33 +20,49 @@ internal sealed class PlaygroundContext
         _projectId = ProjectId.CreateNewId();
         DocumentId = DocumentId.CreateNewId(_projectId);
 
+        References =
+        [
+            CreateMetadataReference(typeof(object).Assembly),
+            CreateMetadataReference(Assembly.Load("netstandard")),
+            CreateMetadataReference(Assembly.Load("System.Runtime")),
+            CreateMetadataReference(Assembly.Load("System.Linq")),
+            CreateMetadataReference(typeof(Console).Assembly),
+            CreateMetadataReference(typeof(Widget).Assembly),
+            CreateMetadataReference(typeof(DataGrid<>).Assembly),
+            CreateMetadataReference(typeof(PieChart).Assembly),
+            CreateMetadataReference(typeof(MaterialIcons).Assembly),
+            CreateMetadataReference(typeof(DiagramView).Assembly)
+        ];
+
         var prjInfo = ProjectInfo.Create(_projectId, VersionStamp.Create(),
             "DemoProject", "DemoProject", LanguageNames.CSharp, null, null,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                .WithNullableContextOptions(NullableContextOptions.Enable),
-            new CSharpParseOptions().WithLanguageVersion(LanguageVersion.Latest));
+                .WithNullableContextOptions(NullableContextOptions.Enable), ParseOptions
+        );
 
         var solution = Workspace.CurrentSolution.AddProject(prjInfo)
-            .AddMetadataReference(_projectId, CreateMetadataReference(typeof(object).Assembly))
-            .AddMetadataReference(_projectId, CreateMetadataReference(typeof(Console).Assembly))
-            .AddMetadataReference(_projectId, CreateMetadataReference(typeof(Widget).Assembly))
-            .AddMetadataReference(_projectId, CreateMetadataReference(typeof(DataGrid<>).Assembly))
-            .AddMetadataReference(_projectId, CreateMetadataReference(typeof(PieChart).Assembly))
-            .AddMetadataReference(_projectId, CreateMetadataReference(typeof(MaterialIcons).Assembly))
-            .AddMetadataReference(_projectId, CreateMetadataReference(typeof(DiagramView).Assembly))
+            .AddMetadataReferences(_projectId, References)
             .AddDocument(DocumentId, "Demo.cs", string.Empty)
-            .AddDocument(DocumentId.CreateNewId(_projectId), "GlobalUsing.cs",
-                "global using System;global using System.Threading.Tasks;global using System.Linq;global using System.Collections.Generic;global using PixUI;"
-            );
+            .AddDocument(DocumentId.CreateNewId(_projectId), "GlobalUsing.cs", GlobalUsings);
         Workspace.TryApplyChanges(solution);
     }
 
     private readonly ProjectId _projectId;
     internal readonly DocumentId DocumentId;
     internal readonly RoslynWorkspace Workspace;
+    internal readonly MetadataReference[] References;
+
+    internal readonly CSharpParseOptions ParseOptions =
+        new CSharpParseOptions().WithLanguageVersion(LanguageVersion.Latest);
+
+    internal readonly string GlobalUsings =
+        "global using System;global using System.Threading.Tasks;global using System.Linq;global using System.Collections.Generic;global using PixUI;";
+
+    public string WidgetTypeName { get; set; } = "HelloView";
 
     public readonly State<SidePadType> ActiveSidePad = SidePadType.Tree;
     internal readonly TreeController<DemoNode> TreeController = new();
+    internal readonly PreviewController PreviewController = new();
 
     private static MetadataReference CreateMetadataReference(Assembly assembly)
     {
@@ -57,5 +76,13 @@ internal sealed class PlaygroundContext
         }
 
         throw new NotSupportedException($"Assembly '{assembly}' doesn't have a MetadataReference.");
+    }
+
+    internal async Task<IList<Diagnostic>> GetProblems()
+    {
+        var document = Workspace.CurrentSolution.GetDocument(DocumentId)!;
+        var semanticModel = await document.GetSemanticModelAsync();
+        return semanticModel!.GetDiagnostics()
+            .ToList();
     }
 }

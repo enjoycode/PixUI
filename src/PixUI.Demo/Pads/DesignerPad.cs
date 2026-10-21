@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+using Microsoft.CodeAnalysis;
 using PixUI.CodeEditor;
 using PixUI.CodeEditor.Roslyn;
 using DocumentEventArgs = PixUI.CodeEditor.DocumentEventArgs;
@@ -21,7 +24,7 @@ internal sealed class DesignerPad : View
         Child = new Splitter()
         {
             Panel1 = new CodeEditorWidget(_codeEditorController),
-            Panel2 = new PreviewPad()
+            Panel2 = new PreviewPad(_context)
         };
     }
 
@@ -52,6 +55,20 @@ internal sealed class DesignerPad : View
 
     private async void RunDelayTask()
     {
-        //TODO:
+        //TODO: Folding
+
+        //检查语法语义错误
+        try
+        {
+            var problems = await _context.GetProblems();
+            //_context.UpdateProblems(ModelNode, problems);
+
+            if (problems.All(p => p.Severity != DiagnosticSeverity.Error) /*&& !_hidePreviewer.Value*/)
+                _context.PreviewController.Invalidate(true /*!_hidePreviewer.Value*/);
+        }
+        catch (Exception e)
+        {
+            Notification.Error($"GetProblems error: {e.Message}");
+        }
     }
 }
