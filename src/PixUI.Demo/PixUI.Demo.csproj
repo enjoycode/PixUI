@@ -62,6 +62,8 @@
         <EmbeddedResource Include="Resources\Demos\Chart\DemoPieChart.cs" />
         <Compile Remove="Resources\Demos\Chart\DemoPolarChart.cs" />
         <EmbeddedResource Include="Resources\Demos\Chart\DemoPolarChart.cs" />
+        <Compile Remove="Resources\Demos\Chart\DemoGeoMap.cs" />
+        <EmbeddedResource Include="Resources\Demos\Chart\DemoGeoMap.cs" />
     </ItemGroup>
 
 </Project>

@@ -13,7 +13,6 @@ public sealed class DemoRoute : View
         {
             new("page", s => new DemoPage(), false, BuildDefaultTransition),
             //new("form", s => new DemoForm(), false, BuildDefaultTransition),
-            new("charts", s => new DemoCharts(), false),
             new("list", s => new DemoListView(), false, BuildDefaultTransition),
             new("animation", s => new DemoAnimation(), false, BuildDefaultTransition),
             new("transform", s => new DemoTransform(), false, BuildDefaultTransition),

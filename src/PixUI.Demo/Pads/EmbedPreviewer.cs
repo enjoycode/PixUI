@@ -65,7 +65,7 @@ internal sealed class EmbedPreviewer : View
         {
             _containerRef.Child = new Center
             {
-                Child = new Text($"Has Error:\n{e.Message}") { MaxLines = 20 }
+                Child = new Text($"Has Error:{e.Message}\n{e.StackTrace}") { MaxLines = 20 }
             };
         }
 
