@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Threading.Tasks;
+using LiveChartsCore;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using PixUI.CodeEditor.Roslyn;
@@ -26,10 +27,13 @@ internal sealed class PlaygroundContext
             CreateMetadataReference(Assembly.Load("netstandard")),
             CreateMetadataReference(Assembly.Load("System.Runtime")),
             CreateMetadataReference(Assembly.Load("System.Linq")),
+            CreateMetadataReference(Assembly.Load("System.ObjectModel")),
             CreateMetadataReference(typeof(Console).Assembly),
             CreateMetadataReference(typeof(Color).Assembly),
             CreateMetadataReference(typeof(Widget).Assembly),
             CreateMetadataReference(typeof(DataGrid<>).Assembly),
+            CreateMetadataReference(typeof(ISeries).Assembly),
+            CreateMetadataReference(typeof(LineSeries<>).Assembly),
             CreateMetadataReference(typeof(PieChart).Assembly),
             CreateMetadataReference(typeof(MaterialIcons).Assembly),
             CreateMetadataReference(typeof(DiagramView).Assembly)
@@ -66,6 +70,7 @@ internal sealed class PlaygroundContext
 
     public readonly State<SidePadType> ActiveSidePad = SidePadType.Tree;
     internal readonly TreeController<DemoNode> TreeController = new();
+    internal readonly DataGridController<Diagnostic> ProblemsController = new();
     internal readonly PreviewController PreviewController = new();
 
     private static MetadataReference CreateMetadataReference(Assembly assembly)
@@ -86,7 +91,14 @@ internal sealed class PlaygroundContext
     {
         var document = Workspace.CurrentSolution.GetDocument(DocumentId)!;
         var semanticModel = await document.GetSemanticModelAsync();
-        return semanticModel!.GetDiagnostics()
+        var result = semanticModel!.GetDiagnostics()
             .ToList();
+        ProblemsController.DataSource = result;
+        return result;
+    }
+
+    internal void GotoProblem(Diagnostic diagnostic)
+    {
+        //TODO:
     }
 }

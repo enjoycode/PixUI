@@ -66,8 +66,6 @@ internal sealed class DesignerPad : View
         try
         {
             var problems = await _context.GetProblems();
-            //_context.UpdateProblems(ModelNode, problems);
-
             if (problems.All(p => p.Severity != DiagnosticSeverity.Error) /*&& !_hidePreviewer.Value*/)
                 _context.PreviewController.Invalidate(true /*!_hidePreviewer.Value*/);
         }

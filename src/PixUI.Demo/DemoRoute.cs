@@ -20,7 +20,6 @@ public sealed class DemoRoute : View
             new("tabview", s => new DemoTabView(), false, BuildDefaultTransition),
             new("treeView", s => new DemoTreeView(), false, BuildDefaultTransition),
             new("datagrid", s => new DemoDataGrid(), false, BuildDefaultTransition),
-            new("codeEditor", s => new DemoCodeEditor(), false, BuildDefaultTransition),
             new("stack", s => new DemoStack()),
             new("designer", s => new DemoDesigner()),
             new("splitter", s => new DemoSplitter()),

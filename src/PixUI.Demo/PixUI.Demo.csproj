@@ -56,6 +56,12 @@
         <EmbeddedResource Include="Resources\Demo.pdf"/>
         <Compile Remove="Resources\Demos\Layout\DemoRow.cs" />
         <EmbeddedResource Include="Resources\Demos\Layout\DemoRow.cs" />
+        <Compile Remove="Resources\Demos\Chart\DemoCartesianChart.cs" />
+        <EmbeddedResource Include="Resources\Demos\Chart\DemoCartesianChart.cs" />
+        <Compile Remove="Resources\Demos\Chart\DemoPieChart.cs" />
+        <EmbeddedResource Include="Resources\Demos\Chart\DemoPieChart.cs" />
+        <Compile Remove="Resources\Demos\Chart\DemoPolarChart.cs" />
+        <EmbeddedResource Include="Resources\Demos\Chart\DemoPolarChart.cs" />
     </ItemGroup>
 
 </Project>
