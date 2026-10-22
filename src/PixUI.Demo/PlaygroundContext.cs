@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Text.Json;
 using System.Threading.Tasks;
 using LiveChartsCore;
 using Microsoft.CodeAnalysis;
@@ -28,6 +29,8 @@ internal sealed class PlaygroundContext
             CreateMetadataReference(Assembly.Load("System.Runtime")),
             CreateMetadataReference(Assembly.Load("System.Linq")),
             CreateMetadataReference(Assembly.Load("System.ObjectModel")),
+            CreateMetadataReference(Assembly.Load("System.Collections")),
+            CreateMetadataReference(typeof(JsonSerializer).Assembly),
             CreateMetadataReference(typeof(Console).Assembly),
             CreateMetadataReference(typeof(Color).Assembly),
             CreateMetadataReference(typeof(Widget).Assembly),

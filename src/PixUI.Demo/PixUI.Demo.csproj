@@ -64,6 +64,12 @@
         <EmbeddedResource Include="Resources\Demos\Chart\DemoPolarChart.cs" />
         <Compile Remove="Resources\Demos\Chart\DemoGeoMap.cs" />
         <EmbeddedResource Include="Resources\Demos\Chart\DemoGeoMap.cs" />
+        <None Remove="Resources\WuxiAreas.json" />
+        <EmbeddedResource Include="Resources\WuxiAreas.json" />
+        <None Remove="Resources\Wuxi.json" />
+        <EmbeddedResource Include="Resources\Wuxi.json" />
+        <Compile Remove="Resources\Demos\Chart\DemoWuxiMap.cs" />
+        <EmbeddedResource Include="Resources\Demos\Chart\DemoWuxiMap.cs" />
     </ItemGroup>
 
 </Project>
