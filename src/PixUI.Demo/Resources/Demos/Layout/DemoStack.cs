@@ -1,6 +1,4 @@
-namespace PixUI.Demo;
-
-public sealed class DemoStack : View
+public class DemoStack : View
 {
     public DemoStack()
     {

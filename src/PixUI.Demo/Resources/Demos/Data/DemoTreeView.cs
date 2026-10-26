@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 
-namespace PixUI.Demo.Mac;
-
 public sealed class DemoTreeView : View
 {
     private readonly List<TreeData> _treeDataSource = new()

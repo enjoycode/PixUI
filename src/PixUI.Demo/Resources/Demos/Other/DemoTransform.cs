@@ -1,7 +1,3 @@
-using System;
-
-namespace PixUI.Demo.Mac;
-
 public sealed class DemoTransform : View
 {
     public DemoTransform()

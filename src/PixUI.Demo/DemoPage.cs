@@ -60,8 +60,6 @@ public sealed class DemoPage : View
                             Children =
                             [
                                 new Button("Click Me", MaterialIcons.Search) { OnTap = OnButtonTap },
-                                new Button("OpenFile") { OnTap = OnOpenFile },
-                                new Button("SaveFile") { OnTap = OnSaveFile },
                             ]
                         },
                         new ButtonGroup()
@@ -115,7 +113,6 @@ public sealed class DemoPage : View
                 {
                     Children =
                     {
-                        new Collapse { Width = 300, Title = new Text("Collapse"), Body = new DemoForm() },
                         new Card { Width = 250, Height = 220, Child = new Calendar(1977, 3) },
                         new DatePicker(new DateTime(1977, 3, 16)) { Width = 200 },
                         new Text(_numValue.ToStateOfString()),
@@ -135,31 +132,6 @@ public sealed class DemoPage : View
         // _firstName.Value = _firstName.Value == "无锡" ? "江阴" : "无锡";
 
         Notification.Error("Click Done!");
-    }
-
-    private async void OnOpenFile(PointerEvent e)
-    {
-        var files = await FileDialog.OpenFileAsync(new OpenFileOptions() { Title = "打开文件" });
-        foreach (var file in files)
-        {
-            Console.WriteLine($"打开文件: {file.FileName} {file.FileStream.Length}");
-            await file.FileStream.DisposeAsync();
-        }
-    }
-
-    private async void OnSaveFile(PointerEvent e)
-    {
-        var ms = new MemoryStream();
-        var textWriter = new StreamWriter(ms);
-        await textWriter.WriteLineAsync("Hello World!");
-        await textWriter.FlushAsync();
-        ms.Position = 0;
-
-        await FileDialog.SaveFileAsync(new SaveFileOptions()
-        {
-            FileName = "HelloWorld.txt",
-            FileStream = ms,
-        });
     }
 
     private void OnButton1Tap(PointerEvent e)

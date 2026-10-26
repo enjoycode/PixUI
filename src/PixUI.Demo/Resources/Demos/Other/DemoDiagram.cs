@@ -1,7 +1,5 @@
 using PixUI.Diagram;
 
-namespace PixUI.Demo;
-
 public sealed class DemoDiagram : View
 {
     public DemoDiagram()

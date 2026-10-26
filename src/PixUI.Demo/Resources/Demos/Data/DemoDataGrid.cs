@@ -1,9 +1,7 @@
 using System.Globalization;
 using System.Linq;
 
-namespace PixUI.Demo.Mac;
-
-public sealed class DemoDataGrid : View
+public class DemoDataGrid : View
 {
     public DemoDataGrid()
     {
@@ -18,11 +16,11 @@ public sealed class DemoDataGrid : View
             Padding = EdgeInsets.All(20),
             Child = new DataGrid<Person>(controller)
                 {
-                    FooterCells = new DataGridFooterCell[]
-                    {
+                    FooterCells =
+                    [
                         new(1, 4) { Text = "平均:", CellStyle = CellStyle.AlignMiddleRight().WithFillColor(0xFFF5F7FA) },
-                        new(5, () => controller.DataView!.Average(o => o.Score).ToString(CultureInfo.InvariantCulture)),
-                    }
+                        new(5, () => controller.DataView!.Average(o => o.Score).ToString(CultureInfo.InvariantCulture))
+                    ]
                 }
                 .AddRowNumColumn("行号", 60, frozen: true)
                 .AddTextColumn("城市", p => p.City, 100, cellStyle: CellStyle.AlignCenter(), autoMergeCell: true)
@@ -37,5 +35,34 @@ public sealed class DemoDataGrid : View
                     OnTap = _ => Notification.Info(person.Name)
                 }, width: 80, frozen: true)
         };
+    }
+}
+
+internal sealed class Person
+{
+    public string City { get; set; }
+    public string Name { get; set; }
+    public int Score { get; set; }
+    public string? Phone { get; set; }
+    public string? Email { get; set; }
+    public string? Memo { get; set; }
+    public bool Female { get; set; }
+
+    public static IList<Person> GeneratePersons(int count)
+    {
+        var random = new Random();
+        var ls = new List<Person>(count);
+        for (var i = 0; i < count; i++)
+        {
+            ls.Add(new Person
+            {
+                City = "City" + (i / 4) + "中N",
+                Name = "Name" + i + "中N",
+                Female = i % 2 == 0,
+                Score = random.Next(0, 100),
+            });
+        }
+
+        return ls;
     }
 }

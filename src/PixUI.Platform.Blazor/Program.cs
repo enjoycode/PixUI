@@ -1,9 +1,7 @@
 using System.Runtime.Versioning;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.JSInterop;
 using PixUI.Demo;
-using PixUI.Demo.Mac;
 using PixUI.Drawing.Skia;
 
 namespace PixUI.Platform.Blazor;
@@ -47,6 +45,6 @@ public static class Program
         FontCollection.RegisterTypeface(ms, FontCollection.DefaultFamilyName, false);
 
         //开始执行Blazor应用
-        WebApplication.Run(() => new DemoRoute(), runInfo);
+        WebApplication.Run(() => new Playground(), runInfo);
     }
 }

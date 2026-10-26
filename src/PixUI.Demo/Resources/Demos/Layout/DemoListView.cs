@@ -1,9 +1,5 @@
-namespace PixUI.Demo.Mac;
-
 public sealed class DemoListView : View
 {
-    private readonly State<string> _scrollTo = "0";
-
     public DemoListView()
     {
         var listViewController = new ListViewController<Widget>(Axis.Horizontal);
@@ -33,6 +29,8 @@ public sealed class DemoListView : View
             }
         };
     }
+    
+    private readonly State<string> _scrollTo = "0";
 
     private static Widget[] BuildList()
     {

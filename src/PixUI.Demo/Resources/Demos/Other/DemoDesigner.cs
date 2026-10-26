@@ -4,8 +4,6 @@ using System.Text.Json;
 using PixUI.Dynamic.Design;
 using PixUI.Dynamic.Json;
 
-namespace PixUI.Demo;
-
 public sealed class DemoDesigner : View
 {
     private static string json = """

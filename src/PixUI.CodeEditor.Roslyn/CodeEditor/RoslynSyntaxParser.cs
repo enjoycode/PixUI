@@ -143,13 +143,17 @@ public sealed class RoslynSyntaxParser : ISyntaxParser
         var start = Document.TextLength - 1;
         var end = 0;
         var changes = _syntaxDiffer.GetChanges(oldTree, newTree);
+        //TODO: 优化为计算与当前编辑范围相交的新节点范围
         foreach (var change in changes)
         {
             //注意以下end索引-1
             if (change.NewNodes == null)
             {
-                start = Math.Min(start, change.Range.Span.Start);
-                end = Math.Max(end, change.Range.Span.Start + change.Range.NewLength - 1);
+                if (change.Range.NewLength > 0) //TODO:待测
+                {
+                    start = Math.Min(start, change.Range.Span.Start);
+                    end = Math.Max(end, change.Range.Span.Start + change.Range.NewLength - 1);
+                }
             }
             else
             {

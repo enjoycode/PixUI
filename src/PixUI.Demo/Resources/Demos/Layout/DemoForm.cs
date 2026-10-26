@@ -1,5 +1,3 @@
-namespace PixUI.Demo;
-
 public sealed class DemoForm : View
 {
     public DemoForm()

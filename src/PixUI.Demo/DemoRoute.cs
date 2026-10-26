@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using PixUI.Demo.Mac;
 
 namespace PixUI.Demo;
 
@@ -13,17 +12,7 @@ public sealed class DemoRoute : View
         {
             new("page", s => new DemoPage(), false, BuildDefaultTransition),
             //new("form", s => new DemoForm(), false, BuildDefaultTransition),
-            new("list", s => new DemoListView(), false, BuildDefaultTransition),
-            new("animation", s => new DemoAnimation(), false, BuildDefaultTransition),
-            new("transform", s => new DemoTransform(), false, BuildDefaultTransition),
-            new("tabview", s => new DemoTabView(), false, BuildDefaultTransition),
-            new("treeView", s => new DemoTreeView(), false, BuildDefaultTransition),
-            new("datagrid", s => new DemoDataGrid(), false, BuildDefaultTransition),
-            new("stack", s => new DemoStack()),
-            new("designer", s => new DemoDesigner()),
-            new("splitter", s => new DemoSplitter()),
             // new("pdf", s => new DemoPdfViewer()),
-            new("diagram", s => new DemoDiagram()),
             new("colors", s => new DemoColorPicker()),
         };
         _navigator = new Navigator(routes);

@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 
-namespace PixUI.Demo.Mac;
-
 public class DemoTabView : View
 {
     private readonly List<TabItem> _icons = new()

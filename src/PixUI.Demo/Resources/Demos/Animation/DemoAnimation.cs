@@ -1,6 +1,4 @@
-namespace PixUI.Demo.Mac;
-
-public sealed class DemoAnimation : View
+public class DemoAnimation : View
 {
     private readonly RxValue<string> _title = "Hello World!";
     private readonly RxValue<float> _fontSize = 30;

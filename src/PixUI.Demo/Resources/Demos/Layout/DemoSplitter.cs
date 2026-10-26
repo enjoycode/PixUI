@@ -1,6 +1,4 @@
-namespace PixUI.Demo;
-
-public sealed class DemoSplitter : View
+public class DemoSplitter : View
 {
     public DemoSplitter()
     {

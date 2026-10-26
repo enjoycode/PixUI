@@ -70,6 +70,38 @@
         <EmbeddedResource Include="Resources\Wuxi.json" />
         <Compile Remove="Resources\Demos\Chart\DemoWuxiMap.cs" />
         <EmbeddedResource Include="Resources\Demos\Chart\DemoWuxiMap.cs" />
+        <Compile Remove="Resources\Demos\Layout\DemoStack.cs" />
+        <EmbeddedResource Include="Resources\Demos\Layout\DemoStack.cs" />
+        <Compile Remove="Resources\Demos\Layout\DemoSplitter.cs" />
+        <EmbeddedResource Include="Resources\Demos\Layout\DemoSplitter.cs" />
+        <Compile Remove="Resources\Demos\Layout\DemoTabView.cs" />
+        <EmbeddedResource Include="Resources\Demos\Layout\DemoTabView.cs" />
+        <Compile Remove="Resources\Demos\Layout\DemoForm.cs" />
+        <EmbeddedResource Include="Resources\Demos\Layout\DemoForm.cs" />
+        <Compile Remove="Resources\Demos\Layout\DemoCollapse.cs" />
+        <EmbeddedResource Include="Resources\Demos\Layout\DemoCollapse.cs" />
+        <Compile Remove="Resources\Demos\Layout\DemoCard.cs" />
+        <EmbeddedResource Include="Resources\Demos\Layout\DemoCard.cs" />
+        <Compile Remove="Resources\Demos\Layout\DemoListView.cs" />
+        <EmbeddedResource Include="Resources\Demos\Layout\DemoListView.cs" />
+        <Compile Remove="Resources\Demos\Data\DemoTreeView.cs" />
+        <EmbeddedResource Include="Resources\Demos\Data\DemoTreeView.cs" />
+        <Compile Remove="Resources\Demos\Data\DemoDataGrid.cs" />
+        <EmbeddedResource Include="Resources\Demos\Data\DemoDataGrid.cs" />
+        <Compile Remove="Resources\Demos\Animation\DemoAnimation.cs" />
+        <EmbeddedResource Include="Resources\Demos\Animation\DemoAnimation.cs" />
+        <Compile Remove="Resources\Demos\Navigation\DemoMenu.cs" />
+        <EmbeddedResource Include="Resources\Demos\Navigation\DemoMenu.cs" />
+        <Compile Remove="Resources\Demos\Navigation\DemoRoute.cs" />
+        <EmbeddedResource Include="Resources\Demos\Navigation\DemoRoute.cs" />
+        <Compile Remove="Resources\Demos\Other\DemoDiagram.cs" />
+        <EmbeddedResource Include="Resources\Demos\Other\DemoDiagram.cs" />
+        <Compile Remove="Resources\Demos\Other\DemoDesigner.cs" />
+        <EmbeddedResource Include="Resources\Demos\Other\DemoDesigner.cs" />
+        <Compile Remove="Resources\Demos\Other\DemoTransform.cs" />
+        <EmbeddedResource Include="Resources\Demos\Other\DemoTransform.cs" />
+        <Compile Remove="Resources\Demos\FileDialog\DemoFileDialog.cs" />
+        <EmbeddedResource Include="Resources\Demos\FileDialog\DemoFileDialog.cs" />
     </ItemGroup>
 
 </Project>
