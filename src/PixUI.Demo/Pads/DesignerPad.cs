@@ -60,7 +60,16 @@ internal sealed class DesignerPad : View
 
     private async void RunDelayTask()
     {
-        //TODO: Folding
+        //更新Foldings
+        try
+        {
+            var foldings = await FoldingService.GetFoldings(_textBuffer.GetRoslynDocument());
+            _codeEditorController.Document.FoldingManager.UpdateFoldings(foldings, 0);
+        }
+        catch (Exception e)
+        {
+            Notification.Error($"UpdateFoldings error: {e.Message}");
+        }
 
         //检查语法语义错误
         try

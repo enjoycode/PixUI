@@ -19,7 +19,7 @@ public sealed class RoslynSourceText : ITextBuffer
     private SourceText _sourceText = null!;
     public bool HasOpen => _sourceText != null!;
 
-    internal Microsoft.CodeAnalysis.Document GetRoslynDocument() =>
+    public Microsoft.CodeAnalysis.Document GetRoslynDocument() =>
         _workspace.CurrentSolution.GetDocument(_documentId)!;
 
     public async Task Open()

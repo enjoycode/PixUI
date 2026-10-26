@@ -23,6 +23,10 @@
         <Publicize Include="Microsoft.CodeAnalysis.Features:Microsoft.CodeAnalysis.Completion.CompletionFilterReason" />
         <Publicize Include="Microsoft.CodeAnalysis.Features:Microsoft.CodeAnalysis.Completion.MatchResult" />
         <Publicize Include="Microsoft.CodeAnalysis.Features:Microsoft.CodeAnalysis.Completion.PatternMatchHelper" />
+        <Publicize Include="Microsoft.CodeAnalysis.Features:Microsoft.CodeAnalysis.Structure.BlockStructureService" />
+        <Publicize Include="Microsoft.CodeAnalysis.Features:Microsoft.CodeAnalysis.Structure.BlockStructureOptions" />
+        <Publicize Include="Microsoft.CodeAnalysis.Features:Microsoft.CodeAnalysis.Structure.BlockStructure" />
+        <Publicize Include="Microsoft.CodeAnalysis.Features:Microsoft.CodeAnalysis.Structure.BlockSpan" />
 
         <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.Host.IPersistentStorageConfiguration" />
         <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.PatternMatching.PatternMatch" />
