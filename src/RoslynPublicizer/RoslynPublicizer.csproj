@@ -31,6 +31,12 @@
         <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.Host.IPersistentStorageConfiguration" />
         <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.PatternMatching.PatternMatch" />
         <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.PatternMatching.PatternMatchKind" />
+        <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.Formatting.SyntaxFormattingOptions" />
+        <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.Formatting.LineFormattingOptions" />
+<!--        <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.Formatting.Formatter.FormatAsync(Microsoft.CodeAnalysis.Document,Microsoft.CodeAnalysis.Formatting.SyntaxFormattingOptions,System.Threading.CancellationToken)" />-->
+        <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.Formatting.Formatter.FormatAsync" />
+
+        <Publicize Include="Microsoft.CodeAnalysis.CSharp.Workspaces:Microsoft.CodeAnalysis.CSharp.Formatting.CSharpSyntaxFormattingOptions" />
     </ItemGroup>
 
     <ItemGroup>

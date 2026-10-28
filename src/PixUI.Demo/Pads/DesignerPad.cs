@@ -21,7 +21,7 @@ internal sealed class DesignerPad : View
             _context.DocumentId);
 
         //事件处理
-        //_codeEditorController.ContextMenuBuilder = e => ContextMenuService.BuildContextMenu(designContext, e);
+        _codeEditorController.ContextMenuBuilder = BuildContextMenu;
         _codeEditorController.Document.DocumentChanged += OnDocumentChanged;
         _delayDocChangedTask = new DelayTask(300, RunDelayTask);
         _context.TreeController.SelectionChanged += OnDemoChanged;
@@ -54,6 +54,15 @@ internal sealed class DesignerPad : View
 
         await _textBuffer.Open();
         _codeEditorController.Document.Open(initCode);
+    }
+
+    private MenuItem[] BuildContextMenu(TextEditor editor)
+    {
+        return
+        [
+            MenuItem.Item("Format Document", null,
+                () => FormattingService.FormatDocument(editor, _context.RoslynDocument))
+        ];
     }
 
     private void OnDocumentChanged(DocumentEventArgs e) => _delayDocChangedTask.Run();
