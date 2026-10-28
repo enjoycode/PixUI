@@ -149,11 +149,8 @@ public sealed class RoslynSyntaxParser : ISyntaxParser
             //注意以下end索引-1
             if (change.NewNodes == null)
             {
-                if (change.Range.NewLength > 0) //TODO:待测
-                {
-                    start = Math.Min(start, change.Range.Span.Start);
-                    end = Math.Max(end, change.Range.Span.Start + change.Range.NewLength - 1);
-                }
+                start = Math.Max(0, Math.Min(start, change.Range.Span.Start));
+                end = Math.Min(newTree.Length, Math.Max(end, change.Range.Span.Start + change.Range.NewLength - 1));
             }
             else
             {
