@@ -1,49 +1,24 @@
-using System.Composition;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Host;
 using Microsoft.CodeAnalysis.Host.Mef;
+using Microsoft.CodeAnalysis.Storage;
 
 namespace PixUI.CodeEditor.Roslyn;
 
-[Obsolete("Obsolete")]
-[ExportWorkspaceServiceFactory(typeof(IPersistentStorageService), ServiceLayer.Host)]
-public sealed class WebPersistentStoreServiceFactory : IWorkspaceServiceFactory
+[ExportWorkspaceServiceFactory(typeof(IPersistentStorageConfiguration), ServiceLayer.Host)]
+public sealed class WebPersistentStoreConfigurationFactory : IWorkspaceServiceFactory
 {
     public IWorkspaceService CreateService(HostWorkspaceServices workspaceServices)
     {
-        Console.WriteLine("Create WebPersistentStorageService");
-        return new WebPersistentStorageService();
+        return new WebPersistentStorageConfiguration();
     }
 }
 
-[Obsolete("Obsolete")]
-internal sealed class WebPersistentStorageService : IPersistentStorageService
+internal sealed class WebPersistentStorageConfiguration : IPersistentStorageConfiguration
 {
-    public IPersistentStorage GetStorage(Solution solution) => new WebPersistentStorage();
-    
-    
-    private sealed class WebPersistentStorage : IPersistentStorage
+    public string? TryGetStorageLocation(SolutionKey solutionKey)
     {
-        public Task<Stream?> ReadStreamAsync(string name, CancellationToken cancellationToken = new CancellationToken())
-            => Task.FromResult<Stream?>(null);
-
-        public Task<Stream?> ReadStreamAsync(Project project, string name,
-            CancellationToken cancellationToken = new CancellationToken())
-            => Task.FromResult<Stream?>(null);
-
-        public Task<Stream?> ReadStreamAsync(Microsoft.CodeAnalysis.Document document, string name,
-            CancellationToken cancellationToken = new CancellationToken())
-            => Task.FromResult<Stream?>(null);
-
-        public Task<bool> WriteStreamAsync(string name, Stream stream,
-            CancellationToken cancellationToken = new CancellationToken())
-            => Task.FromResult(false);
-
-        public Task<bool> WriteStreamAsync(Project project, string name, Stream stream,
-            CancellationToken cancellationToken = new CancellationToken()) => Task.FromResult(false);
-
-        public Task<bool> WriteStreamAsync(Microsoft.CodeAnalysis.Document document, string name, Stream stream,
-            CancellationToken cancellationToken = new CancellationToken()) => Task.FromResult(false);
+        return null;
     }
-}
 
+    public bool ThrowOnFailure => false;
+}

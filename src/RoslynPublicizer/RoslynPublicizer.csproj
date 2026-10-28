@@ -29,6 +29,7 @@
         <Publicize Include="Microsoft.CodeAnalysis.Features:Microsoft.CodeAnalysis.Structure.BlockSpan" />
 
         <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.Host.IPersistentStorageConfiguration" />
+        <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.Storage.SolutionKey" />
         <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.PatternMatching.PatternMatch" />
         <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.PatternMatching.PatternMatchKind" />
         <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.Formatting.SyntaxFormattingOptions" />

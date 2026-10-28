@@ -36,6 +36,33 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.12"/>
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.12" PrivateAssets="all"/>
     </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="Microsoft.CodeAnalysis">
+            <HintPath>..\..\out\Roslyn\Microsoft.CodeAnalysis.dll</HintPath>
+        </Reference>
+        <Reference Include="Microsoft.CodeAnalysis.CSharp">
+            <HintPath>..\..\out\Roslyn\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+        </Reference>
+        <Reference Include="Microsoft.CodeAnalysis.CSharp.Features">
+            <HintPath>..\..\out\Roslyn\Microsoft.CodeAnalysis.CSharp.Features.dll</HintPath>
+        </Reference>
+        <Reference Include="Microsoft.CodeAnalysis.CSharp.Workspaces">
+            <HintPath>..\..\out\Roslyn\Microsoft.CodeAnalysis.CSharp.Workspaces.dll</HintPath>
+        </Reference>
+        <Reference Include="Microsoft.CodeAnalysis.Elfie">
+            <HintPath>..\..\out\Roslyn\Microsoft.CodeAnalysis.Elfie.dll</HintPath>
+        </Reference>
+        <Reference Include="Microsoft.CodeAnalysis.Features">
+            <HintPath>..\..\out\Roslyn\Microsoft.CodeAnalysis.Features.dll</HintPath>
+        </Reference>
+        <Reference Include="Microsoft.CodeAnalysis.Scripting">
+            <HintPath>..\..\out\Roslyn\Microsoft.CodeAnalysis.Scripting.dll</HintPath>
+        </Reference>
+        <Reference Include="Microsoft.CodeAnalysis.Workspaces">
+            <HintPath>..\..\out\Roslyn\Microsoft.CodeAnalysis.Workspaces.dll</HintPath>
+        </Reference>
+    </ItemGroup>
     
     <Import Project="../PixUI.Drawing.Skia/Native/Wasm.targets" />
     

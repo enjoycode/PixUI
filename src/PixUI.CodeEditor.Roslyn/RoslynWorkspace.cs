@@ -1,7 +1,6 @@
 using System.Collections.Immutable;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Formatting;
 using Microsoft.CodeAnalysis.Host;
 using Microsoft.CodeAnalysis.Host.Mef;
 using Microsoft.CodeAnalysis.Text;
@@ -94,7 +93,7 @@ public sealed class HostServicesAggregator
         // We always include the default Roslyn assemblies:
         if (OperatingSystem.IsBrowser())
         {
-            builder.Add(typeof(WebPersistentStorageService).Assembly);
+            builder.Add(typeof(WebPersistentStoreConfigurationFactory).Assembly);
         }
 
         foreach (var assembly in MefHostServices.DefaultAssemblies)
