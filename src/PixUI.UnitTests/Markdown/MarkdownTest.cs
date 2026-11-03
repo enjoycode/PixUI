@@ -8,11 +8,36 @@ using Markdig.Renderers.Normalize;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using NUnit.Framework;
+using PixUI.AIChatBox;
+using PixUI.Drawing.Skia;
 
 namespace PixUI.UnitTests.Markdown;
 
-public class MarkdownAstTest
+public class MarkdownTest
 {
+    [SetUp]
+    public void Setup()
+    {
+        Render.Init(new SkiaRender());
+    }
+    
+    [Test]
+    public void StreamTest()
+    {
+        var controller = new ChatBoxController();
+        controller.Width = 400;
+        controller.AppendAIThinkContent("用户\n\n");
+        controller.AppendAIThinkContent("要求");
+    }
+    
+    [Test(Description = "增量解析测试")]
+    public void ParseTest()
+    {
+        var pipeline = new MarkdownPipelineBuilder().UsePipeTables().Build();
+
+        var doc = Markdig.Markdown.Parse("```charp\n\n```", pipeline);
+    }
+    
     [Test(Description = "修改AST测试")]
     public void ModifyAstTest()
     {

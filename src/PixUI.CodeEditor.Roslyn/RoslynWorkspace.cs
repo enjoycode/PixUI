@@ -76,7 +76,7 @@ public class RoslynWorkspace : Workspace
         }
     }
 
-    internal void OnDocumentChanged(DocumentId documentId, SourceText text)
+    public void OnDocumentChanged(DocumentId documentId, SourceText text)
     {
         OnDocumentTextChanged(documentId, text, PreservationMode.PreserveIdentity);
     }

@@ -16,12 +16,15 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Markdig" Version="1.5.1" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
         <PackageReference Include="NUnit" Version="4.6.1" />
         <PackageReference Include="NUnit3TestAdapter" Version="6.3.0" />
+        <PackageReference Include="Yoga.Net" Version="3.2.3" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\PixUI.AIChatBox\PixUI.AIChatBox.csproj" />
       <ProjectReference Include="..\PixUI.CodeEditor.Roslyn\PixUI.CodeEditor.Roslyn.csproj" />
       <ProjectReference Include="..\PixUI.CodeEditor.Text\PixUI.CodeEditor.Text.csproj" />
       <ProjectReference Include="..\PixUI.CodeEditor.TreeSitter\PixUI.CodeEditor.TreeSitter.csproj" />
@@ -30,7 +33,6 @@
       <ProjectReference Include="..\PixUI.Dynamic.Design\PixUI.Dynamic.Design.csproj" />
       <ProjectReference Include="..\PixUI.Dynamic.Json\PixUI.Dynamic.Json.csproj" />
       <ProjectReference Include="..\PixUI.Dynamic\PixUI.Dynamic.csproj" />
-      <ProjectReference Include="..\PixUI.Markdown\PixUI.Markdown.csproj" />
       <ProjectReference Include="..\PixUI\PixUI.csproj" />
     </ItemGroup>
     

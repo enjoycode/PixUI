@@ -11,4 +11,8 @@
       <PackageReference Include="Yoga.Net" Version="3.2.3" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Extensions\" />
+    </ItemGroup>
+
 </Project>
