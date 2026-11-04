@@ -5,5 +5,6 @@ namespace PixUI.AIChatBox;
 internal abstract class MarkdownBlock
 {
     internal abstract float Height { get; }
-    internal abstract void Layout(Block node, string textBuffer, ChatBoxController controller);
+    internal abstract void Layout(Block node, ChatBoxController controller);
+    internal abstract void OnPaint(ICanvas canvas, ChatBoxController controller);
 }

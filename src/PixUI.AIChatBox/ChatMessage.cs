@@ -8,7 +8,7 @@ public abstract class ChatMessage
 
     internal abstract void OnLayout(float availableWidth);
 
-    internal abstract void OnPaint(ICanvas canvas);
+    internal abstract void OnPaint(ICanvas canvas, ChatBoxController controller);
 }
 
 public sealed class AIMessage : ChatMessage
@@ -29,12 +29,25 @@ public sealed class AIMessage : ChatMessage
 
     internal override void OnLayout(float availableWidth)
     {
-        throw new NotImplementedException();
+        
     }
 
-    internal override void OnPaint(ICanvas canvas)
+    internal override void OnPaint(ICanvas canvas, ChatBoxController controller)
     {
-        throw new NotImplementedException();
+        // draw border
+        var border = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, controller.Width, H), 3, 3);
+        canvas.DrawRRect(border, Paint.Shared(Colors.Red, PaintStyle.Stroke)); //TODO:
+
+        //TODO:优化仅画可见区域
+        var offsetY = 0f;
+        foreach (var element in _elements)
+        {
+            canvas.Translate(0, offsetY);
+            element.OnPaint(canvas, controller);
+            offsetY += element.Height;
+        }
+
+        canvas.Translate(0, -offsetY);
     }
 }
 
@@ -42,11 +55,11 @@ public sealed class UserMessage : ChatMessage
 {
     internal override void OnLayout(float availableWidth)
     {
-        throw new NotImplementedException();
+        
     }
 
-    internal override void OnPaint(ICanvas canvas)
+    internal override void OnPaint(ICanvas canvas, ChatBoxController controller)
     {
-        throw new NotImplementedException();
+        
     }
 }

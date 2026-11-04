@@ -33,9 +33,12 @@ public class MarkdownTest
     [Test(Description = "增量解析测试")]
     public void ParseTest()
     {
-        var pipeline = new MarkdownPipelineBuilder().UsePipeTables().Build();
+        var pipeline = new MarkdownPipelineBuilder()
+            .UseEmphasisExtras()
+            .UsePipeTables()
+            .Build();
 
-        var doc = Markdig.Markdown.Parse("```charp\n\n```", pipeline);
+        var doc = Markdig.Markdown.Parse("**AA *BB*  CC**", pipeline);
     }
     
     [Test(Description = "修改AST测试")]

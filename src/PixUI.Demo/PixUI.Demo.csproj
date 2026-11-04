@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\PixUI.AIChatBox\PixUI.AIChatBox.csproj" />
         <ProjectReference Include="..\PixUI.CodeEditor.Roslyn\PixUI.CodeEditor.Roslyn.csproj" />
         <ProjectReference Include="..\PixUI.CodeEditor.Text\PixUI.CodeEditor.Text.csproj"/>
         <ProjectReference Include="..\PixUI.CodeEditor.TreeSitter\PixUI.CodeEditor.TreeSitter.csproj"/>
@@ -102,6 +103,8 @@
         <EmbeddedResource Include="Resources\Demos\Other\DemoTransform.cs" />
         <Compile Remove="Resources\Demos\FileDialog\DemoFileDialog.cs" />
         <EmbeddedResource Include="Resources\Demos\FileDialog\DemoFileDialog.cs" />
+        <Compile Remove="Resources\Demos\Other\DemoChatBox.cs" />
+        <EmbeddedResource Include="Resources\Demos\Other\DemoChatBox.cs" />
     </ItemGroup>
 
 </Project>

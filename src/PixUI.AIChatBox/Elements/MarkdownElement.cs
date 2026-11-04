@@ -8,6 +8,8 @@ internal sealed class MarkdownElement : MessageElement
     private readonly List<MarkdownBlock> _blocks = [];
     private string _textBuffer = string.Empty; //TODO: 待Markdig支持流式缓存
 
+    internal override float Height => _blocks.Sum(b => b.Height);
+
     internal float Append(string markdown, ChatBoxController controller)
     {
         float heightDiff = 0;
@@ -18,7 +20,7 @@ internal sealed class MarkdownElement : MessageElement
         foreach (var node in newDoc)
         {
             var block = CreateBlock(node);
-            block.Layout(node, _textBuffer, controller);
+            block.Layout(node, controller);
 
             if (isNew)
             {
@@ -46,9 +48,18 @@ internal sealed class MarkdownElement : MessageElement
         throw new NotImplementedException();
     }
 
-    internal override void OnPaint(ICanvas canvas)
+    internal override void OnPaint(ICanvas canvas,  ChatBoxController controller)
     {
-        throw new NotImplementedException();
+        //TODO: 仅画可见区域
+        var offsetY = 0f;
+        foreach (var block in _blocks)
+        {
+            canvas.Translate(0, offsetY);
+            block.OnPaint(canvas, controller);
+            offsetY += block.Height;
+        }
+
+        canvas.Translate(0, -offsetY);
     }
 
     private static MarkdownBlock CreateBlock(Block node)

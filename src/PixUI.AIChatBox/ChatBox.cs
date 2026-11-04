@@ -2,6 +2,12 @@ namespace PixUI.AIChatBox;
 
 public sealed class ChatBox : Widget, IScrollable
 {
+    public ChatBox(ChatBoxController controller)
+    {
+        Controller = controller;
+        Controller.RepaintAction = () => Repaint();
+    }
+
     public readonly ChatBoxController Controller;
 
     #region ====IScrollable====
@@ -31,6 +37,9 @@ public sealed class ChatBox : Widget, IScrollable
 
     protected override void OnLayout(Size maxSize)
     {
+        SetLayoutSize(maxSize);
+
+        // ReSharper disable once CompareOfFloatsByEqualityOperator
         if (Controller.Width != maxSize.Width)
         {
             Controller.Width = maxSize.Width;
@@ -57,7 +66,7 @@ public sealed class ChatBox : Widget, IScrollable
             if (child.Y >= scrollOffsetY + H) break; //大于下边界
 
             canvas.Translate(0, child.Y);
-            child.OnPaint(canvas);
+            child.OnPaint(canvas, Controller);
             canvas.Translate(0, -child.Y);
         }
 

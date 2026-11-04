@@ -9,40 +9,75 @@ internal sealed class MarkdownParagraph : MarkdownBlock
 
     internal override float Height => _paragraph?.Height ?? 0;
 
-    internal override void Layout(Block node, string textBuffer, ChatBoxController controller)
+    internal override void Layout(Block node, ChatBoxController controller)
     {
         _paragraph?.Dispose();
         var paraNode = (ParagraphBlock)node;
         var inline = paraNode.Inline;
-        if (inline == null) return;
+        if (inline?.FirstChild == null) return;
 
         using var ps = ParagraphStyle.Create(); //TODO: move to controller
         using var pb = ParagraphBuilder.Create(ps);
+        var styles = new Stack<InlineStyle>();
+        styles.Push(InlineStyle.None);
 
-        var child = inline.FirstChild;
+        BuildContainerInline(pb, inline, styles, controller);
+
+        styles.Clear();
+        _paragraph = pb.Build();
+        _paragraph.Layout(controller.Width);
+    }
+
+    private static void BuildContainerInline(IParagraphBuilder pb, ContainerInline node, Stack<InlineStyle> styles,
+        ChatBoxController controller)
+    {
+        var child = node.FirstChild;
         while (child != null)
         {
             switch (child)
             {
-                case LiteralInline literal:
-                {
-                    pb.PushStyle(controller.LiteralTextStyle);
-                    pb.AddText(textBuffer.Substring(literal.Span.Start, literal.Span.Length));
-                    pb.Pop();
-                    break;
-                }
-                case EmphasisInline emphasis:
-                {
-                    //TODO:
-                    break;
-                }
+                case LiteralInline literal: BuildLiteral(pb, styles.Peek(), literal, controller); break;
+                case EmphasisInline emphasis: BuildEmphasis(pb, emphasis, styles, controller); break;
                 default: throw new NotImplementedException();
             }
 
             child = child.NextSibling;
         }
+    }
 
-        _paragraph = pb.Build();
-        _paragraph.Layout(controller.Width);
+    private static void BuildLiteral(IParagraphBuilder pb, InlineStyle style, LiteralInline node,
+        ChatBoxController controller)
+    {
+        pb.PushStyle(controller.GetTextStyle(style));
+        pb.AddText(node.Content.ToString()); //TODO: avoid string allocate
+        pb.Pop();
+    }
+
+    private static void BuildEmphasis(IParagraphBuilder pb, EmphasisInline node, Stack<InlineStyle> styles,
+        ChatBoxController controller)
+    {
+        if (node.FirstChild == null) return;
+
+        var style = node.Parent is EmphasisInline ? styles.Peek() : InlineStyle.None;
+        if (node.DelimiterChar is '*' or '_')
+        {
+            if (node.DelimiterCount == 1)
+                style |= InlineStyle.Italic;
+            else if (node.DelimiterCount == 2)
+                style |= InlineStyle.Bold;
+        }
+        else if (node.DelimiterChar is '~' && node.DelimiterCount == 2)
+            style |= InlineStyle.Strike;
+
+        styles.Push(style);
+        BuildContainerInline(pb, node, styles, controller);
+        styles.Pop();
+    }
+
+    internal override void OnPaint(ICanvas canvas, ChatBoxController controller)
+    {
+        if (_paragraph == null) return;
+
+        canvas.DrawParagraph(_paragraph, 0, 0);
     }
 }

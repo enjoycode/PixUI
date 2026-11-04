@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using LiveChartsCore;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using PixUI.AIChatBox;
 using PixUI.CodeEditor.Roslyn;
 using PixUI.Diagram;
 using PixUI.LiveCharts;
@@ -39,7 +40,8 @@ internal sealed class PlaygroundContext
             CreateMetadataReference(typeof(LineSeries<>).Assembly),
             CreateMetadataReference(typeof(PieChart).Assembly),
             CreateMetadataReference(typeof(MaterialIcons).Assembly),
-            CreateMetadataReference(typeof(DiagramView).Assembly)
+            CreateMetadataReference(typeof(DiagramView).Assembly),
+            CreateMetadataReference(typeof(ChatBox).Assembly),
         ];
 
         var prjInfo = ProjectInfo.Create(_projectId, VersionStamp.Create(),

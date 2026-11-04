@@ -6,9 +6,14 @@ internal sealed class MarkdownCodeBlock : MarkdownBlock
 {
     internal override float Height => throw new NotImplementedException();
 
-    internal override void Layout(Block node, string textBuffer, ChatBoxController controller)
+    internal override void Layout(Block node, ChatBoxController controller)
     {
         var codeNode = (FencedCodeBlock)node;
+        throw new NotImplementedException();
+    }
+
+    internal override void OnPaint(ICanvas canvas, ChatBoxController controller)
+    {
         throw new NotImplementedException();
     }
 }
