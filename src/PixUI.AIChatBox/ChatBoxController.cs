@@ -18,6 +18,7 @@ public sealed class ChatBoxController
         ItalicTextStyle = CreateTextStyle(Theme, FontWeight.Normal, FontSlant.Italic);
         BoldAndItalicTextStyle = CreateTextStyle(Theme, FontWeight.Bold, FontSlant.Italic);
         StrikeTextStyle = CreateTextStyle(Theme, FontWeight.Bold, FontSlant.Italic); //TODO: fix
+        InlineCodeTextStyle = CreateTextStyle(Theme.FontSize, Colors.Magenta, FontWeight.Bold, FontSlant.Upright);
     }
 
     internal readonly ScrollController ScrollController;
@@ -41,24 +42,30 @@ public sealed class ChatBoxController
         RepaintAction?.Invoke(); //TODO: check is visible
     }
 
+    #region ====TextStyles====
+
     public ITextStyle NormalTextStyle { get; private set; }
     public ITextStyle BoldAndItalicTextStyle { get; private set; }
     public ITextStyle BoldTextStyle { get; private set; }
     public ITextStyle ItalicTextStyle { get; private set; }
     public ITextStyle StrikeTextStyle { get; private set; }
+    public ITextStyle InlineCodeTextStyle { get; private set; }
 
-    private static ITextStyle CreateTextStyle(Theme theme, FontWeight weight, FontSlant slant)
+    private static ITextStyle CreateTextStyle(Theme theme, FontWeight weight, FontSlant slant) =>
+        CreateTextStyle(theme.FontSize, theme.TextColor, weight, slant);
+
+    private static ITextStyle CreateTextStyle(float fontSize, Color color, FontWeight weight, FontSlant slant)
     {
         var ts = TextStyle.Create();
-        ts.FontSize = theme.FontSize;
-        ts.Color = theme.TextColor;
+        ts.FontSize = fontSize;
+        ts.Color = color;
         ts.FontStyle = new FontStyle(weight, slant);
         return ts;
     }
 
     internal ITextStyle GetTextStyle(InlineStyle style)
     {
-        //TODO: Code and Link first
+        //TODO: Link first
         if (style.HasFlag(InlineStyle.Bold) && style.HasFlag(InlineStyle.Italic))
             return BoldAndItalicTextStyle;
         if (style.HasFlag(InlineStyle.Bold))
@@ -70,4 +77,6 @@ public sealed class ChatBoxController
 
         return NormalTextStyle;
     }
+
+    #endregion
 }

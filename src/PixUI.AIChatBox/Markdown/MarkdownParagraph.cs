@@ -38,6 +38,7 @@ internal sealed class MarkdownParagraph : MarkdownBlock
             {
                 case LiteralInline literal: BuildLiteral(pb, styles.Peek(), literal, controller); break;
                 case EmphasisInline emphasis: BuildEmphasis(pb, emphasis, styles, controller); break;
+                case CodeInline code: BuildCode(pb, code, controller); break;
                 default: throw new NotImplementedException();
             }
 
@@ -50,6 +51,13 @@ internal sealed class MarkdownParagraph : MarkdownBlock
     {
         pb.PushStyle(controller.GetTextStyle(style));
         pb.AddText(node.Content.AsSpan());
+        pb.Pop();
+    }
+
+    private static void BuildCode(IParagraphBuilder pb, CodeInline node, ChatBoxController controller)
+    {
+        pb.PushStyle(controller.InlineCodeTextStyle);
+        pb.AddText(node.ContentSpan);
         pb.Pop();
     }
 
