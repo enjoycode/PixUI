@@ -49,7 +49,7 @@ internal sealed class MarkdownParagraph : MarkdownBlock
         ChatBoxController controller)
     {
         pb.PushStyle(controller.GetTextStyle(style));
-        pb.AddText(node.Content.ToString()); //TODO: avoid string allocate
+        pb.AddText(node.Content.AsSpan());
         pb.Pop();
     }
 

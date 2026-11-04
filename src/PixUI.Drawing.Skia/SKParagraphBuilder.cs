@@ -15,9 +15,10 @@ public sealed class SKParagraphBuilder : SKNativeObject, IParagraphBuilder
 
     public void Pop() => SkiaApi.sk_paragraph_builder_pop(Handle);
 
-    public unsafe void AddText(string text)
+    public void AddText(string text) => AddText(text.AsSpan());
+
+    public unsafe void AddText(ReadOnlySpan<char> span)
     {
-        ReadOnlySpan<char> span = text.AsSpan();
         fixed (void* t = span)
         {
             SkiaApi.sk_paragraph_builder_add_utf16_text(Handle, t, span.Length);

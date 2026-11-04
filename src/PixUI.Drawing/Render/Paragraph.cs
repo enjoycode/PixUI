@@ -48,6 +48,7 @@ public interface IParagraphBuilder : IDisposable
     void PushStyle(ITextStyle textStyle);
     void Pop();
     void AddText(string text);
+    void AddText(ReadOnlySpan<char> span);
     IParagraph Build();
 }
 
