@@ -12,6 +12,11 @@ internal sealed class MarkdownCodeBlock : MarkdownBlock
         throw new NotImplementedException();
     }
 
+    internal override void Relayout(float availableWidth)
+    {
+        throw new NotImplementedException();
+    }
+
     internal override void OnPaint(ICanvas canvas, ChatBoxController controller)
     {
         throw new NotImplementedException();

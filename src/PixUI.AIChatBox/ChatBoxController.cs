@@ -19,6 +19,9 @@ public sealed class ChatBoxController
         BoldAndItalicTextStyle = CreateTextStyle(Theme, FontWeight.Bold, FontSlant.Italic);
         StrikeTextStyle = CreateTextStyle(Theme, FontWeight.Bold, FontSlant.Italic); //TODO: fix
         InlineCodeTextStyle = CreateTextStyle(Theme.FontSize, Colors.Magenta, FontWeight.Bold, FontSlant.Upright);
+
+        ParagraphStyle = PixUI.ParagraphStyle.Create();
+        ParagraphStyle.TextStyle = NormalTextStyle;
     }
 
     internal readonly ScrollController ScrollController;
@@ -50,6 +53,8 @@ public sealed class ChatBoxController
     public ITextStyle ItalicTextStyle { get; private set; }
     public ITextStyle StrikeTextStyle { get; private set; }
     public ITextStyle InlineCodeTextStyle { get; private set; }
+
+    public IParagraphStyle ParagraphStyle { get; private set; }
 
     private static ITextStyle CreateTextStyle(Theme theme, FontWeight weight, FontSlant slant) =>
         CreateTextStyle(theme.FontSize, theme.TextColor, weight, slant);

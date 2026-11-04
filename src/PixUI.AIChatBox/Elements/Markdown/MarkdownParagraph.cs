@@ -16,8 +16,7 @@ internal sealed class MarkdownParagraph : MarkdownBlock
         var inline = paraNode.Inline;
         if (inline?.FirstChild == null) return;
 
-        using var ps = ParagraphStyle.Create(); //TODO: move to controller
-        using var pb = ParagraphBuilder.Create(ps);
+        using var pb = ParagraphBuilder.Create(controller.ParagraphStyle);
         var styles = new Stack<InlineStyle>();
         styles.Push(InlineStyle.None);
 
@@ -26,6 +25,11 @@ internal sealed class MarkdownParagraph : MarkdownBlock
         styles.Clear();
         _paragraph = pb.Build();
         _paragraph.Layout(controller.Width);
+    }
+
+    internal override void Relayout(float availableWidth)
+    {
+        _paragraph?.Layout(availableWidth);
     }
 
     private static void BuildContainerInline(IParagraphBuilder pb, ContainerInline node, Stack<InlineStyle> styles,

@@ -45,10 +45,13 @@ internal sealed class MarkdownElement : MessageElement
 
     internal override void OnLayout(float availableWidth)
     {
-        throw new NotImplementedException();
+        foreach (var block in _blocks)
+        {
+            block.Relayout(availableWidth);
+        }
     }
 
-    internal override void OnPaint(ICanvas canvas,  ChatBoxController controller)
+    internal override void OnPaint(ICanvas canvas, ChatBoxController controller)
     {
         //TODO: 仅画可见区域
         var offsetY = 0f;

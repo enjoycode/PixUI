@@ -29,7 +29,9 @@ public sealed class AIMessage : ChatMessage
 
     internal override void OnLayout(float availableWidth)
     {
-        
+        foreach (var element in _elements)
+            element.OnLayout(availableWidth);
+        H = _elements.Sum(e => e.Height);
     }
 
     internal override void OnPaint(ICanvas canvas, ChatBoxController controller)
@@ -53,13 +55,7 @@ public sealed class AIMessage : ChatMessage
 
 public sealed class UserMessage : ChatMessage
 {
-    internal override void OnLayout(float availableWidth)
-    {
-        
-    }
+    internal override void OnLayout(float availableWidth) { }
 
-    internal override void OnPaint(ICanvas canvas, ChatBoxController controller)
-    {
-        
-    }
+    internal override void OnPaint(ICanvas canvas, ChatBoxController controller) { }
 }
