@@ -1,3 +1,4 @@
+using Markdig.Extensions.Tables;
 using Markdig.Parsers;
 using Markdig.Syntax;
 
@@ -24,13 +25,14 @@ internal sealed class MarkdownElement : MessageElement
 
             if (isNew)
             {
-                _blocks.Add(block);
                 heightDiff += block.Height;
+                _blocks.Add(block);
             }
             else
             {
-                _blocks[^1] = block;
                 heightDiff += (block.Height - _blocks[^1].Height);
+                _blocks[^1].Dispose();
+                _blocks[^1] = block;
             }
 
             isNew = true;
@@ -57,23 +59,20 @@ internal sealed class MarkdownElement : MessageElement
         var offsetY = 0f;
         foreach (var block in _blocks)
         {
-            canvas.Translate(0, offsetY);
             block.OnPaint(canvas, controller);
+            canvas.Translate(0, block.Height);
+
             offsetY += block.Height;
         }
 
         canvas.Translate(0, -offsetY);
     }
 
-    private static MarkdownBlock CreateBlock(Block node)
+    private static MarkdownBlock CreateBlock(Block node) => node switch
     {
-        switch (node)
-        {
-            case ParagraphBlock:
-                return new MarkdownParagraph();
-            case FencedCodeBlock:
-                return new MarkdownCodeBlock();
-            default: throw new NotImplementedException();
-        }
-    }
+        ParagraphBlock => new MarkdownParagraph(),
+        Table => new MarkdownTable(),
+        FencedCodeBlock => new MarkdownCodeBlock(),
+        _ => throw new NotImplementedException()
+    };
 }

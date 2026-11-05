@@ -9,6 +9,8 @@ internal sealed class MarkdownParagraph : MarkdownBlock
 
     internal override float Height => _paragraph?.Height ?? 0;
 
+    internal float Width => _paragraph?.LongestLine ?? 0;
+
     internal override void Layout(Block node, ChatBoxController controller)
     {
         _paragraph?.Dispose();
@@ -29,6 +31,7 @@ internal sealed class MarkdownParagraph : MarkdownBlock
 
     internal override void Relayout(float availableWidth)
     {
+        if (_paragraph == null || (_paragraph.Lines <= 1 && Width <= availableWidth)) return;
         _paragraph?.Layout(availableWidth);
     }
 
@@ -43,7 +46,8 @@ internal sealed class MarkdownParagraph : MarkdownBlock
                 case LiteralInline literal: BuildLiteral(pb, styles.Peek(), literal, controller); break;
                 case EmphasisInline emphasis: BuildEmphasis(pb, emphasis, styles, controller); break;
                 case CodeInline code: BuildCode(pb, code, controller); break;
-                default: throw new NotImplementedException();
+                case LineBreakInline lineBreak: BuildLineBreak(pb, lineBreak, controller); break;
+                default: throw new NotImplementedException(child.GetType().Name);
             }
 
             child = child.NextSibling;
@@ -55,6 +59,13 @@ internal sealed class MarkdownParagraph : MarkdownBlock
     {
         pb.PushStyle(controller.GetTextStyle(style));
         pb.AddText(node.Content.AsSpan());
+        pb.Pop();
+    }
+
+    private static void BuildLineBreak(IParagraphBuilder pb, LineBreakInline node, ChatBoxController controller)
+    {
+        pb.PushStyle(controller.NormalTextStyle);
+        pb.AddText("\n");
         pb.Pop();
     }
 
@@ -92,4 +103,6 @@ internal sealed class MarkdownParagraph : MarkdownBlock
 
         canvas.DrawParagraph(_paragraph, 0, 0);
     }
+
+    internal override void Dispose() => _paragraph?.Dispose();
 }

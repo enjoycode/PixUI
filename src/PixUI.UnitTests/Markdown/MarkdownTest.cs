@@ -38,7 +38,13 @@ public class MarkdownTest
             .UsePipeTables()
             .Build();
 
-        var doc = Markdig.Markdown.Parse("**AA *BB*  CC**", pipeline);
+        var markdown = """
+                       | AA | BB | CC |
+                       |----|----|----|
+                       | C1 | C2 | C3 |
+                       """;
+
+        var doc = Markdig.Markdown.Parse(markdown, pipeline);
     }
     
     [Test(Description = "修改AST测试")]
