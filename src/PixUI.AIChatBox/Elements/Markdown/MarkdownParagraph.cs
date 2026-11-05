@@ -18,7 +18,7 @@ internal sealed class MarkdownParagraph : MarkdownBlock
         var inline = paraNode.Inline;
         if (inline?.FirstChild == null) return;
 
-        using var pb = ParagraphBuilder.Create(controller.ParagraphStyle);
+        using var pb = ParagraphBuilder.Create(ChatBoxTheme.ParagraphStyle);
         var styles = new Stack<InlineStyle>();
         styles.Push(InlineStyle.None);
 
@@ -43,10 +43,10 @@ internal sealed class MarkdownParagraph : MarkdownBlock
         {
             switch (child)
             {
-                case LiteralInline literal: BuildLiteral(pb, styles.Peek(), literal, controller); break;
+                case LiteralInline literal: BuildLiteral(pb, styles.Peek(), literal); break;
                 case EmphasisInline emphasis: BuildEmphasis(pb, emphasis, styles, controller); break;
-                case CodeInline code: BuildCode(pb, code, controller); break;
-                case LineBreakInline lineBreak: BuildLineBreak(pb, lineBreak, controller); break;
+                case CodeInline code: BuildCode(pb, code); break;
+                case LineBreakInline lineBreak: BuildLineBreak(pb, lineBreak); break;
                 default: throw new NotImplementedException(child.GetType().Name);
             }
 
@@ -54,24 +54,23 @@ internal sealed class MarkdownParagraph : MarkdownBlock
         }
     }
 
-    private static void BuildLiteral(IParagraphBuilder pb, InlineStyle style, LiteralInline node,
-        ChatBoxController controller)
+    private static void BuildLiteral(IParagraphBuilder pb, InlineStyle style, LiteralInline node)
     {
-        pb.PushStyle(controller.GetTextStyle(style));
+        pb.PushStyle(ChatBoxTheme.GetTextStyle(style));
         pb.AddText(node.Content.AsSpan());
         pb.Pop();
     }
 
-    private static void BuildLineBreak(IParagraphBuilder pb, LineBreakInline node, ChatBoxController controller)
+    private static void BuildLineBreak(IParagraphBuilder pb, LineBreakInline node)
     {
-        pb.PushStyle(controller.NormalTextStyle);
+        pb.PushStyle(ChatBoxTheme.NormalTextStyle);
         pb.AddText("\n");
         pb.Pop();
     }
 
-    private static void BuildCode(IParagraphBuilder pb, CodeInline node, ChatBoxController controller)
+    private static void BuildCode(IParagraphBuilder pb, CodeInline node)
     {
-        pb.PushStyle(controller.InlineCodeTextStyle);
+        pb.PushStyle(ChatBoxTheme.InlineCodeTextStyle);
         pb.AddText(node.ContentSpan);
         pb.Pop();
     }
