@@ -7,6 +7,7 @@ internal sealed class MarkdownTable : MarkdownBlock
 {
     private readonly List<ColumnInfo> _columns = [];
     private readonly List<RowInfo> _rows = [];
+    private float[] _maxColumnWidths = [];
 
     internal override float Height => _rows.Sum(r => r.Height) +
                                       _rows.Count * ChatBoxTheme.TableCellPadding * 2;
@@ -20,7 +21,7 @@ internal sealed class MarkdownTable : MarkdownBlock
             _columns.Add(new ColumnInfo() { Alignment = column.Alignment });
 
         _rows.Clear();
-        var maxColumnWidths = new float[_columns.Count];
+        _maxColumnWidths = new float[_columns.Count];
         foreach (var rowNode in table)
         {
             var row = (TableRow)rowNode;
@@ -35,8 +36,8 @@ internal sealed class MarkdownTable : MarkdownBlock
                 {
                     var cellParagraph = new MarkdownParagraph();
                     cellParagraph.Layout(paragraphNode, controller); //先按最大宽度布局
-                    if (columnIndex < maxColumnWidths.Length)
-                        maxColumnWidths[columnIndex] = Math.Max(maxColumnWidths[columnIndex], cellParagraph.Width);
+                    if (columnIndex < _maxColumnWidths.Length)
+                        _maxColumnWidths[columnIndex] = Math.Max(_maxColumnWidths[columnIndex], cellParagraph.Width);
                     rowInfo.Cells.Add(cellParagraph);
                 }
 
@@ -45,17 +46,34 @@ internal sealed class MarkdownTable : MarkdownBlock
         }
 
         //重新计算合适的列宽
-        var totalWidth = controller.Width - ChatBoxTheme.TableCellPadding * (_columns.Count + 1);
+        CalcColumnWidths(controller.Width);
+    }
+
+    internal override void Relayout(float availableWidth)
+    {
+        // var totalWidth = _columns.Sum(r => r.Width) +
+        //                  _columns.Count * ChatBoxTheme.TableCellPadding * 2;
+        // if (totalWidth <= availableWidth) return;
+
+        foreach (var column in _columns)
+            column.Reset();
+
+        CalcColumnWidths(availableWidth);
+    }
+
+    private void CalcColumnWidths(float availableWidth)
+    {
+        var totalWidth = availableWidth - ChatBoxTheme.TableCellPadding * (_columns.Count + 1);
         var avgColumnWidth = totalWidth / _columns.Count;
         var totalFixed = 0f;
         var fixedCount = 0;
         for (int i = 0; i < _columns.Count; i++)
         {
-            if (maxColumnWidths[i] <= avgColumnWidth)
+            if (_maxColumnWidths[i] <= avgColumnWidth)
             {
-                _columns[i].Width = maxColumnWidths[i];
+                _columns[i].Width = _maxColumnWidths[i];
                 _columns[i].IsFixed = true;
-                totalFixed += maxColumnWidths[i];
+                totalFixed += _maxColumnWidths[i];
                 fixedCount++;
             }
         }
@@ -80,8 +98,6 @@ internal sealed class MarkdownTable : MarkdownBlock
         }
     }
 
-    internal override void Relayout(float availableWidth) { }
-
     internal override void OnPaint(ICanvas canvas, ChatBoxController controller)
     {
         var offsetY = ChatBoxTheme.TableCellPadding;
@@ -91,9 +107,10 @@ internal sealed class MarkdownTable : MarkdownBlock
             var rowHeight = _rows[i].Height;
             for (int j = 0; j < _columns.Count; j++)
             {
-                var cellRect = Rect.FromLTWH(offsetX - ChatBoxTheme.TableCellPadding, 
+                var cellRect = Rect.FromLTWH(
+                    offsetX - ChatBoxTheme.TableCellPadding,
                     offsetY - ChatBoxTheme.TableCellPadding,
-                    _columns[j].Width + ChatBoxTheme.TableCellPadding * 2, 
+                    _columns[j].Width + ChatBoxTheme.TableCellPadding * 2,
                     rowHeight + ChatBoxTheme.TableCellPadding * 2);
                 canvas.DrawRect(cellRect, Paint.Shared(Colors.Gray, PaintStyle.Stroke));
 
