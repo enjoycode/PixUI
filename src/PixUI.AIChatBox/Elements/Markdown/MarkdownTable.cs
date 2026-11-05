@@ -1,3 +1,4 @@
+using System.Runtime.Intrinsics.X86;
 using Markdig.Extensions.Tables;
 using Markdig.Syntax;
 
@@ -8,7 +9,8 @@ internal sealed class MarkdownTable : MarkdownBlock
     private readonly List<ColumnInfo> _columns = [];
     private readonly List<RowInfo> _rows = [];
 
-    internal override float Height => _rows.Sum(r => r.Height);
+    internal override float Height => _rows.Sum(r => r.Height) + _rows.Count * CELL_PADDING * 2;
+    private const float CELL_PADDING = 2f;
 
     internal override void Layout(Block node, ChatBoxController controller)
     {
@@ -33,7 +35,7 @@ internal sealed class MarkdownTable : MarkdownBlock
                 if (cell[0] is ParagraphBlock paragraphNode)
                 {
                     var cellParagraph = new MarkdownParagraph();
-                    cellParagraph.Layout(paragraphNode, controller);
+                    cellParagraph.Layout(paragraphNode, controller); //先按最大宽度布局
                     if (columnIndex < maxColumnWidths.Length)
                         maxColumnWidths[columnIndex] = Math.Max(maxColumnWidths[columnIndex], cellParagraph.Width);
                     rowInfo.Cells.Add(cellParagraph);
@@ -44,7 +46,7 @@ internal sealed class MarkdownTable : MarkdownBlock
         }
 
         //重新计算合适的列宽
-        var totalWidth = controller.Width;
+        var totalWidth = controller.Width - CELL_PADDING * (_columns.Count + 1);
         var avgColumnWidth = totalWidth / _columns.Count;
         var totalFixed = 0f;
         var fixedCount = 0;
@@ -83,13 +85,15 @@ internal sealed class MarkdownTable : MarkdownBlock
 
     internal override void OnPaint(ICanvas canvas, ChatBoxController controller)
     {
-        var offsetY = 0f;
+        var offsetY = CELL_PADDING;
         for (int i = 0; i < _rows.Count; i++)
         {
-            var offsetX = 0f;
+            var offsetX = CELL_PADDING;
+            var rowHeight = _rows[i].Height;
             for (int j = 0; j < _columns.Count; j++)
             {
-                var cellRect = Rect.FromLTWH(offsetX, offsetY, _columns[j].Width, _rows[i].Height);
+                var cellRect = Rect.FromLTWH(offsetX - CELL_PADDING, offsetY - CELL_PADDING,
+                    _columns[j].Width + CELL_PADDING * 2, rowHeight + CELL_PADDING * 2);
                 canvas.DrawRect(cellRect, Paint.Shared(Colors.Gray, PaintStyle.Stroke));
 
                 var cell = _rows[i].Cells[j];
@@ -97,9 +101,10 @@ internal sealed class MarkdownTable : MarkdownBlock
                 canvas.Translate(offsetX, offsetY);
                 cell.OnPaint(canvas, controller);
                 canvas.Translate(-offsetX, -offsetY);
-                offsetX += _columns[j].Width;
+                offsetX += _columns[j].Width + CELL_PADDING * 2;
             }
-            offsetY += _rows[i].Height;
+
+            offsetY += rowHeight + CELL_PADDING * 2;
         }
     }
 

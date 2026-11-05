@@ -6,5 +6,5 @@ public sealed class Theme
 
     public Color TextColor { get; set; } = Colors.Black;
 
-    public float LineSpacing { get; set; } = 2f;
+    // public float LineSpacing { get; set; } = 2f;
 }
