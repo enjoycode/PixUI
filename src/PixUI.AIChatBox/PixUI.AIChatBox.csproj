@@ -12,6 +12,8 @@
 
     <ItemGroup>
       <PackageReference Include="Markdig" Version="1.5.1" />
+      <PackageReference Include="TextMateSharp" Version="3.0.0-preview.1" />
+      <PackageReference Include="TextMateSharp.Grammars" Version="3.0.0-preview.1" />
     </ItemGroup>
 
 </Project>

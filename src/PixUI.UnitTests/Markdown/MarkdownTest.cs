@@ -24,10 +24,12 @@ public class MarkdownTest
     [Test]
     public void StreamTest()
     {
-        var controller = new ChatBoxController();
-        controller.Width = 400;
-        controller.AppendAIThinkContent("用户\n\n");
-        controller.AppendAIThinkContent("要求");
+        // var controller = new ChatBoxController();
+        // controller.Width = 400;
+        // controller.AppendAIThinkContent("用户\n\n");
+        // controller.AppendAIThinkContent("要求");
+        var gramma = CodeTokenizer.GetGramma("csharp");
+        Assert.IsNotNull(gramma);
     }
     
     [Test(Description = "增量解析测试")]
@@ -38,10 +40,18 @@ public class MarkdownTest
             .UsePipeTables()
             .Build();
 
+        // var markdown = """
+        //                | AA | BB | CC |
+        //                |----|----|----|
+        //                | C1 | C2 | C3 |
+        //                """;
         var markdown = """
-                       | AA | BB | CC |
-                       |----|----|----|
-                       | C1 | C2 | C3 |
+                       ```csharp
+                       public class HelloService
+                       {
+                           
+                       }
+                       ```
                        """;
 
         var doc = Markdig.Markdown.Parse(markdown, pipeline);

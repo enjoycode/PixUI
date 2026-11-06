@@ -14,7 +14,7 @@ public static class ChatBoxTheme
         ParagraphStyle = PixUI.ParagraphStyle.Create();
         ParagraphStyle.TextStyle = NormalTextStyle;
     }
-    
+
     public static float FontSize { get; set; } = 13f;
 
     public static Color TextColor { get; set; } = Colors.Black;
@@ -30,9 +30,9 @@ public static class ChatBoxTheme
     public static ITextStyle BoldTextStyle { get; private set; }
     public static ITextStyle ItalicTextStyle { get; private set; }
     public static ITextStyle StrikeTextStyle { get; private set; }
-    public static  ITextStyle InlineCodeTextStyle { get; private set; }
+    public static ITextStyle InlineCodeTextStyle { get; private set; }
 
-    public static  IParagraphStyle ParagraphStyle { get; private set; }
+    public static IParagraphStyle ParagraphStyle { get; private set; }
 
     private static ITextStyle CreateTextStyle(FontWeight weight, FontSlant slant) =>
         CreateTextStyle(FontSize, TextColor, weight, slant);
