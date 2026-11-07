@@ -22,7 +22,7 @@ public static class ChatBoxTheme
     public static float TableCellPadding { get; set; } = 2f;
 
     // public float LineSpacing { get; set; } = 2f;
-    
+
     #region ====TextStyles====
 
     public static ITextStyle NormalTextStyle { get; private set; }
@@ -46,20 +46,42 @@ public static class ChatBoxTheme
         return ts;
     }
 
-    internal static ITextStyle GetTextStyle(InlineStyle style)
+    internal static ITextStyle GetTextStyle(InlineStyle style, int headingLevel)
     {
-        //TODO: Link first
+        ITextStyle ts;
         if (style.HasFlag(InlineStyle.Bold) && style.HasFlag(InlineStyle.Italic))
-            return BoldAndItalicTextStyle;
-        if (style.HasFlag(InlineStyle.Bold))
-            return BoldTextStyle;
-        if (style.HasFlag(InlineStyle.Italic))
-            return ItalicTextStyle;
-        if (style.HasFlag(InlineStyle.Strike))
-            return StrikeTextStyle;
+            ts = BoldAndItalicTextStyle;
+        else if (style.HasFlag(InlineStyle.Bold))
+            ts = BoldTextStyle;
+        else if (style.HasFlag(InlineStyle.Italic))
+            ts = ItalicTextStyle;
+        else if (style.HasFlag(InlineStyle.Strike))
+            ts = StrikeTextStyle;
+        else
+            ts = NormalTextStyle;
 
-        return NormalTextStyle;
+        ts.FontSize = GetFontSize(headingLevel);
+
+        return ts;
     }
+
+    internal static ITextStyle GetInlineCodeTextStyle(int headingLevel)
+    {
+        var ts = InlineCodeTextStyle;
+        ts.FontSize = GetFontSize(headingLevel);
+        return ts;
+    }
+
+    private static float GetFontSize(int headingLevel) => headingLevel switch
+    {
+        1 => FontSize + 18,
+        2 => FontSize + 15,
+        3 => FontSize + 12,
+        4 => FontSize + 9,
+        5 => FontSize + 6,
+        6 => FontSize + 3,
+        _ => FontSize
+    };
 
     #endregion
 }

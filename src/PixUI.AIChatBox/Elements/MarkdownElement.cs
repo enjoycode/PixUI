@@ -40,7 +40,17 @@ internal sealed class MarkdownElement : MessageElement
         }
 
         if (lastNode != null)
-            _textBuffer = lastNode.IsOpen ? _textBuffer[lastNode.Span.Start..] : string.Empty;
+        {
+            var lastNodeIsOpen = lastNode.IsOpen;
+            if (lastNode is HeadingBlock)
+            {
+                //特殊处理HeadingBlock，IsOpen始终为false, 只能根据是否换行来判断
+                if (_textBuffer.Length <= lastNode.Span.Start + lastNode.Span.Length)
+                    lastNodeIsOpen = true;
+            }
+
+            _textBuffer = lastNodeIsOpen ? _textBuffer[lastNode.Span.Start..] : string.Empty;
+        }
 
         return heightDiff;
     }
@@ -70,9 +80,10 @@ internal sealed class MarkdownElement : MessageElement
 
     private static MarkdownBlock CreateBlock(Block node) => node switch
     {
+        HeadingBlock => new MarkdownHeading(),
         ParagraphBlock => new MarkdownParagraph(),
         Table => new MarkdownTable(),
         FencedCodeBlock => new MarkdownCodeBlock(),
-        _ => throw new NotImplementedException()
+        _ => throw new NotImplementedException(node.GetType().Name)
     };
 }

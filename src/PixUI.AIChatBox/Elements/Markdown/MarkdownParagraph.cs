@@ -22,7 +22,7 @@ internal sealed class MarkdownParagraph : MarkdownBlock
         var styles = new Stack<InlineStyle>();
         styles.Push(InlineStyle.None);
 
-        BuildContainerInline(pb, inline, styles, controller);
+        ContainerInlineBuilder.Build(pb, inline, styles, 0, controller);
 
         styles.Clear();
         _paragraph = pb.Build();
@@ -33,67 +33,6 @@ internal sealed class MarkdownParagraph : MarkdownBlock
     {
         if (_paragraph == null || (_paragraph.Lines <= 1 && Width <= availableWidth)) return;
         _paragraph?.Layout(availableWidth);
-    }
-
-    private static void BuildContainerInline(IParagraphBuilder pb, ContainerInline node, Stack<InlineStyle> styles,
-        ChatBoxController controller)
-    {
-        var child = node.FirstChild;
-        while (child != null)
-        {
-            switch (child)
-            {
-                case LiteralInline literal: BuildLiteral(pb, styles.Peek(), literal); break;
-                case EmphasisInline emphasis: BuildEmphasis(pb, emphasis, styles, controller); break;
-                case CodeInline code: BuildCode(pb, code); break;
-                case LineBreakInline lineBreak: BuildLineBreak(pb, lineBreak); break;
-                default: throw new NotImplementedException(child.GetType().Name);
-            }
-
-            child = child.NextSibling;
-        }
-    }
-
-    private static void BuildLiteral(IParagraphBuilder pb, InlineStyle style, LiteralInline node)
-    {
-        pb.PushStyle(ChatBoxTheme.GetTextStyle(style));
-        pb.AddText(node.Content.AsSpan());
-        pb.Pop();
-    }
-
-    private static void BuildLineBreak(IParagraphBuilder pb, LineBreakInline node)
-    {
-        pb.PushStyle(ChatBoxTheme.NormalTextStyle);
-        pb.AddText("\n");
-        pb.Pop();
-    }
-
-    private static void BuildCode(IParagraphBuilder pb, CodeInline node)
-    {
-        pb.PushStyle(ChatBoxTheme.InlineCodeTextStyle);
-        pb.AddText(node.ContentSpan);
-        pb.Pop();
-    }
-
-    private static void BuildEmphasis(IParagraphBuilder pb, EmphasisInline node, Stack<InlineStyle> styles,
-        ChatBoxController controller)
-    {
-        if (node.FirstChild == null) return;
-
-        var style = node.Parent is EmphasisInline ? styles.Peek() : InlineStyle.None;
-        if (node.DelimiterChar is '*' or '_')
-        {
-            if (node.DelimiterCount == 1)
-                style |= InlineStyle.Italic;
-            else if (node.DelimiterCount == 2)
-                style |= InlineStyle.Bold;
-        }
-        else if (node.DelimiterChar is '~' && node.DelimiterCount == 2)
-            style |= InlineStyle.Strike;
-
-        styles.Push(style);
-        BuildContainerInline(pb, node, styles, controller);
-        styles.Pop();
     }
 
     internal override void OnPaint(ICanvas canvas, ChatBoxController controller)
