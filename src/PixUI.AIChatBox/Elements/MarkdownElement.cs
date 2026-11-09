@@ -85,6 +85,7 @@ internal sealed class MarkdownElement : MessageElement
         Table => new MarkdownTable(),
         FencedCodeBlock => new MarkdownCodeBlock(),
         QuoteBlock => new MarkdownQuote(),
-        _ => throw new NotImplementedException(node.GetType().Name)
+        ThematicBreakBlock => new MarkdownThematicBreak(),
+        _ => new MarkdownUnsupported()
     };
 }

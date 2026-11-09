@@ -25,6 +25,8 @@ public static class ChatBoxTheme
 
     public static Color QuoteBackgroundColor { get; set; } = Colors.LightGray;
 
+    public static Color HorizontalRuleColor { get; set; } = Colors.LightGray;
+
     // public float LineSpacing { get; set; } = 2f;
 
     #region ====TextStyles====

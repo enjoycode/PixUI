@@ -43,4 +43,10 @@ internal sealed class MarkdownQuote : MarkdownBlock
             block.OnPaint(canvas, controller);
         canvas.Translate(-_quoteWidth, 0);
     }
+
+    internal override void Dispose()
+    {
+        foreach (var block in _blocks)
+            block.Dispose();
+    }
 }
