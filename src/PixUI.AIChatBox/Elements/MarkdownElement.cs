@@ -21,7 +21,7 @@ internal sealed class MarkdownElement : MessageElement
         foreach (var node in newDoc)
         {
             var block = CreateBlock(node);
-            block.Layout(node, controller);
+            block.Layout(node, controller.Width);
 
             if (isNew)
             {
@@ -78,12 +78,13 @@ internal sealed class MarkdownElement : MessageElement
         canvas.Translate(0, -offsetY);
     }
 
-    private static MarkdownBlock CreateBlock(Block node) => node switch
+    internal static MarkdownBlock CreateBlock(Block node) => node switch
     {
         HeadingBlock => new MarkdownHeading(),
         ParagraphBlock => new MarkdownParagraph(),
         Table => new MarkdownTable(),
         FencedCodeBlock => new MarkdownCodeBlock(),
+        QuoteBlock => new MarkdownQuote(),
         _ => throw new NotImplementedException(node.GetType().Name)
     };
 }

@@ -53,7 +53,7 @@ public class MarkdownTest
                        ```
                        """;
 
-        var doc = Markdig.Markdown.Parse("## Heading`bb`cc", pipeline);
+        var doc = Markdig.Markdown.Parse("> aa\n> bb\n\n", pipeline);
     }
     
     [Test(Description = "修改AST测试")]

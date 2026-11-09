@@ -10,7 +10,7 @@ internal sealed class MarkdownHeading : MarkdownBlock
 
     private float Width => _paragraph?.LongestLine ?? 0;
 
-    internal override void Layout(Block node, ChatBoxController controller)
+    internal override void Layout(Block node, float availableWidth)
     {
         var headingNode = (HeadingBlock)node;
         if (headingNode.Inline == null) return;
@@ -19,11 +19,11 @@ internal sealed class MarkdownHeading : MarkdownBlock
         var styles = new Stack<InlineStyle>();
         styles.Push(InlineStyle.Bold);
 
-        ContainerInlineBuilder.Build(pb, headingNode.Inline, styles, headingNode.Level, controller);
+        ContainerInlineBuilder.Build(pb, headingNode.Inline, styles, headingNode.Level);
 
         styles.Clear();
         _paragraph = pb.Build();
-        _paragraph.Layout(controller.Width);
+        _paragraph.Layout(availableWidth);
     }
 
     internal override void Relayout(float availableWidth)

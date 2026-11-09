@@ -11,7 +11,7 @@ internal sealed class MarkdownParagraph : MarkdownBlock
 
     internal float Width => _paragraph?.LongestLine ?? 0;
 
-    internal override void Layout(Block node, ChatBoxController controller)
+    internal override void Layout(Block node, float availableWidth)
     {
         _paragraph?.Dispose();
         var paraNode = (ParagraphBlock)node;
@@ -22,11 +22,11 @@ internal sealed class MarkdownParagraph : MarkdownBlock
         var styles = new Stack<InlineStyle>();
         styles.Push(InlineStyle.None);
 
-        ContainerInlineBuilder.Build(pb, inline, styles, 0, controller);
+        ContainerInlineBuilder.Build(pb, inline, styles, 0);
 
         styles.Clear();
         _paragraph = pb.Build();
-        _paragraph.Layout(controller.Width);
+        _paragraph.Layout(availableWidth);
     }
 
     internal override void Relayout(float availableWidth)

@@ -8,7 +8,7 @@ namespace PixUI.AIChatBox;
 internal static class ContainerInlineBuilder
 {
     internal static void Build(IParagraphBuilder pb, ContainerInline node,
-        Stack<InlineStyle> styles, int headingLevel, ChatBoxController controller)
+        Stack<InlineStyle> styles, int headingLevel)
     {
         var child = node.FirstChild;
         while (child != null)
@@ -16,7 +16,7 @@ internal static class ContainerInlineBuilder
             switch (child)
             {
                 case LiteralInline literal: BuildLiteral(pb, styles.Peek(), headingLevel, literal); break;
-                case EmphasisInline emphasis: BuildEmphasis(pb, emphasis, styles, headingLevel, controller); break;
+                case EmphasisInline emphasis: BuildEmphasis(pb, emphasis, styles, headingLevel); break;
                 case CodeInline code: BuildCode(pb, headingLevel, code); break;
                 case LineBreakInline lineBreak: BuildLineBreak(pb, lineBreak); break;
                 default: throw new NotImplementedException(child.GetType().Name);
@@ -48,7 +48,7 @@ internal static class ContainerInlineBuilder
     }
 
     private static void BuildEmphasis(IParagraphBuilder pb, EmphasisInline node,
-        Stack<InlineStyle> styles, int headingLevel, ChatBoxController controller)
+        Stack<InlineStyle> styles, int headingLevel)
     {
         if (node.FirstChild == null) return;
 
@@ -64,7 +64,7 @@ internal static class ContainerInlineBuilder
             style |= InlineStyle.Strike;
 
         styles.Push(style);
-        Build(pb, node, styles, headingLevel, controller);
+        Build(pb, node, styles, headingLevel);
         styles.Pop();
     }
 }

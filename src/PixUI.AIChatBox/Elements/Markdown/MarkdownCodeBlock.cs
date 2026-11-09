@@ -15,7 +15,7 @@ internal sealed class MarkdownCodeBlock : MarkdownBlock
 
     internal override float Height => _lines.Sum(l => l.Height) + _cmdBarHeight + _doublePadding;
 
-    internal override void Layout(Block node, ChatBoxController controller)
+    internal override void Layout(Block node, float availableWidth)
     {
         foreach (var oldLine in _lines)
             oldLine.Paragraph?.Dispose();

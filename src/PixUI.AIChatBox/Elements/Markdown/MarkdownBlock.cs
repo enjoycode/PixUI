@@ -5,7 +5,7 @@ namespace PixUI.AIChatBox;
 internal abstract class MarkdownBlock
 {
     internal abstract float Height { get; }
-    internal abstract void Layout(Block node, ChatBoxController controller);
+    internal abstract void Layout(Block node, float availableWidth);
 
     /// <summary>
     /// 在视图宽度改变时重新布局

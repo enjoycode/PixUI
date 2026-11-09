@@ -21,6 +21,10 @@ public static class ChatBoxTheme
 
     public static float TableCellPadding { get; set; } = 2f;
 
+    public static Color QuoteColor { get; set; } = Colors.Gray;
+
+    public static Color QuoteBackgroundColor { get; set; } = Colors.LightGray;
+
     // public float LineSpacing { get; set; } = 2f;
 
     #region ====TextStyles====
