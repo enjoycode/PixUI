@@ -9,14 +9,14 @@ internal sealed class MarkdownQuote : MarkdownBlock
 
     internal override float Height => _blocks.Sum(b => b.Height);
 
-    internal override void Layout(Block node, float availableWidth)
+    internal override void Build(Block node, float availableWidth)
     {
         var quoteNode = (QuoteBlock)node;
 
         foreach (var child in quoteNode)
         {
             var block = MarkdownElement.CreateBlock(child);
-            block.Layout(child, availableWidth - _quoteWidth);
+            block.Build(child, availableWidth - _quoteWidth);
             _blocks.Add(block);
         }
     }

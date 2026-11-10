@@ -21,7 +21,7 @@ internal sealed class MarkdownElement : MessageElement
         foreach (var node in newDoc)
         {
             var block = CreateBlock(node);
-            block.Layout(node, controller.Width);
+            block.Build(node, controller.Width);
 
             if (isNew)
             {
@@ -84,6 +84,7 @@ internal sealed class MarkdownElement : MessageElement
         ParagraphBlock => new MarkdownParagraph(),
         Table => new MarkdownTable(),
         FencedCodeBlock => new MarkdownCodeBlock(),
+        ListBlock => new MarkdownList(),
         QuoteBlock => new MarkdownQuote(),
         ThematicBreakBlock => new MarkdownThematicBreak(),
         _ => new MarkdownUnsupported()

@@ -10,7 +10,7 @@ internal sealed class MarkdownHeading : MarkdownBlock
 
     private float Width => _paragraph?.LongestLine ?? 0;
 
-    internal override void Layout(Block node, float availableWidth)
+    internal override void Build(Block node, float availableWidth)
     {
         var headingNode = (HeadingBlock)node;
         if (headingNode.Inline == null) return;

@@ -26,12 +26,12 @@ public class MarkdownTest
     {
         var controller = new ChatBoxController();
         controller.Width = 400;
-        controller.AppendAIThinkContent("##");
-        controller.AppendAIThinkContent(" 要求\n");
-        controller.AppendAIThinkContent("如下");
+        controller.AppendAIThinkContent("- First\n");
+        controller.AppendAIThinkContent("  - 1.1\n");
+        controller.AppendAIThinkContent("  - 1.2\n");
     }
     
-    [Test(Description = "增量解析测试")]
+    [Test(Description = "AST测试")]
     public void ParseTest()
     {
         var pipeline = new MarkdownPipelineBuilder()
@@ -44,16 +44,22 @@ public class MarkdownTest
         //                |----|----|----|
         //                | C1 | C2 | C3 |
         //                """;
+        // var markdown = """
+        //                ```csharp
+        //                public class HelloService
+        //                {
+        //                    
+        //                }
+        //                ```
+        //                """;
         var markdown = """
-                       ```csharp
-                       public class HelloService
-                       {
-                           
-                       }
-                       ```
+                       - Item **1**
+                         1. Subitem 1.1
+                         1. Subitem 1.2
+                       - Item 2
                        """;
 
-        var doc = Markdig.Markdown.Parse("AA\n---\nBB\n", pipeline);
+        var doc = Markdig.Markdown.Parse(markdown, pipeline);
     }
     
     [Test(Description = "修改AST测试")]

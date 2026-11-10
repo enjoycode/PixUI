@@ -5,7 +5,11 @@ namespace PixUI.AIChatBox;
 internal abstract class MarkdownBlock
 {
     internal abstract float Height { get; }
-    internal abstract void Layout(Block node, float availableWidth);
+
+    /// <summary>
+    /// 将Markdig的Block转换为相应的MarkdownBlock并进行布局
+    /// </summary>
+    internal abstract void Build(Block node, float availableWidth);
 
     /// <summary>
     /// 在视图宽度改变时重新布局

@@ -7,7 +7,7 @@ internal sealed class MarkdownUnsupported : MarkdownBlock
     private IParagraph? _paragraph;
     internal override float Height => 20;
 
-    internal override void Layout(Block node, float availableWidth)
+    internal override void Build(Block node, float availableWidth)
     {
         using var pb = ParagraphBuilder.Create(ChatBoxTheme.ParagraphStyle);
         pb.PushStyle(ChatBoxTheme.NormalTextStyle);

@@ -5,7 +5,7 @@ namespace PixUI.AIChatBox;
 internal sealed class MarkdownThematicBreak : MarkdownBlock
 {
     internal override float Height => 16;
-    internal override void Layout(Block node, float availableWidth) { }
+    internal override void Build(Block node, float availableWidth) { }
     internal override void Relayout(float availableWidth) { }
 
     internal override void OnPaint(ICanvas canvas, ChatBoxController controller)

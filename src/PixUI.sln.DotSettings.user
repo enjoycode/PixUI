@@ -58,6 +58,7 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=111d06f6_002D0aa5_002D4a16_002Daa38_002D649f91a6acd6/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="ParseTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.Markdown.MarkdownTest.ParseTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.Markdown.MarkdownTest.StreamTest&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	

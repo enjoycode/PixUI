@@ -11,7 +11,7 @@ internal sealed class MarkdownParagraph : MarkdownBlock
 
     internal float Width => _paragraph?.LongestLine ?? 0;
 
-    internal override void Layout(Block node, float availableWidth)
+    internal override void Build(Block node, float availableWidth)
     {
         _paragraph?.Dispose();
         var paraNode = (ParagraphBlock)node;

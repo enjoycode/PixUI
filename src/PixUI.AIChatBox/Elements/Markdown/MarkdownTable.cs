@@ -12,7 +12,7 @@ internal sealed class MarkdownTable : MarkdownBlock
     internal override float Height => _rows.Sum(r => r.Height) +
                                       _rows.Count * ChatBoxTheme.TableCellPadding * 2;
 
-    internal override void Layout(Block node, float availableWidth)
+    internal override void Build(Block node, float availableWidth)
     {
         var table = (Table)node;
 
@@ -35,7 +35,7 @@ internal sealed class MarkdownTable : MarkdownBlock
                 if (cell[0] is ParagraphBlock paragraphNode)
                 {
                     var cellParagraph = new MarkdownParagraph();
-                    cellParagraph.Layout(paragraphNode, availableWidth); //先按最大宽度布局
+                    cellParagraph.Build(paragraphNode, availableWidth); //先按最大宽度布局
                     if (columnIndex < _maxColumnWidths.Length)
                         _maxColumnWidths[columnIndex] = Math.Max(_maxColumnWidths[columnIndex], cellParagraph.Width);
                     rowInfo.Cells.Add(cellParagraph);
