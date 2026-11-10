@@ -48,6 +48,11 @@ internal sealed class MarkdownElement : MessageElement
                 if (_textBuffer.Length <= lastNode.Span.Start + lastNode.Span.Length)
                     lastNodeIsOpen = true;
             }
+            else if (lastNode is ListBlock)
+            {
+                //特殊处理ListBlock, 在追加嵌套的子项时IsOpen为false(子项的IsOpen=true)
+                lastNodeIsOpen = true;
+            }
 
             _textBuffer = lastNodeIsOpen ? _textBuffer[lastNode.Span.Start..] : string.Empty;
         }
