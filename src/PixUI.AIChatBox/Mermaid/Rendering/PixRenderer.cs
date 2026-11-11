@@ -9,7 +9,7 @@ internal static class PixRenderer
     {
         using var picRecorder = PictureRecorder.Create();
         using var canvas = picRecorder.BeginRecording(Rect.FromLTWH(0, 0, (float)graph.Width, (float)graph.Height));
-        var edgeRadius = 0.0f;
+        var edgeRadius = (float)DesignSystem.Spec.EdgeBendRadius;
 
         ClusterPalette? palette = null;
         // var palette = diagramType is DiagramType.Flowchart or DiagramType.State
@@ -25,7 +25,11 @@ internal static class PixRenderer
             AppendEdge(edge, edgeRadius, canvas);
         }
 
-        //TODO: edge label
+        foreach (var edge in graph.Edges)
+        {
+            if (edge.Style != EdgeStyle.Invisible && !string.IsNullOrEmpty(edge.Label))
+                AppendEdgeLabel(edge, canvas);
+        }
 
         foreach (var node in graph.Nodes)
             AppendNode(node, canvas, palette);
@@ -45,12 +49,13 @@ internal static class PixRenderer
 
         //TODO: styles
         var strokeColor = Colors.Black;
-        var strokeWidth = 1f;
+        var strokeWidth = (float)DesignSystem.Spec.EdgeWidth;
 
         using var path = SvgRenderer.IsOrthogonal(edge.Points)
             ? BuildOrthogonalPath(edge.Points, cornerRadius)
             : BuildRoundedPath(edge.Points, cornerRadius);
         var paint = Paint.Shared(strokeColor, PaintStyle.Stroke, strokeWidth);
+        paint.IsAntialias = true;
         canvas.DrawPath(path, paint);
 
         //start and end arrow
@@ -69,6 +74,12 @@ internal static class PixRenderer
             using var endArrow = BuildArrowPath(targetPoint, targetSecondPoint);
             canvas.DrawPath(endArrow, Paint.Shared(strokeColor));
         }
+    }
+
+    private static void AppendEdgeLabel(PositionedEdge edge, ICanvas canvas)
+    {
+        var mid = edge.LabelPosition ?? VisualLanguage.PathMidpoint(edge.Points);
+        DesignSystem.AppendEdgeLabel((float)mid.X, (float)mid.Y, edge.Label!, canvas /*TODO: overrideColor*/);
     }
 
     /// <summary>
@@ -256,12 +267,19 @@ internal static class PixRenderer
 
     private static void AppendNode(PositionedNode node, ICanvas canvas, ClusterPalette? palette = null)
     {
+        AppendNodeShape(node, canvas, palette);
+        AppendNodeLabel(node, canvas);
+    }
+
+    private static void AppendNodeShape(PositionedNode node, ICanvas canvas, ClusterPalette? palette = null)
+    {
         var (x, y, w, h) = ((float)node.X, (float)node.Y, (float)node.Width, (float)node.Height);
         //TODO: styles
         IPaint? stroke = Paint.Create(Colors.Black, PaintStyle.Stroke);
-        stroke.StrokeWidth = 2f;
+        stroke.StrokeWidth = (float)DesignSystem.Spec.OutlineWidth;
+        stroke.IsAntialias = true;
         IPaint? fill = null;
-        var radius = 4f;
+        var radius = (float)DesignSystem.Spec.NodeRadius;
 
         switch (node.Shape)
         {
@@ -277,9 +295,49 @@ internal static class PixRenderer
             case NodeShape.Diamond:
                 AppendDiamond(x, y, w, h, stroke, fill, canvas);
                 break;
-            default:
-                throw new NotImplementedException($"{node.Shape}");
+            case NodeShape.Circle:
+                AppendCircle(x, y, w, h, stroke, fill, canvas);
+                break;
+            case NodeShape.DoubleCircle:
+                AppendDoubleCircle(x, y, w, h, stroke, fill, canvas);
+                break;
+            case NodeShape.Subroutine:
+                AppendSubroutine(x, y, w, h, stroke, fill, canvas);
+                break;
+            case NodeShape.Hexagon:
+                AppendHexagon(x, y, w, h, stroke, fill, canvas);
+                break;
+            case NodeShape.Cylinder:
+                AppendCylinder(x, y, w, h, stroke, fill, canvas);
+                break;
+            case NodeShape.Asymmetric:
+                AppendAsymmetric(x, y, w, h, stroke, fill, canvas);
+                break;
+            case NodeShape.Trapezoid:
+                AppendTrapezoid(x, y, w, h, stroke, fill, canvas);
+                break;
+            case NodeShape.TrapezoidAlt:
+                AppendTrapezoidAlt(x, y, w, h, stroke, fill, canvas);
+                break;
+            case NodeShape.Parallelogram:
+                AppendParallelogram(x, y, w, h, true, stroke, fill, canvas);
+                break;
+            case NodeShape.ParallelogramAlt:
+                AppendParallelogram(x, y, w, h, false, stroke, fill, canvas);
+                break;
+            case NodeShape.StateStart:
+                DesignSystem.AppendTerminal(x + w / 2, y + h / 2, Math.Min(w, h) / 2 - 2f, false, canvas);
+                break;
+            case NodeShape.StateEnd:
+                DesignSystem.AppendTerminal(x + w / 2, y + h / 2, Math.Min(w, h) / 2 - 2, true, canvas);
+                break;
+            case NodeShape.ForkJoin:
+                AppendForkJoin(x, y, w, h, canvas);
+                break;
         }
+
+        stroke?.Dispose();
+        fill?.Dispose();
     }
 
     private static void AppendRect(float x, float y, float w, float h, float radius,
@@ -305,8 +363,8 @@ internal static class PixRenderer
 
     private static void AppendDiamond(float x, float y, float w, float h, IPaint? stroke, IPaint? fill, ICanvas canvas)
     {
-        var cx = x + (w / 2);
-        var cy = y + (h / 2);
+        var cx = x + w / 2;
+        var cy = y + h / 2;
         var hw = w / 2;
         var hh = h / 2;
 
@@ -322,6 +380,197 @@ internal static class PixRenderer
             canvas.DrawPath(path, fill);
         if (stroke != null)
             canvas.DrawPath(path, stroke);
+    }
+
+    private static void AppendCircle(float x, float y, float w, float h, IPaint? stroke, IPaint? fill, ICanvas canvas)
+    {
+        var cx = x + w / 2;
+        var cy = y + h / 2;
+        var r = Math.Min(w, h) / 2;
+
+        if (fill != null)
+            canvas.DrawCircle(cx, cy, r, fill);
+        if (stroke != null)
+            canvas.DrawCircle(cx, cy, r, stroke);
+    }
+
+    private static void AppendDoubleCircle(float x, float y, float w, float h, IPaint? stroke, IPaint? fill,
+        ICanvas canvas)
+    {
+        var cx = x + w / 2;
+        var cy = y + h / 2;
+        var outerR = Math.Min(w, h) / 2;
+        var innerR = outerR - 5;
+
+        if (fill != null)
+        {
+            canvas.DrawCircle(cx, cy, outerR, fill);
+            // canvas.DrawCircle(cx, cy, innerR, fill);
+        }
+
+        if (stroke != null)
+        {
+            canvas.DrawCircle(cx, cy, outerR, stroke);
+            canvas.DrawCircle(cx, cy, innerR, stroke);
+        }
+    }
+
+    private static void AppendSubroutine(float x, float y, float w, float h, IPaint? stroke, IPaint? fill,
+        ICanvas canvas)
+    {
+        const int inset = 8;
+        AppendRect(x, y, w, h, RenderConstants.Radii.Rectangle, stroke, fill, canvas);
+
+        if (stroke != null)
+        {
+            canvas.DrawLine(x + inset, y, x + inset, y + h, stroke);
+            canvas.DrawLine(x + w - inset, y, x + w - inset, y + h, stroke);
+        }
+    }
+
+    private static void AppendHexagon(float x, float y, float w, float h, IPaint? stroke, IPaint? fill, ICanvas canvas)
+    {
+        var inset = h / 4;
+        using var pb = PathBuilder.Create();
+        pb.MoveTo(x + inset, y);
+        pb.LineTo(x + w - inset, y);
+        pb.LineTo(x + w, y + h / 2);
+        pb.LineTo(x + w - inset, y + h);
+        pb.LineTo(x + inset, y + h);
+        pb.LineTo(x, y + h / 2);
+        pb.Close();
+        using var path = pb.Detach();
+        if (fill != null)
+            canvas.DrawPath(path, fill);
+        if (stroke != null)
+            canvas.DrawPath(path, stroke);
+    }
+
+    private static void AppendCylinder(float x, float y, float w, float h, IPaint? stroke, IPaint? fill, ICanvas canvas)
+    {
+        const int ry = 7;
+        var cx = x + w / 2;
+        var bodyTop = y + ry;
+        var bodyH = h - 2 * ry;
+
+        if (fill != null)
+            canvas.DrawRect(Rect.FromLTWH(x, bodyTop, w, bodyH), fill);
+
+        if (stroke != null)
+        {
+            canvas.DrawLine(x, bodyTop, x, bodyTop + bodyH, stroke);
+            canvas.DrawLine(x + w, bodyTop, x + w, bodyTop + bodyH, stroke);
+        }
+
+        if (fill != null)
+        {
+            canvas.DrawOval(cx, y + h - ry, w / 2, ry, fill);
+            canvas.DrawOval(cx, bodyTop, w / 2, ry, fill);
+        }
+
+        if (stroke != null)
+        {
+            canvas.DrawOval(cx, y + h - ry, w / 2, ry, stroke);
+            canvas.DrawOval(cx, bodyTop, w / 2, ry, stroke);
+        }
+    }
+
+    private static void AppendAsymmetric(float x, float y, float w, float h, IPaint? stroke, IPaint? fill,
+        ICanvas canvas)
+    {
+        const int indent = 12;
+        using var pb = PathBuilder.Create();
+        pb.MoveTo(x + indent, y);
+        pb.LineTo(x + w, y);
+        pb.LineTo(x + w, y + h);
+        pb.LineTo(x + indent, y + h);
+        pb.LineTo(x, y + h / 2);
+        pb.Close();
+        using var path = pb.Detach();
+        if (fill != null)
+            canvas.DrawPath(path, fill);
+        if (stroke != null)
+            canvas.DrawPath(path, stroke);
+    }
+
+    private static void AppendTrapezoid(float x, float y, float w, float h, IPaint? stroke, IPaint? fill,
+        ICanvas canvas)
+    {
+        var inset = w * 0.15f;
+        using var pb = PathBuilder.Create();
+        pb.MoveTo(x + inset, y);
+        pb.LineTo(x + w - inset, y);
+        pb.LineTo(x + w, y + h);
+        pb.LineTo(x, y + h);
+        pb.Close();
+        using var path = pb.Detach();
+        if (fill != null)
+            canvas.DrawPath(path, fill);
+        if (stroke != null)
+            canvas.DrawPath(path, stroke);
+    }
+
+    private static void AppendTrapezoidAlt(float x, float y, float w, float h, IPaint? stroke, IPaint? fill,
+        ICanvas canvas)
+    {
+        var inset = w * 0.15f;
+        using var pb = PathBuilder.Create();
+        pb.MoveTo(x, y);
+        pb.LineTo(x + w, y);
+        pb.LineTo(x + w - inset, y + h);
+        pb.LineTo(x + inset, y + h);
+        pb.Close();
+        using var path = pb.Detach();
+        if (fill != null)
+            canvas.DrawPath(path, fill);
+        if (stroke != null)
+            canvas.DrawPath(path, stroke);
+    }
+
+    private static void AppendParallelogram(float x, float y, float w, float h, bool leansRight,
+        IPaint? stroke, IPaint? fill, ICanvas canvas)
+    {
+        var lean = w * 0.15f;
+        var (topLeft, topRight, bottomRight, bottomLeft) = leansRight
+            ? (x + lean, x + w, x + w - lean, x)
+            : (x, x + w - lean, x + w, x + lean);
+
+        using var pb = PathBuilder.Create();
+        pb.MoveTo(topLeft, y);
+        pb.LineTo(topRight, y);
+        pb.LineTo(bottomRight, y + h);
+        pb.LineTo(bottomLeft, y + h);
+        pb.Close();
+        using var path = pb.Detach();
+        if (fill != null)
+            canvas.DrawPath(path, fill);
+        if (stroke != null)
+            canvas.DrawPath(path, stroke);
+    }
+
+    private static void AppendForkJoin(float x, float y, float w, float h, ICanvas canvas)
+    {
+        var fillColor = Colors.Black; //TODO: var(--_line-strong)
+        var fill = Paint.Shared(fillColor);
+        var rect = Rect.FromLTWH(x, y, w, h);
+        var rounded = RRect.FromRectAndRadius(rect, 2, 2);
+        canvas.DrawRRect(rounded, fill);
+    }
+
+    private static void AppendNodeLabel(PositionedNode node, ICanvas canvas)
+    {
+        if (node.Shape is NodeShape.StateStart or NodeShape.StateEnd or NodeShape.ForkJoin &&
+            string.IsNullOrEmpty(node.Label))
+            return;
+
+        var cx = (float)(node.X + node.Width / 2);
+        var cy = (float)(node.Y + node.Height / 2);
+        //TODO: styles
+        var textColor = Colors.Black;
+
+        //TODO: markdown
+        //if (node.IsMarkdown)
+        DesignSystem.AppendText(node.Label, cx, cy, TypeRole.Label, textColor, canvas);
     }
 
     #endregion
