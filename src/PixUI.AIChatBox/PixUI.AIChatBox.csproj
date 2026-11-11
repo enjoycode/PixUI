@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\ext\mermaider\src\Mermaider\Mermaider.csproj" />
       <ProjectReference Include="..\PixUI\PixUI.csproj" />
     </ItemGroup>
 

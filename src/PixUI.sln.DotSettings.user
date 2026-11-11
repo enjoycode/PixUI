@@ -60,11 +60,17 @@
   &lt;TestAncestor&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.Markdown.MarkdownTest.ParseTest&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.Markdown.MarkdownTest.StreamTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.Markdown.MermaidTest.ParseTest&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	
 	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=58c56b00_002Df81e_002D48fd_002Da74f_002Dc8e84271fcf4/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Continuous Testing" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Solution /&gt;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=6c635672_002D9b33_002D4498_002Dbbb4_002D81b75725dbc9/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="ParseTest #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;NUnit3x::62959C4B-FF54-4BBB-9A2A-0068CDBAE35A::net10.0::PixUI.UnitTests.Markdown.MermaidTest.ParseTest&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	</wpf:ResourceDictionary>

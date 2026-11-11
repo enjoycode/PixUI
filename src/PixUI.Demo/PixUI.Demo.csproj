@@ -105,6 +105,8 @@
         <EmbeddedResource Include="Resources\Demos\FileDialog\DemoFileDialog.cs" />
         <Compile Remove="Resources\Demos\Other\DemoChatBox.cs" />
         <EmbeddedResource Include="Resources\Demos\Other\DemoChatBox.cs" />
+        <Compile Remove="Resources\Demos\Other\DemoMermaid.cs" />
+        <EmbeddedResource Include="Resources\Demos\Other\DemoMermaid.cs" />
     </ItemGroup>
 
 </Project>

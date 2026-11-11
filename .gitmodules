@@ -2,3 +2,7 @@
 	path = ext/LiveCharts2
 	url = https://github.com/enjoycode/LiveCharts2.git
 	branch = PixUI2
+[submodule "ext/mermaider"]
+	path = ext/mermaider
+	url = https://github.com/enjoycode/mermaider.git
+	branch = PixUI
