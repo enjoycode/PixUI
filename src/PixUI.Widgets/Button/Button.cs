@@ -238,7 +238,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     {
         if (Style == ButtonStyle.Transparent) return;
 
-        var paint = PixUI.Paint.Shared();
+        var paint = Paint.Shared();
         paint.Style = Style == ButtonStyle.Solid ? PaintStyle.Fill : PaintStyle.Stroke;
         paint.StrokeWidth = Style == ButtonStyle.Outline ? (_borderWidth?.Value ?? 2) : 0;
         paint.IsAntialias = Shape != ButtonShape.Square;
@@ -256,8 +256,14 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
                 canvas.DrawRRect(rrect, paint);
                 break;
             }
-            default:
-                throw new NotImplementedException();
+            case ButtonShape.Pills:
+            {
+                var radius = H / 2;
+                var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, W, H),
+                    radius, radius);
+                canvas.DrawRRect(rrect, paint);
+                break;
+            }
         }
     }
 

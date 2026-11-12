@@ -17,13 +17,6 @@ public sealed class Container : SingleChildWidget
         set => Bind(ref _fillColor, value, RepaintOnStateChanged);
     }
 
-    [Obsolete("Use FillColor")]
-    public State<Color>? BgColor
-    {
-        get => FillColor;
-        set => FillColor = value;
-    }
-
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
         if (_fillColor != null)

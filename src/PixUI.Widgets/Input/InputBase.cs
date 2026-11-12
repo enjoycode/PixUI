@@ -171,7 +171,7 @@ public abstract class InputBase<T> : Widget where T : Widget //, IFocusable
         if (_border != null)
             _border.Paint(canvas, bounds, IsReadonly ? Theme.DisabledBgColor : fillColor);
         else
-            canvas.DrawRect(bounds, PixUI.Paint.Shared(fillColor));
+            canvas.DrawRect(bounds, Paint.Shared(fillColor));
 
         PaintChildren(canvas, area);
     }
