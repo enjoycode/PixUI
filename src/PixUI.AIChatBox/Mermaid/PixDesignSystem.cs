@@ -9,7 +9,7 @@ public static class PixDesignSystem
 
     internal static Color FgColor { get; } = Colors.Black;
     internal static Color BgColor { get; } = Colors.Light(Colors.LightGray);
-    internal static Color AccentColor { get; } = Colors.Magenta;
+    internal static Color AccentColor { get; } = 0xFF3B82F6;
     internal static Color EdgeColor { get; } = Colors.Black;
     private static Color MarkerColor => Spec.Marker == MarkerKind.Thin ? AccentColor : EdgeColor;
 
@@ -60,7 +60,7 @@ public static class PixDesignSystem
     /// </summary>
     internal static void AppendTerminal(float cx, float cy, float r, bool end, ICanvas canvas)
     {
-        var accentColor = Colors.Magenta; //TODO: ColorFamily.AccentBase;
+        var accentColor = AccentColor; //TODO: ColorFamily.AccentBase;
         if (Spec.Terminal == TerminalKind.Square)
         {
             var s = r * 1.6f;
@@ -89,13 +89,16 @@ public static class PixDesignSystem
         if (end)
         {
             var stroke = Paint.Shared(accentColor, PaintStyle.Stroke, 2f);
+            stroke.IsAntialias = true;
             canvas.DrawCircle(cx, cy, rr, stroke);
             var fill = Paint.Shared(accentColor);
+            fill.IsAntialias = true;
             canvas.DrawCircle(cx, cy, Math.Max(2, rr - 4), fill);
         }
         else
         {
             var fill = Paint.Shared(accentColor);
+            fill.IsAntialias = true;
             canvas.DrawCircle(cx, cy, rr, fill);
         }
     }

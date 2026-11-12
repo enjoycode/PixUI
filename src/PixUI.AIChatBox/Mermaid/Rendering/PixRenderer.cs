@@ -272,6 +272,7 @@ internal static class PixRenderer
         stroke.StrokeWidth = (float)PixDesignSystem.Spec.OutlineWidth;
         stroke.IsAntialias = true;
         IPaint? fill = Paint.Create(Colors.Light(Colors.LightGray));
+        fill.IsAntialias = true;
         var radius = (float)PixDesignSystem.Spec.NodeRadius;
 
         switch (node.Shape)

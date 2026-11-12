@@ -10,7 +10,7 @@ public static class PixMermaidRenderer
     public static IPicture RenderPicture(string text)
     {
         var (cleaned, metadata) = DiagramPreprocessor.Process(text);
-        var lines = Mermaider.MermaidRenderer.PreprocessLines(cleaned);
+        var lines = MermaidRenderer.PreprocessLines(cleaned);
         if (lines.Length == 0)
             throw new MermaidParseException("Empty mermaid diagram");
 
@@ -20,6 +20,12 @@ public static class PixMermaidRenderer
             case DiagramType.Flowchart:
             {
                 var parsed = FlowchartParser.Parse(lines);
+                var positioned = LightweightLayoutEngine.Layout(parsed);
+                return PixRenderer.Render(positioned, diagramType);
+            }
+            case DiagramType.State:
+            {
+                var parsed = StateParser.Parse(lines);
                 var positioned = LightweightLayoutEngine.Layout(parsed);
                 return PixRenderer.Render(positioned, diagramType);
             }
