@@ -12,7 +12,7 @@ public class DemoMermaid : View
                       C --> E[结束]
                       D --> E
                       """;
-        _picture = MermaidRenderer.RenderPicture(mermaid);
+        _picture = PixMermaidRenderer.RenderPicture(mermaid);
     }
     
     private IPicture? _picture;

@@ -5,7 +5,7 @@ using Mermaider.Parsing;
 
 namespace PixUI.Mermaid;
 
-public static class MermaidRenderer
+public static class PixMermaidRenderer
 {
     public static IPicture RenderPicture(string text)
     {
@@ -22,6 +22,12 @@ public static class MermaidRenderer
                 var parsed = FlowchartParser.Parse(lines);
                 var positioned = LightweightLayoutEngine.Layout(parsed);
                 return PixRenderer.Render(positioned, diagramType);
+            }
+            case DiagramType.Sequence:
+            {
+                var parsed = SequenceParser.Parse(lines);
+                var positioned = SequenceLayout.Layout(parsed);
+                return PixSequenceRenderer.Render(positioned);
             }
             default:
                 throw new NotImplementedException($"DiagramType: {diagramType}暂未实现");

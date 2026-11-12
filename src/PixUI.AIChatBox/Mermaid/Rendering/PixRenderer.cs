@@ -9,7 +9,7 @@ internal static class PixRenderer
     {
         using var picRecorder = PictureRecorder.Create();
         using var canvas = picRecorder.BeginRecording(Rect.FromLTWH(0, 0, (float)graph.Width, (float)graph.Height));
-        var edgeRadius = (float)DesignSystem.Spec.EdgeBendRadius;
+        var edgeRadius = (float)PixDesignSystem.Spec.EdgeBendRadius;
 
         ClusterPalette? palette = null;
         // var palette = diagramType is DiagramType.Flowchart or DiagramType.State
@@ -37,8 +37,7 @@ internal static class PixRenderer
         //TODO: group header
         foreach (var group in graph.Groups) { }
 
-        var result = picRecorder.EndRecording();
-        return result;
+        return picRecorder.EndRecording();
     }
 
     #region ====Edge====
@@ -49,7 +48,7 @@ internal static class PixRenderer
 
         //TODO: styles
         var strokeColor = Colors.Black;
-        var strokeWidth = (float)DesignSystem.Spec.EdgeWidth;
+        var strokeWidth = (float)PixDesignSystem.Spec.EdgeWidth;
 
         using var path = SvgRenderer.IsOrthogonal(edge.Points)
             ? BuildOrthogonalPath(edge.Points, cornerRadius)
@@ -63,23 +62,23 @@ internal static class PixRenderer
         {
             var sourcePoint = new Point((float)edge.Points[0].X, (float)edge.Points[0].Y);
             var sourceSecondPoint = new Point((float)edge.Points[1].X, (float)edge.Points[1].Y);
-            using var startArrow = BuildArrowPath(sourcePoint, sourceSecondPoint);
-            canvas.DrawPath(startArrow, Paint.Shared(strokeColor));
+            var marker = PixDesignSystem.Marker(MarkerShape.Arrow);
+            marker.PaintTo(canvas, sourceSecondPoint,  sourcePoint);
         }
 
         if (edge.HasArrowEnd)
         {
             var targetPoint = new Point((float)edge.Points[^1].X, (float)edge.Points[^1].Y);
             var targetSecondPoint = new Point((float)edge.Points[^2].X, (float)edge.Points[^2].Y);
-            using var endArrow = BuildArrowPath(targetPoint, targetSecondPoint);
-            canvas.DrawPath(endArrow, Paint.Shared(strokeColor));
+            var marker = PixDesignSystem.Marker(MarkerShape.Arrow);
+            marker.PaintTo(canvas, targetSecondPoint, targetPoint);
         }
     }
 
     private static void AppendEdgeLabel(PositionedEdge edge, ICanvas canvas)
     {
         var mid = edge.LabelPosition ?? VisualLanguage.PathMidpoint(edge.Points);
-        DesignSystem.AppendEdgeLabel((float)mid.X, (float)mid.Y, edge.Label!, canvas /*TODO: overrideColor*/);
+        PixDesignSystem.AppendEdgeLabel((float)mid.X, (float)mid.Y, edge.Label!, canvas /*TODO: overrideColor*/);
     }
 
     /// <summary>
@@ -255,12 +254,6 @@ internal static class PixRenderer
         return path.Detach();
     }
 
-    private static IPath BuildArrowPath(Point startPoint, Point endPoint)
-    {
-        var (basePoint, left, right) = Utils.GetArrowPoints(CapType.Arrow1, endPoint, startPoint, 6, 6);
-        return Utils.CreateArrow(startPoint, left, right, basePoint, true);
-    }
-
     #endregion
 
     #region ====Node====
@@ -276,10 +269,10 @@ internal static class PixRenderer
         var (x, y, w, h) = ((float)node.X, (float)node.Y, (float)node.Width, (float)node.Height);
         //TODO: styles
         IPaint? stroke = Paint.Create(Colors.Black, PaintStyle.Stroke);
-        stroke.StrokeWidth = (float)DesignSystem.Spec.OutlineWidth;
+        stroke.StrokeWidth = (float)PixDesignSystem.Spec.OutlineWidth;
         stroke.IsAntialias = true;
-        IPaint? fill = null;
-        var radius = (float)DesignSystem.Spec.NodeRadius;
+        IPaint? fill = Paint.Create(Colors.Light(Colors.LightGray));
+        var radius = (float)PixDesignSystem.Spec.NodeRadius;
 
         switch (node.Shape)
         {
@@ -326,10 +319,10 @@ internal static class PixRenderer
                 AppendParallelogram(x, y, w, h, false, stroke, fill, canvas);
                 break;
             case NodeShape.StateStart:
-                DesignSystem.AppendTerminal(x + w / 2, y + h / 2, Math.Min(w, h) / 2 - 2f, false, canvas);
+                PixDesignSystem.AppendTerminal(x + w / 2, y + h / 2, Math.Min(w, h) / 2 - 2f, false, canvas);
                 break;
             case NodeShape.StateEnd:
-                DesignSystem.AppendTerminal(x + w / 2, y + h / 2, Math.Min(w, h) / 2 - 2, true, canvas);
+                PixDesignSystem.AppendTerminal(x + w / 2, y + h / 2, Math.Min(w, h) / 2 - 2, true, canvas);
                 break;
             case NodeShape.ForkJoin:
                 AppendForkJoin(x, y, w, h, canvas);
@@ -570,7 +563,7 @@ internal static class PixRenderer
 
         //TODO: markdown
         //if (node.IsMarkdown)
-        DesignSystem.AppendText(node.Label, cx, cy, TypeRole.Label, textColor, canvas);
+        PixDesignSystem.AppendText(node.Label, cx, cy, TypeRole.Label, textColor, canvas);
     }
 
     #endregion
