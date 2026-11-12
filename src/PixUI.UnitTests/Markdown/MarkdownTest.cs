@@ -26,9 +26,9 @@ public class MarkdownTest
     {
         var controller = new ChatBoxController();
         controller.Width = 400;
-        controller.AppendAIThinkContent("- First\n");
-        controller.AppendAIThinkContent("  - 1.1\n");
-        controller.AppendAIThinkContent("  - 1.2\n");
+        controller.AppendAIContent("- First\n");
+        controller.AppendAIContent("  - 1.1\n");
+        controller.AppendAIContent("  - 1.2\n");
     }
     
     [Test(Description = "AST测试")]

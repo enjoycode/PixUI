@@ -33,6 +33,6 @@ public class DemoChatBox : View
     {
         if (string.IsNullOrEmpty(_input.Value)) return;
         
-        _controller.AppendAIThinkContent(_input.Value.Replace("\\n", "\n"));
+        _controller.AppendAIContent(_input.Value.Replace("\\n", "\n"));
     }
 }

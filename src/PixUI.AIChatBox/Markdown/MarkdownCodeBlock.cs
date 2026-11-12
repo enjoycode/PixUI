@@ -1,4 +1,5 @@
 using Markdig.Syntax;
+using PixUI.Mermaid;
 using TextMateSharp.Grammars;
 using TextMateSharp.Internal.Grammars;
 
@@ -12,8 +13,11 @@ internal sealed class MarkdownCodeBlock : MarkdownBlock
     private readonly List<CodeLineInfo> _lines = [];
     private string? _language;
     private IParagraph? _languageParagraph;
+    private IPicture? _picture;
 
-    internal override float Height => _lines.Sum(l => l.Height) + _cmdBarHeight + _doublePadding;
+    internal override float Height => _picture != null
+        ? _picture.CullRect.Height + _cmdBarHeight + _doublePadding
+        : _lines.Sum(l => l.Height) + _cmdBarHeight + _doublePadding;
 
     internal override void Build(Block node, float availableWidth)
     {
@@ -27,12 +31,42 @@ internal sealed class MarkdownCodeBlock : MarkdownBlock
 
         if (codeNode.Lines.Count == 0) return;
 
-        //TODO: 因仅追加考虑只处理追加的行
-        var gramma = CodeTokenizer.GetGramma(_language);
-        if (gramma == null)
-            BuildWithoutGramma(codeNode);
+        if (!codeNode.IsOpen && _language == "mermaid")
+        {
+            var text = codeNode.Lines.ToString();
+            try
+            {
+                _picture = PixMermaidRenderer.RenderPicture(text);
+            }
+            catch (NotImplementedException)
+            {
+                //Fallback to ascii diagram
+                var asciiMermaid = Mermaider.MermaidRenderer.RenderAscii(text);
+                BuildAsciiMermaid(asciiMermaid);
+            }
+        }
         else
-            BuildWithGramma(codeNode, gramma);
+        {
+            //TODO: 因仅追加考虑只处理追加的行
+            var gramma = CodeTokenizer.GetGramma(_language);
+            if (gramma == null)
+                BuildWithoutGramma(codeNode);
+            else
+                BuildWithGramma(codeNode, gramma);
+        }
+    }
+
+    private void BuildAsciiMermaid(string ascii)
+    {
+        using var pb = ParagraphBuilder.Create(ChatBoxTheme.ParagraphStyle);
+        using var textStyle = TextStyle.Create();
+        textStyle.Color = CodeTokenizer.EditorForeground;
+        pb.PushStyle(textStyle);
+        pb.AddText(ascii);
+        pb.Pop();
+        var ph = pb.Build();
+        ph.Layout(float.MaxValue);
+        _lines.Add(new CodeLineInfo() { Paragraph = ph });
     }
 
     private void BuildLanguageParagraph()
@@ -51,7 +85,6 @@ internal sealed class MarkdownCodeBlock : MarkdownBlock
 
     private void BuildWithoutGramma(FencedCodeBlock node)
     {
-        using var pb = ParagraphBuilder.Create(ChatBoxTheme.ParagraphStyle);
         using var textStyle = TextStyle.Create();
         textStyle.Color = CodeTokenizer.EditorForeground;
         foreach (var line in node.Lines.Lines)
@@ -59,6 +92,7 @@ internal sealed class MarkdownCodeBlock : MarkdownBlock
             IParagraph? lineParagraph = null;
             if (!line.Slice.IsEmpty)
             {
+                using var pb = ParagraphBuilder.Create(ChatBoxTheme.ParagraphStyle);
                 pb.PushStyle(textStyle);
                 pb.AddText(line.Slice.AsSpan());
                 pb.Pop();
@@ -132,14 +166,21 @@ internal sealed class MarkdownCodeBlock : MarkdownBlock
         canvas.DrawLine(rect.X, offsetY, rect.Right, offsetY,
             Paint.Shared(CodeTokenizer.EditorForeground, PaintStyle.Stroke));
 
-        //draw lines
-        foreach (var line in _lines)
+        //draw lines or diagram
+        if (_picture != null)
         {
-            canvas.Translate(0, offsetY);
-            if (line.Paragraph != null)
-                canvas.DrawParagraph(line.Paragraph, 5, 0);
-            canvas.Translate(0, -offsetY);
-            offsetY += line.Height;
+            canvas.DrawPicture(_picture, 0, offsetY);
+        }
+        else
+        {
+            foreach (var line in _lines)
+            {
+                canvas.Translate(0, offsetY);
+                if (line.Paragraph != null)
+                    canvas.DrawParagraph(line.Paragraph, 5, 0);
+                canvas.Translate(0, -offsetY);
+                offsetY += line.Height;
+            }
         }
     }
 
