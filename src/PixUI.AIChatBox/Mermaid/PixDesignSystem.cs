@@ -13,7 +13,47 @@ public static class PixDesignSystem
     internal static Color EdgeColor { get; } = Colors.Black;
     private static Color MarkerColor => Spec.Marker == MarkerKind.Thin ? AccentColor : EdgeColor;
 
-    private static Dictionary<string, Marker> _markers = [];
+    internal static readonly IPathEffect? DashArray = PathEffect.CreateDash([5f, 4f], 10);
+
+    private static readonly Dictionary<string, Marker> _markers = [];
+
+    internal static int Weight(TypeRole role) => role switch
+    {
+        TypeRole.Title => 700,
+        TypeRole.Heading => Spec.HeadingWeight,
+        TypeRole.Subheading => 600,
+        TypeRole.Label => Spec.LabelWeight,
+        TypeRole.Body or TypeRole.Meta => 400,
+        TypeRole.Caption => 500,
+        _ => 600,
+    };
+
+    /// <summary>
+    /// Draws <paramref name="glyph"/> centred at (<paramref name="cx"/>, <paramref name="cy"/>)
+    /// in <paramref name="ink"/>, about 20px across × <paramref name="scale"/>.
+    /// </summary>
+    internal static void AppendGlyph(DesignSystem.Glyph glyph, float cx, float cy, Color ink, ICanvas canvas,
+        float scale = 1.0f)
+    {
+        //TODO:
+    }
+
+    internal static void AppendBox(float x, float y, float w, float h, ICanvas canvas, /*TODO: ColorFamily*/
+        float? radius = null)
+    {
+        //TODO: styles
+        var strokeColor = EdgeColor; //NodeStroke(family)
+        var fillColor = BgColor; //NodeFill(family)
+
+        var r = (float)(radius ?? Spec.NodeRadius);
+        var rect = RRect.FromRectAndRadius(Rect.FromLTWH(x, y, w, h), r, r);
+        var fill = Paint.Shared(fillColor);
+        fill.IsAntialias = true;
+        canvas.DrawRRect(rect, fill);
+        var stroke = Paint.Shared(strokeColor, PaintStyle.Stroke, (float)Spec.OutlineWidth);
+        stroke.IsAntialias = true;
+        canvas.DrawRRect(rect, stroke);
+    }
 
     /// <summary>
     /// A start (filled) or end (ring + core) terminal in the accent: dot, square or disc per preset.
@@ -60,10 +100,11 @@ public static class PixDesignSystem
         }
     }
 
-    internal static void AppendText(string text, float cx, float cy, TypeRole role, Color color, ICanvas canvas)
+    internal static void AppendText(string text, float cx, float cy, TypeRole role, ICanvas canvas, Color? color = null)
     {
-        var fontSize = (float)Mermaider.Rendering.DesignSystem.Px(role);
-        using var ph = TextPainter.BuildParagraph(text, float.MaxValue, fontSize, color);
+        var textColor = color ?? Colors.Black;
+        var fontSize = (float)DesignSystem.Px(role);
+        using var ph = TextPainter.BuildParagraph(text, float.MaxValue, fontSize, textColor);
         AppendParagraph(ph, cx, cy, canvas);
     }
 
@@ -78,7 +119,7 @@ public static class PixDesignSystem
     {
         using var ps = ParagraphStyle.Create();
         using var ts = TextStyle.Create();
-        ts.FontSize = (float)Mermaider.Rendering.DesignSystem.Px(TypeRole.Caption);
+        ts.FontSize = (float)DesignSystem.Px(TypeRole.Caption);
         ts.FontStyle = new FontStyle(FontWeight.Medium, FontSlant.Upright);
         ts.Color = Colors.Black; //TODO:
         using var pb = ParagraphBuilder.Create(ps);
@@ -88,8 +129,8 @@ public static class PixDesignSystem
         using var ph = pb.Build();
         ph.Layout(float.MaxValue);
 
-        var w = (float)Mermaider.Rendering.DesignSystem.LabelBoxWidth(ph.LongestLine);
-        var h = Math.Max((float)Mermaider.Rendering.DesignSystem.PillHeight, ph.Height + 6);
+        var w = (float)DesignSystem.LabelBoxWidth(ph.LongestLine);
+        var h = Math.Max((float)DesignSystem.PillHeight, ph.Height + 6);
         var r = Spec.Label == LabelKind.Chip ? Math.Min(6f, h / 2) : h / 2;
 
         var edgeColor = Colors.Black; //TODO: var(--_line)

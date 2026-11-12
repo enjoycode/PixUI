@@ -563,7 +563,7 @@ internal static class PixRenderer
 
         //TODO: markdown
         //if (node.IsMarkdown)
-        PixDesignSystem.AppendText(node.Label, cx, cy, TypeRole.Label, textColor, canvas);
+        PixDesignSystem.AppendText(node.Label, cx, cy, TypeRole.Label, canvas, textColor);
     }
 
     #endregion

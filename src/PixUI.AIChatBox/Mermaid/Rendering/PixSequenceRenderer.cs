@@ -1,5 +1,6 @@
 using Mermaider.Models;
 using Mermaider.Rendering;
+using Mermaider.Text;
 
 namespace PixUI.Mermaid;
 
@@ -11,6 +12,11 @@ internal static class PixSequenceRenderer
     /// Space between a message line and the centre of its caption.
     /// </summary>
     private const float LabelLift = 14;
+
+    /// <summary>
+    /// Width the person glyph and its gap take in front of an actor's name (also reserved by the layout).
+    /// </summary>
+    internal const float GlyphWidth = 22;
 
     public static IPicture Render(PositionedSequenceDiagram diagram)
     {
@@ -32,10 +38,49 @@ internal static class PixSequenceRenderer
         foreach (var message in diagram.Messages)
             AppendMessage(message, diagram.DestroyMarkers, canvas);
 
+        foreach (var actor in diagram.Actors)
+            AppendActor(actor, canvas /*, palette.Has(actor.Id) ? palette.Family(actor.Id) : ds.Neutral*/);
+
+        if (diagram.Actors.Count > 0)
+        {
+            var actorH = diagram.Actors[0].Height;
+            var bottomActorY = diagram.Height - actorH - 30;
+            foreach (var actor in diagram.Actors)
+            {
+                // a destroyed participant ends at its cross; mermaid draws no closing box for it
+                if (diagram.DestroyMarkers.Any(dm => Math.Abs(dm.X - actor.X) < 0.5))
+                    continue;
+                AppendActor(actor with { Y = bottomActorY },
+                    canvas, /*palette.Has(actor.Id) ? palette.Family(actor.Id) : ds.Neutral,*/ mirror: true);
+            }
+        }
+
         return picRecorder.EndRecording();
     }
 
     private static void AppendBox(PositionedSequenceBox box, ICanvas canvas) { }
+
+    private static void AppendActor(PositionedSequenceActor actor, /*TODO: ColorFamily*/ ICanvas canvas,
+        bool mirror = false)
+    {
+        PixDesignSystem.AppendBox((float)(actor.X - actor.Width / 2), (float)actor.Y, (float)actor.Width,
+            (float)actor.Height, canvas /*family*/);
+
+        var cy = (float)(actor.Y + actor.Height / 2);
+        if (actor.Type == SequenceActorType.Actor)
+        {
+            // an actor is the same chip with a person glyph in the family ink in front of its name
+            var textW = TextMetrics.MeasureMultiline(actor.Label.AsSpan(), DesignSystem.Px(TypeRole.Label),
+                PixDesignSystem.Weight(TypeRole.Label)).Width;
+            var left = (float)(actor.X - (GlyphWidth + textW) / 2);
+            PixDesignSystem.AppendGlyph(DesignSystem.Glyph.Person, left + 8, cy, Colors.Black, canvas);
+            PixDesignSystem.AppendText(actor.Label, left + GlyphWidth, cy, TypeRole.Label, canvas /*anchor: "start"*/);
+        }
+        else
+        {
+            PixDesignSystem.AppendText(actor.Label, (float)actor.X, cy, TypeRole.Label, canvas);
+        }
+    }
 
     private static void AppendLifeline(Lifeline lifeline, ICanvas canvas)
     {
@@ -56,8 +101,14 @@ internal static class PixSequenceRenderer
             msg = msg with { X2 = msg.X2 + (msg.X2 > msg.X1 ? -(DestroySize + 4) : DestroySize + 4) };
 
         var dashed = msg.LineStyle == SequenceLineStyle.Dashed;
+        var dashEffect = dashed ? PixDesignSystem.DashArray : null;
         var shape = msg.ArrowHead == SequenceArrowHead.Filled ? MarkerShape.Arrow : MarkerShape.Open;
-        IPathEffect? dashEffect = dashed ? PathEffect.CreateDash([5f, 4f], 10) : null; //TODO: cache on DesignSystem
+        var edgeColor = PixDesignSystem.EdgeColor;
+        var edgeWidth = (float)PixDesignSystem.Spec.EdgeWidth;
+
+        var stroke = Paint.Shared(edgeColor, PaintStyle.Stroke, edgeWidth);
+        stroke.IsAntialias = true;
+        stroke.PathEffect = dashEffect;
 
         var label = msg.Label;
         if (msg.IsSelf)
@@ -65,17 +116,28 @@ internal static class PixSequenceRenderer
             const double loopW = 30;
             const double loopH = 20;
             const double labelPadding = 8;
-            throw new NotImplementedException();
+
+            using var pb = PathBuilder.Create();
+            pb.MoveTo((float)msg.X1, (float)msg.Y);
+            pb.LineTo((float)(msg.X1 + loopW), (float)msg.Y);
+            pb.LineTo((float)(msg.X1 + loopW), (float)(msg.Y + loopH));
+            pb.LineTo((float)msg.X2, (float)(msg.Y + loopH));
+            using var path = pb.Detach();
+
+            stroke.StrokeJoin = StrokeJoin.Round;
+            canvas.DrawPath(path, stroke);
+
+            AppendAutoNumberBadge(ref label, (float)msg.X1, (float)msg.Y, canvas);
+            if (label.Length > 0)
+            {
+                var labelW = DesignSystem.LabelBoxWidth(TextMetrics
+                    .MeasureMultiline(label.AsSpan(), DesignSystem.Px(TypeRole.Caption), 500).Width);
+                PixDesignSystem.AppendEdgeLabel((float)(msg.X1 + loopW + labelPadding + labelW / 2),
+                    (float)(msg.Y + loopH / 2), label, canvas);
+            }
         }
         else
         {
-            var edgeColor = PixDesignSystem.EdgeColor;
-            var edgeWidth = (float)PixDesignSystem.Spec.EdgeWidth;
-
-            var stroke = Paint.Shared(edgeColor, PaintStyle.Stroke, edgeWidth);
-            stroke.IsAntialias = true;
-            stroke.PathEffect = dashEffect;
-            stroke.StrokeJoin = StrokeJoin.Round;
             canvas.DrawLine((float)msg.X1, (float)msg.Y, (float)msg.X2, (float)msg.Y, stroke);
 
             var marker = PixDesignSystem.Marker(shape);
@@ -88,8 +150,6 @@ internal static class PixSequenceRenderer
                 PixDesignSystem.AppendEdgeLabel((float)(msg.X1 + msg.X2) / 2, (float)msg.Y - LabelLift, label, canvas);
             }
         }
-
-        dashEffect?.Dispose();
     }
 
     private static void AppendAutoNumberBadge(ref string label, float x, float y, ICanvas canvas)
@@ -115,6 +175,6 @@ internal static class PixSequenceRenderer
         canvas.DrawCircle(x, y, r, fill);
         var stroke = Paint.Shared(strokeColor, PaintStyle.Stroke, 1.5f);
         canvas.DrawCircle(x, y, r, stroke);
-        PixDesignSystem.AppendText(numStr, x, y, TypeRole.Tag, strokeColor, canvas);
+        PixDesignSystem.AppendText(numStr, x, y, TypeRole.Tag, canvas, strokeColor);
     }
 }
