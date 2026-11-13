@@ -20,6 +20,7 @@ internal static class ContainerInlineBuilder
                 case CodeInline code: BuildCode(pb, headingLevel, code); break;
                 case LineBreakInline lineBreak: BuildLineBreak(pb, lineBreak); break;
                 case LinkInline link: BuildLink(pb, link); break;
+                case ContainerInline container: Build(pb, container, styles, headingLevel); break;
                 default: throw new NotImplementedException(child.GetType().Name);
             }
 

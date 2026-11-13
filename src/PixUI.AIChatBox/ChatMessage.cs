@@ -14,15 +14,17 @@ public abstract class ChatMessage
 public sealed class AIMessage : ChatMessage
 {
     private readonly List<MessageElement> _elements = [];
+    private bool _thinking;
 
     internal void AppendContent(string content, ChatBoxController controller, bool thinking = false)
     {
-        if (_elements.Count == 0 || _elements[^1] is not MarkdownElement markdownElement)
+        if (_elements.Count == 0 || thinking != _thinking || _elements[^1] is not MarkdownElement markdownElement)
         {
             markdownElement = new MarkdownElement();
             _elements.Add(markdownElement);
         }
 
+        _thinking = thinking;
         var heightDiff = markdownElement.Append(content, controller);
         H += heightDiff;
     }

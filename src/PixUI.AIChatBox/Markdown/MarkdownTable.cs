@@ -100,29 +100,29 @@ internal sealed class MarkdownTable : MarkdownBlock
 
     internal override void OnPaint(ICanvas canvas, ChatBoxController controller)
     {
-        var offsetY = ChatBoxTheme.TableCellPadding;
+        var cellPadding = ChatBoxTheme.TableCellPadding;
+        var offsetY = cellPadding;
         for (int i = 0; i < _rows.Count; i++)
         {
-            var offsetX = ChatBoxTheme.TableCellPadding;
+            var offsetX = cellPadding;
             var rowHeight = _rows[i].Height;
             for (int j = 0; j < _columns.Count; j++)
             {
-                var cellRect = Rect.FromLTWH(
-                    offsetX - ChatBoxTheme.TableCellPadding,
-                    offsetY - ChatBoxTheme.TableCellPadding,
-                    _columns[j].Width + ChatBoxTheme.TableCellPadding * 2,
-                    rowHeight + ChatBoxTheme.TableCellPadding * 2);
+                var cellRect = Rect.FromLTWH(offsetX - cellPadding, offsetY - cellPadding,
+                    _columns[j].Width + cellPadding * 2,
+                    rowHeight + cellPadding * 2);
                 canvas.DrawRect(cellRect, Paint.Shared(Colors.Gray, PaintStyle.Stroke));
 
+                if (_rows[i].Cells.Count - 1 < j) continue;
                 var cell = _rows[i].Cells[j];
                 if (cell == null) continue;
                 canvas.Translate(offsetX, offsetY);
                 cell.OnPaint(canvas, controller);
                 canvas.Translate(-offsetX, -offsetY);
-                offsetX += _columns[j].Width + ChatBoxTheme.TableCellPadding * 2;
+                offsetX += _columns[j].Width + cellPadding * 2;
             }
 
-            offsetY += rowHeight + ChatBoxTheme.TableCellPadding * 2;
+            offsetY += rowHeight + cellPadding * 2;
         }
     }
 
@@ -143,6 +143,6 @@ internal sealed class MarkdownTable : MarkdownBlock
     {
         public RowInfo() { }
         public List<MarkdownParagraph?> Cells { get; } = [];
-        public float Height => Cells.Max(c => c?.Height ?? 0);
+        public float Height => Cells.Count > 0 ? Cells.Max(c => c?.Height ?? 0) : 0;
     }
 }
