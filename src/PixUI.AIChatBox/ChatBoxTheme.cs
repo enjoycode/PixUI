@@ -10,6 +10,7 @@ public static class ChatBoxTheme
         BoldAndItalicTextStyle = CreateTextStyle(FontWeight.Bold, FontSlant.Italic);
         StrikeTextStyle = CreateTextStyle(FontWeight.Bold, FontSlant.Italic); //TODO: fix
         InlineCodeTextStyle = CreateTextStyle(FontSize, Colors.Magenta, FontWeight.Bold, FontSlant.Upright);
+        LinkTextStyle = CreateTextStyle(FontSize, Colors.Blue, FontWeight.Bold, FontSlant.Upright);
 
         ParagraphStyle = PixUI.ParagraphStyle.Create();
         ParagraphStyle.TextStyle = NormalTextStyle;
@@ -41,6 +42,7 @@ public static class ChatBoxTheme
     public static ITextStyle ItalicTextStyle { get; private set; }
     public static ITextStyle StrikeTextStyle { get; private set; }
     public static ITextStyle InlineCodeTextStyle { get; private set; }
+    public static ITextStyle LinkTextStyle { get; private set; }
 
     public static IParagraphStyle ParagraphStyle { get; private set; }
 

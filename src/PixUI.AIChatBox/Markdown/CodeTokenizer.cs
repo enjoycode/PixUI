@@ -32,6 +32,7 @@ internal static class CodeTokenizer
         language switch
         {
             "csharp" or "c#" => Registry.LoadGrammar("source.cs"),
+            "json" => Registry.LoadGrammar("source.json"),
             _ => null
         };
 }

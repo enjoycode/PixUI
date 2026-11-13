@@ -59,7 +59,7 @@ public class MarkdownTest
                        - Item 2
                        """;
 
-        var doc = Markdig.Markdown.Parse(markdown, pipeline);
+        var doc = Markdig.Markdown.Parse("[演示](https://www.example.com)", pipeline);
     }
     
     [Test(Description = "修改AST测试")]

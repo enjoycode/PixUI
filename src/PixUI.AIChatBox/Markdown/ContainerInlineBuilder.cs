@@ -19,6 +19,7 @@ internal static class ContainerInlineBuilder
                 case EmphasisInline emphasis: BuildEmphasis(pb, emphasis, styles, headingLevel); break;
                 case CodeInline code: BuildCode(pb, headingLevel, code); break;
                 case LineBreakInline lineBreak: BuildLineBreak(pb, lineBreak); break;
+                case LinkInline link: BuildLink(pb, link); break;
                 default: throw new NotImplementedException(child.GetType().Name);
             }
 
@@ -66,5 +67,15 @@ internal static class ContainerInlineBuilder
         styles.Push(style);
         Build(pb, node, styles, headingLevel);
         styles.Pop();
+    }
+
+    private static void BuildLink(IParagraphBuilder pb, LinkInline node)
+    {
+        if (string.IsNullOrEmpty(node.Url)) return;
+
+        //TODO:返回HitTest占位, 暂简单实现
+        pb.PushStyle(ChatBoxTheme.LinkTextStyle);
+        pb.AddText(node.Url);
+        pb.Pop();
     }
 }
