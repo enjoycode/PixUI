@@ -152,6 +152,10 @@ internal sealed class MarkdownCodeBlock : MarkdownBlock
     internal override void OnPaint(ICanvas canvas, ChatBoxController controller)
     {
         var background = CodeTokenizer.EditorBackground;
+        if (background == ChatBoxTheme.BackgroundColor)
+            background = ChatBoxTheme.IsDarkTheme
+                ? Color.Lerp(background, new Color(0xFF, 0xFF, 0xFF, background.Alpha), 0.1)!.Value
+                : Color.Lerp(background, new Color(0, 0, 0, background.Alpha), 0.1)!.Value;
 
         //draw border and background
         var rect = Rect.FromLTWH(_padding, _padding, controller.Width - _doublePadding, Height - _doublePadding);

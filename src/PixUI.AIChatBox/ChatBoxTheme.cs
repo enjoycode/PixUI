@@ -15,9 +15,13 @@ public static class ChatBoxTheme
         ParagraphStyle.TextStyle = NormalTextStyle;
     }
 
+    public static bool IsDarkTheme { get; set; } = false;
+
     public static float FontSize { get; set; } = 13f;
 
     public static Color TextColor { get; set; } = Colors.Black;
+    
+    public static Color BackgroundColor { get; set; } = Colors.White;
 
     public static float TableCellPadding { get; set; } = 2f;
 

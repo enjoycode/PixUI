@@ -20,6 +20,9 @@ public sealed class ChatBoxController
     internal readonly MarkdownPipeline MarkdownPipeline;
     internal Action? RepaintAction { get; set; }
 
+    public Action<string>? OnSendMessage { get; set; }
+    public Action? OnAddFile { get; set; }
+
     public void AppendAIContent(string text, bool thinking = false)
     {
         if (Messages.Count == 0 || Messages[^1] is not AIMessage lastAIMessage)
@@ -40,5 +43,6 @@ public sealed class ChatBoxController
         msg.Y = Messages.Count > 0 ? Messages[^1].Y + Messages[^1].H + SPACING : 0;
         Messages.Add(msg);
         RepaintAction?.Invoke(); //TODO: check is visible
+        OnSendMessage?.Invoke(text);
     }
 }

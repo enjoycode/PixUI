@@ -7,7 +7,7 @@ internal static class CodeTokenizer
 {
     static CodeTokenizer()
     {
-        Registry = new Registry(new RegistryOptions(ThemeName.DarkPlus));
+        Registry = new Registry(new RegistryOptions(ThemeName.LightPlus));
 
         Theme = Registry.GetTheme();
         var guiColors = Theme.GetGuiColorDictionary();
