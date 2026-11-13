@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using PixUI.Demo.Agent;
 using PixUI.Platform;
 
 namespace PixUI.Demo;
@@ -34,12 +35,13 @@ internal sealed class MenuPad : View
 
     private MenuItem[] BuildMenuItems() =>
     [
-        MenuItem.SubMenu("File", null, [
+        MenuItem.SubMenu("File", MaterialIcons.Code, [
             MenuItem.Item("Open", MaterialIcons.FileOpen),
             MenuItem.Item("Save", MaterialIcons.SaveAs, SaveFile),
         ]),
-        MenuItem.Item("Tool", null),
-        MenuItem.Item("Help", null),
+        MenuItem.Item("AI Chat", MaterialIcons.Chat, OpenAIChat),
+        MenuItem.Item("Tool", MaterialIcons.Build),
+        MenuItem.Item("Help", MaterialIcons.Help),
     ];
 
     private async void SaveFile()
@@ -60,4 +62,7 @@ internal sealed class MenuPad : View
             Notification.Error($"Save Error: {e.Message}");
         }
     }
+
+    private static void OpenAIChat() =>
+        Dialog.Show("AI Chat", _ => new AgentView(), size: new(600, 600));
 }
