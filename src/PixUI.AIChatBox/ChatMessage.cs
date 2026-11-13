@@ -29,6 +29,14 @@ public sealed class AIMessage : ChatMessage
         H += heightDiff;
     }
 
+    internal void AppendFunctionCall(string name, IDictionary<string, object?>? args, ChatBoxController controller)
+    {
+        var functionCallElement = new FunctionCallElement(name, args);
+        _elements.Add(functionCallElement);
+        functionCallElement.OnLayout(controller.Width);
+        H += functionCallElement.Height;
+    }
+
     internal override void OnLayout(float availableWidth)
     {
         foreach (var element in _elements)

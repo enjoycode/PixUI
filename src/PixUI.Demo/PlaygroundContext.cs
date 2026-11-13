@@ -17,8 +17,11 @@ namespace PixUI.Demo;
 
 internal sealed class PlaygroundContext
 {
+    public static PlaygroundContext Instance { get; private set; } = null!;
+    
     public PlaygroundContext()
     {
+        Instance = this;
         Workspace = new RoslynWorkspace();
         _projectId = ProjectId.CreateNewId();
         DocumentId = DocumentId.CreateNewId(_projectId);

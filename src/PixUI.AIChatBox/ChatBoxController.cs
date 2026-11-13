@@ -25,6 +25,20 @@ public sealed class ChatBoxController
 
     public void AppendAIContent(string text, bool thinking = false)
     {
+        var lastAIMessage = GetOrCreateAIMessage();
+        lastAIMessage.AppendContent(text, this, thinking);
+        RepaintAction?.Invoke(); //TODO: check is visible
+    }
+
+    public void AppendAIFunctionCall(string name, IDictionary<string, object?>? args)
+    {
+        var lastAIMessage = GetOrCreateAIMessage();
+        lastAIMessage.AppendFunctionCall(name, args, this);
+        RepaintAction?.Invoke(); //TODO: check is visible
+    }
+
+    private AIMessage GetOrCreateAIMessage()
+    {
         if (Messages.Count == 0 || Messages[^1] is not AIMessage lastAIMessage)
         {
             lastAIMessage = new AIMessage();
@@ -33,8 +47,7 @@ public sealed class ChatBoxController
             Messages.Add(lastAIMessage);
         }
 
-        lastAIMessage.AppendContent(text, this, thinking);
-        RepaintAction?.Invoke(); //TODO: check is visible
+        return lastAIMessage;
     }
 
     public void SendUserMessage(string text /*TODO: 附件*/)

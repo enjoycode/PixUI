@@ -1,7 +1,10 @@
+using System;
+using System.Collections.Generic;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using OllamaSharp;
 using PixUI.AIChatBox;
+using PixUI.Demo.Agent.Tools;
 
 namespace PixUI.Demo.Agent;
 
@@ -13,7 +16,7 @@ internal sealed class AgentView : View
         _chatController.OnSendMessage = OnSendMessage;
 
         Child = new ChatBox(_chatController);
-        
+
         BuildAgent();
     }
 
@@ -24,6 +27,7 @@ internal sealed class AgentView : View
     private const string INSTRUCTIONS = """
                                         你是C#和PixUI专家
                                         """;
+
     private void BuildAgent()
     {
         IChatClient ollamaClient = new OllamaApiClient(AIOptions.Url, AIOptions.Model);
@@ -31,14 +35,14 @@ internal sealed class AgentView : View
         //     .UseLogging(loggerFactory)
         //     //.UseAIContextProviders()
         //     .Build();
-        
+
         var clientOptions = new ChatClientAgentOptions()
         {
             Name = "MyFirstAgent",
             ChatOptions = new ChatOptions()
             {
                 Instructions = INSTRUCTIONS,
-                //Tools = [AIFunctionFactory.Create(Tools.GetWeather)],
+                Tools = BuildTools(),
                 Temperature = 1,
                 TopP = 0.95f,
                 TopK = 64,
@@ -54,6 +58,11 @@ internal sealed class AgentView : View
         };
         _agent = new ChatClientAgent(ollamaClient, clientOptions);
     }
+
+    private static IList<AITool> BuildTools() =>
+    [
+        AIFunctionFactory.Create(CodeTool.ReadCurrentDemoCode)
+    ];
 
     private async void OnSendMessage(string message)
     {
@@ -74,6 +83,18 @@ internal sealed class AgentView : View
                 else if (content is UsageContent usageContent)
                 {
                     //TODO:
+                }
+                else if (content is FunctionCallContent functionCallContent)
+                {
+                    _chatController.AppendAIFunctionCall(functionCallContent.Name, functionCallContent.Arguments);
+                }
+                else if (content is FunctionResultContent functionResultContent)
+                {
+                    
+                }
+                else
+                {
+                    Console.WriteLine(content.ToString());
                 }
             }
         }
