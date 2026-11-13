@@ -31,34 +31,13 @@ public abstract class Dialog : Popup
             {
                 Children =
                 {
-                    BuildTitle(),
+                    new DialogTitle(this),
                     new Expanded(_body),
                     BuildFooter()
                 }
             }
         };
         _child.Parent = this;
-    }
-
-    private Widget BuildTitle()
-    {
-        return new Row()
-        {
-            Height = 25,
-            Children =
-            {
-                new Container { Width = 35 }, //TODO: SizeBox
-                new Expanded
-                {
-                    Child = new Center { Child = new Text(Title) }
-                },
-                new Button(null, MaterialIcons.Close)
-                {
-                    Style = ButtonStyle.Transparent,
-                    OnTap = _ => Close(DialogResult.None),
-                },
-            }
-        };
     }
 
     protected abstract Widget BuildBody();
@@ -260,4 +239,65 @@ public abstract class Dialog : Popup
     }
 
     #endregion
+
+    private sealed class DialogTitle : SingleChildWidget, IMouseRegion
+    {
+        public DialogTitle(Dialog owner)
+        {
+            _owner = owner;
+            MouseRegion = new MouseRegion(() => Cursors.Hand, false);
+            MouseRegion.PointerMove += OnPointerMove;
+            MouseRegion.PointerUp += OnPointerUp;
+
+            Child = new Row()
+            {
+                Height = 25,
+                Children =
+                {
+                    new Container { Width = 35 }, //TODO: SizeBox
+                    new Expanded
+                    {
+                        Child = new Center { Child = new Text(_owner.Title) }
+                    },
+                    new Button(null, MaterialIcons.Close)
+                    {
+                        Style = ButtonStyle.Transparent,
+                        OnTap = _ => _owner.Close(DialogResult.None),
+                    },
+                }
+            };
+        }
+
+        private readonly Dialog _owner;
+        private bool _isDragging;
+        public MouseRegion MouseRegion { get; }
+
+        private void OnPointerMove(PointerEvent e)
+        {
+            if (e.Buttons != PointerButtons.Left) return;
+
+            _isDragging = true;
+            var newX = _owner.LayoutLocation.X + e.DeltaX;
+            var newY = _owner.LayoutLocation.Y + e.DeltaY;
+            _owner.UpdatePosition(newX, newY);
+        }
+
+        private void OnPointerUp(PointerEvent e)
+        {
+            if (e.Buttons == PointerButtons.Left && _isDragging)
+            {
+                _isDragging = false;
+                _owner.Root?.Window.NewHitTestForPopup(); //暂简单强制重新HitTest
+            }
+        }
+
+        public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
+        {
+            var rect = Rect.FromLTWH(0, 0, W, H);
+            var paint = Paint.Shared(Colors.LightGray);
+            canvas.DrawRect(rect, paint);
+
+            base.OnPaint(canvas, area);
+        }
+    }
 }

@@ -225,7 +225,7 @@ internal sealed class PopupProxy : Widget
         if (!ContainsPoint(x, y)) return false;
 
         result.Add(this); //需要，子级有IMouseRegion的OnTap判断错误
-        _popup.HitTest(x, y, result);
+        _popup.HitTest(x - _popup.X, y - _popup.Y, result); //_popup可能移动过位置
         return true;
     }
 
