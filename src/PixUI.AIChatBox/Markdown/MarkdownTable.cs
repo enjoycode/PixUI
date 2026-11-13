@@ -63,7 +63,7 @@ internal sealed class MarkdownTable : MarkdownBlock
 
     private void CalcColumnWidths(float availableWidth)
     {
-        var totalWidth = availableWidth - ChatBoxTheme.TableCellPadding * (_columns.Count + 1);
+        var totalWidth = availableWidth - ChatBoxTheme.TableCellPadding * 2 * _columns.Count;
         var avgColumnWidth = totalWidth / _columns.Count;
         var totalFixed = 0f;
         var fixedCount = 0;

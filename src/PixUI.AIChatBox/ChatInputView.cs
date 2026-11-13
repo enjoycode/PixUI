@@ -13,7 +13,7 @@ internal sealed class ChatInputView : View
             {
                 Children =
                 [
-                    new TextInput(_input) { Border = null },
+                    new TextInput(_input) { Border = null, HintText = "Describe the task for the agent"},
                     new Row()
                     {
                         Children =

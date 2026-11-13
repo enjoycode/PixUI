@@ -61,6 +61,23 @@ public class MarkdownTest
 
         var doc = Markdig.Markdown.Parse("[演示](https://www.example.com)", pipeline);
     }
+
+    [Test(Description = "不完整表格Bug")]
+    public void ParseTableBug()
+    {
+        // https://github.com/xoofx/markdig/issues/977
+        var pipeline = new MarkdownPipelineBuilder()
+            .UsePipeTables()
+            .Build();
+        var markdown = """
+                       | Type | `float` | `double` |
+                       |---|---|---|
+                       | **Alias** | `single` | `double` |
+                       |
+                       """;
+        var doc = Markdig.Markdown.Parse(markdown, pipeline);
+        Assert.IsTrue(doc.Count == 1);
+    }
     
     [Test(Description = "修改AST测试")]
     public void ModifyAstTest()
