@@ -157,8 +157,11 @@ internal sealed class MarkdownCodeBlock : MarkdownBlock
                 ? Color.Lerp(background, new Color(0xFF, 0xFF, 0xFF, background.Alpha), 0.1)!.Value
                 : Color.Lerp(background, new Color(0, 0, 0, background.Alpha), 0.1)!.Value;
 
-        //draw border and background
         var rect = Rect.FromLTWH(_padding, _padding, controller.Width - _doublePadding, Height - _doublePadding);
+        canvas.Save();
+        canvas.ClipRect(rect);
+
+        //draw border and background
         var round = RRect.FromRectAndRadius(rect, 3, 3);
         canvas.DrawRRect(round, Paint.Shared(background));
 
@@ -186,6 +189,8 @@ internal sealed class MarkdownCodeBlock : MarkdownBlock
                 offsetY += line.Height;
             }
         }
+
+        canvas.Restore();
     }
 
     private readonly struct CodeLineInfo

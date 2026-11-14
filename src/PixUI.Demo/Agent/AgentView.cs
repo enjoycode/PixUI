@@ -90,7 +90,7 @@ internal sealed class AgentView : View
                 }
                 else if (content is FunctionResultContent functionResultContent)
                 {
-                    
+                    //TODO: should show functionResultContent.Exception
                 }
                 else
                 {
