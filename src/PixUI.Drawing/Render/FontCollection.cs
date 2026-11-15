@@ -10,7 +10,7 @@ public interface IFontCollection
 
     bool HasLoading(string familyName);
 
-    void RegisterTypeface(Stream stream, string fontFAmily, bool isAsset);
+    ITypeface? RegisterTypeface(Stream stream, string fontFAmily, bool isAsset);
 
     ITypeface? FindTypeface(string familyName, bool bold, bool italic);
 
@@ -46,7 +46,7 @@ public static class FontCollection
     public static ITypeface? TryMatchFamilyFromAsset(string familyName) =>
         Render.Backend.FontCollection.TryMatchFamilyFromAsset(familyName);
 
-    public static void RegisterTypeface(Stream stream, string fontFamily, bool isAsset) =>
+    public static ITypeface? RegisterTypeface(Stream stream, string fontFamily, bool isAsset) =>
         Render.Backend.FontCollection.RegisterTypeface(stream, fontFamily, isAsset);
 
     public static ITypeface? FindTypeface(string familyName, bool bold, bool italic) =>

@@ -8,13 +8,11 @@ internal sealed class CompletionItemWidget : Widget
     {
         _item = item;
         // _isSelected = isSelected;
-        _iconPainter = new IconPainter(() => Repaint());
     }
 
     private readonly ICompletionItem _item;
 
     // private readonly State<bool> _isSelected;
-    private readonly IconPainter _iconPainter;
     private IParagraph? _paragraph; //TODO: use TextPainter
 
     protected override void OnLayout(Size maxSize)
@@ -27,7 +25,8 @@ internal sealed class CompletionItemWidget : Widget
         const float fontSize = 13f;
         const float x = 2f;
         const float y = 3f;
-        _iconPainter.Paint(canvas, fontSize, Colors.Gray, GetIcon(_item.Kind), x, y);
+        using var glyph = new IconGlyph(GetIcon(_item.Kind), fontSize);
+        glyph.Paint(canvas, Colors.Gray, x, y);
         _paragraph ??= TextPainter.BuildParagraph(_item.Label, float.PositiveInfinity,
             fontSize, Colors.Black, null, 1, true);
 

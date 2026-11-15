@@ -20,18 +20,18 @@ public sealed class SKFontCollection : IFontCollection
 
     public bool HasAny => _loading.Count > 0;
 
-    public void RegisterTypeface(Stream stream, string fontFAmily, bool isAsset)
+    public ITypeface? RegisterTypeface(Stream stream, string fontFAmily, bool isAsset)
     {
         using var data = SKData.Create(stream);
         if (data == null)
             throw new Exception("Can't create SKData from stream");
-        RegisterTypeface(data, fontFAmily, isAsset);
+        return RegisterTypeface(data, fontFAmily, isAsset);
     }
 
     /// <summary>
     /// 加载并注册字体
     /// </summary>
-    public void RegisterTypeface(SKData data, string fontFamily, bool isAsset)
+    public ITypeface? RegisterTypeface(SKData data, string fontFamily, bool isAsset)
     {
         SKTypeface? typeface;
         if (OperatingSystem.IsBrowser())
@@ -46,16 +46,21 @@ public sealed class SKFontCollection : IFontCollection
 
         if (typeface == null)
         {
+#if DEBUG
             Console.WriteLine($"Can't create Typeface[{fontFamily}] from data");
-            return;
+#endif
+            return null;
         }
 
         SkiaApi.sk_typeface_font_provider_register_typeface(_assetFontMgr, typeface.Handle);
+#if DEBUG
         Console.WriteLine($"FontCollection.RegisterTypeface: {typeface.FamilyName}");
+#endif
 
         _loaded[fontFamily] = typeface;
         if (isAsset)
             FontChanged?.Invoke();
+        return typeface;
     }
 
     public unsafe ITypeface? FindTypeface(string familyName, bool bold, bool italic)

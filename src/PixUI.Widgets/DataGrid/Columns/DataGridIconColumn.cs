@@ -23,8 +23,8 @@ public sealed class DataGridIconColumn<T> : DataGridColumn<T>
         var icon = _cellValueGetter(row);
         if (icon == null) return;
 
-        //TODO: cache icon painter
-        using var iconPainter = new IconPainter(() => controller.DataGrid.Body.Repaint() /*TODO: repaint column only*/);
+        using var glyph = new IconGlyph(icon.Value, cellStyle.FontSize);
+
         var offsetX = cellRect.Left + CellStyle.CellPadding;
         var offsetY = cellRect.Top;
         if (cellStyle.VerticalAlignment == VerticalAlignment.Middle)
@@ -32,7 +32,6 @@ public sealed class DataGridIconColumn<T> : DataGridColumn<T>
         else if (cellStyle.VerticalAlignment == VerticalAlignment.Bottom)
             offsetY = offsetY - cellRect.Bottom - cellStyle.FontSize;
 
-        iconPainter.Paint(canvas, cellStyle.FontSize, cellStyle.TextColor ?? Colors.Black, icon.Value,
-            offsetX, offsetY);
+        glyph.Paint(canvas, cellStyle.TextColor ?? Colors.Black, offsetX, offsetY);
     }
 }

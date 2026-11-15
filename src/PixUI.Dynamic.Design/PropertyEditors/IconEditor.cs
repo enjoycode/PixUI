@@ -192,17 +192,14 @@ internal sealed class IconItem : Widget, IMouseRegion
 {
     public IconItem( /*string name, */ IconData data)
     {
-        // _name = TextPainter.BuildParagraph(name, float.MaxValue, 8, Colors.Black);
-        _data = data;
-        _iconPainter = new IconPainter(() => Repaint());
+        _glyph = new IconGlyph(data, 30);
 
         MouseRegion = new MouseRegion(() => Cursors.Hand);
         MouseRegion.HoverChanged += OnHoverChanged;
     }
 
     // private readonly Paragraph _name;
-    private readonly IconData _data;
-    private readonly IconPainter _iconPainter;
+    private readonly IconGlyph _glyph;
     private bool _isHover;
 
     public MouseRegion MouseRegion { get; }
@@ -228,16 +225,22 @@ internal sealed class IconItem : Widget, IMouseRegion
         if (_isHover)
         {
             var rrect = RRect.FromRectAndRadius(Rect.FromLTWH(0, 0, W, H), 5, 5);
-            var paint = PixUI.Paint.Shared(Colors.Gray);
+            var paint = Paint.Shared(Colors.Gray);
             canvas.DrawRRect(rrect, paint);
 
-            _iconPainter.Paint(canvas, 30, 0xFFF7821B, _data, 10, 10);
+            _glyph.Paint(canvas, 0xFFF7821B, 10, 10);
         }
         else
         {
-            _iconPainter.Paint(canvas, 30, Colors.Black, _data, 10, 10);
+            _glyph.Paint(canvas, Colors.Black, 10, 10);
         }
 
         //canvas.DrawParagraph(_name, (W - _name.MaxIntrinsicWidth) / 2f, 40);
+    }
+
+    public override void Dispose()
+    {
+        _glyph.Dispose();
+        base.Dispose();
     }
 }
