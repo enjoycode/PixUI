@@ -37,7 +37,7 @@ public sealed class EventEditor : Widget
         _editButton.Parent = this;
         _deleteButton = new Button(icon: MaterialIcons.Clear)
         {
-            Style = ButtonStyle.Transparent,
+            Fill = ButtonFill.Transparent,
             Width = _buttonSize,
             Height = _buttonSize,
             OnTap = _ => OnDelete()

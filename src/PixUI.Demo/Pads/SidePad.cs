@@ -52,7 +52,7 @@ internal sealed class NaviBar : View
         return new Button(null, icon)
         {
             FontSize = _buttonSize,
-            TextColor = color, Style = ButtonStyle.Transparent,
+            TextColor = color, Fill = ButtonFill.Transparent,
             OnTap = e => OnClick(type)
         };
     }

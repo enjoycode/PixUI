@@ -19,11 +19,11 @@ internal sealed class ChatInputView : View
                         Children =
                         [
                             new Button(icon: MaterialIcons.Add)
-                                { Style = ButtonStyle.Transparent, Shape = ButtonShape.Pills },
+                                { Fill = ButtonFill.Transparent, Shape = ButtonShape.Pills },
                             new Expanded(),
                             new Button(icon: MaterialIcons.Upload)
                             {
-                                Style = ButtonStyle.Transparent, Shape = ButtonShape.Pills,
+                                Fill = ButtonFill.Transparent, Shape = ButtonShape.Pills,
                                 OnTap = _ => SendMessage()
                             }
                         ]

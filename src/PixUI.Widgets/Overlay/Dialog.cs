@@ -261,7 +261,7 @@ public abstract class Dialog : Popup
                     },
                     new Button(null, MaterialIcons.Close)
                     {
-                        Style = ButtonStyle.Transparent,
+                        Fill = ButtonFill.Transparent,
                         OnTap = _ => _owner.Close(DialogResult.None),
                     },
                 }

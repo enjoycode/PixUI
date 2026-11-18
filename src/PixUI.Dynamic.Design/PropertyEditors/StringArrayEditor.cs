@@ -72,21 +72,21 @@ public sealed class StringArrayDialog : Dialog
                         new Expanded(new TextInput(text)),
                         new Button(icon: MaterialIcons.Clear)
                         {
-                            Style = ButtonStyle.Transparent,
+                            Fill = ButtonFill.Transparent,
                             Width = _buttonSize,
                             Height = _buttonSize,
                             OnTap = _ => OnRemove(i),
                         },
                         new IfConditional(notFirst, () => new Button(icon: MaterialIcons.ArrowUpward)
                         {
-                            Style = ButtonStyle.Transparent,
+                            Fill = ButtonFill.Transparent,
                             Width = _buttonSize,
                             Height = _buttonSize,
                             OnTap = _ => OnMoveUp(i),
                         }, () => new Container() { Width = _buttonSize, Height = _buttonSize }),
                         new IfConditional(notLast, () => new Button(icon: MaterialIcons.ArrowDownward)
                         {
-                            Style = ButtonStyle.Transparent,
+                            Fill = ButtonFill.Transparent,
                             Width = _buttonSize,
                             Height = _buttonSize,
                             OnTap = _ => OnMoveDonw(i),

@@ -16,7 +16,7 @@ public sealed class ColorPicker : InputBase<EditableText>
         PrefixWidget = new ColorRect(_state);
         SuffixWidget = new Button(icon: MaterialIcons.ColorLens)
         {
-            Style = ButtonStyle.Transparent,
+            Fill = ButtonFill.Transparent,
             TextColor = Colors.Black,
             OnTap = _ => SwitchPopup(),
         };

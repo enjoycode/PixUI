@@ -37,7 +37,7 @@ internal sealed class StateGroup : View
                         .AddTextColumn("Type", s => s.Type.ToString())
                         .AddButtonColumn("Value", (s, _) => new Button(icon: MaterialIcons.Edit)
                         {
-                            Style = ButtonStyle.Transparent,
+                            Fill = ButtonFill.Transparent,
                             Shape = ButtonShape.Pills,
                             OnTap = _ => OnEditState(s),
                         }, 50)

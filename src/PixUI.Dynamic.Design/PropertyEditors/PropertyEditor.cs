@@ -69,7 +69,7 @@ public sealed class PropertyEditor : Widget
     {
         var button = new Button(icon: MaterialIcons.Link)
         {
-            Style = ButtonStyle.Transparent,
+            Fill = ButtonFill.Transparent,
             Width = ButtonSize,
             Height = ButtonSize
         };
@@ -81,7 +81,7 @@ public sealed class PropertyEditor : Widget
     {
         var button = new Button(icon: MaterialIcons.Clear)
         {
-            Style = ButtonStyle.Transparent,
+            Fill = ButtonFill.Transparent,
             Width = ButtonSize,
             Height = ButtonSize,
         };

@@ -28,7 +28,7 @@ public sealed class TabView<T> : Widget
                             tabBuilder(data, tab.IsSelected),
                             new Button(null, MaterialIcons.Close)
                             {
-                                Style = ButtonStyle.Transparent,
+                                Fill = ButtonFill.Transparent,
                                 Shape = ButtonShape.Pills,
                                 OnTap = _ => controller.Remove(data)
                             }

@@ -24,7 +24,7 @@ internal sealed class NotificationEntry : SingleChildWidget
                     new Expanded() { Child = text },
                     new Button(null, MaterialIcons.Close)
                     {
-                        Style = ButtonStyle.Transparent,
+                        Fill = ButtonFill.Transparent,
                         Shape = ButtonShape.Pills,
                         OnTap = _ => _controller.Reverse()
                     }

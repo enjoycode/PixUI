@@ -17,7 +17,7 @@ public sealed class DatePicker : InputBase<EditableText>
         _iconColor = new RxProxy<Color>(() => Editor.TextColor?.Value ?? Colors.Black);
         SuffixWidget = new Button(icon: MaterialIcons.CalendarMonth)
         {
-            Style = ButtonStyle.Transparent,
+            Fill = ButtonFill.Transparent,
             TextColor = _iconColor,
             OnTap = _ => SwitchPopup(),
         };

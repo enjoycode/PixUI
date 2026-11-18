@@ -16,7 +16,7 @@ internal sealed class BottomPad : View
             .AddButtonColumn("Goto",
                 (p, _) => new Button(icon: MaterialIcons.NextPlan)
                 {
-                    Style = ButtonStyle.Transparent,
+                    Fill = ButtonFill.Transparent,
                     Shape = ButtonShape.Pills,
                     FontSize = 20,
                     OnTap = _ => context.GotoProblem(p)

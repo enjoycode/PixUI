@@ -116,7 +116,7 @@ internal sealed class CalendarNaviBar : Widget
     {
         var button = new Button(icon: icon)
         {
-            Style = ButtonStyle.Transparent,
+            Fill = ButtonFill.Transparent,
             Shape = ButtonShape.Pills,
             FontSize = 20,
             OnTap = _ => action(),

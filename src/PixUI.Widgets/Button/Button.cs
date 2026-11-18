@@ -62,7 +62,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         init => Bind(ref _enabled!, value, OnEnabledChangd);
     }
 
-    public ButtonStyle Style { get; set; } = ButtonStyle.Solid;
+    public ButtonFill Fill { get; set; } = ButtonFill.Solid;
     public ButtonShape Shape { get; set; } = ButtonShape.Standard;
 
     public State<Color>? TextColor
@@ -70,7 +70,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         get => _textColor;
         set
         {
-            _textColor = value ?? (Style == ButtonStyle.Solid ? Colors.White : Colors.Black);
+            _textColor = value ?? (Fill == ButtonFill.Solid ? Colors.White : Colors.Black);
             if (_textWidget != null) _textWidget.TextColor = _textColor;
             if (_iconWidget != null) _iconWidget.Color = _textColor;
         }
@@ -154,7 +154,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     private Rect GetHoverBounds()
     {
         //Icon only 特殊处理
-        if (_iconWidget != null && _textWidget == null && Style == ButtonStyle.Transparent)
+        if (_iconWidget != null && _textWidget == null && Fill == ButtonFill.Transparent)
             return Rect.FromLTWH(_iconWidget.X, _iconWidget.Y, _iconWidget.W, _iconWidget.H);
         return Rect.FromLTWH(0, 0, W, H);
     }
@@ -195,7 +195,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     {
         if (Text == null && Icon == null) return;
 
-        _textColor ??= Style == ButtonStyle.Solid ? Colors.White : Colors.Black;
+        _textColor ??= Fill == ButtonFill.Solid ? Colors.White : Colors.Black;
 
         if (Text != null && _textWidget == null)
         {
@@ -236,11 +236,11 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
 
     private void PaintShape(ICanvas canvas)
     {
-        if (Style == ButtonStyle.Transparent) return;
+        if (Fill == ButtonFill.Transparent) return;
 
         var paint = Paint.Shared();
-        paint.Style = Style == ButtonStyle.Solid ? PaintStyle.Fill : PaintStyle.Stroke;
-        paint.StrokeWidth = Style == ButtonStyle.Outline ? (_borderWidth?.Value ?? 2) : 0;
+        paint.Style = Fill == ButtonFill.Solid ? PaintStyle.Fill : PaintStyle.Stroke;
+        paint.StrokeWidth = Fill == ButtonFill.Outline ? (_borderWidth?.Value ?? 2) : 0;
         paint.IsAntialias = Shape != ButtonShape.Square;
         paint.Color = _fillColor?.Value ?? new Color(0xFF3880FF);
 
@@ -276,7 +276,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         var y = 0f;
         var w = W;
         var h = H;
-        if (_iconWidget != null && _textWidget == null && Style == ButtonStyle.Transparent)
+        if (_iconWidget != null && _textWidget == null && Fill == ButtonFill.Transparent)
         {
             x = _iconWidget.X;
             y = _iconWidget.Y;
