@@ -2,15 +2,15 @@ namespace PixUI;
 
 public static class Attributes
 {
-    public const string StylableAttribute =
+    public const string StylableWidgetAttribute =
         """
         using System;
         namespace PixUI;
         
         [AttributeUsage(AttributeTargets.Class)]
-        public sealed class StylableAttribute<TStyle> : Attribute where TStyle : Style
+        public sealed class StylableWidgetAttribute<TStyle> : Attribute where TStyle : Style
         {
-            public StylableAttribute() {}
+            public StylableWidgetAttribute() {}
         }
         """;
     

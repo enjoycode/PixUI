@@ -25,7 +25,7 @@ public class SourceGenerator : IIncrementalGenerator
             .CreateSyntaxProvider(
                 (s, _) => s is ClassDeclarationSyntax,
                 (ctx, _) => TypeHelper.GetClassDeclarationForSourceGen(ctx))
-            .Where(t => t.classType != SourceGenClassType.None)
+            .Where(t => t.GenType != SourceGenClassType.None)
             .Select((t, _) => t);
 
         // Generate the source code.
@@ -41,27 +41,27 @@ public class SourceGenerator : IIncrementalGenerator
     /// <param name="compilation">Compilation used to provide access to the Semantic Model.</param>
     /// <param name="classDeclarations">Nodes annotated with the [Report] attribute that trigger the generate action.</param>
     private void GenerateCode(SourceProductionContext context, Compilation compilation,
-        ImmutableArray<(ClassDeclarationSyntax, SourceGenClassType)> classDeclarations)
+        ImmutableArray<SourceGenClassInfo> classDeclarations)
     {
         // Go through all filtered class declarations.
-        foreach (var (classDeclarationSyntax, type) in classDeclarations)
+        foreach (var item in classDeclarations)
         {
             // We need to get semantic model of the class to retrieve metadata.
-            var semanticModel = compilation.GetSemanticModel(classDeclarationSyntax.SyntaxTree);
+            var semanticModel = compilation.GetSemanticModel(item.ClassDeclaration.SyntaxTree);
 
             // Symbols allow us to get the compile-time information.
-            if (semanticModel.GetDeclaredSymbol(classDeclarationSyntax) is not INamedTypeSymbol classSymbol)
+            if (semanticModel.GetDeclaredSymbol(item.ClassDeclaration) is not INamedTypeSymbol classSymbol)
                 continue;
 
             var namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
 
             // 'Identifier' means the token of the node. Get class name from the syntax node.
-            var className = classDeclarationSyntax.Identifier.Text;
+            var className = item.ClassDeclaration.Identifier.Text;
 
-            if (type == SourceGenClassType.StyleObject)
+            if (item.GenType == SourceGenClassType.StyleObject)
             {
                 var sb = new StringBuilder();
-                GenerateStyleObject(sb, namespaceName, className, classDeclarationSyntax, semanticModel);
+                GenerateStyleObject(sb, namespaceName, className, item.ClassDeclaration, semanticModel);
                 // Add the source code to the compilation.
                 context.AddSource($"{className}.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
             }
@@ -77,10 +77,10 @@ public class SourceGenerator : IIncrementalGenerator
         sb.Append(namespaceName);
         sb.AppendLine(";");
         sb.AppendLine();
-        
+
         sb.AppendLine($"partial class {className}");
         sb.AppendLine("{");
-        
+
         var styleProperties = TypeHelper.GetStyleProperties(classDeclaration, semanticModel);
         foreach (var propInfo in styleProperties)
         {
@@ -94,7 +94,7 @@ public class SourceGenerator : IIncrementalGenerator
                 if (propInfo.DefaultValueProxy) sb.Append('?');
                 sb.AppendLine(";");
             }
-            
+
             sb.AppendLine($"\tpartial {returnType} {propertyName}");
             sb.AppendLine("\t{");
             //getter
@@ -111,7 +111,7 @@ public class SourceGenerator : IIncrementalGenerator
             {
                 sb.AppendLine(";");
             }
-            
+
             //setter
             sb.AppendLine("\t\tset");
             sb.AppendLine("\t\t{");
@@ -119,12 +119,14 @@ public class SourceGenerator : IIncrementalGenerator
             {
                 //TODO:
             }
+
             if (propInfo.DefaultValueProxy)
             {
-               sb.AppendLine($"\t\t\tvar changed = {fieldName} == null || {fieldName}.Value.Value != value.Value;");
-               sb.AppendLine($"\t\t\tRemoveBinding({fieldName}?.State, nameof({propertyName}));");
-               sb.AppendLine($"\t\t\t{fieldName} = value;");
-               sb.AppendLine($"\t\t\tAddBinding({fieldName}.Value.State, nameof({propertyName}), {propInfo.Listener});");
+                sb.AppendLine($"\t\t\tvar changed = {fieldName} == null || {fieldName}.Value.Value != value.Value;");
+                sb.AppendLine($"\t\t\tRemoveBinding({fieldName}?.State, nameof({propertyName}));");
+                sb.AppendLine($"\t\t\t{fieldName} = value;");
+                sb.AppendLine(
+                    $"\t\t\tAddBinding({fieldName}.Value.State, nameof({propertyName}), {propInfo.Listener});");
             }
             else
             {
@@ -142,7 +144,7 @@ public class SourceGenerator : IIncrementalGenerator
             else
                 sb.AppendLine("\t}");
         }
-        
+
         sb.AppendLine("}");
     }
 }

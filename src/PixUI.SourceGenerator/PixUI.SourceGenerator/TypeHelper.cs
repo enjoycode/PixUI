@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -10,11 +11,12 @@ internal static class TypeHelper
     private const string Namespace = "PixUI";
 
     /// <summary>
-    /// Checks whether the Node is annotated with attribute and maps syntax context to the specific node type (ClassDeclarationSyntax).
+    /// Checks whether the Node is annotated with attribute and maps syntax context
+    /// to the specific node type (ClassDeclarationSyntax).
     /// </summary>
     /// <param name="context">Syntax context, based on CreateSyntaxProvider predicate</param>
     /// <returns>The specific cast and whether the attribute was found.</returns>
-    internal static (ClassDeclarationSyntax, SourceGenClassType classType) GetClassDeclarationForSourceGen(
+    internal static SourceGenClassInfo GetClassDeclarationForSourceGen(
         GeneratorSyntaxContext context)
     {
         var classDeclarationSyntax = (ClassDeclarationSyntax)context.Node;
@@ -30,17 +32,25 @@ internal static class TypeHelper
 
             // Check the full name of the attribute.
             if (attributeName == $"{Namespace}.{nameof(Attributes.StyleObjectAttribute)}")
-                return (classDeclarationSyntax, SourceGenClassType.StyleObject);
-            if (attributeName == $"{Namespace}.{nameof(Attributes.StylableAttribute)}")
-                return (classDeclarationSyntax, SourceGenClassType.StylableWidget);
+                return new(classDeclarationSyntax, SourceGenClassType.StyleObject);
+            if (attributeName == $"{Namespace}.{nameof(Attributes.StylableWidgetAttribute)}")
+                return new(classDeclarationSyntax, SourceGenClassType.StylableWidget, GetStyleType(attributeSymbol));
         }
 
-        return (classDeclarationSyntax, SourceGenClassType.None);
+        return new(classDeclarationSyntax, SourceGenClassType.None);
+    }
+
+    internal static string GetStyleType(IMethodSymbol attributeSymbol)
+    {
+        var containingType = attributeSymbol.ContainingType;
+        return containingType is { TypeArguments.Length: > 0 }
+            ? containingType.TypeArguments[0].Name
+            : throw new Exception("Not a StylableWidgetAttribute");
     }
 
     /// <summary>
     /// 收集 classDeclaration 下所有标记了 StylePropertyAttribute 的属性，并解析其命名参数，
-    /// 转换为 StylePropertyInfo。仅依赖语法节点（无 SemanticModel）。
+    /// 转换为 StylePropertyInfo。
     /// </summary>
     internal static IEnumerable<StylePropertyInfo> GetStyleProperties(ClassDeclarationSyntax classDeclaration,
         SemanticModel semanticModel)
@@ -52,7 +62,7 @@ internal static class TypeHelper
             {
                 if (!IsStylePropertyAttribute(attribute, semanticModel))
                     continue;
-                if (semanticModel.GetDeclaredSymbol(property) is not IPropertySymbol propertySymbol) 
+                if (semanticModel.GetDeclaredSymbol(property) is not IPropertySymbol propertySymbol)
                     continue;
 
                 string? defaultValue = null;
@@ -66,13 +76,13 @@ internal static class TypeHelper
                     {
                         var name = argument.NameColon?.Name.ToString();
                         if (name == "defaultValue")
-                            defaultValue = GetStringValue(argument.Expression);
+                            defaultValue = GetLiteralStringValue(argument.Expression);
                         else if (name == "defaultValueProxy")
-                            defaultValueProxy = GetBoolValue(argument.Expression);
+                            defaultValueProxy = GetLiteralBoolValue(argument.Expression);
                         else if (name == "validator")
-                            validator = GetStringValue(argument.Expression);
+                            validator = GetLiteralStringValue(argument.Expression);
                         else if (name == "listener")
-                            listener = GetStringValue(argument.Expression);
+                            listener = GetLiteralStringValue(argument.Expression);
                     }
                 }
 
@@ -91,7 +101,7 @@ internal static class TypeHelper
                $"{Namespace}.{nameof(Attributes.StylePropertyAttribute)}";
     }
 
-    private static string? GetStringValue(ExpressionSyntax expression)
+    private static string? GetLiteralStringValue(ExpressionSyntax expression)
     {
         if (expression is LiteralExpressionSyntax literal && literal.Token.Value is string value)
             return value;
@@ -99,13 +109,28 @@ internal static class TypeHelper
         return null;
     }
 
-    private static bool GetBoolValue(ExpressionSyntax expression)
+    private static bool GetLiteralBoolValue(ExpressionSyntax expression)
     {
         if (expression is LiteralExpressionSyntax literal && literal.Token.Value is bool value)
             return value;
 
         return false;
     }
+}
+
+internal readonly struct SourceGenClassInfo
+{
+    public SourceGenClassInfo(ClassDeclarationSyntax classDeclaration,
+        SourceGenClassType genType, string? styleType = null)
+    {
+        ClassDeclaration = classDeclaration;
+        GenType = genType;
+        StyleType = styleType;
+    }
+
+    public ClassDeclarationSyntax ClassDeclaration { get; }
+    public SourceGenClassType GenType { get; }
+    public string? StyleType { get; }
 }
 
 internal readonly struct StylePropertyInfo
