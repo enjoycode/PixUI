@@ -1,0 +1,148 @@
+using System.Collections.Immutable;
+using System.Text;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
+
+namespace PixUI;
+
+[Generator]
+public class SourceGenerator : IIncrementalGenerator
+{
+    public void Initialize(IncrementalGeneratorInitializationContext context)
+    {
+        // Add the marker attribute to the compilation.
+        context.RegisterPostInitializationOutput(ctx =>
+        {
+            ctx.AddSource($"{nameof(Attributes.StylePropertyAttribute)}.g.cs",
+                SourceText.From(Attributes.StylePropertyAttribute, Encoding.UTF8));
+            ctx.AddSource($"{nameof(Attributes.StyleObjectAttribute)}.g.cs",
+                SourceText.From(Attributes.StyleObjectAttribute, Encoding.UTF8));
+        });
+
+        // Filter classes annotated with attribute. Only filtered Syntax Nodes can trigger code generation.
+        var provider = context.SyntaxProvider
+            .CreateSyntaxProvider(
+                (s, _) => s is ClassDeclarationSyntax,
+                (ctx, _) => TypeHelper.GetClassDeclarationForSourceGen(ctx))
+            .Where(t => t.classType != SourceGenClassType.None)
+            .Select((t, _) => t);
+
+        // Generate the source code.
+        context.RegisterSourceOutput(context.CompilationProvider.Combine(provider.Collect()),
+            ((ctx, t) => GenerateCode(ctx, t.Left, t.Right)));
+    }
+
+    /// <summary>
+    /// Generate code action.
+    /// It will be executed on specific nodes (ClassDeclarationSyntax annotated with the [Report] attribute) changed by the user.
+    /// </summary>
+    /// <param name="context">Source generation context used to add source files.</param>
+    /// <param name="compilation">Compilation used to provide access to the Semantic Model.</param>
+    /// <param name="classDeclarations">Nodes annotated with the [Report] attribute that trigger the generate action.</param>
+    private void GenerateCode(SourceProductionContext context, Compilation compilation,
+        ImmutableArray<(ClassDeclarationSyntax, SourceGenClassType)> classDeclarations)
+    {
+        // Go through all filtered class declarations.
+        foreach (var (classDeclarationSyntax, type) in classDeclarations)
+        {
+            // We need to get semantic model of the class to retrieve metadata.
+            var semanticModel = compilation.GetSemanticModel(classDeclarationSyntax.SyntaxTree);
+
+            // Symbols allow us to get the compile-time information.
+            if (semanticModel.GetDeclaredSymbol(classDeclarationSyntax) is not INamedTypeSymbol classSymbol)
+                continue;
+
+            var namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
+
+            // 'Identifier' means the token of the node. Get class name from the syntax node.
+            var className = classDeclarationSyntax.Identifier.Text;
+
+            if (type == SourceGenClassType.StyleObject)
+            {
+                var sb = new StringBuilder();
+                GenerateStyleObject(sb, namespaceName, className, classDeclarationSyntax, semanticModel);
+                // Add the source code to the compilation.
+                context.AddSource($"{className}.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
+            }
+        }
+    }
+
+    private static void GenerateStyleObject(StringBuilder sb, string namespaceName, string className,
+        ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
+    {
+        sb.AppendLine("using System;");
+        sb.AppendLine("using PixUI;");
+        sb.Append("namespace ");
+        sb.Append(namespaceName);
+        sb.AppendLine(";");
+        sb.AppendLine();
+        
+        sb.AppendLine($"partial class {className}");
+        sb.AppendLine("{");
+        
+        var styleProperties = TypeHelper.GetStyleProperties(classDeclaration, semanticModel);
+        foreach (var propInfo in styleProperties)
+        {
+            var returnType = propInfo.PropertySymbol.Type.ToDisplayString();
+            var propertyName = propInfo.PropertySymbol.Name;
+            var fieldName = propInfo.DefaultValueProxy ? $"_{propertyName}" : "field";
+
+            if (propInfo.DefaultValueProxy)
+            {
+                sb.Append($"\tprivate {returnType} {fieldName}");
+                if (propInfo.DefaultValueProxy) sb.Append('?');
+                sb.AppendLine(";");
+            }
+            
+            sb.AppendLine($"\tpartial {returnType} {propertyName}");
+            sb.AppendLine("\t{");
+            //getter
+            sb.Append("\t\tget");
+            if (propInfo.DefaultValueProxy)
+            {
+                sb.AppendLine();
+                sb.AppendLine("\t\t{");
+                sb.AppendLine($"\t\t\tif {fieldName} == null return {propInfo.DefaultValue}");
+                sb.AppendLine($"\t\t\treturn {fieldName}.Value;");
+                sb.AppendLine("\t\t}");
+            }
+            else
+            {
+                sb.AppendLine(";");
+            }
+            
+            //setter
+            sb.AppendLine("\t\tset");
+            sb.AppendLine("\t\t{");
+            if (!string.IsNullOrEmpty(propInfo.Validator))
+            {
+                //TODO:
+            }
+            if (propInfo.DefaultValueProxy)
+            {
+               sb.AppendLine($"\t\t\tvar changed = {fieldName} == null || {fieldName}.Value.Value != value.Value;");
+               sb.AppendLine($"\t\t\tRemoveBinding({fieldName}?.State, nameof({propertyName}));");
+               sb.AppendLine($"\t\t\t{fieldName} = value;");
+               sb.AppendLine($"\t\t\tAddBinding({fieldName}.Value.State, nameof({propertyName}), {propInfo.Listener});");
+            }
+            else
+            {
+                sb.AppendLine($"\t\t\tvar changed = {fieldName}.Value != value.Value;");
+                sb.AppendLine($"\t\t\tRemoveBinding({fieldName}.State, nameof({propertyName}));");
+                sb.AppendLine($"\t\t\t{fieldName} = value;");
+                sb.AppendLine($"\t\t\tAddBinding({fieldName}.State, nameof({propertyName}), {propInfo.Listener});");
+            }
+
+            sb.AppendLine($"\t\t\tif (changed) OnStyleValueChanged({propInfo.Listener});");
+            sb.AppendLine("\t\t}"); //end setter
+
+            if (!propInfo.DefaultValueProxy && propInfo.DefaultValue != "default")
+                sb.AppendLine($"\t}} = {propInfo.DefaultValue};");
+            else
+                sb.AppendLine("\t}");
+        }
+        
+        sb.AppendLine("}");
+    }
+}
