@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 public abstract class TextBase : Widget
@@ -159,9 +157,9 @@ public abstract class TextBase : Widget
             canvas.Restore();
     }
 
-    public override void Dispose()
+    protected override void DisposeInternal()
     {
         ClearCachedParagraph();
-        base.Dispose();
+        base.DisposeInternal();
     }
 }

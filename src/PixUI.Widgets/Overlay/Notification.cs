@@ -59,10 +59,10 @@ internal sealed class NotificationEntry : SingleChildWidget
         _controller.Forward();
     }
 
-    public override void Dispose()
+    protected override void DisposeInternal()
     {
         _controller.Dispose();
-        base.Dispose();
+        base.DisposeInternal();
     }
 }
 

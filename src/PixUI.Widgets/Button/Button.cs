@@ -319,11 +319,12 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         return $"{nameof(Button)}[\"{Text.Value}\"]";
     }
 
-    public override void Dispose()
+
+    protected override void DisposeInternal()
     {
         _textWidget?.Dispose();
         _iconWidget?.Dispose();
-        base.Dispose();
+        base.DisposeInternal();
     }
 
     #endregion

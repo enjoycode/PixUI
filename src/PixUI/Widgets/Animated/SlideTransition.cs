@@ -46,9 +46,9 @@ public sealed class SlideTransition : Transform
         SetTransform(Matrix4.CreateTranslation(_offsetX, _offsetY, 0));
     }
 
-    public override void Dispose()
+    protected override void DisposeInternal()
     {
         _position.ValueChanged -= OnPositionChanged;
-        base.Dispose();
+        base.DisposeInternal();
     }
 }

@@ -142,12 +142,7 @@ internal readonly struct StylePropertyInfo
         DefaultValue = defaultValue ?? "default";
         DefaultValueProxy = defaultValueProxy;
         Validator = validator;
-        Listener = listener switch
-        {
-            "Relayout" => "Widget.RelayoutOnStyleChanged",
-            null or "Repaint" => "Widget.RepaintOnStyleChanged",
-            _ => listener
-        };
+        Listener = string.IsNullOrEmpty(listener) ? "Repaint" : listener!;
     }
 
     public IPropertySymbol PropertySymbol { get; }

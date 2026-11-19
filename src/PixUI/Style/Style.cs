@@ -5,6 +5,9 @@ namespace PixUI;
 public abstract class Style
 {
     internal bool IsDefault { get; set; }
+    
+    protected static void Repaint(Widget widget) => widget.Repaint();
+    protected static void Relayout(Widget widget) => widget.Relayout();
 }
 
 public abstract class Style<TWidget> : Style, IDisposable where TWidget : Widget

@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 public sealed class RotationTransition : Transform
@@ -37,9 +35,9 @@ public sealed class RotationTransition : Transform
 
     private void OnTurnChanged() => SetTransform(CalcTransform());
 
-    public override void Dispose()
+    protected override void DisposeInternal()
     {
         _turns.ValueChanged -= OnTurnChanged;
-        base.Dispose();
+        base.DisposeInternal();
     }
 }

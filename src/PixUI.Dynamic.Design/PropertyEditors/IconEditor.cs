@@ -238,9 +238,9 @@ internal sealed class IconItem : Widget, IMouseRegion
         //canvas.DrawParagraph(_name, (W - _name.MaxIntrinsicWidth) / 2f, 40);
     }
 
-    public override void Dispose()
+    protected override void DisposeInternal()
     {
         _glyph.Dispose();
-        base.Dispose();
+        base.DisposeInternal();
     }
 }

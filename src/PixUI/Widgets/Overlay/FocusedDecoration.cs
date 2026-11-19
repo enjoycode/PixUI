@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 public sealed class FocusedDecoration
@@ -123,7 +121,7 @@ internal sealed class FocusedDecorator : FlowDecorator<Widget>
         }
     }
 
-    public override void Dispose()
+    protected override void DisposeInternal()
     {
         if (_controller != null)
         {
@@ -132,6 +130,6 @@ internal sealed class FocusedDecorator : FlowDecorator<Widget>
             _controller.Dispose();
         }
 
-        base.Dispose();
+        base.DisposeInternal();
     }
 }

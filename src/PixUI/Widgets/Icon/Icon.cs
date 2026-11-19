@@ -50,9 +50,9 @@ public sealed class Icon : Widget
         _glyph.Paint(canvas, color);
     }
 
-    public override void Dispose()
+    protected override void DisposeInternal()
     {
         _glyph.Dispose();
-        base.Dispose();
+        base.DisposeInternal();
     }
 }

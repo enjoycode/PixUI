@@ -193,10 +193,10 @@ internal sealed class PopupTransitionWrap : SingleChildWidget
         return base.HitTest(x, y, result);
     }
 
-    public override void Dispose()
+    protected override void DisposeInternal()
     {
         AnimationController.Dispose();
-        base.Dispose();
+        base.DisposeInternal();
     }
 }
 
