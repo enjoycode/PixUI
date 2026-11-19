@@ -7,7 +7,7 @@ public abstract class View : SingleChildWidget
     public State<Color>? FillColor
     {
         get => _fillColor;
-        set => Bind(ref _fillColor, value, RepaintOnStateChanged);
+        set => Bind(ref _fillColor, value, Repaint);
     }
 
     public override bool IsOpaque => _fillColor != null && _fillColor.Value.IsOpaque;

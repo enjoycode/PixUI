@@ -64,9 +64,9 @@ public abstract class TextBase : Widget
     protected virtual void OnTextChanged(State state)
     {
         if (this is EditableText)
-            RepaintOnStateChanged(state);
+            Repaint(state);
         else
-            RelayoutOnStateChanged(state);
+            Relayout(state);
     }
 
     public void ClearCachedParagraph()
@@ -76,16 +76,16 @@ public abstract class TextBase : Widget
         CachedParagraph = null;
     }
 
-    protected override void RepaintOnStateChanged(State state)
+    private void RepaintOnStateChanged(State? state)
     {
         ClearCachedParagraph();
-        base.RepaintOnStateChanged(state);
+        Repaint(state);
     }
 
-    protected override void RelayoutOnStateChanged(State state)
+    private void RelayoutOnStateChanged(State? state)
     {
         ClearCachedParagraph();
-        base.RelayoutOnStateChanged(state);
+        Relayout(state);
     }
 
     protected void BuildParagraph(string text, float width)

@@ -35,7 +35,7 @@ public sealed class TreeView<T> : Widget, IScrollable
     public State<Color>? FillColor
     {
         get => _fillColor;
-        init => Bind(ref _fillColor, value, RepaintOnStateChanged);
+        init => Bind(ref _fillColor, value, Repaint);
     }
 
     public bool AllowDrag

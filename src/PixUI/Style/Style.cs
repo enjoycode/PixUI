@@ -5,7 +5,7 @@ namespace PixUI;
 public abstract class Style
 {
     internal bool IsDefault { get; set; }
-    
+
     protected static void Repaint(Widget widget) => widget.Repaint();
     protected static void Relayout(Widget widget) => widget.Relayout();
 }
@@ -66,7 +66,10 @@ public abstract class Style<TWidget> : Style, IDisposable where TWidget : Widget
         if (state == null) return;
         var existed = FindState(state);
         if (existed >= 0)
-            _states![existed].RemoveProperty(propertyName);
+        {
+            if (_states![existed].RemoveProperty(propertyName))
+                _states.RemoveAt(existed);
+        }
     }
 
     private int FindState(State state)
@@ -133,13 +136,15 @@ public abstract class Style<TWidget> : Style, IDisposable where TWidget : Widget
             Properties.Add((propertyName, listener));
         }
 
-        public void RemoveProperty(string propertyName)
+        public bool RemoveProperty(string propertyName)
         {
             for (var i = Properties.Count - 1; i >= 0; i--)
             {
                 if (Properties[i].PropertyName == propertyName)
                     Properties.RemoveAt(i);
             }
+
+            return Properties.Count == 0;
         }
     }
 }

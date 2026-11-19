@@ -14,7 +14,7 @@ public sealed class Container : SingleChildWidget
     public State<Color>? FillColor
     {
         get => _fillColor;
-        set => Bind(ref _fillColor, value, RepaintOnStateChanged);
+        set => Bind(ref _fillColor, value, Repaint);
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)

@@ -101,7 +101,7 @@ public sealed class Splitter : Widget
     public State<bool>? Panel1Collapsed
     {
         get => _panel1Collapsed;
-        init => Bind(ref _panel1Collapsed, value, RelayoutOnStateChanged);
+        init => Bind(ref _panel1Collapsed, value, Relayout);
     }
 
     private bool IsPanel1Collapsed => _panel1Collapsed is { Value: true };
@@ -109,7 +109,7 @@ public sealed class Splitter : Widget
     public State<bool>? Panel2Collapsed
     {
         get => _panel2Collapsed;
-        init => Bind(ref _panel2Collapsed, value, RelayoutOnStateChanged);
+        init => Bind(ref _panel2Collapsed, value, Relayout);
     }
 
     private bool IsPanel2Collapsed => _panel2Collapsed is { Value: true };

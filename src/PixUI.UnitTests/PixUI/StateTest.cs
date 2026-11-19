@@ -55,7 +55,7 @@ public class StateTest
         public required State<DateTime?> Value
         {
             get => _value;
-            init => Bind(ref _value!, value, RepaintOnStateChanged);
+            init => Bind(ref _value!, value, Repaint);
         }
     }
 

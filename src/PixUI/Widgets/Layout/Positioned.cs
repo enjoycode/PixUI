@@ -28,7 +28,7 @@ public sealed class Positioned : Widget
         get => _left;
         set
         {
-            Bind(ref _left, value, RelayoutOnStateChanged);
+            Bind(ref _left, value, Relayout);
             Parent?.Repaint(); //TODO: remove when impl OnChildBoundsChanged
         }
     }
@@ -38,7 +38,7 @@ public sealed class Positioned : Widget
         get => _right;
         set
         {
-            Bind(ref _right, value, RelayoutOnStateChanged);
+            Bind(ref _right, value, Relayout);
             Parent?.Repaint(); //TODO:
         }
     }
@@ -48,7 +48,7 @@ public sealed class Positioned : Widget
         get => _top;
         set
         {
-            Bind(ref _top, value, RelayoutOnStateChanged);
+            Bind(ref _top, value, Relayout);
             Parent?.Repaint(); //TODO:
         }
     }
@@ -58,7 +58,7 @@ public sealed class Positioned : Widget
         get => _bottom;
         set
         {
-            Bind(ref _bottom, value, RelayoutOnStateChanged);
+            Bind(ref _bottom, value, Relayout);
             Parent?.Repaint(); //TODO:
         }
     }

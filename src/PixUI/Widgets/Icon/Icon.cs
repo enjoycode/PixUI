@@ -22,7 +22,7 @@ public sealed class Icon : Widget
     public State<Color>? Color
     {
         get => _color;
-        set => Bind(ref _color, value, RepaintOnStateChanged);
+        set => Bind(ref _color, value, Repaint);
     }
 
     private void OnDataChanged(State state)

@@ -30,10 +30,10 @@ public sealed class ImageBox : Widget
     private void OnImageSourceChanged(State imgSrc)
     {
         _imgSrc.Value.OnLoaded = OnImageLoaded;
-        RelayoutOnStateChanged(imgSrc);
+        Relayout(imgSrc);
     }
 
-    private void OnImageLoaded() => RelayoutOnStateChanged(_imgSrc);
+    private void OnImageLoaded() => Relayout(_imgSrc);
 
     protected override void OnLayout(Size maxSize)
     {

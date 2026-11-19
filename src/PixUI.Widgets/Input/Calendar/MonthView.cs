@@ -9,9 +9,9 @@ public sealed class MonthView : Widget, IMouseRegion
         if (year.Value < 1 || year.Value > 9999 || month.Value < 1 || month.Value > 12)
             throw new ArgumentOutOfRangeException();
 
-        Bind(ref Year!, year, RepaintOnStateChanged);
-        Bind(ref Month!, month, RepaintOnStateChanged);
-        Bind(ref _selectedDate!, new RxValue<DateTime?>(null), RepaintOnStateChanged);
+        Bind(ref Year!, year, Repaint);
+        Bind(ref Month!, month, Repaint);
+        Bind(ref _selectedDate!, new RxValue<DateTime?>(null), Repaint);
 
         InitMouseRegion();
     }
@@ -21,16 +21,16 @@ public sealed class MonthView : Widget, IMouseRegion
         if (selectedDate.Value == null)
         {
             var today = DateTime.Today;
-            Bind(ref Year!, new RxValue<int>(today.Year), RepaintOnStateChanged);
-            Bind(ref Month!, new RxValue<int>(today.Month), RepaintOnStateChanged);
+            Bind(ref Year!, new RxValue<int>(today.Year), Repaint);
+            Bind(ref Month!, new RxValue<int>(today.Month), Repaint);
         }
         else
         {
-            Bind(ref Year!, new RxValue<int>(selectedDate.Value.Value.Year), RepaintOnStateChanged);
-            Bind(ref Month!, new RxValue<int>(selectedDate.Value.Value.Month), RepaintOnStateChanged);
+            Bind(ref Year!, new RxValue<int>(selectedDate.Value.Value.Year), Repaint);
+            Bind(ref Month!, new RxValue<int>(selectedDate.Value.Value.Month), Repaint);
         }
 
-        Bind(ref _selectedDate!, selectedDate, RepaintOnStateChanged);
+        Bind(ref _selectedDate!, selectedDate, Repaint);
 
         InitMouseRegion();
     }

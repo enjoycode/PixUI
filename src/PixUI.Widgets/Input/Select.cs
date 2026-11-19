@@ -187,7 +187,7 @@ internal sealed class SelectText : TextBase, IMouseRegion, IFocusable
     public State<bool>? Readonly
     {
         get => _readonly;
-        set => Bind(ref _readonly, value, RepaintOnStateChanged);
+        set => Bind(ref _readonly, value, Repaint);
     }
 
     protected override bool ForceHeight => true;

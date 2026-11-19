@@ -65,7 +65,7 @@ internal sealed class IconList : Widget, IScrollable
     {
         _keyword = keyword;
         _filtered = _allIcons = GetAllIcons();
-        _keyword.AddListener(RelayoutOnStateChanged);
+        _keyword.AddListener(Relayout);
     }
 
     private readonly List<ValueTuple<string, IconData>> _allIcons;

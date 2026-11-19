@@ -47,13 +47,13 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     public State<string>? Text
     {
         get => _text;
-        init => Bind(ref _text, value, RelayoutOnStateChanged);
+        init => Bind(ref _text, value, Relayout);
     }
 
     public State<IconData>? Icon
     {
         get => _icon;
-        init => Bind(ref _icon, value, RelayoutOnStateChanged);
+        init => Bind(ref _icon, value, Relayout);
     }
 
     public State<bool> Enabled
@@ -79,7 +79,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
     public State<Color>? FillColor
     {
         get => _fillColor;
-        set => Bind(ref _fillColor, value, RepaintOnStateChanged);
+        set => Bind(ref _fillColor, value, Repaint);
     }
 
     public State<float>? FontSize

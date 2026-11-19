@@ -87,7 +87,7 @@ public abstract partial class Widget : IDisposable
     public State<float>? Width
     {
         get => _width;
-        set => Bind(ref _width, value, RelayoutOnStateChanged);
+        set => Bind(ref _width, value, Relayout);
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public abstract partial class Widget : IDisposable
     public State<float>? Height
     {
         get => _height;
-        set => Bind(ref _height, value, RelayoutOnStateChanged);
+        set => Bind(ref _height, value, Relayout);
     }
 
     /// <summary>
@@ -471,9 +471,9 @@ public abstract partial class Widget : IDisposable
     /// </summary>
     public void Relayout() => InvalidQueue.Add(this, InvalidAction.Relayout, null);
 
-    protected virtual void RepaintOnStateChanged(State state) => InvalidQueue.Add(this, InvalidAction.Repaint, null);
+    protected void Repaint(State? state) => InvalidQueue.Add(this, InvalidAction.Repaint, null);
 
-    protected virtual void RelayoutOnStateChanged(State state) => InvalidQueue.Add(this, InvalidAction.Relayout, null);
+    protected void Relayout(State? state) => InvalidQueue.Add(this, InvalidAction.Relayout, null);
 
     #endregion
 
