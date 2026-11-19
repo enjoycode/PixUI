@@ -9,22 +9,30 @@ namespace PixUI.Tests;
 public class SourceGeneratorTests
 {
     private readonly ITestOutputHelper _testOutputHelper;
+
     public SourceGeneratorTests(ITestOutputHelper testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
     }
 
-    private const string StyleClassCode =
+    private const string StyleObjectCode =
         """
-        using PixUI;
-        namespace TestNamespace;
+        namespace PixUI;
 
         [StyleObject]
         public partial class ButtonStyle
         {
-            [StyleProperty(defaultValue: "12f", validator: "{v} > 0 && {v} < 100", listener: "Relayout"]
+            [StyleProperty(defaultValue: "12f", validator: "{0} > 0 && {0} < 100", listener: "Relayout"]
             public partial BindableProperty<float> FontSize { get; set; }
         }";
+        """;
+
+    private const string StylableWidgetCode =
+        """
+        namespace PixUI;
+
+        [StylableWidget<ButtonStyle>]
+        public partial class Button {}
         """;
 
 
@@ -39,7 +47,7 @@ public class SourceGeneratorTests
 
         // We need to create a compilation with the required source code.
         var compilation = CSharpCompilation.Create(nameof(SourceGeneratorTests),
-            [CSharpSyntaxTree.ParseText(StyleClassCode)],
+            [CSharpSyntaxTree.ParseText(StyleObjectCode), CSharpSyntaxTree.ParseText(StylableWidgetCode)],
             [
                 // To support 'System.Attribute' inheritance, add reference to 'System.Private.CoreLib'.
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location)
@@ -49,8 +57,10 @@ public class SourceGeneratorTests
         var runResult = driver.RunGenerators(compilation).GetRunResult();
 
         // All generated files can be found in 'RunResults.GeneratedTrees'.
-        var generatedFileSyntax = runResult.GeneratedTrees.Single(t => t.FilePath.EndsWith("ButtonStyle.g.cs"));
-        _testOutputHelper.WriteLine(generatedFileSyntax.GetText().ToString());
+        var generatedStyleObject = runResult.GeneratedTrees.Single(t => t.FilePath.EndsWith("ButtonStyle.g.cs"));
+        _testOutputHelper.WriteLine(generatedStyleObject.GetText().ToString());
+        var generatedStylableObject = runResult.GeneratedTrees.Single(t => t.FilePath.EndsWith("Button.g.cs"));
+        _testOutputHelper.WriteLine(generatedStylableObject.GetText().ToString());
 
         // Complex generators should be tested using text comparison.
         // Assert.Equal(ExpectedGeneratedClassText, generatedFileSyntax.GetText().ToString(),

@@ -33,7 +33,7 @@ internal static class TypeHelper
             // Check the full name of the attribute.
             if (attributeName == $"{Namespace}.{nameof(Attributes.StyleObjectAttribute)}")
                 return new(classDeclarationSyntax, SourceGenClassType.StyleObject);
-            if (attributeName == $"{Namespace}.{nameof(Attributes.StylableWidgetAttribute)}")
+            if (attributeName.StartsWith($"{Namespace}.{nameof(Attributes.StylableWidgetAttribute)}<"))
                 return new(classDeclarationSyntax, SourceGenClassType.StylableWidget, GetStyleType(attributeSymbol));
         }
 
