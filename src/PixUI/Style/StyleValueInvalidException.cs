@@ -1,6 +1,6 @@
 namespace PixUI;
 
-public sealed class StyleValueInvalidException
+public sealed class StyleValueInvalidException : Exception
 {
     public StyleValueInvalidException(string className, string propertyName, string validator)
     {

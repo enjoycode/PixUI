@@ -95,9 +95,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sugiyama", "..\ext\mermaide
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mermaider", "..\ext\mermaider\src\Mermaider\Mermaider.csproj", "{228EB664-F0F6-4387-A63D-D6DEB12A9D52}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.SourceGenerator", "PixUI.SourceGenerator\PixUI.SourceGenerator\PixUI.SourceGenerator.csproj", "{B1F74BA1-5E78-4241-AA45-62F5A4EC2503}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.SourceGenerator", "PixUI.SourceGenerator\PixUI.SourceGenerator.csproj", "{B1F74BA1-5E78-4241-AA45-62F5A4EC2503}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.SourceGenerator.Tests", "PixUI.SourceGenerator\PixUI.SourceGenerator.Tests\PixUI.SourceGenerator.Tests.csproj", "{59C20C27-63CC-4A1C-980C-6D98DFEE7EA0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixUI.SourceGenerator.Tests", "PixUI.SourceGenerator.Tests\PixUI.SourceGenerator.Tests.csproj", "{59C20C27-63CC-4A1C-980C-6D98DFEE7EA0}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PixUI.SourceGenerator.Shared", "PixUI.SourceGenerator.Shared\PixUI.SourceGenerator.Shared.shproj", "{0B75E415-F1CD-445F-A63A-38635B884E83}"
 EndProject

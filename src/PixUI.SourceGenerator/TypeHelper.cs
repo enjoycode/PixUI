@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace PixUI;
@@ -25,7 +26,8 @@ internal static class TypeHelper
         foreach (var attributeListSyntax in classDeclarationSyntax.AttributeLists)
         foreach (var attributeSyntax in attributeListSyntax.Attributes)
         {
-            if (context.SemanticModel.GetSymbolInfo(attributeSyntax).Symbol is not IMethodSymbol attributeSymbol)
+            if (ModelExtensions.GetSymbolInfo(context.SemanticModel, attributeSyntax).Symbol is not IMethodSymbol
+                attributeSymbol)
                 continue; // if we can't get the symbol, ignore it
 
             var attributeName = attributeSymbol.ContainingType.ToDisplayString();
@@ -62,13 +64,14 @@ internal static class TypeHelper
             {
                 if (!IsStylePropertyAttribute(attribute, semanticModel))
                     continue;
-                if (semanticModel.GetDeclaredSymbol(property) is not IPropertySymbol propertySymbol)
+                if (ModelExtensions.GetDeclaredSymbol(semanticModel, property) is not IPropertySymbol propertySymbol)
                     continue;
 
                 string? defaultValue = null;
                 var defaultValueProxy = false;
                 string? validator = null;
                 string? listener = null;
+                var modifiers = GetModifiersOfProperty(property);
 
                 if (attribute.ArgumentList is not null)
                 {
@@ -86,15 +89,31 @@ internal static class TypeHelper
                     }
                 }
 
-                yield return new StylePropertyInfo(propertySymbol, defaultValue, defaultValueProxy,
-                    validator, listener);
+                yield return new StylePropertyInfo(propertySymbol, modifiers,
+                    defaultValue, defaultValueProxy, validator, listener);
             }
         }
     }
 
+    private static string GetModifiersOfProperty(PropertyDeclarationSyntax propertyDeclaration)
+    {
+        SyntaxKind[] accessModifiers =
+        [
+            SyntaxKind.PublicKeyword,
+            SyntaxKind.PrivateKeyword,
+            SyntaxKind.ProtectedKeyword,
+            SyntaxKind.InternalKeyword
+        ];
+        var modifiers = propertyDeclaration.Modifiers
+            .Where(t => accessModifiers.Contains(t.Kind()))
+            .Select(t => t.Text);
+
+        return string.Join(" ", modifiers);
+    }
+
     private static bool IsStylePropertyAttribute(AttributeSyntax attribute, SemanticModel semanticModel)
     {
-        if (semanticModel.GetSymbolInfo(attribute).Symbol is not IMethodSymbol attributeSymbol)
+        if (ModelExtensions.GetSymbolInfo(semanticModel, attribute).Symbol is not IMethodSymbol attributeSymbol)
             return false;
 
         return attributeSymbol.ContainingType.ToDisplayString() ==
@@ -135,10 +154,12 @@ internal readonly struct SourceGenClassInfo
 
 internal readonly struct StylePropertyInfo
 {
-    public StylePropertyInfo(IPropertySymbol propertySymbol, string? defaultValue = null,
-        bool defaultValueProxy = false, string? validator = null, string? listener = null)
+    public StylePropertyInfo(IPropertySymbol propertySymbol, string modifiers,
+        string? defaultValue = null, bool defaultValueProxy = false,
+        string? validator = null, string? listener = null)
     {
         PropertySymbol = propertySymbol;
+        Modifiers = modifiers;
         DefaultValue = defaultValue ?? "default";
         DefaultValueProxy = defaultValueProxy;
         Validator = validator;
@@ -146,6 +167,7 @@ internal readonly struct StylePropertyInfo
     }
 
     public IPropertySymbol PropertySymbol { get; }
+    public string Modifiers { get; }
     public string DefaultValue { get; }
     public bool DefaultValueProxy { get; }
     public string? Validator { get; }

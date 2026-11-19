@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -22,7 +23,7 @@ public class SourceGeneratorTests
         [StyleObject]
         public partial class ButtonStyle
         {
-            [StyleProperty(defaultValue: "12f", validator: "{0} > 0 && {0} < 100", listener: "Relayout"]
+            [StyleProperty(defaultValue: "12f", validator: "{0} > 0 && {0} < 100", listener: "Relayout")]
             public partial BindableProperty<float> FontSize { get; set; }
         }";
         """;

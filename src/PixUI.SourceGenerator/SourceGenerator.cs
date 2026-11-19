@@ -141,7 +141,9 @@ partial class {className}
                 sb.AppendLine(";");
             }
 
-            sb.AppendLine($"\tpartial {returnType} {propertyName}");
+            sb.Append($"\t{propInfo.Modifiers}");
+            if (!string.IsNullOrEmpty(propInfo.Modifiers)) sb.Append(' ');
+            sb.AppendLine($"partial {returnType} {propertyName}");
             sb.AppendLine("\t{");
             //getter
             sb.Append("\t\tget");
