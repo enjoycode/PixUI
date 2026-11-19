@@ -4,7 +4,7 @@ namespace PixUI;
 
 public abstract class Style
 {
-    internal bool IsDefault { get; set; }
+    public bool IsDefault { get; internal init; }
 
     protected static void Repaint(Widget widget) => widget.Repaint();
     protected static void Relayout(Widget widget) => widget.Relayout();
@@ -15,6 +15,9 @@ public abstract class Style<TWidget> : Style, IDisposable where TWidget : Widget
     private List<TWidget>? _widgets;
     private List<StateChangeListener>? _states;
 
+    /// <summary>
+    /// 添加当前样式关联的Widget
+    /// </summary>
     internal void AddWidget(TWidget widget)
     {
         if (IsDefault) throw new InvalidOperationException("Default style can't binding to widget");
@@ -24,6 +27,9 @@ public abstract class Style<TWidget> : Style, IDisposable where TWidget : Widget
         _widgets.Add(widget);
     }
 
+    /// <summary>
+    /// 移除当前样式关联的Widget
+    /// </summary>
     internal void RemoveWidget(TWidget widget)
     {
         _widgets?.Remove(widget);
@@ -106,7 +112,7 @@ public abstract class Style<TWidget> : Style, IDisposable where TWidget : Widget
         {
             if (ReferenceEquals(state, stateChangeListener.State))
             {
-                foreach (var (propertyName, action) in stateChangeListener.Properties)
+                foreach (var (_, action) in stateChangeListener.Properties)
                 {
                     OnStyleValueChanged(action);
                 }

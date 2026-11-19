@@ -399,6 +399,12 @@ public abstract partial class Widget : IDisposable
 
     #region ====Paint====
 
+    protected TStyle GetStyle<TStyle>() where TStyle : Style, new()
+    {
+        //TODO: 沿树向上查找样式表(StyleSheet)，都没有返回主题默认
+        return Theme.GetStyle<TStyle>();
+    }
+
     /// <summary>
     /// 开始绘制前转换画布坐标为本地坐标，并且根所需要转换矩阵或裁剪绘制区域
     /// </summary>
