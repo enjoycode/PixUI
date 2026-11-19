@@ -23,6 +23,8 @@ internal static class TypeHelper
         var classDeclarationSyntax = (ClassDeclarationSyntax)context.Node;
 
         // Go through all attributes of the class.
+        var genClassType = SourceGenClassType.None;
+        string? styleType = null;
         foreach (var attributeListSyntax in classDeclarationSyntax.AttributeLists)
         foreach (var attributeSyntax in attributeListSyntax.Attributes)
         {
@@ -33,16 +35,21 @@ internal static class TypeHelper
             var attributeName = attributeSymbol.ContainingType.ToDisplayString();
 
             // Check the full name of the attribute.
-            if (attributeName == $"{Namespace}.{nameof(Attributes.StyleObjectAttribute)}")
-                return new(classDeclarationSyntax, SourceGenClassType.StyleObject);
-            if (attributeName.StartsWith($"{Namespace}.{nameof(Attributes.StylableWidgetAttribute)}<"))
-                return new(classDeclarationSyntax, SourceGenClassType.StylableWidget, GetStyleType(attributeSymbol));
+            if (attributeName == $"{Namespace}.{nameof(SourceGenAttributes.StyleObjectAttribute)}")
+                genClassType |= SourceGenClassType.StyleObject;
+            else if (attributeName == $"{Namespace}.{nameof(SourceGenAttributes.BindableWidgetAttribute)}")
+                genClassType |= SourceGenClassType.BindableWidget;
+            else if (attributeName.StartsWith($"{Namespace}.{nameof(SourceGenAttributes.StylableWidgetAttribute)}<"))
+            {
+                styleType = GetStyleType(attributeSymbol);
+                genClassType |= SourceGenClassType.StylableWidget;
+            }
         }
 
-        return new(classDeclarationSyntax, SourceGenClassType.None);
+        return new(classDeclarationSyntax, genClassType, styleType);
     }
 
-    internal static string GetStyleType(IMethodSymbol attributeSymbol)
+    private static string GetStyleType(IMethodSymbol attributeSymbol)
     {
         var containingType = attributeSymbol.ContainingType;
         return containingType is { TypeArguments.Length: > 0 }
@@ -50,19 +57,15 @@ internal static class TypeHelper
             : throw new Exception("Not a StylableWidgetAttribute");
     }
 
-    /// <summary>
-    /// 收集 classDeclaration 下所有标记了 StylePropertyAttribute 的属性，并解析其命名参数，
-    /// 转换为 StylePropertyInfo。
-    /// </summary>
-    internal static IEnumerable<StylePropertyInfo> GetStyleProperties(ClassDeclarationSyntax classDeclaration,
-        SemanticModel semanticModel)
+    internal static IEnumerable<BindablePropertyInfo> GetBindableProperties(
+        ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
     {
         foreach (var property in classDeclaration.Members.OfType<PropertyDeclarationSyntax>())
         {
             foreach (var attributeList in property.AttributeLists)
             foreach (var attribute in attributeList.Attributes)
             {
-                if (!IsStylePropertyAttribute(attribute, semanticModel))
+                if (!IsBindablePropertyAttribute(attribute, semanticModel))
                     continue;
                 if (ModelExtensions.GetDeclaredSymbol(semanticModel, property) is not IPropertySymbol propertySymbol)
                     continue;
@@ -89,7 +92,7 @@ internal static class TypeHelper
                     }
                 }
 
-                yield return new StylePropertyInfo(propertySymbol, modifiers,
+                yield return new BindablePropertyInfo(propertySymbol, modifiers,
                     defaultValue, defaultValueProxy, validator, listener);
             }
         }
@@ -111,13 +114,20 @@ internal static class TypeHelper
         return string.Join(" ", modifiers);
     }
 
-    private static bool IsStylePropertyAttribute(AttributeSyntax attribute, SemanticModel semanticModel)
+    /// <summary>
+    /// 是否标为[BindableProperty] or [StyleProperty]
+    /// </summary>
+    /// <param name="attribute"></param>
+    /// <param name="semanticModel"></param>
+    /// <returns></returns>
+    private static bool IsBindablePropertyAttribute(AttributeSyntax attribute, SemanticModel semanticModel)
     {
         if (ModelExtensions.GetSymbolInfo(semanticModel, attribute).Symbol is not IMethodSymbol attributeSymbol)
             return false;
 
-        return attributeSymbol.ContainingType.ToDisplayString() ==
-               $"{Namespace}.{nameof(Attributes.StylePropertyAttribute)}";
+        var attributeName = attributeSymbol.ContainingType.ToDisplayString();
+        return attributeName is $"{Namespace}.{nameof(SourceGenAttributes.StylePropertyAttribute)}"
+            or $"{Namespace}.{nameof(SourceGenAttributes.BindablePropertyAttribute)}";
     }
 
     private static string? GetLiteralStringValue(ExpressionSyntax expression)
@@ -152,9 +162,9 @@ internal readonly struct SourceGenClassInfo
     public string? StyleType { get; }
 }
 
-internal readonly struct StylePropertyInfo
+internal readonly struct BindablePropertyInfo
 {
-    public StylePropertyInfo(IPropertySymbol propertySymbol, string modifiers,
+    public BindablePropertyInfo(IPropertySymbol propertySymbol, string modifiers,
         string? defaultValue = null, bool defaultValueProxy = false,
         string? validator = null, string? listener = null)
     {

@@ -9,7 +9,7 @@
     <Import_RootNamespace>PixUI.SourceGenerator.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Attributes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SourceGenAttributes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SourceGenClassType.cs" />
   </ItemGroup>
 </Project>

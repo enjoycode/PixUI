@@ -486,11 +486,13 @@ public abstract partial class Widget : IDisposable
     #region ====IDisposable====
 
     protected virtual void DisposeStyle() { }
+    protected virtual void DisposeStates() { }
     protected virtual void DisposeInternal() { }
 
     public void Dispose()
     {
         DisposeStyle();
+        DisposeStates();
         DisposeInternal();
         Parent = null;
     }

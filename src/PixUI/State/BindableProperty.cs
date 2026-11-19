@@ -30,3 +30,17 @@ public readonly struct BindableProperty<T> where T : IEquatable<T>
 
     public override string ToString() => Value.ToString() ?? string.Empty;
 }
+
+public sealed class PropertyValueInvalidException : Exception
+{
+    public PropertyValueInvalidException(string className, string propertyName, string validator)
+    {
+        ClassName = className;
+        PropertyName = propertyName;
+        Validator = validator;
+    }
+
+    public string ClassName { get; }
+    public string PropertyName { get; }
+    public string Validator { get; }
+}

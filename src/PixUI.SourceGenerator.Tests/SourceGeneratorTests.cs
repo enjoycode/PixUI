@@ -32,8 +32,12 @@ public class SourceGeneratorTests
         """
         namespace PixUI;
 
-        [StylableWidget<ButtonStyle>]
-        public partial class Button {}
+        [StylableWidget<ButtonStyle>, BindableWidget]
+        public partial class Button 
+        {
+            [BindableProperty(defaultValue: "12f", validator: "{0} > 0 && {0} < 100")]
+            public partial BindableProperty<float> FontSize { get; set; }
+        }
         """;
 
 
