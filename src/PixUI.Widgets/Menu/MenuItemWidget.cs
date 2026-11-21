@@ -9,6 +9,7 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
         Depth = depth;
         MenuItem = menuItem;
         _controller = controller;
+        _textStyle = new TextWidgetStyle() { TextColor = _controller.TextColor };
 
         BuildChildren(inPopup);
 
@@ -20,6 +21,7 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
     internal readonly MenuItem MenuItem;
     internal readonly int Depth;
     private readonly MenuController _controller;
+    private readonly TextWidgetStyle _textStyle;
 
     private Icon? _icon;
     private Text? _label; //TODO:考虑实现并使用SimpleText
@@ -40,7 +42,7 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
             _icon.Parent = this;
         }
 
-        _label = new Text(MenuItem.Label!) { TextColor = _controller.TextColor };
+        _label = new Text(MenuItem.Label!) { Style = _textStyle };
         _label.Parent = this;
 
         if (MenuItem.Type == MenuItemType.SubMenu)

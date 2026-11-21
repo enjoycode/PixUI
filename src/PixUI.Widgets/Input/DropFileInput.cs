@@ -18,7 +18,7 @@ public sealed class DropFileInput : SingleChildWidget, IDroppable
                 Children =
                 {
                     new Icon(MaterialIcons.SaveAlt) { Size = 30, Color = color },
-                    new Text("Drop file here") { TextColor = color },
+                    new Text("Drop file here") { Style = { TextColor = color } },
                 }
             }
         };

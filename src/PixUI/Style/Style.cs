@@ -1,6 +1,15 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace PixUI;
+
+public interface IStyle<TSelf> where TSelf : Style, IStyle<TSelf>
+{
+    /// <summary>
+    /// 当前默认样式的静态实例
+    /// </summary>
+    static abstract TSelf? Default { get; set; }
+}
 
 public abstract class Style
 {
@@ -10,7 +19,8 @@ public abstract class Style
     protected static void Relayout(Widget widget) => widget.Relayout();
 }
 
-public abstract class Style<TWidget> : Style, IDisposable where TWidget : Widget
+public abstract class Style<TWidget, TStyle> : Style, IDisposable 
+    where TWidget : Widget where TStyle : Style<TWidget, TStyle>
 {
     private List<TWidget>? _widgets;
     private List<StateChangeListener>? _states;
@@ -35,19 +45,26 @@ public abstract class Style<TWidget> : Style, IDisposable where TWidget : Widget
         _widgets?.Remove(widget);
     }
 
-    // protected void SetProperty<T>(string propName, ref BindableProperty<T> oldValue, BindableProperty<T> newValue, 
-    //     Action<TWidget> action) where T : struct, IEquatable<T>
-    // {
-    //     var changed = !EqualityComparer<T>.Default.Equals(oldValue.Value, newValue.Value);
-    //     RemoveBinding(oldValue.State, propName);
-    //     oldValue = newValue;
-    //     AddBinding(newValue.State, propName, action);
-    //     if (changed)
-    //         OnStyleValueChanged(action);
-    // }
+    protected void SetStyleProperty<T>(ref BindableProperty<T>? local, in T oldValue,
+        in BindableProperty<T> newValue, Action<TWidget> action,
+        [CallerMemberName] string? propName = null)
+    {
+        var changed = EqualityComparer<T>.Default.Equals(oldValue, newValue.Value);
+        if (local is { State: not null } && newValue.State == null)
+        {
+            //已经绑定至状态，直接修改状态值
+            local.Value.State.Value = newValue.Value;
+        }
+        else
+        {
+            RemoveBinding(local?.State, propName!);
+            local = newValue.State is UnbindState<float> ? newValue.Value : newValue;
+            AddBinding(local.Value.State, propName!, action);
+            if (changed) OnStyleValueChanged(action);
+        }
+    }
 
-    protected void AddBinding<T>(State<T>? state, string propertyName, Action<TWidget> action)
-        where T : IEquatable<T>
+    private void AddBinding<T>(State<T>? state, string propertyName, Action<TWidget> action)
     {
         if (state == null) return;
 
@@ -66,8 +83,7 @@ public abstract class Style<TWidget> : Style, IDisposable where TWidget : Widget
         state.AddListener(OnStateChanged);
     }
 
-    protected void RemoveBinding<T>(State<T>? state, string propertyName)
-        where T : IEquatable<T>
+    private void RemoveBinding<T>(State<T>? state, string propertyName)
     {
         if (state == null) return;
         var existed = FindState(state);
@@ -95,7 +111,15 @@ public abstract class Style<TWidget> : Style, IDisposable where TWidget : Widget
         return existed;
     }
 
-    protected void OnStyleValueChanged(Action<TWidget> action)
+    /// <summary>
+    /// 在widget.Style属性变更时比较当前与oldStyle的各个样式值
+    /// </summary>
+    public virtual void OnStyleChanged(TWidget widget, TStyle oldStyle) { }
+
+    /// <summary>
+    /// 样式属性值变更时通知相关Widget进行相应的操作
+    /// </summary>
+    private void OnStyleValueChanged(Action<TWidget> action)
     {
         if (_widgets == null || _widgets.Count == 0) return;
 
@@ -105,6 +129,10 @@ public abstract class Style<TWidget> : Style, IDisposable where TWidget : Widget
         }
     }
 
+    /// <summary>
+    /// 侦听样式属性绑定的状态值变更
+    /// </summary>
+    /// <param name="state"></param>
     private void OnStateChanged(State state)
     {
         if (_states == null || _states.Count == 0) return;
@@ -122,6 +150,7 @@ public abstract class Style<TWidget> : Style, IDisposable where TWidget : Widget
 
     public void Dispose()
     {
+        GC.SuppressFinalize(this);
         _widgets = null;
 
         if (_states == null || _states.Count == 0) return;

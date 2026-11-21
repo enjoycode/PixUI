@@ -59,7 +59,7 @@ public sealed class TreeController<T>
     /// </summary>
     public TreeNode<T>? FirstSelectedNode => _selectedNodes.Count > 0 ? _selectedNodes[0] : null;
 
-    public TreeNode<T>[] SelectedNodes => _selectedNodes.ToArray();
+    public IReadOnlyList<TreeNode<T>> SelectedNodes => _selectedNodes;
 
     public event Action? SelectionChanged;
 

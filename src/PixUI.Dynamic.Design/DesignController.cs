@@ -227,4 +227,10 @@ public sealed class DesignController
     internal void OnSelectionChanged() => SelectionChanged?.Invoke();
 
     #endregion
+
+    #region =====Shared Styles====
+
+    internal static readonly TextWidgetStyle BoldTextStyle = new() { FontWeight = FontWeight.Bold };
+
+    #endregion
 }

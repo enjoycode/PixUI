@@ -4,7 +4,7 @@ public sealed class Icon : Widget
 {
     public Icon(State<IconData> data)
     {
-        _glyph = new IconGlyph(data.Value, Theme.DefaultFontSize);
+        _glyph = new IconGlyph(data.Value, Theme.FontSize);
         Bind(ref _data!, data, OnDataChanged);
     }
 
@@ -33,13 +33,13 @@ public sealed class Icon : Widget
 
     private void OnSizeChanged(State state)
     {
-        _glyph.Font.Size = _size?.Value ?? Theme.DefaultFontSize;
+        _glyph.Font.Size = _size?.Value ?? Theme.FontSize;
         Relayout();
     }
 
     protected override void OnLayout(Size maxSize)
     {
-        var size = _size?.Value ?? Theme.DefaultFontSize; //TODO: measure font size
+        var size = _size?.Value ?? Theme.FontSize; //TODO: measure font size
         SetLayoutSize(Math.Max(0, Math.Min(maxSize.Width, size)),
             Math.Max(0, Math.Min(maxSize.Height, size)));
     }

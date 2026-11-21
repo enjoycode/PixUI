@@ -3,7 +3,7 @@ namespace PixUI;
 /// <summary>
 /// 可与状态绑定的属性，如果没有绑定状态内部直接存储值
 /// </summary>
-public readonly struct BindableProperty<T> where T : IEquatable<T>
+public readonly struct BindableProperty<T>
 {
     public BindableProperty(T value)
     {
@@ -28,7 +28,7 @@ public readonly struct BindableProperty<T> where T : IEquatable<T>
 
     public static implicit operator BindableProperty<T>(State<T> state) => new(state);
 
-    public override string ToString() => Value.ToString() ?? string.Empty;
+    public override string ToString() => Value?.ToString() ?? string.Empty;
 }
 
 public sealed class PropertyValueInvalidException : Exception

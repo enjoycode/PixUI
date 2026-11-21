@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 public sealed class EditableText : TextBase, IMouseRegion, IFocusable
@@ -44,7 +42,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
     /// <summary>
     /// 字体行高
     /// </summary>
-    private float FontHeight => (FontSize?.Value ?? Theme.DefaultFontSize) + 4;
+    private float FontHeight => GetStyle().FontSize.Value + 4;
 
     protected override bool ForceHeight => true;
 
@@ -115,13 +113,13 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
             return;
 
         _changeByTextInput = true;
-        Text.Value = newText;
+        Text = newText;
         _changeByTextInput = false;
         _caretPosition = insertPos + text.Length;
         _selectionStart = _selectionEnd = _caretPosition;
     }
 
-    protected override void OnTextChanged(State state)
+    protected override void OnTextChanged(State? state)
     {
         if (!_changeByTextInput)
             _caretPosition = Text.Value == null! ? 0 : Text.Value.Length;
@@ -212,7 +210,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
     {
         if (_selectionStart == _selectionEnd) return false;
 
-        Text.Value = Text.Value.Remove(_selectionStart, _selectionEnd - _selectionStart);
+        Text = Text.Value.Remove(_selectionStart, _selectionEnd - _selectionStart);
         _caretPosition = _selectionEnd = _selectionStart;
         return true;
     }
@@ -224,7 +222,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         _changeByTextInput = true;
         if (!DeleteSelection() && _caretPosition != 0)
         {
-            Text.Value = Text.Value.Remove(_caretPosition - 1, 1);
+            Text = Text.Value.Remove(_caretPosition - 1, 1);
             _caretPosition--;
         }
 
@@ -350,7 +348,7 @@ public sealed class EditableText : TextBase, IMouseRegion, IFocusable
         var s = CachedParagraph!.GetRectForPosition(_selectionStart, BoxHeightStyle.Tight, BoxWidthStyle.Tight);
         var e = CachedParagraph!.GetRectForPosition(_selectionEnd - 1, BoxHeightStyle.Tight, BoxWidthStyle.Tight);
         var rect = new Rect(s.Rect.Left, 0, e.Rect.Right, H);
-        var paint = PixUI.Paint.Shared(0xFFB3D7FF);
+        var paint = Paint.Shared(0xFFB3D7FF);
         paint.BlendMode = BlendMode.Difference;
         paint.IsAntialias = true;
         canvas.DrawRect(rect, paint);

@@ -73,7 +73,7 @@ public class RouteView : DynamicView //Don't sealed this class
                                 Child = new Card
                                 {
                                     Padding = EdgeInsets.Only(10, 5, 10, 5),
-                                    Child = new Text("403 Forbidden.") { FontSize = 20 }
+                                    Child = new Text("403 Forbidden.") { Style = { FontSize = 20 } }
                                 }
                             };
             ReplaceTo(forbidden);

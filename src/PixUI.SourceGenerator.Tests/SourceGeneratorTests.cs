@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -20,10 +19,10 @@ public class SourceGeneratorTests
         """
         namespace PixUI;
 
-        [StyleObject]
+        [StyleObject<Button>]
         public partial class ButtonStyle
         {
-            [StyleProperty(defaultValue: "12f", validator: "{0} > 0 && {0} < 100", listener: "Relayout")]
+            [BindableProperty(defaultValue: "12f", validator: "{0} > 0 && {0} < 100", listener: "OnFontSizeChanged")]
             public partial BindableProperty<float> FontSize { get; set; }
         }";
         """;

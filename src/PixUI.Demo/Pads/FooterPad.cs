@@ -10,7 +10,7 @@ internal sealed class FooterPad : View
             FillColor = new Color(0xFFCC653A),
             Child = new Center
             {
-                Child = new Text("enjoycode@icloud.com") { TextColor = Colors.White }
+                Child = new Text("enjoycode@icloud.com") { Style = { TextColor = Colors.White } }
             }
         };
     }

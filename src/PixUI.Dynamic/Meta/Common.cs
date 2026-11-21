@@ -26,8 +26,8 @@ partial class DynamicWidgetManager
         properties: new DynamicPropertyMeta[]
         {
             new(nameof(Text.Text), typeof(State<string>), false, true, "Hello World"),
-            new(nameof(Text.FontSize), typeof(State<float>), true),
-            new(nameof(Text.TextColor), typeof(State<Color>), true),
+            // new(nameof(Text.FontSize), typeof(State<float>), true),
+            // new(nameof(Text.TextColor), typeof(State<Color>), true),
         }
     );
 }

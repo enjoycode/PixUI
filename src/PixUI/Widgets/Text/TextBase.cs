@@ -1,47 +1,16 @@
 namespace PixUI;
 
-public abstract class TextBase : Widget
+[BindableWidget, StylableWidget<TextWidgetStyle>]
+public abstract partial class TextBase : Widget
 {
-    private static readonly State<string> EmptyText = new RxProxy<string>(() => string.Empty);
-    private State<string> _text = EmptyText;
-    private State<float>? _fontSize;
-    private State<FontWeight>? _fontWeight;
-    private State<Color>? _textColor;
     private int _maxLines = 1;
 
     protected IParagraph? CachedParagraph { get; private set; }
 
-    public State<string> Text
-    {
-        get => _text;
-        set
-        {
-            Bind(ref _text!, value, OnTextChanged);
-#if DEBUG
-            DebugLabel = _text.Value;
-#endif
-        }
-    }
+    [BindableProperty(defaultValue: "string.Empty", listener: nameof(OnTextChanged))]
+    public partial BindableProperty<string> Text { get; set; }
 
     protected virtual bool ForceHeight { get; } = false;
-
-    public State<float>? FontSize
-    {
-        get => _fontSize;
-        set => Bind(ref _fontSize, value, RelayoutOnStateChanged);
-    }
-
-    public State<FontWeight>? FontWeight
-    {
-        get => _fontWeight;
-        set => Bind(ref _fontWeight, value, RepaintOnStateChanged);
-    }
-
-    public State<Color>? TextColor
-    {
-        get => _textColor;
-        set => Bind(ref _textColor, value, RepaintOnStateChanged);
-    }
 
     public int MaxLines
     {
@@ -61,8 +30,9 @@ public abstract class TextBase : Widget
         }
     }
 
-    protected virtual void OnTextChanged(State state)
+    protected virtual void OnTextChanged(State? state)
     {
+        DebugLabel = Text.Value;
         if (this is EditableText)
             Repaint(state);
         else
@@ -76,34 +46,20 @@ public abstract class TextBase : Widget
         CachedParagraph = null;
     }
 
-    private void RepaintOnStateChanged(State? state)
-    {
-        ClearCachedParagraph();
-        Repaint(state);
-    }
-
-    private void RelayoutOnStateChanged(State? state)
-    {
-        ClearCachedParagraph();
-        Relayout(state);
-    }
-
     protected void BuildParagraph(string text, float width)
     {
         //if (_cachedParagraph != null) return;
         CachedParagraph?.Dispose();
 
-        var color = _textColor?.Value ?? Colors.Black;
+        var color = GetStyle().TextColor.Value;
         CachedParagraph = BuildParagraphInternal(text, width, color);
     }
 
     protected IParagraph BuildParagraphInternal(string text, float width, in Color color)
     {
-        var fontSize = _fontSize?.Value ?? Theme.DefaultFontSize;
-        FontStyle? fontStyle = _fontWeight == null
-            ? null
-            : new FontStyle(_fontWeight.Value, FontSlant.Upright);
-        return TextPainter.BuildParagraph(text, width, fontSize, color, fontStyle, _maxLines, ForceHeight);
+        var style = GetStyle();
+        FontStyle? fontStyle = new FontStyle(style.FontWeight.Value, FontSlant.Upright);
+        return TextPainter.BuildParagraph(text, width, style.FontSize.Value, color, fontStyle, _maxLines, ForceHeight);
     }
 
     protected override void OnLayout(Size maxSize)
@@ -161,5 +117,30 @@ public abstract class TextBase : Widget
     {
         ClearCachedParagraph();
         base.DisposeInternal();
+    }
+}
+
+[StyleObject<TextBase>]
+public sealed partial class TextWidgetStyle : Style<TextBase, TextWidgetStyle>
+{
+    [BindableProperty(defaultValue: "Theme.FontSize", listener: "RelayoutOnStyleChanged")]
+    public partial BindableProperty<float> FontSize { get; set; }
+
+    [BindableProperty(defaultValue: "PixUI.FontWeight.Normal", listener: "RepaintOnStyleChanged")]
+    public partial BindableProperty<FontWeight> FontWeight { get; set; }
+
+    [BindableProperty(defaultValue: "Theme.TextColor", listener: "RepaintOnStyleChanged")]
+    public partial BindableProperty<Color> TextColor { get; set; }
+
+    private static void RelayoutOnStyleChanged(TextBase widget)
+    {
+        widget.ClearCachedParagraph();
+        widget.Relayout();
+    }
+
+    private static void RepaintOnStyleChanged(TextBase widget)
+    {
+        widget.ClearCachedParagraph();
+        widget.Repaint();
     }
 }

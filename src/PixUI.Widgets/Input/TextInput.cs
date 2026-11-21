@@ -11,30 +11,24 @@ public sealed class TextInput : InputBase<EditableText>
     }
 
     [SetsRequiredMembers]
-    public TextInput(State<string> text) : this()
+    public TextInput(BindableProperty<string> text) : this()
     {
         Text = text;
     }
 
-    public required State<string> Text
+    public required BindableProperty<string> Text
     {
         init
         {
             Editor.Text = value;
-            Readonly = value.Readonly;
+            //Readonly = value.Readonly;
         }
     }
 
-    public State<float>? FontSize
+    public TextWidgetStyle Style
     {
-        get => Editor.FontSize;
-        set => Editor.FontSize = value;
-    }
-
-    public State<Color>? TextColor
-    {
-        get => Editor.TextColor;
-        set => Editor.TextColor = value;
+        get => Editor.Style;
+        set => Editor.Style = value;
     }
 
     public Widget? Prefix

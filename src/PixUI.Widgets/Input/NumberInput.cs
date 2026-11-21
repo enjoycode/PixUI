@@ -62,6 +62,6 @@ public sealed class NumberInput<T> : InputBase<EditableText> where T : struct, I
 
     private void OnNullableChanged(State state)
     {
-        Editor.Text.Value = state.ToString() ?? string.Empty;
+        Editor.Text = state.ToString() ?? string.Empty;
     }
 }

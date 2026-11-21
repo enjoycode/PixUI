@@ -10,11 +10,11 @@ public sealed class DatePicker : InputBase<EditableText>
     {
         Padding = new RxValue<EdgeInsets>(EdgeInsets.Only(4, 4, 0, 4));
 
-        Editor = new EditableText { Text = string.Empty /*must assign*/ };
+        Editor = new EditableText { Text = _editorText /*must assign*/ };
         Editor.FocusNode.FocusChanged += OnFocusChanged;
-        Editor.Text.AddListener(OnTextChanged);
+        _editorText.AddListener(OnTextChanged);
 
-        _iconColor = new RxProxy<Color>(() => Editor.TextColor?.Value ?? Colors.Black);
+        _iconColor = new RxProxy<Color>(() => Editor.GetStyle().TextColor.Value);
         SuffixWidget = new Button(icon: MaterialIcons.CalendarMonth)
         {
             Fill = ButtonFill.Transparent,
@@ -22,6 +22,8 @@ public sealed class DatePicker : InputBase<EditableText>
             OnTap = _ => SwitchPopup(),
         };
     }
+
+    private readonly State<string> _editorText = string.Empty;
 
     [SetsRequiredMembers]
     public DatePicker(State<DateTime?> value) : this()
@@ -40,15 +42,15 @@ public sealed class DatePicker : InputBase<EditableText>
         init => Bind(ref _value!, value, OnValueChanged, true);
     }
 
-    public State<Color>? TextColor
-    {
-        get => Editor.TextColor;
-        set
-        {
-            Editor.TextColor = value;
-            _iconColor.NotifyValueChanged();
-        }
-    }
+    // public State<Color>? TextColor
+    // {
+    //     get => Editor.TextColor;
+    //     set
+    //     {
+    //         Editor.TextColor = value;
+    //         _iconColor.NotifyValueChanged();
+    //     }
+    // }
 
     public override State<bool>? Readonly { get; set; }
 
@@ -82,7 +84,7 @@ public sealed class DatePicker : InputBase<EditableText>
         if (!e.IsFocused)
         {
             // restore edit text to DateTime format
-            Editor.Text.Value = _value.Value == null ? string.Empty : _value.Value.Value.ToString(FORMAT);
+            Editor.Text = _value.Value == null ? string.Empty : _value.Value.Value.ToString(FORMAT);
             // maybe lost focus by tap button
             if (!ReferenceEquals(e.NewFocusedWidget, SuffixWidget))
                 HidePopup();
@@ -95,7 +97,7 @@ public sealed class DatePicker : InputBase<EditableText>
 
     private void OnValueChanged(State state)
     {
-        Editor.Text.Value = _value.Value == null ? string.Empty : _value.Value.Value.ToString(FORMAT);
+        Editor.Text = _value.Value == null ? string.Empty : _value.Value.Value.ToString(FORMAT);
     }
 
     private void OnTextChanged(State state)

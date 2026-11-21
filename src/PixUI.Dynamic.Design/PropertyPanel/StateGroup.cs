@@ -18,7 +18,7 @@ internal sealed class StateGroup : View
                     {
                         Children =
                         {
-                            new Text("State") { FontWeight = FontWeight.Bold },
+                            new Text("State") { Style = DesignController.BoldTextStyle},
                             new ButtonGroup
                             {
                                 Children =

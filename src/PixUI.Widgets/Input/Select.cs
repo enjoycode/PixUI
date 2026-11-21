@@ -16,7 +16,7 @@ public abstract class SelectBase<T> : InputBase<Widget>
             ? new EditableText()
             : new SelectText();
 
-        _iconColor = new RxProxy<Color>(() => TextColor?.Value ?? new Color(0xff5f6368));
+        _iconColor = new RxProxy<Color>(() => TextColor.Value);
         SuffixWidget = new ExpandIcon(new FloatTween(0, 0.5f).Animate(_expandAnimation), color: _iconColor);
 
         if (Editor is IMouseRegion mouseRegion)
@@ -61,12 +61,12 @@ public abstract class SelectBase<T> : InputBase<Widget>
         }
     }
 
-    public State<Color>? TextColor
+    public BindableProperty<Color> TextColor
     {
-        get => ((TextBase)Editor).TextColor;
+        get => ((TextBase)Editor).GetStyle().TextColor;
         set
         {
-            ((TextBase)Editor).TextColor = value;
+            ((TextBase)Editor).Style.TextColor = value;
             _iconColor.NotifyValueChanged();
         }
     }
@@ -118,9 +118,9 @@ public abstract class SelectBase<T> : InputBase<Widget>
             {
                 var color = selected.ToComputed(i => i == index ? Colors.White : Colors.Black);
                 return new Text(_labelGetter != null ? _labelGetter(data) : data?.ToString() ?? "")
-                    { TextColor = color };
+                    { Style = { TextColor = color } };
             });
-        _listPopup = new ListPopup<T>(Overlay!, optionBuilder, W + 8, Theme.DefaultFontSize + 8);
+        _listPopup = new ListPopup<T>(Overlay!, optionBuilder, W + 8, Theme.FontSize + 8);
         _listPopup.DataSource = new List<T>(Options);
         _listPopup.AutoFitInWindowWidth = true;
         //初始化选中的
@@ -196,7 +196,7 @@ internal sealed class SelectText : TextBase, IMouseRegion, IFocusable
     {
         BuildParagraph(Text.Value, maxSize.Width);
 
-        var fontHeight = (FontSize?.Value ?? Theme.DefaultFontSize) + 4;
+        var fontHeight = GetStyle().FontSize.Value + 4;
         SetLayoutSize(maxSize.Width, Math.Min(maxSize.Height, fontHeight));
     }
 

@@ -140,7 +140,7 @@ public sealed class FormItem : Widget
 
         var form = Parent as Form;
         var textColor = (TextColor ?? form?.TextColor) ?? Colors.Black;
-        var fontSize = (FontSize ?? form?.FontSize) ?? Theme.DefaultFontSize;
+        var fontSize = (FontSize ?? form?.FontSize) ?? Theme.FontSize;
         _cachedLabelParagraph = TextPainter.BuildParagraph(Label, float.PositiveInfinity, fontSize, textColor);
     }
 

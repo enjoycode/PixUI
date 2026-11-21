@@ -73,7 +73,7 @@ internal sealed class PopupMenu : Widget
 
         if (maxWidthChild!.MenuItem.Type != MenuItemType.SubMenu)
         {
-            maxChildWidth += Theme.DefaultFontSize;
+            maxChildWidth += Theme.FontSize;
         }
 
         //重设所有子项等宽

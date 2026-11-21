@@ -71,8 +71,8 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         set
         {
             _textColor = value ?? (Fill == ButtonFill.Solid ? Colors.White : Colors.Black);
-            if (_textWidget != null) _textWidget.TextColor = _textColor;
-            if (_iconWidget != null) _iconWidget.Color = _textColor;
+            _textWidget?.Style.TextColor = _textColor;
+            _iconWidget?.Color = _textColor;
         }
     }
 
@@ -88,7 +88,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         set
         {
             _fontSize = value;
-            if (_textWidget != null) _textWidget.FontSize = value;
+            if (_textWidget != null) _textWidget.Style.FontSize = value;
             if (_iconWidget != null) _iconWidget.Size = value;
         }
     }
@@ -199,7 +199,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
 
         if (Text != null && _textWidget == null)
         {
-            _textWidget = new Text(Text) { TextColor = _textColor, FontSize = _fontSize };
+            _textWidget = new Text(Text) { Style = { TextColor = _textColor, FontSize = _fontSize } };
             _textWidget.Parent = this;
         }
 

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using PixUI.Platform;
 
 namespace PixUI.Demo;
 
@@ -52,9 +50,9 @@ public sealed class DemoPage : View
                 {
                     Children =
                     {
-                        new Text(_firstName) { FontSize = 20, TextColor = Colors.Red },
-                        new Text(_lastName) { FontSize = 20, TextColor = Colors.Red },
-                        new Text(_fullName) { FontSize = 50, TextColor = Colors.Red },
+                        new Text(_firstName) { Style = { FontSize = 20, TextColor = Colors.Red } },
+                        new Text(_lastName) { Style = { FontSize = 20, TextColor = Colors.Red } },
+                        new Text(_fullName) { Style = { FontSize = 50, TextColor = Colors.Red } },
                         new Row(VerticalAlignment.Middle, 5)
                         {
                             Children =
@@ -180,7 +178,7 @@ public sealed class DemoPage : View
     private Widget BuildPopupItem(Person person, int index, State<int> isSelected)
     {
         var color = isSelected.ToComputed(i => i == index ? Colors.White : Colors.Black);
-        return new Text(person.Name) { TextColor = color };
+        return new Text(person.Name) { Style = { TextColor = color } };
     }
 
     protected override void OnMounted()

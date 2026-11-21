@@ -42,6 +42,8 @@ public abstract class State : IDisposable
         }
     }
 
+    public static State<TValue> Unbind<TValue>(TValue value) => new UnbindState<TValue>(value);
+
     public virtual void Dispose() => _bindings?.Clear();
 }
 
@@ -85,6 +87,30 @@ public abstract class State<T> : State
             return new RxValue<T>(value);
         }
 #endif
+}
+
+/// <summary>
+/// 专门用于BindableProperty解除绑定的状态
+/// </summary>
+/// <typeparam name="T"></typeparam>
+internal sealed class UnbindState<T> : State<T>
+{
+    public UnbindState(T value)
+    {
+        _value = value;
+    }
+
+    private readonly T _value;
+
+    public override bool Readonly => true;
+
+    public override object? BoxedValue => Value;
+
+    public override T Value
+    {
+        get => _value;
+        set => throw new InvalidOperationException("UnbindState cannot change the value.");
+    }
 }
 
 public static class StateExtensions

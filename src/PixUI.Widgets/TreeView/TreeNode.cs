@@ -48,7 +48,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         {
             _row.Label = value;
             if (_row.Label is Text text)
-                text.TextColor = _color;
+                text.Style.TextColor = _color;
         }
     }
 

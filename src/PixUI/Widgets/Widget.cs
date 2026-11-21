@@ -231,30 +231,6 @@ public abstract partial class Widget : IDisposable
 
     #endregion
 
-    #region ====Bind State====
-
-    /// <summary>
-    /// 绑定状态,在状态变更时执行相应的操作
-    /// </summary>
-    /// <param name="state">状态变量引用</param>
-    /// <param name="newState">新的状态</param>
-    /// <param name="action">状态变更时的操作</param>
-    /// <param name="forceAction">是否强制执行一次变更操作，否则只有已挂载时执行</param>
-    protected void Bind<T>(ref T? state, T? newState, Action<State> action, bool forceAction = false)
-        where T : State
-    {
-        if (ReferenceEquals(state, newState)) return;
-
-        state?.RemoveListener(action);
-        state = newState;
-        state?.AddListener(action);
-
-        //暂强制调用一次变更
-        if (forceAction || IsMounted) action(state ?? State.Empty);
-    }
-
-    #endregion
-
     #region ====Layout Methods====
 
     /// <summary>
@@ -397,13 +373,59 @@ public abstract partial class Widget : IDisposable
 
     #endregion
 
-    #region ====Paint====
-
-    protected TStyle GetStyle<TStyle>() where TStyle : Style, new()
+    #region ====Style Methods====
+    
+    /// <summary>
+    /// 获取本地样式属性，如无则创建实例
+    /// </summary>
+    protected static TStyle GetLocalStyleProperty<TWidget, TStyle>(TWidget widget, ref TStyle? local)
+        where TWidget : Widget where TStyle : Style<TWidget, TStyle>, new()
     {
-        //TODO: 沿树向上查找样式表(StyleSheet)，都没有返回主题默认
-        return Theme.GetStyle<TStyle>();
+        if (local != null) return local;
+
+        local = new TStyle();
+        local.AddWidget(widget);
+        return local;
     }
+
+    /// <summary>
+    /// 设置本地样式属性
+    /// </summary>
+    /// <param name="widget"></param>
+    /// <param name="local"></param>
+    /// <param name="oldStyle"></param>
+    /// <param name="newStyle">如果等于主题默认，则设本地实例为NULL</param>
+    /// <typeparam name="TWidget"></typeparam>
+    /// <typeparam name="TStyle"></typeparam>
+    protected static void SetLocalStyleProperty<TWidget, TStyle>(TWidget widget, ref TStyle? local,
+        in TStyle oldStyle, in TStyle newStyle)
+        where TWidget : Widget where TStyle : Style<TWidget, TStyle>
+    {
+        if (ReferenceEquals(local, newStyle)) return;
+
+        local?.RemoveWidget(widget);
+        if (!newStyle.IsDefault)
+        {
+            local = newStyle;
+            local.AddWidget(widget);
+            local.OnStyleChanged(widget, oldStyle);
+        }
+        else
+        {
+            local = null;
+            newStyle.OnStyleChanged(widget, oldStyle);
+        }
+    }
+
+    protected TStyle GetStyle<TStyle>() where TStyle : Style, IStyle<TStyle>, new()
+    {
+        //TODO: 暂简单实现，沿树向上查找样式表(StyleSheet)，都没有返回主题默认
+        return Theme.GetDefaultStyle<TStyle>();
+    }
+
+    #endregion
+
+    #region ====Paint====
 
     /// <summary>
     /// 开始绘制前转换画布坐标为本地坐标，并且根所需要转换矩阵或裁剪绘制区域
@@ -465,7 +487,45 @@ public abstract partial class Widget : IDisposable
 
     #endregion
 
-    #region ====StateChange & Invalidate====
+    #region ====State & Invalidate====
+    
+    protected static void SetBindableProperty<T>(ref BindableProperty<T> property, in BindableProperty<T> newValue,
+        Action<State?> action) where T : IEquatable<T>
+    {
+        if (property.State != null && newValue.State == null)
+        {
+            //已经绑定且新值非状态,直接修改当前绑定状态的值
+            property.State.Value = newValue.Value;
+        }
+        else
+        {
+            var changed = EqualityComparer<T>.Default.Equals(property.Value, newValue.Value);
+            property.State?.RemoveListener(action);
+            property = newValue.State is UnbindState<T> ? newValue.Value : newValue;
+            property.State?.AddListener(action);
+            if (changed) action(property.State);
+        }
+    }
+    
+    /// <summary>
+    /// 绑定状态,在状态变更时执行相应的操作
+    /// </summary>
+    /// <param name="state">状态变量引用</param>
+    /// <param name="newState">新的状态</param>
+    /// <param name="action">状态变更时的操作</param>
+    /// <param name="forceAction">是否强制执行一次变更操作，否则只有已挂载时执行</param>
+    protected void Bind<T>(ref T? state, T? newState, Action<State> action, bool forceAction = false)
+        where T : State
+    {
+        if (ReferenceEquals(state, newState)) return;
+
+        state?.RemoveListener(action);
+        state = newState;
+        state?.AddListener(action);
+
+        //暂强制调用一次变更
+        if (forceAction || IsMounted) action(state ?? State.Empty);
+    }
 
     /// <summary>
     /// 重新绘制

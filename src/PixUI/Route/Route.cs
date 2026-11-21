@@ -78,7 +78,7 @@ internal sealed class NotFoundRoute : RouteBase
             Child = new Card
             {
                 Padding = EdgeInsets.Only(10, 5, 10, 5),
-                Child = new Text("404 Not Found.") { FontSize = 20 }
+                Child = new Text("404 Not Found.") { Style = { FontSize = 20 } }
             }
         });
     }

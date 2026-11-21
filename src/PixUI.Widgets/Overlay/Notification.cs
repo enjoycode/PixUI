@@ -137,7 +137,7 @@ public sealed class Notification : Popup
     private static void Show(IconData icon, string text, State<Color> textColor, State<Color> bgColor)
     {
         var iconWidget = new Icon(icon) { Size = 18, Color = textColor };
-        var textWidget = new Text(text) { TextColor = textColor, MaxLines = 5 };
+        var textWidget = new Text(text) { Style = { TextColor = textColor }, MaxLines = 5 };
 
         var win = UIWindow.Current;
         var exists = win.Overlay.FindEntry(e => e is Notification);
