@@ -11,13 +11,22 @@ public sealed class ExpandIcon : SingleChildWidget, IMouseRegion
         set => MouseRegion.PointerDown += value;
     }
 
-    public ExpandIcon(Animation<float> turns, State<float>? size = null, State<Color>? color = null)
+    public ExpandIcon(Animation<float> turns, BindableProperty<float>? size = null,
+        BindableProperty<Color>? color = null)
     {
         MouseRegion = new MouseRegion();
 
+        var iconStyle = Theme.GetDefaultStyle<IconStyle>();
+        if (size != null || color != null)
+        {
+            iconStyle = new IconStyle();
+            if (size != null) iconStyle.Size = size.Value;
+            if (color != null) iconStyle.Color = color.Value;
+        }
+
         Child = new RotationTransition(turns)
         {
-            Child = new Icon(MaterialIcons.ExpandMore) { Size = size, Color = color }
+            Child = new Icon(MaterialIcons.ExpandMore) { Style = iconStyle }
         };
     }
 }

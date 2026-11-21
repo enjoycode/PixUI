@@ -72,7 +72,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         {
             _textColor = value ?? (Fill == ButtonFill.Solid ? Colors.White : Colors.Black);
             _textWidget?.Style.TextColor = _textColor;
-            _iconWidget?.Color = _textColor;
+            _iconWidget?.Style.Color = _textColor;
         }
     }
 
@@ -88,8 +88,9 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
         set
         {
             _fontSize = value;
-            if (_textWidget != null) _textWidget.Style.FontSize = value;
-            if (_iconWidget != null) _iconWidget.Size = value;
+            _textWidget?.Style.FontSize =
+                value ?? State.Unbind(Theme.GetDefaultStyle<TextWidgetStyle>().FontSize.Value);
+            _iconWidget?.Style.Size = value ?? State.Unbind(Theme.GetDefaultStyle<IconStyle>().Size.Value);
         }
     }
 
@@ -199,13 +200,26 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
 
         if (Text != null && _textWidget == null)
         {
-            _textWidget = new Text(Text) { Style = { TextColor = _textColor, FontSize = _fontSize } };
+            _textWidget = new Text(Text)
+            {
+                Style =
+                {
+                    TextColor = _textColor, FontSize =
+                        _fontSize ?? State.Unbind(Theme.GetDefaultStyle<TextWidgetStyle>().FontSize.Value)
+                }
+            };
             _textWidget.Parent = this;
         }
 
         if (Icon != null && _iconWidget == null)
         {
-            _iconWidget = new Icon(Icon) { Color = _textColor, Size = _fontSize };
+            _iconWidget = new Icon(Icon)
+            {
+                Style =
+                {
+                    Color = _textColor, Size = _fontSize ?? State.Unbind(Theme.GetDefaultStyle<IconStyle>().Size.Value)
+                }
+            };
             _iconWidget.Parent = this;
         }
     }
@@ -269,7 +283,7 @@ public sealed class Button : Widget, IMouseRegion, IFocusable
 
     private void PaintMask(ICanvas canvas, Color color)
     {
-        var paint = PixUI.Paint.Shared(color);
+        var paint = Paint.Shared(color);
         paint.IsAntialias = Shape != ButtonShape.Square;
 
         var x = 0f;

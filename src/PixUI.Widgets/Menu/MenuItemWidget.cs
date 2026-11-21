@@ -1,5 +1,3 @@
-using System;
-
 namespace PixUI;
 
 internal sealed class MenuItemWidget : Widget, IMouseRegion
@@ -9,7 +7,6 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
         Depth = depth;
         MenuItem = menuItem;
         _controller = controller;
-        _textStyle = new TextWidgetStyle() { TextColor = _controller.TextColor };
 
         BuildChildren(inPopup);
 
@@ -21,7 +18,6 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
     internal readonly MenuItem MenuItem;
     internal readonly int Depth;
     private readonly MenuController _controller;
-    private readonly TextWidgetStyle _textStyle;
 
     private Icon? _icon;
     private Text? _label; //TODO:考虑实现并使用SimpleText
@@ -38,17 +34,17 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
 
         if (MenuItem.Icon != null)
         {
-            _icon = new Icon(MenuItem.Icon) { Color = _controller.TextColor };
+            _icon = new Icon(MenuItem.Icon.Value) { Style = _controller.IconStyle };
             _icon.Parent = this;
         }
 
-        _label = new Text(MenuItem.Label!) { Style = _textStyle };
+        _label = new Text(MenuItem.Label ?? string.Empty) { Style = _controller.TextStyle };
         _label.Parent = this;
 
         if (MenuItem.Type == MenuItemType.SubMenu)
         {
             _expander = new Icon(inPopup ? MaterialIcons.ChevronRight : MaterialIcons.ExpandMore)
-                { Color = _controller.TextColor };
+                { Style = _controller.IconStyle };
             _expander.Parent = this;
         }
     }
@@ -141,7 +137,7 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
     {
         if (MenuItem.Type == MenuItemType.Divider)
         {
-            var paint = PixUI.Paint.Shared(Colors.Gray, PaintStyle.Stroke, 2);
+            var paint = Paint.Shared(Colors.Gray, PaintStyle.Stroke, 2);
             var midY = H / 2;
             canvas.DrawLine(_controller.ItemPadding.Left, midY, W - _controller.ItemPadding.Horizontal, midY, paint);
             return;
@@ -149,7 +145,7 @@ internal sealed class MenuItemWidget : Widget, IMouseRegion
 
         if (_isHover)
         {
-            var paint = PixUI.Paint.Shared(_controller.HoverColor, PaintStyle.Fill);
+            var paint = Paint.Shared(_controller.HoverColor, PaintStyle.Fill);
             canvas.DrawRect(Rect.FromLTWH(0, 0, W, H), paint);
         }
 

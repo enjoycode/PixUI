@@ -8,11 +8,13 @@ public struct IconGlyph : IDisposable
         GlyphId = Font.GetGlyph(data.CodePoint);
     }
 
-    public IFont Font { get; private set; }
+    public IFont? Font { get; private set; }
     public ushort GlyphId { get; internal set; }
 
     public readonly void Paint(ICanvas canvas, Color textColor, float offsetX = 0, float offsetY = 0)
     {
+        if (Font == null) return;
+        
         var paint = PixUI.Paint.Shared(textColor);
         canvas.DrawGlyph(GlyphId, offsetX, Font.Size + offsetY, 0, 0, Font, paint);
     }

@@ -2,7 +2,8 @@ namespace PixUI;
 
 internal sealed class MenuController
 {
-    internal readonly State<Color> TextColor = Colors.Black;
+    internal TextWidgetStyle TextStyle { get; set; } = new();
+    internal IconStyle IconStyle { get; set; } = new();
 
     public EdgeInsets ItemPadding { get; } = EdgeInsets.Only(8, 5, 8, 5);
 
@@ -12,13 +13,15 @@ internal sealed class MenuController
 
     public Color Color
     {
-        set => TextColor.Value = value;
+        set
+        {
+            TextStyle.TextColor = value;
+            IconStyle.Color = value;
+        }
     }
 
     public Color HoverColor { get; set; } = Theme.AccentColor;
-
-    public Color HoverTextColor { get; set; } = Colors.White;
-
+    
     private PopupMenuStack? _popupMenuStack;
 
     internal void OnMenuItemHoverChanged(MenuItemWidget item, bool hover)

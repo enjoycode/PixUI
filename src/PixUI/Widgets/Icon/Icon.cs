@@ -1,52 +1,49 @@
 namespace PixUI;
 
-public sealed class Icon : Widget
+/// <summary>
+/// 字体图标组件
+/// </summary>
+[StylableWidget<IconStyle>, BindableWidget]
+public sealed partial class Icon : Widget
 {
-    public Icon(State<IconData> data)
+    public Icon() { }
+
+    public Icon(BindableProperty<IconData> data)
     {
-        _glyph = new IconGlyph(data.Value, Theme.FontSize);
-        Bind(ref _data!, data, OnDataChanged);
+        Data = data.Value;
     }
 
-    private readonly State<IconData> _data;
     private IconGlyph _glyph;
-    private State<float>? _size;
-    private State<Color>? _color;
 
-    public State<float>? Size
-    {
-        get => _size;
-        set => Bind(ref _size, value, OnSizeChanged, true);
-    }
+    [BindableProperty(listener: "OnDataChanged")]
+    public partial BindableProperty<IconData> Data { get; set; }
 
-    public State<Color>? Color
+    private void OnDataChanged(State? state)
     {
-        get => _color;
-        set => Bind(ref _color, value, Repaint);
-    }
-
-    private void OnDataChanged(State state)
-    {
-        _glyph.GlyphId = _glyph.Font.GetGlyph(_data.Value.CodePoint);
+        if (_glyph.Font == null)
+            _glyph = new IconGlyph(Data.Value, GetStyle().Size.Value);
+        else
+            _glyph.GlyphId = _glyph.Font.GetGlyph(Data.Value.CodePoint);
         Repaint();
     }
 
-    private void OnSizeChanged(State state)
+    internal void OnSizeChanged()
     {
-        _glyph.Font.Size = _size?.Value ?? Theme.FontSize;
+        if (_glyph.Font == null) return;
+        _glyph.Font.Size = GetStyle().Size.Value;
         Relayout();
     }
 
     protected override void OnLayout(Size maxSize)
     {
-        var size = _size?.Value ?? Theme.FontSize; //TODO: measure font size
+        var size = GetStyle().Size.Value; //TODO: measure font size
         SetLayoutSize(Math.Max(0, Math.Min(maxSize.Width, size)),
             Math.Max(0, Math.Min(maxSize.Height, size)));
     }
 
     public override void OnPaint(ICanvas canvas, IDirtyArea? area = null)
     {
-        var color = _color?.Value ?? new Color(0xff5f6368);
+        var color = GetStyle().Color.Value;
         _glyph.Paint(canvas, color);
     }
 
@@ -55,4 +52,16 @@ public sealed class Icon : Widget
         _glyph.Dispose();
         base.DisposeInternal();
     }
+}
+
+[StyleObject<Icon>]
+public sealed partial class IconStyle : Style<Icon, IconStyle>
+{
+    [BindableProperty(defaultValue: "Theme.FontSize", listener: "OnSizeChanged")]
+    public partial BindableProperty<float> Size { get; set; }
+
+    [BindableProperty(defaultValue: "new PixUI.Color(0xFF5F6368)")]
+    public partial BindableProperty<Color> Color { get; set; }
+
+    private static void OnSizeChanged(Icon icon) => icon.OnSizeChanged();
 }

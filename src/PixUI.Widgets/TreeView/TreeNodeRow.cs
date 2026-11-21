@@ -35,13 +35,13 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         }
     }
 
-    internal Icon Icon
+    internal Icon? Icon
     {
-        get => _icon!;
+        get => _icon;
         set
         {
             _icon = value;
-            _icon.Parent = this;
+            _icon?.Parent = this;
         }
     }
 
@@ -51,7 +51,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         set
         {
             _label = value;
-            if (_label != null) _label.Parent = this;
+            _label?.Parent = this;
         }
     }
 
@@ -120,7 +120,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         using var recorder = PictureRecorder.Create();
         using var canvas = recorder.BeginRecording(rect);
         canvas.Scale(scale, scale);
-        var paint = PixUI.Paint.Shared(Colors.Gray.WithAlpha(128));
+        var paint = Paint.Shared(Colors.Gray.WithAlpha(128));
         canvas.DrawRect(rect, paint);
         var iconWidth = 0f;
         if (_icon != null)
@@ -157,18 +157,18 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
         using var recorder = PictureRecorder.Create();
         using var canvas = recorder.BeginRecording(rect);
         canvas.Scale(scale, scale);
-        var paint = PixUI.Paint.Shared(Colors.Gray, PaintStyle.Stroke, 2);
+        var paint = Paint.Shared(Colors.Gray, PaintStyle.Stroke, 2);
         canvas.DrawRect(Rect.FromLTWH(1 + scrollX, 1, width - scrollX - 2, height - 2), paint);
 
         const float indent = 4f;
         if (position == DropPosition.Upper)
         {
-            paint = PixUI.Paint.Shared(Theme.FocusedColor);
+            paint = Paint.Shared(Theme.FocusedColor);
             canvas.DrawRect(Rect.FromLTWH(1 + scrollX, 1, width - scrollX - 2, indent), paint);
         }
         else if (position == DropPosition.Under)
         {
-            paint = PixUI.Paint.Shared(Theme.FocusedColor);
+            paint = Paint.Shared(Theme.FocusedColor);
             canvas.DrawRect(Rect.FromLTWH(1 + scrollX, height - indent - 1, width - scrollX - 2, indent), paint);
         }
 
@@ -284,7 +284,7 @@ internal sealed class TreeNodeRow<T> : Widget, IDraggable, IDroppable
     {
         if (_isHover)
         {
-            var paint = PixUI.Paint.Shared(Controller.HoverColor);
+            var paint = Paint.Shared(Controller.HoverColor);
             canvas.DrawRect(GetRowRect(), paint);
         }
 

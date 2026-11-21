@@ -490,7 +490,7 @@ public abstract partial class Widget : IDisposable
     #region ====State & Invalidate====
     
     protected static void SetBindableProperty<T>(ref BindableProperty<T> property, in BindableProperty<T> newValue,
-        Action<State?> action) where T : IEquatable<T>
+        Action<State?> action)
     {
         if (property.State != null && newValue.State == null)
         {
@@ -499,7 +499,7 @@ public abstract partial class Widget : IDisposable
         }
         else
         {
-            var changed = EqualityComparer<T>.Default.Equals(property.Value, newValue.Value);
+            var changed = !EqualityComparer<T>.Default.Equals(property.Value, newValue.Value);
             property.State?.RemoveListener(action);
             property = newValue.State is UnbindState<T> ? newValue.Value : newValue;
             property.State?.AddListener(action);

@@ -10,14 +10,14 @@ public sealed class DropFileInput : SingleChildWidget, IDroppable
         Height = 60;
         MouseRegion = new MouseRegion(opaque: true);
 
-        State<Color> color = Colors.Gray;
+        var color = Colors.Gray;
         Child = new Center
         {
             Child = new Column
             {
                 Children =
                 {
-                    new Icon(MaterialIcons.SaveAlt) { Size = 30, Color = color },
+                    new Icon(MaterialIcons.SaveAlt) { Style = { Size = 30, Color = color } },
                     new Text("Drop file here") { Style = { TextColor = color } },
                 }
             }

@@ -13,7 +13,7 @@ public sealed class ColorEditor : ValueEditorBase
         var colorState = state.ToNoneNullable(Color.Empty);
         Child = new TextInput(_text)
         {
-            Suffix = new Icon(MaterialIcons.Square) { Color = colorState },
+            Suffix = new Icon(MaterialIcons.Square) { Style = { Color = colorState } },
             OnCommitChanges = OnCommitChanges,
         };
     }

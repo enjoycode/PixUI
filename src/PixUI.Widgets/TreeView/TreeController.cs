@@ -36,6 +36,15 @@ public sealed class TreeController<T>
         TreeView = treeView;
     }
 
+    #region ----Shared Node Styles----
+
+    internal readonly TextWidgetStyle SelectedTextStyle = new() { TextColor = Theme.FocusedColor};
+    internal readonly TextWidgetStyle NormalTextStyle = new() { TextColor = Colors.Black}; //TODO: fix color
+    internal readonly IconStyle SelectedIconStyle = new() { Color = Theme.FocusedColor };
+    internal readonly IconStyle NormalIconStyle = new() { Color = Colors.Black }; //TODO: fix color
+
+    #endregion
+
     #region ----DragDrop----
 
     public bool AllowDrag { get; set; }

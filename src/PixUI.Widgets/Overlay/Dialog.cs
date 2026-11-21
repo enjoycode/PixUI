@@ -94,7 +94,7 @@ public abstract class Dialog : Popup
                 {
                     Children =
                     [
-                        new Icon(MaterialIcons.Help) { Size = 25, Color = Colors.Red },
+                        new Icon(MaterialIcons.Help) { Style = { Size = 25, Color = Colors.Red } },
                         new Text(message) { Style = { TextColor = Colors.Red } }
                     ]
                 }

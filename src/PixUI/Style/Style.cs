@@ -49,7 +49,7 @@ public abstract class Style<TWidget, TStyle> : Style, IDisposable
         in BindableProperty<T> newValue, Action<TWidget> action,
         [CallerMemberName] string? propName = null)
     {
-        var changed = EqualityComparer<T>.Default.Equals(oldValue, newValue.Value);
+        var changed = !EqualityComparer<T>.Default.Equals(oldValue, newValue.Value);
         if (local is { State: not null } && newValue.State == null)
         {
             //已经绑定至状态，直接修改状态值

@@ -14,7 +14,7 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         _row = new TreeNodeRow<T>();
         _row.Parent = this;
 
-        _color = IsSelected.ToComputed(s => s ? Theme.FocusedColor : Colors.Black); //TODO: fix color
+        IsSelected.AddListener(OnIsSelectedChanged);
     }
 
     #region ====Fields & Properties====
@@ -25,7 +25,6 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
 
     private readonly TreeNodeRow<T> _row;
     public readonly State<bool> IsSelected = false;
-    private readonly State<Color> _color; //for icon and label
     private State<bool?>? _checkState;
 
     private AnimationController? _expandController; //TODO:考虑提升至TreeController共用实例
@@ -37,18 +36,18 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
         set
         {
             _row.Icon = value;
-            _row.Icon.Color ??= _color;
+            if (!_row.Icon.IsLocalStyle)
+                _row.Icon.Style = Controller.NormalIconStyle;
         }
     }
 
     public Widget Label
     {
-        get => _row.Label!;
         set
         {
             _row.Label = value;
             if (_row.Label is Text text)
-                text.Style.TextColor = _color;
+                text.Style = Controller.NormalTextStyle;
         }
     }
 
@@ -85,6 +84,14 @@ public sealed class TreeNode<T> : Widget, IDataTransferItem
     public int Index => ParentNode?.IndexOf(this) ?? Controller.Nodes.IndexOf(this);
 
     #endregion
+
+    private void OnIsSelectedChanged(State state)
+    {
+        if (_row.Icon is { IsLocalStyle: true })
+            _row.Icon.Style = IsSelected.Value ? Controller.SelectedIconStyle : Controller.NormalIconStyle;
+        if (_row.Label is Text text)
+            text.Style = IsSelected.Value ? Controller.SelectedTextStyle : Controller.NormalTextStyle;
+    }
 
     #region ====Expand & Collapse=====
 
